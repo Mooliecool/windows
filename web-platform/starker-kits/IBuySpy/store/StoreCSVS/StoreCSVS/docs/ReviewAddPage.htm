@@ -1,0 +1,128 @@
+<HTML>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <h1>
+            ReviewAdd.aspx
+        </h1>
+        <p>
+            <strong>Page Description: &nbsp;</strong>The ReviewAdd page enables customers 
+            to enter their own review of a product.
+        </p>
+        <p>
+            <strong>Implementation Notes:</strong> &nbsp;This page appears when a user 
+            clicks the "Review this Product" image link on a product detail page ( <A href="ProductDetails_aspx.htm">
+                ProductsDetails.aspx </A>). The link is not actually part of the product 
+            detail page. Instead, it is part of the ReviewList user control ( <A href="_ReviewList_ascx.htm">
+                _ReviewList.ascx </A>
+        ) that is incorporated into the page.
+        <p>
+            When users click the "Review this Product" link, the user control calls the 
+            ReviewAdd.aspx page.&nbsp; The ID of the product to review is passed to this 
+            page in the query string. For example, if the user wants to add a review of the 
+            "Mighty, Mighty Pen," the URL to display this page would be 
+            ReviewAdd.aspx?productID= 371).
+        </p>
+        <p>
+        The page logic is encapsulated in two event handlers, the Page_Load event 
+        handler and an event handler for the Click event of an ImageButton control.
+        <p>
+        <p>
+            <strong>Page_Load Event Handler:</strong>&nbsp;The Page_Load event handler 
+            obtains the specified ProductID parameter using the&nbsp;<strong>Params</strong>&nbsp;collection 
+            of the page's&nbsp;<strong>Request</strong>&nbsp;object.&nbsp; The Params 
+            collection contains all query string, form field, cookie, and server variables 
+            sent from a client during an HTTP request. This the typical API through which 
+            page developers access arguments when doing page to page navigation transfers.
+        </p>
+        <p>
+            After converting the ProductID into an Integer, the Page_Load event handler 
+            creates an instance of the ProductDB class and calls its GetProductDetails 
+            method, passing it the product ID. This method internally uses the <A href="ProductDetail.htm">
+                ProductDetail</A> stored procedure to fetch the ModelName field of the 
+            product.
+        </p>
+        <p>
+            The code in the Page_Load event handler is wrapped in a conditional code block 
+            that only executes if&nbsp;<strong>Page.IsPostBack</strong> &nbsp; is false. 
+            This check determines whether the page is being accessed for the first time or 
+            whether it is being displayed because the user clicked the Submit button (which 
+            causes the page to <em>"post back" </em>to the server). The Page.IsPostBack 
+            property provides us with an easy way to ensure the page only fetches product 
+            information the first time the page is being displayed.
+        </p>
+        <p>
+            <strong>ReviewAddBtn_Click Event Handler: &nbsp;</strong>The ReviewAddBtn_Click 
+            event handler&nbsp;is raised&nbsp;only when a user clicks the submit image 
+            button on the page. This handler illustrates an important feature of ASP.NET 
+            pages and server controls: although the click actually occurs in the browser, 
+            the handler runs on the server, after the page has been posted back.
+        </p>
+        <p>
+            All the logic required to transmit the Click event information from the browser 
+            to the server, and there to find and execute the correct method, is all built 
+            into the page and control framework. No client-side script, ActiveX controls, 
+            Java applets, or any other special processing is required to make this happen. 
+            It works with all browsers, including Internet Explorer, Netscape, and Opera.
+        </p>
+        <p>
+            The ReviewAddBtn_Click event handler calls the AddReview method of the 
+            ReviewsDB class, which in turn calls the <A href="ReviewsAdd.htm">ReviewsAdd</A>
+            stored procedure to save the user's review in the IBuySpy database. All values 
+            are HTML encoded before the method is called. This provides protection against 
+            a common hacker technique, which is to embed image and anchor links within 
+            posted text values that, when later rendered on a page, end up displaying 
+            remote images (with pass through links) on the page.
+        </p>
+        <p>
+            <a name="validate"></a><strong>Validating User Input: &nbsp;</strong>The page 
+            requires that users enter a name and email address. If you look at the source 
+            for the ReviewAdd page, you'll see that there is no input validation code. 
+            Instead, we use the built-in ASP.NET validation controls, which enable you to 
+            declaratively specify validation constraints on any input control.
+        </p>
+        <p>
+            ASP.NET comes with built-in validation controls to handle almost any validation 
+            requirement: the RequiredField, CompareValidator, RegularExpressionValidator, 
+            RangeValidator, and CustomValidator controls. The validation control 
+            architecture is extensible, so that other situation-specific controls (ZIP code 
+            validators, country code validators, etc) can also be developed by third 
+            parties.
+        </p>
+        <p>
+            You can put a validation control anywhere on a page and declaratively link it 
+            to a target input control using the validator's ControlToValidate property. You 
+            can optionally specify a Text property that displays in place of the validation 
+            control if the input data fails the validation test. If necessary, you can use 
+            multiple validators to "chain" validation logic for a single control (for 
+            example, a field is required and must meet a specified pattern).
+        </p>
+        <p>
+            If the page is displayed in a browser that supports EcmaScript 1.2 and the 
+            Dynamic HTML (DHTML) 4.0, the validation controls can perform client-side 
+            validation, which provides immediate feedback to the user.&nbsp; The validators 
+            also perform their check in server code, so if the browser does not support 
+            DHMTL, or if client-side scripting is disabled, the validation check is still 
+            performed. No code changes are required to enable either scenario -- all logic 
+            required to handle the checks on both basic and DHTML-compatible browsers is 
+            built into the controls themselves.
+        </p>
+        <p>
+            If you are using validation controls, your server code&nbsp;can determine 
+            whether the user's input passed the check by testing the IsValid property of 
+            the validation control. Additionally, you can check the page's IsValid 
+            property; this property is an aggregate of the IsValid properties of all the 
+            validators on the page. If any one validation has detected a failure, the 
+            page's IsValid property is set to false.
+        </p>
+        <p>
+            That's how the ReviewAdd page works. Only if all controls on the page are valid 
+            will we go ahead and add the product review. If one of the input fields is 
+            invalid, then the page will simply be redisplayed again, with the validation 
+            controls automatically taking care of displaying the appropriate error message 
+            to the user.
+        </p>
+    </body>
+</HTML>

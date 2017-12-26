@@ -1,0 +1,61 @@
+<html>
+<head><title>ASP.NET Forums Installation</title>
+<HTA:APPLICATION ID="oMe"
+    APPLICATIONNAME="AspNetForumsInstallation"
+    MAXIMIZEBUTTON="no"
+    SINGLEINSTANCE="yes">
+<script language="vbscript">
+Option Explicit
+Private oFS         'FileSystemObject
+Private oShell      'command shell object
+Private sFullPath   'install path
+
+Public Function RunConfig()
+    Dim sCmd
+
+    sCmd = BuildCmdLine(oFS.BuildPath(sFullPath, "aspnetforumssetup.exe"), _
+            Array(sFullPath))
+    If Not oShell.Run(sCmd, , True) = 0 Then
+        MsgBox "An error was encountered attempting to configure the sample.", 16
+    End If
+End Function
+
+'initialize variables
+Private Sub window_onload()
+    window.resizeTo 700, 500
+
+    Set oFS = CreateObject("Scripting.FileSystemObject")
+    Set oShell = CreateObject("WScript.Shell")
+
+    sFullPath = oFS.GetParentFolderName(oMe.commandLine)
+    'work around bug in FileSystemObject
+    If Left(sFullPath, 1) = """" Then sFullPath = Mid(sFullPath, 2)
+End Sub
+
+'builds a command line from an array of parameter strings
+' wraps quotes around any parameters (or the target) that have spaces
+Private Function BuildCmdLine(ByVal sTarget, ByVal aryParams)
+    Dim sCmd, sParam
+
+    If InStr(sTarget, " ") > 0 Then
+        sCmd = """" & sTarget & """"
+    Else
+        sCmd = sTarget
+    End If
+
+    For Each sParam In aryParams
+        If InStr(sParam, " ") > 0 Then
+            sCmd = sCmd & " """ & sParam & """"
+        Else
+            sCmd = sCmd & " " & sParam
+        End If
+    Next
+
+    BuildCmdLine = sCmd
+End Function
+</script>
+</head>
+<body style="margin:0" scroll="no">
+<iframe application="yes" src="Install.htm" frameborder="no" style="height:expression(document.body.clientHeight);width:expression(document.body.clientWidth)"></iframe>
+</body>
+</html>

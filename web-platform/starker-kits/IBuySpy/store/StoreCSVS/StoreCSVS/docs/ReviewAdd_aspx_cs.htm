@@ -1,0 +1,110 @@
+<html><head><link rel=stylesheet href=style.css></head><body><div class=SourcePanel style='font-size:12'><pre style='background-color:white'>
+<font color= "blue">using</font> System;
+<font color= "blue">using</font> System.Collections;
+<font color= "blue">using</font> System.ComponentModel;
+<font color= "blue">using</font> System.Data;
+<font color= "blue">using</font> System.Drawing;
+<font color= "blue">using</font> System.Web;
+<font color= "blue">using</font> System.Web.UI;
+<font color= "blue">using</font> System.Web.UI.WebControls;
+<font color= "blue">using</font> System.Web.UI.HtmlControls;
+<font color= "blue"></font>
+<font color= "blue">namespace</font> IBuySpy {
+<font color= "blue"></font>
+<font color= "blue">    public class</font> ReviewAdd : System.Web.UI.Page {
+<font color= "blue"></font>
+<font color= "blue">        protected </font>System.Web.UI.WebControls.Label ModelName;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.TextBox Name;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator1;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.TextBox Email;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator2;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.RadioButtonList Rating;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.TextBox Comment;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator3;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.ImageButton ReviewAddBtn;
+<font color= "blue">    </font>
+<font color= "blue">        public </font>ReviewAdd() {
+<font color= "blue">            </font>Page.Init += new System.EventHandler(Page_Init);
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // The Page_Load event on this page is used to fetch details</font>
+<font color= "green">        // about the product to review.  It then updates UI elements</font>
+<font color= "green">        // with the results.</font>
+<font color= "green">        //</font>
+<font color= "green">        // Note that the product to review is specified using</font>
+<font color= "green">        // a querystring argument to the page.</font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue">           </font>
+<font color= "blue">        private void</font> Page_Load(object sender, System.EventArgs e) {
+<font color= "blue"></font>
+<font color= "blue"></font><font color= "blue">            if </font>(Page.IsPostBack != true) {<font color= "blue"></font>
+<font color= "blue"></font>
+<font color= "green">                // Obtain ProductID of Product to Review</font>
+<font color= "blue">                </font>int productID = Int32.Parse(Request["productID"]);
+<font color= "blue">        </font>
+<font color= "green">                // Populate Product Name on Page</font>
+<font color= "blue">                </font>IBuySpy.ProductsDB products = new IBuySpy.ProductsDB();
+<font color= "blue">                </font>ModelName.Text = products.GetProductDetails(productID).ModelName;
+<font color= "blue">            </font>
+<font color= "green">                // Store ProductID in Page State to use on PostBack</font>
+<font color= "blue">                </font>ViewState["productID"] = productID;
+<font color= "blue">            </font>}
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // The ReviewAddBtn_Click event is used to add a new</font>
+<font color= "green">        // review into the IBuySpy Reviews database.</font>
+<font color= "green">        //</font>
+<font color= "green">        // Note that we are deliberately HtmlEncoding all text</font>
+<font color= "green">        // values *before* adding them to the database.  This allows</font>
+<font color= "green">        // us to prevent hackers from adding images or hyperlinks</font>
+<font color= "green">        // into the message content.</font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        private void</font> ReviewAddBtn_Click(object sender, System.Web.UI.ImageClickEventArgs e) {
+<font color= "blue"></font>
+<font color= "green">            // Only add the review if all fields on the page are valid</font>
+<font color= "blue"></font><font color= "blue">            if </font>(Page.IsValid == true) {<font color= "blue"></font>
+<font color= "blue">              </font>
+<font color= "green">                // Obtain ProductID from Page State</font>
+<font color= "blue">                </font>int productID = (int) ViewState["productID"];
+<font color= "blue">            </font>
+<font color= "green">                // Obtain Rating number of RadioButtonList</font>
+<font color= "blue">                </font>int rating = Int32.Parse(Rating.SelectedItem.Value);
+<font color= "blue">             </font>
+<font color= "green">                // Add Review to ReviewsDB.  HtmlEncode before entry</font>
+<font color= "blue">                </font>IBuySpy.ReviewsDB review = new IBuySpy.ReviewsDB();
+<font color= "blue">                </font>review.AddReview(productID, Server.HtmlEncode(Name.Text), Server.HtmlEncode(Email.Text), rating, Server.HtmlEncode(Comment.Text));
+<font color= "blue">              </font>
+<font color= "green">                // Redirect client back to the originating product details page</font>
+<font color= "blue">                </font>Response.Redirect("ProductDetails.aspx?ProductID=" + productID);
+<font color= "blue">            </font>}
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "blue">        private void</font> Page_Init(object sender, EventArgs e) {
+<font color= "green">            //</font>
+<font color= "green">            // CODEGEN: This call is required by the ASP.NET Web Form Designer.</font>
+<font color= "green">            //</font>
+<font color= "blue">            </font>InitializeComponent();
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "blue">        </font>#region Web Form Designer generated code
+<font color= "green">        /// <summary></font>
+<font color= "green">        /// Required method for Designer support - do not modify</font>
+<font color= "green">        /// the contents of this method with the code editor.</font>
+<font color= "green">        /// </summary></font>
+<font color= "blue">        private void</font> InitializeComponent() {    
+<font color= "blue">            </font>this.ReviewAddBtn.Click += new System.Web.UI.ImageClickEventHandler(this.ReviewAddBtn_Click);
+<font color= "blue">            </font>this.Load += new System.EventHandler(this.Page_Load);
+<font color= "blue"></font>
+<font color= "blue">        </font>}
+<font color= "blue">        </font>#endregion
+<font color= "blue"></font>
+<font color= "blue">    </font>}
+<font color= "blue"></font>}
+</pre>

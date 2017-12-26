@@ -1,0 +1,111 @@
+<html><head><link rel=stylesheet href=style.css></head><body><div class=SourcePanel style='font-size:12'><pre style='background-color:white'>
+<font color= "blue">using</font> System;
+<font color= "blue">using</font> System.Collections;
+<font color= "blue">using</font> System.ComponentModel;
+<font color= "blue">using</font> System.Data;
+<font color= "blue">using</font> System.Data.SqlClient;
+<font color= "blue">using</font> System.Drawing;
+<font color= "blue">using</font> System.Web;
+<font color= "blue">using</font> System.Web.SessionState;
+<font color= "blue">using</font> System.Web.UI;
+<font color= "blue">using</font> System.Web.UI.WebControls;
+<font color= "blue">using</font> System.Web.UI.HtmlControls;
+<font color= "blue"></font>
+<font color= "blue">namespace</font> IBuySpy {
+<font color= "blue"></font>
+<font color= "blue">    public class</font> CheckOut : System.Web.UI.Page {
+<font color= "blue">        protected </font>System.Web.UI.WebControls.Label Header;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.Label Message;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.DataGrid MyDataGrid;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.Label TotalLbl;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.ImageButton SubmitBtn;
+<font color= "blue"></font>
+<font color= "blue">        public </font>CheckOut() {
+<font color= "blue">            </font>Page.Init += new System.EventHandler(Page_Init);
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // The Page_Load event on this page is used to load the</font>
+<font color= "green">        // ShoppingCart DataGrid *the first time* the page is</font>
+<font color= "green">        // accessed.</font>
+<font color= "green">        //</font>
+<font color= "green">        // Note that subsequent postbacks to the page *do not*</font>
+<font color= "green">        // reload the Datagrid.  Instead, we rely on the control's</font>
+<font color= "green">        // built-in viewstate management to rebuild the control</font>
+<font color= "green">        // on the server.</font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        private void</font> Page_Load(object sender, System.EventArgs e) {
+<font color= "blue"></font>
+<font color= "blue"></font><font color= "blue">            if </font>(Page.IsPostBack == false) {<font color= "blue"></font>
+<font color= "blue"></font>
+<font color= "green">                // Calculate end-user's shopping cart ID</font>
+<font color= "blue">                </font>IBuySpy.ShoppingCartDB cart = new IBuySpy.ShoppingCartDB();
+<font color= "blue">                </font>String cartId = cart.GetShoppingCartId();
+<font color= "blue"></font>
+<font color= "green">                // Populate datagrid with shopping cart data</font>
+<font color= "blue">                </font>MyDataGrid.DataSource = cart.GetItems(cartId);
+<font color= "blue">                </font>MyDataGrid.DataBind();
+<font color= "blue"></font>
+<font color= "green">                // Update total price label</font>
+<font color= "blue">                </font>TotalLbl.Text = String.Format( "{0:c}", cart.GetTotal(cartId));
+<font color= "blue">            </font>}
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // The SubmitBtn_Click event handle is used to order the</font>
+<font color= "green">        // items within the current shopping cart.  It then</font>
+<font color= "green">        // displays the orderid and order status to the screen</font>
+<font color= "green">        // (hiding the "SubmitBtn" button to ensure that the</font>
+<font color= "green">        // user can't click it twice).</font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        private void</font> SubmitBtn_Click(object sender, System.Web.UI.ImageClickEventArgs e) {
+<font color= "blue">            </font>
+<font color= "blue">            </font>IBuySpy.ShoppingCartDB cart = new IBuySpy.ShoppingCartDB();
+<font color= "blue"></font>
+<font color= "green">            // Calculate end-user's shopping cart ID</font>
+<font color= "blue">            </font>String cartId = cart.GetShoppingCartId();
+<font color= "blue"></font>
+<font color= "green">            // Calculate end-user's customerID</font>
+<font color= "blue">            </font>String customerId = User.Identity.Name;
+<font color= "blue"></font>
+<font color= "blue"></font><font color= "blue">            if </font>((cartId != null) && (customerId != null)) {<font color= "blue"></font>
+<font color= "blue"></font>
+<font color= "green">                // Place the order</font>
+<font color= "blue">                </font>IBuySpy.OrdersDB ordersDatabase = new IBuySpy.OrdersDB();
+<font color= "blue">                </font>int orderId = ordersDatabase.PlaceOrder(customerId, cartId);
+<font color= "blue"></font>
+<font color= "green">                //Update labels to reflect the fact that the order has taken place</font>
+<font color= "blue">                </font>Header.Text="Check Out Complete!";
+<font color= "blue">                </font>Message.Text = "<b>Your Order Number Is: </b>" + orderId;
+<font color= "blue">                </font>SubmitBtn.Visible = false;
+<font color= "blue">            </font>}
+<font color= "blue">        </font>}
+<font color= "blue">        </font>
+<font color= "blue">        private void</font> Page_Init(object sender, EventArgs e) {
+<font color= "green">            //</font>
+<font color= "green">            // CODEGEN: This call is required by the ASP.NET Web Form Designer.</font>
+<font color= "green">            //</font>
+<font color= "blue">            </font>InitializeComponent();
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "blue">        </font>#region Web Form Designer generated code
+<font color= "green">        /// <summary></font>
+<font color= "green">        /// Required method for Designer support - do not modify</font>
+<font color= "green">        /// the contents of this method with the code editor.</font>
+<font color= "green">        /// </summary></font>
+<font color= "blue">        private void</font> InitializeComponent() {    
+<font color= "blue">            </font>this.SubmitBtn.Click += new System.Web.UI.ImageClickEventHandler(this.SubmitBtn_Click);
+<font color= "blue">            </font>this.Load += new System.EventHandler(this.Page_Load);
+<font color= "blue"></font>
+<font color= "blue">        </font>}
+<font color= "blue">        </font>#endregion
+<font color= "blue"></font>
+<font color= "blue">    </font>}
+<font color= "blue"></font>}
+</pre>

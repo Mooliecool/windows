@@ -1,0 +1,109 @@
+<html>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body class="NormalIndent">
+        <h1>"OrdersDetail" Stored Procedure</h1>
+
+        <b>Description:</b>
+
+        <P>This stored procedure accepts an OrderID as input and returns a recordset
+        and 3 output parameters containing details of the given OrderID. </P>
+
+        <b>Definition:</b>
+
+        <pre>
+
+    CREATE Procedure OrdersDetail
+    (
+        @OrderID    int,
+        @CustomerID int,
+        @OrderDate  datetime OUTPUT,
+        @ShipDate   datetime OUTPUT,
+        @OrderTotal money OUTPUT
+    )
+    AS
+
+    /* Return the order dates from the Orders
+        Also verifies the order exists for this customer. */
+    SELECT
+        @OrderDate = OrderDate,
+        @ShipDate = ShipDate
+
+    FROM
+        Orders
+
+    WHERE
+        OrderID = @OrderID
+        AND
+        CustomerID = @CustomerID
+
+    IF @@Rowcount = 1
+    BEGIN
+
+    /* First, return the OrderTotal out param */
+    SELECT
+        @OrderTotal = Cast(SUM(OrderDetails.Quantity * OrderDetails.UnitCost) as money)
+
+    FROM
+        OrderDetails
+
+    WHERE
+        OrderID= @OrderID
+
+    /* Then, return the recordset of info */
+    SELECT
+        Products.ProductID,
+        Products.ModelName,
+        Products.ModelNumber,
+        OrderDetails.UnitCost,
+        OrderDetails.Quantity,
+        (OrderDetails.Quantity * OrderDetails.UnitCost) as ExtendedAmount
+
+    FROM
+        OrderDetails
+      INNER JOIN Products ON OrderDetails.ProductID = Products.ProductID
+
+    WHERE
+        OrderID = @OrderID
+
+    END
+        </pre>
+
+        <b>Database Tables Used: </b>
+
+        <P><i>Orders:</i> &nbsp;The Orders table contains the header information about all the orders in the
+        system (i.e., all items that are actually purchased.  Users must check out their
+        cart to place an order in the system).  When an order is created, an
+        entry is made in the Orders table with the CustomerID, OrderDate and ShipDate. 
+        Then, any information about the products in the order is added to the
+        OrderDetails table as discussed below.  Note that if no OrderDate or ShipDate is
+        provided, the current date is entered as default.
+
+        <p>
+
+        <img src="1x1.gif" width=25> <IMG src="../docs/images/Orders.gif">
+
+        <P><i>OrderDetails:</i> &nbsp;The OrderDetails table contains detailed product information for each
+        order in the system.  For each product in an order, an entry is made into the
+        OrderDetails table containing the ProductID, Quantity and current UnitCost of
+        the item.  There is a many to one relationship between OrderDetails table and
+        the Orders table.  Note the primary key in the table is both OrderID and
+        ProductID (since those two columns are the minimum required to guarantee
+        uniqueness of a record).
+
+        <p>
+
+        <img src="1x1.gif" width=25> <IMG src="../docs/images/OrderDetails.gif">
+
+        <P><i>Products:</i> &nbsp;The Products table contains all of the information about all of the products
+        on the IBuySpy web site. Its primary key is the ProductID identity field.  Note
+        that product descriptions are limited to 3800 characters.
+
+        <p>
+
+        <img src="1x1.gif" width=25> <IMG src="../docs/images/products.gif">
+
+    </body>
+</html>

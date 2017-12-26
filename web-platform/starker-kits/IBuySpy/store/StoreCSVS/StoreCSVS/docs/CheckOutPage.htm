@@ -1,0 +1,119 @@
+<HTML>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body class="NormalIndent">
+        <h1>
+            CheckOut.aspx Page
+        </h1>
+        <b>Description:</b> &nbsp; The CheckOut.aspx page displays the list of items in 
+        a customer's shopping cart and prompts the user to place the order. When the 
+        user clicks the "Submit" button, the page places the order with the system and 
+        then provides an order tracking number.
+        <br>
+        <br>
+        <STRONG>Security Notes</STRONG>: &nbsp;The CheckOut.aspx page allows only 
+        authenticated customers -- customers who have an IBuySpy user ID and have 
+        logged in using the <A href="Login_aspx.htm">Login.aspx</A>&nbsp;page -- to 
+        view their cart and check out. If a user has not already logged on, the 
+        checkout page is not displayed. Instead, the user is directed to the login 
+        page.
+        <br>
+        <br>
+        To restrict access to the check out page, several entries were added to the 
+        IBuySpy application's <A href="Web_config.htm">Web.config</A>&nbsp;file. The 
+        following entry assigns a security context to the CheckOut.aspx page, 
+        explicitly denying anonymous user access to the CheckOut.aspx page. (The "?" 
+        user stands for "anonymous.")
+        <br>
+        <br>
+        &nbsp;&nbsp;&nbsp;<FONT color="blue">&lt;</FONT><FONT color="maroon">location</FONT><font color="#000000">&nbsp;</font>path="CheckOut.aspx"<FONT color="blue">&gt;</FONT>
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;</FONT><FONT color="maroon">system.web</FONT><FONT color="blue">&gt;</FONT>
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">
+            &lt;</FONT><FONT color="maroon">authorization</FONT><FONT color="blue">&gt;</FONT>
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <FONT color="blue">&lt;</FONT><FONT color="maroon">deny</FONT>&nbsp;users="?"<FONT color="blue">/&gt;</FONT>
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">
+            &lt;/</FONT><FONT color="maroon">authorization</FONT><FONT color="blue">&gt;</FONT>
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;/</FONT><FONT color="maroon">system.web</FONT><FONT color="blue">&gt;</FONT>
+        <BR>
+        &nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;/</FONT><FONT color="maroon">location</FONT><FONT color="blue">&gt;</FONT>
+        <BR>
+        <br>
+        <br>
+        The following entry specifies how authentication will be maintained and further 
+        specifies the page on which authentication will be performed. In the IBuySpy 
+        application, this occurs on the Login.aspx page.
+        <br>
+        <br>
+        &nbsp;&nbsp;&nbsp;<FONT color="blue">&lt;</FONT><FONT color="maroon">system.web</FONT><FONT color="blue">&gt;</FONT>
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;</FONT><FONT color="maroon">authentication</FONT><font color="#000000">&nbsp;</font>mode="Forms"<FONT color="blue">&gt;</FONT>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;</FONT><FONT color="maroon">forms</FONT><font color="#000000">&nbsp;</font>name="IBuySpyStoreAuth" 
+        loginUrl="login.aspx" protection="All" path="/"<FONT color="blue">&gt;</FONT><FONT color="blue">&lt;/</FONT><FONT color="maroon">forms</FONT><FONT color="blue">&gt;</FONT>
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;/</FONT><FONT color="maroon">authentication</FONT><FONT color="blue">&gt;</FONT>
+        <BR>
+        &nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;/</FONT><FONT color="maroon">system.web</FONT><FONT color="blue">&gt;</FONT></P> 
+        When a non-authenticated user attempts to display the check out page, the 
+        built-in ASP.NET forms-based security system determines that the user is denied 
+        access to the page and redirects the user to the specified page for 
+        establishing authentication.
+        <br>
+        <br>
+        If you like, you can customize the look and feel of the login page. You can 
+        also validate the user's credentials in whatever manner you prefer to validate. 
+        (We designed the application to check user names and passwords against a 
+        database). After users successfully identify themselves (that is, they pass the 
+        authentication check), they are redirected back to CheckOut.aspx and granted 
+        access to the page.
+        <br>
+        <br>
+        For more details about security, review the <A href="Login_aspx.htm">Login.aspx</A>&nbsp; 
+        page within IBuySpy to see how this is done.
+        <br>
+        <br>
+        <STRONG>Displaying the Cart</STRONG>: &nbsp; The logic for this page is 
+        encapsulated in two event handlers: &nbsp;<strong>Page_Load</strong>&nbsp; 
+        event and the&nbsp;<strong>SubmitBtn_Click</strong>&nbsp;event handler for the 
+        "Submit" button.
+        <br>
+        <br>
+        As in the ShoppingCart.aspx page, shopping cart information is displayed in a 
+        DataGrid control. When the CheckOut.aspx page is first displayed, the Page_Load 
+        event handler obtains a collection of all items within the user's shopping cart 
+        by calling the GetItems method of the ShoppingCartDB class. The GetItems method 
+        in turn uses the <A href="ShoppingCartList.htm">ShoppingCartList</A>&nbsp;stored 
+        procedure to retrieve the items from the database.
+        <br>
+        <br>
+        Once the collection of items is retrieved, it is bound to the DataGrid control 
+        by setting the grid's DataSource property then calling the grid's&nbsp;<strong>DataBind()</strong>&nbsp; 
+        method. This causes the grid to loop through the data source and generate a row 
+        for each item. The layout of each item is determined by a set of individual 
+        column definitions in the DataGrid control.
+        <br>
+        <br>
+        When the cart information has been displayed, the handler invokes the GetTotal 
+        method of the ShoppingCartDB class to calculate a total cost. The total is 
+        formatted using the locale-dependent String.Format() method.
+        <br>
+        <br>
+        <STRONG>Checking Out</STRONG>: &nbsp; The SubmitBtn_Click event handler is used 
+        to place the actual customer order. It calls the PlaceOrder method of the 
+        OrdersDB class, which in turn calls the <A href="OrdersAdd.htm">OrdersAdd</A>&nbsp;stored 
+        procedure to insert a new record into the database.
+        <br>
+        <br>
+        After the order has been written, the handler hides the "Submit" button and 
+        then redisplays the page with the customer tracking number of the placed order.
+    </body>
+</HTML>

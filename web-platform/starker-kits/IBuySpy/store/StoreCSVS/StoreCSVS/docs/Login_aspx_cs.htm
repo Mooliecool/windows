@@ -1,0 +1,109 @@
+<html><head><link rel=stylesheet href=style.css></head><body><div class=SourcePanel style='font-size:12'><pre style='background-color:white'>
+<font color= "blue">using</font> System;
+<font color= "blue">using</font> System.Collections;
+<font color= "blue">using</font> System.ComponentModel;
+<font color= "blue">using</font> System.Data;
+<font color= "blue">using</font> System.Drawing;
+<font color= "blue">using</font> System.Web;
+<font color= "blue">using</font> System.Web.Security;
+<font color= "blue">using</font> System.Web.UI;
+<font color= "blue">using</font> System.Web.UI.WebControls;
+<font color= "blue">using</font> System.Web.UI.HtmlControls;
+<font color= "blue"></font>
+<font color= "blue">namespace</font> IBuySpy {
+<font color= "blue"></font>
+<font color= "blue">    public class</font> Login : System.Web.UI.Page {
+<font color= "blue"></font>
+<font color= "blue">        protected </font>System.Web.UI.WebControls.Label Message;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.TextBox email;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.RequiredFieldValidator emailRequired;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.RegularExpressionValidator emailValid;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.TextBox password;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.RequiredFieldValidator passwordRequired;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.CheckBox RememberLogin;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.ImageButton LoginBtn;
+<font color= "blue">    </font>
+<font color= "blue">        public </font>Login() {
+<font color= "blue">            </font>Page.Init += new System.EventHandler(Page_Init);
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // The LoginBtn_Click event is used on this page to</font>
+<font color= "green">        // authenticate a customer's supplied username/password</font>
+<font color= "green">        // credentials against a database.</font>
+<font color= "green">        //</font>
+<font color= "green">        // If the supplied username/password are valid, then</font>
+<font color= "green">        // the event handler adds a cookie to the client</font>
+<font color= "green">        // (so that we can personalize the home page's welcome</font>
+<font color= "green">        // message), migrates any items stored in the user's</font>
+<font color= "green">        // temporary (non-persistent) shopping cart to their</font>
+<font color= "green">        // permanent customer account, and then redirects the browser</font>
+<font color= "green">        // back to the originating page.</font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        private void</font> LoginBtn_Click(object sender, System.Web.UI.ImageClickEventArgs e) {
+<font color= "blue"></font>
+<font color= "green">            // Only attempt a login if all form fields on the page are valid</font>
+<font color= "blue"></font><font color= "blue">            if </font>(Page.IsValid == true) {<font color= "blue"></font>
+<font color= "blue"></font>
+<font color= "green">                // Save old ShoppingCartID</font>
+<font color= "blue">                </font>IBuySpy.ShoppingCartDB shoppingCart = new IBuySpy.ShoppingCartDB();
+<font color= "blue">                </font>String tempCartID = shoppingCart.GetShoppingCartId();
+<font color= "blue"></font>
+<font color= "green">                // Attempt to Validate User Credentials using CustomersDB</font>
+<font color= "blue">                </font>IBuySpy.CustomersDB accountSystem = new IBuySpy.CustomersDB();
+<font color= "blue">                </font>String customerId = accountSystem.Login(email.Text, password.Text);
+<font color= "blue"></font>
+<font color= "blue"></font><font color= "blue">                if </font>(customerId != null) {<font color= "blue"></font>
+<font color= "blue"></font>
+<font color= "green">                    // Migrate any existing shopping cart items into the permanent shopping cart</font>
+<font color= "blue">                    </font>shoppingCart.MigrateCart(tempCartID, customerId);
+<font color= "blue"></font>
+<font color= "green">                    // Lookup the customer's full account details</font>
+<font color= "blue">                    </font>IBuySpy.CustomerDetails customerDetails = accountSystem.GetCustomerDetails(customerId);
+<font color= "blue"></font>
+<font color= "green">                    // Store the user's fullname in a cookie for personalization purposes</font>
+<font color= "blue">                    </font>Response.Cookies["IBuySpy_FullName"].Value = customerDetails.FullName;
+<font color= "blue"></font>
+<font color= "green">                    // Make the cookie persistent only if the user selects "persistent" login checkbox</font>
+<font color= "blue"></font><font color= "blue">                    if </font>(RememberLogin.Checked == true) {<font color= "blue"></font>
+<font color= "blue">                        </font>Response.Cookies["IBuySpy_FullName"].Expires = DateTime.Now.AddMonths(1);
+<font color= "blue">                    </font>}
+<font color= "blue"></font>
+<font color= "green">                    // Redirect browser back to originating page</font>
+<font color= "blue">                    </font>FormsAuthentication.RedirectFromLoginPage(customerId, RememberLogin.Checked);
+<font color= "blue">                </font>}
+<font color= "blue"></font><font color= "blue">                else </font>{<font color= "blue"></font>
+<font color= "blue">                    </font>Message.Text = "Login Failed!";
+<font color= "blue">                </font>}
+<font color= "blue">            </font>}
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "blue">        private void</font> Page_Load(object sender, System.EventArgs e) {
+<font color= "green">            // Put user code to initialize the page here</font>
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "blue">        private void</font> Page_Init(object sender, EventArgs e) {
+<font color= "green">            //</font>
+<font color= "green">            // CODEGEN: This call is required by the ASP.NET Web Form Designer.</font>
+<font color= "green">            //</font>
+<font color= "blue">            </font>InitializeComponent();
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "blue">        </font>#region Web Form Designer generated code
+<font color= "green">        /// <summary></font>
+<font color= "green">        /// Required method for Designer support - do not modify</font>
+<font color= "green">        /// the contents of this method with the code editor.</font>
+<font color= "green">        /// </summary></font>
+<font color= "blue">        private void</font> InitializeComponent() {    
+<font color= "blue">            </font>this.LoginBtn.Click += new System.Web.UI.ImageClickEventHandler(this.LoginBtn_Click);
+<font color= "blue">            </font>this.Load += new System.EventHandler(this.Page_Load);
+<font color= "blue"></font>
+<font color= "blue">        </font>}
+<font color= "blue">        </font>#endregion
+<font color= "blue"></font>
+<font color= "blue">    </font>}
+<font color= "blue"></font>}
+</pre>

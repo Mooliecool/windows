@@ -1,0 +1,125 @@
+<HTML>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <BODY>
+        <h1>
+            OrderList.aspx Page
+        </h1>
+        <P>
+            <strong>Description:</strong>&nbsp;The OrderList page displays a list of all 
+            orders that the accessing customer has ever placed with IBuySpy.
+        </P>
+        <P>
+            <strong>Implementation Notes:</strong>
+        &nbsp;This page appears when the user clicks the "Account" button at the top of 
+        any page in the IBuySpy application.&nbsp;
+        <p>
+            Access to the OrderList.aspx page limited to authorized users only, per the 
+            configuration system.&nbsp; The OrderList page logic is encapsulated entirely 
+            within its&nbsp;<strong>Page_Load</strong>&nbsp;event handler.&nbsp; This event 
+            handler is called when the page is accessed by a browser client.&nbsp;
+        </p>
+        <p>
+            <strong>Configuration Details:&nbsp;</strong>&nbsp;The OrderList.aspx page has 
+            been configured to deny access to all non-authenticated customers of the 
+            IBuySpy application.&nbsp; This is accomplished by adding an authorization 
+            entry within the IBuySpy's <A href="Web_config.htm">Web.config</A>&nbsp;file:
+        </p>
+        <p>
+            &nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;</FONT><FONT color="maroon">location</FONT>
+            <font color="#000000">&nbsp;</font>path="OrderList.aspx"<FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;</FONT><FONT color="maroon">system.web</FONT><FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">
+                &lt;</FONT><FONT color="maroon">authorization</FONT><FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <FONT color="blue">&lt;</FONT><FONT color="maroon">deny</FONT><font color="#000000">&nbsp;</font>users="?"<FONT color="blue">/&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">
+                &lt;/</FONT><FONT color="maroon">authorization</FONT><FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;/</FONT><FONT color="maroon">system.web</FONT><FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;/</FONT><FONT color="maroon">location</FONT><FONT color="blue">&gt;</FONT>
+            <BR>
+        </p>
+        <p>
+            The above entry explicitly denies anonymous user access to the OrderList.aspx 
+            URL (in the configuration entry above, the "?" stands for "anonymous 
+            users").&nbsp; When a non-authenticated user attempts to access this page, the 
+            built-in ASP.NET forms-based security system will automatically redirect them 
+            to a configured login page.&nbsp; The IBuySpy configuration entry below 
+            specifies that the Login.aspx page will be the designated login page for this 
+            application:
+        </p>
+        <P>
+            &nbsp;&nbsp;&nbsp;<FONT color="blue">&lt;</FONT><FONT color="maroon">system.web</FONT><FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;</FONT><FONT color="maroon">authentication</FONT><font color="#000000">&nbsp;</font>mode="Forms"<FONT color="blue">&gt;</FONT>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;</FONT><FONT color="maroon">forms</FONT><font color="#000000">&nbsp;</font>name="IBuySpyStoreAuth" 
+            loginUrl="login.aspx" protection="All" path="/"<FONT color="blue">&gt;</FONT><FONT color="blue">&lt;/</FONT><FONT color="maroon">forms</FONT><FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;/</FONT><FONT color="maroon">authentication</FONT><FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;/</FONT><FONT color="maroon">system.web</FONT><FONT color="blue">&gt;</FONT>
+        </P>
+        <P>
+            Developers are free to customize the look and feel of the login page however 
+            they want, and may perform whatever manner of credential validation checks 
+            necessary to validate the user (in the IBuySpy application we check 
+            usernames/passwords against a database).&nbsp; After the client successfully 
+            identifies themselves (ie: their username and password are correct) they are 
+            redirected back to OrderList.aspx and granted access to the page.&nbsp; Please 
+            review the <A href="Login_aspx.htm">Login.aspx</A>
+        &nbsp;page to see how this is done within IBuySpy.
+        <p>
+            <strong>Page_Load Event Handler:&nbsp;</strong> &nbsp;The code within the 
+            Page_Load event handler utilizes the Page's User object to lookup the 
+            authenticated identity of the connected customer.&nbsp; For IBuySpy the 
+            authenticated identity name is the customer's unique CustomerId.&nbsp; The 
+            OrderList.aspx Page_Load event handler then utilizes this CustomerId value to 
+            call the GetOrderDetails method of the IBuySpy.OrdersDB class to obtain details 
+            about a specific order the customer has placed.&nbsp; This method internally 
+            uses the <A href="OrdersList.htm">OrdersList</A>
+        &nbsp;stored procedure to fetch the product&nbsp;information from the IBuySpy 
+        database.
+        <P>
+        The specific items within the order are then displayed using an 
+        &lt;asp:DataGrid&gt; control.&nbsp; Various style properties have been set on 
+        the &lt;asp:datagrid&gt; to make it look nice and presentable.&nbsp; Various 
+        &lt;asp:Label&gt; server controls are also then used to output aggregate 
+        information about the order (total order price, ship date, order date, etc).
+        <P>
+            <B>Peformance Notes:</B>
+            <ul>
+                <li>
+                    Because the data used to populate this page is not itself cached (only the 
+                    rendered output is cached), the data is returned from the database using 
+                    a&nbsp;<strong>DataReader</strong>&nbsp; rather than a DataSet. A DataReader is 
+                    a forward-only, read-only "firehose" data cursor and it's much lighter-weight 
+                    and faster than a dataset. It's very important to note that you must explicitly 
+                    close the data connection used by a DataReader&nbsp; <em>after</em>&nbsp;DataBind() 
+                    is called. In IBuySpy, middle-tier methods return a SQLDataReaderResults class 
+                    that includes not only a DataReader, but also a Close() method. After 
+                    databinding, the page closes the data reader and its connection using the&nbsp;<strong>result.Close()</strong>&nbsp;method.
+                <li>
+                Because this page does not post back to itself -- that is, there are no buttons 
+                that submit the page back to ProductsList.aspx -- we do not need to preserve 
+                the values of controls on the page across requests. Consequently we disabled 
+                control state management by adding a "MaintainState=false" attribute to the 
+                Page directive. This reduces the size of the page and speeds page processing.
+                <li>
+                    Because the page does not use session state, we do not require the Session 
+                    intrinsic object to be available on this page. Therefore we disabled session 
+                    state management by adding a "EnableSessionState= false" attribute to the Page 
+                    directive, which again speeds the page.
+                </li>
+            </ul>
+    </BODY>
+</HTML>

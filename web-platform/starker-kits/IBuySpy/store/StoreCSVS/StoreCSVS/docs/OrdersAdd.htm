@@ -1,0 +1,112 @@
+<html>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body class="NormalIndent">
+        <h1>
+            "OrdersAdd" Stored Procedure
+        </h1>
+        <b>Description:</b>
+        <P>
+            This stored procedure first creates a record in the Orders table for the order
+            being created.&nbsp; Then, it adds all of the products from the user's shopping
+            cart into the OrderDetails table, and then emptys the user's shopping
+            cart.&nbsp; It performs all three of these steps in a transaction.&nbsp; This
+            ensures that if an error occurs adding an item to the OrderDetails table, there
+            will not be an empty order left in the Orders table.&nbsp;
+        </P>
+        <b>Definition:</b>
+        <pre>
+
+    CREATE Procedure OrdersAdd
+    (
+        @CustomerID int,
+        @CartID     nvarchar(50),
+        @OrderDate  datetime,
+        @ShipDate   datetime,
+        @OrderID    int OUTPUT
+    )
+    AS
+
+    BEGIN TRAN AddOrder
+
+    /* Create the Order header */
+    INSERT INTO Orders
+    (
+        CustomerID,
+        OrderDate,
+        ShipDate
+    )
+    VALUES
+    (
+        @CustomerID,
+        @OrderDate,
+        @ShipDate
+    )
+
+    SELECT
+        @OrderID = @@Identity
+
+    /* Copy items from given shopping cart to OrdersDetail table for given OrderID*/
+    INSERT INTO OrderDetails
+    (
+        OrderID,
+        ProductID,
+        Quantity,
+        UnitCost
+    )
+
+    SELECT
+        @OrderID,
+        ShoppingCart.ProductID,
+        Quantity,
+        Products.UnitCost
+
+    FROM
+        ShoppingCart
+      INNER JOIN Products ON ShoppingCart.ProductID = Products.ProductID
+
+    WHERE
+        CartID = @CartID
+
+    /* Removal of  items from user's shopping cart will happen on the business layer*/
+    EXEC ShoppingCartEmpty @CartId
+
+    COMMIT TRAN AddOrder
+        </pre>
+        <b>Database Tables Used: </b>
+        <P>
+            <i>Orders:</i>
+        &nbsp;The Orders table contains the header information about all the orders in
+        the system (i.e., all items that are actually purchased. Users must check out
+        their cart to place an order in the system). When an order is created, an entry
+        is made in the Orders table with the CustomerID, OrderDate and ShipDate. Then,
+        any information about the products in the order is added to the OrderDetails
+        table as discussed below. Note that if no OrderDate or ShipDate is provided,
+        the current date is entered as default.
+        <p>
+            <IMG src="1x1.gif" width="25"> <IMG src="../docs/images/Orders.gif">
+        <P>
+            <i>OrderDetails:</i>
+        &nbsp;The OrderDetails table contains detailed product information for each
+        order in the system. For each product in an order, an entry is made into the
+        OrderDetails table containing the ProductID, Quantity and current UnitCost of
+        the item. There is a many to one relationship between OrderDetails table and
+        the Orders table. Note the primary key in the table is both OrderID and
+        ProductID (since those two columns are the minimum required to guarantee
+        uniqueness of a record).
+        <p>
+            <IMG src="1x1.gif" width="25"> <IMG src="../docs/images/OrderDetails.gif">
+        <P>
+            <i>ShoppingCart:</i>
+        &nbsp;The ShoppingCart table keeps track of the items a user has
+        purchased.&nbsp; Its primary key is the RecordID field.&nbsp; The CartID is a
+        string which we use to identify the user currently logged in.&nbsp; There is a
+        many to one relationship between the ShoppingCart table and the Products
+        table.&nbsp; Note that if not Quantity is supplied, a default of 1 is entered.
+        <p>
+            <IMG src="1x1.gif" width="25"> <IMG src="../docs/images/ShoppingCart.gif">
+        </p>
+    </body>
+</html>

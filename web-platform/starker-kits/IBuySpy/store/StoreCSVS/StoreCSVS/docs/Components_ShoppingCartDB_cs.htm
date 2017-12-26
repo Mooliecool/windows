@@ -1,0 +1,372 @@
+<html><head><link rel=stylesheet href=style.css></head><body><div class=SourcePanel style='font-size:12'><pre style='background-color:white'>
+<font color= "blue">using</font> System;
+<font color= "blue">using</font> System.Configuration;
+<font color= "blue">using</font> System.Data;
+<font color= "blue">using</font> System.Data.SqlClient;
+<font color= "blue"></font>
+<font color= "blue">namespace</font> IBuySpy {
+<font color= "blue"></font>
+<font color= "green">    //*******************************************************</font>
+<font color= "green">    //</font>
+<font color= "green">    // ShoppingCartDB Class</font>
+<font color= "green">    //</font>
+<font color= "green">    // Business/Data Logic Class that encapsulates all data</font>
+<font color= "green">    // logic necessary to add/remove/update/purchase items</font>
+<font color= "green">    // within an IBuySpy shopping cart.</font>
+<font color= "green">    //</font>
+<font color= "green">    //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">    public class</font> ShoppingCartDB {
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // ShoppingCartDB.GetItems() Method <a name="GetItems"></a></font>
+<font color= "green">        //</font>
+<font color= "green">        // The GetItems method returns a struct containing</font>
+<font color= "green">        // a forward-only, read-only DataReader.  This displays a list of all</font>
+<font color= "green">        // items within a shopping cart. The SQLDataReaderResult struct</font>
+<font color= "green">        // also returns the SQL connection, which must be explicitly closed</font>
+<font color= "green">        // after the data from the DataReader is bound into the controls.</font>
+<font color= "green">        //</font>
+<font color= "green">        // Other relevant sources:</font>
+<font color= "green">        //     + <a href="ShoppingCartList.htm" style="color:green">ShoppingCartList Stored Procedure</a></font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        public </font>SqlDataReader GetItems(string cartID) {
+<font color= "blue"></font>
+<font color= "green">            // Create Instance of Connection and Command Object</font>
+<font color= "blue">            </font>SqlConnection myConnection = new SqlConnection(ConfigurationSettings.AppSettings["ConnectionString"]);
+<font color= "blue">            </font>SqlCommand myCommand = new SqlCommand("ShoppingCartList", myConnection);
+<font color= "blue"></font>
+<font color= "green">            // Mark the Command as a SPROC</font>
+<font color= "blue">            </font>myCommand.CommandType = CommandType.StoredProcedure;
+<font color= "blue"></font>
+<font color= "green">            // Add Parameters to SPROC</font>
+<font color= "blue">            </font>SqlParameter parameterCartID = new SqlParameter("@CartID", SqlDbType.NVarChar, 50);
+<font color= "blue">            </font>parameterCartID.Value = cartID;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterCartID);
+<font color= "blue"></font>
+<font color= "green">            // Execute the command</font>
+<font color= "blue">            </font>myConnection.Open();
+<font color= "blue">            </font>SqlDataReader result = myCommand.ExecuteReader(CommandBehavior.CloseConnection);
+<font color= "blue"></font>
+<font color= "green">            // Return the datareader result</font>
+<font color= "blue">            return</font> result;
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // ShoppingCartDB.AddItem() Method <a name="AddItem"></a></font>
+<font color= "green">        //</font>
+<font color= "green">        // The AddItem method adds an item into a shopping cart.</font>
+<font color= "green">        //</font>
+<font color= "green">        // Other relevant sources:</font>
+<font color= "green">        //     + <a href="ShoppingCartAddItem.htm" style="color:green">ShoppingCartAddItem Stored Procedure</a></font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        public void</font> AddItem(string cartID, int productID, int quantity) {
+<font color= "blue"></font>
+<font color= "green">            // Create Instance of Connection and Command Object</font>
+<font color= "blue">            </font>SqlConnection myConnection = new SqlConnection(ConfigurationSettings.AppSettings["ConnectionString"]);
+<font color= "blue">            </font>SqlCommand myCommand = new SqlCommand("ShoppingCartAddItem", myConnection);
+<font color= "blue"></font>
+<font color= "green">            // Mark the Command as a SPROC</font>
+<font color= "blue">            </font>myCommand.CommandType = CommandType.StoredProcedure;
+<font color= "blue"></font>
+<font color= "green">            // Add Parameters to SPROC</font>
+<font color= "blue">            </font>SqlParameter parameterProductID = new SqlParameter("@ProductID", SqlDbType.Int, 4);
+<font color= "blue">            </font>parameterProductID.Value = productID;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterProductID);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterCartID = new SqlParameter("@CartID", SqlDbType.NVarChar, 50);
+<font color= "blue">            </font>parameterCartID.Value = cartID;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterCartID);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterQuantity = new SqlParameter("@Quantity", SqlDbType.Int, 4);
+<font color= "blue">            </font>parameterQuantity.Value = quantity;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterQuantity);
+<font color= "blue"></font>
+<font color= "green">            // Open the connection and execute the Command</font>
+<font color= "blue">            </font>myConnection.Open();
+<font color= "blue">            </font>myCommand.ExecuteNonQuery();
+<font color= "blue">            </font>myConnection.Close();
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // ShoppingCartDB.UpdateItem() Method <a name="UpdateItem"></a></font>
+<font color= "green">        //</font>
+<font color= "green">        // The UpdateItem method updates the quantity of an item</font>
+<font color= "green">        // in a shopping cart.</font>
+<font color= "green">        //</font>
+<font color= "green">        // Other relevant sources:</font>
+<font color= "green">        //     + <a href="ShoppingCartUpdate.htm" style="color:green">ShoppingCartUpdate Stored Procedure</a></font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        public void</font> UpdateItem(string cartID, int productID, int quantity) {
+<font color= "blue"></font>
+<font color= "green">            // throw an exception if quantity is a negative number</font>
+<font color= "blue"></font><font color= "blue">            if </font>(quantity < 0) {<font color= "blue"></font>
+<font color= "blue">                </font>throw new Exception("Quantity cannot be a negative number");
+<font color= "blue">            </font>}
+<font color= "blue"></font>
+<font color= "green">            // Create Instance of Connection and Command Object</font>
+<font color= "blue">            </font>SqlConnection myConnection = new SqlConnection(ConfigurationSettings.AppSettings["ConnectionString"]);
+<font color= "blue">            </font>SqlCommand myCommand = new SqlCommand("ShoppingCartUpdate", myConnection);
+<font color= "blue"></font>
+<font color= "green">            // Mark the Command as a SPROC</font>
+<font color= "blue">            </font>myCommand.CommandType = CommandType.StoredProcedure;
+<font color= "blue"></font>
+<font color= "green">            // Add Parameters to SPROC</font>
+<font color= "blue">            </font>SqlParameter parameterProductID = new SqlParameter("@ProductID", SqlDbType.Int, 4);
+<font color= "blue">            </font>parameterProductID.Value = productID;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterProductID);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterCartID = new SqlParameter("@CartID", SqlDbType.NVarChar, 50);
+<font color= "blue">            </font>parameterCartID.Value = cartID;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterCartID);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterQuantity = new SqlParameter("@Quantity", SqlDbType.Int, 4);
+<font color= "blue">            </font>parameterQuantity.Value = quantity;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterQuantity);
+<font color= "blue"></font>
+<font color= "green">            // Open the connection and execute the Command</font>
+<font color= "blue">            </font>myConnection.Open();
+<font color= "blue">            </font>myCommand.ExecuteNonQuery();
+<font color= "blue">            </font>myConnection.Close();
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // ShoppingCartDB.RemoveItem() Method <a name="RemoveItem"></a></font>
+<font color= "green">        //</font>
+<font color= "green">        // The RemoveItem method removes an item from a</font>
+<font color= "green">        // shopping cart.</font>
+<font color= "green">        //</font>
+<font color= "green">        // Other relevant sources:</font>
+<font color= "green">        //     + <a href="ShoppingCartRemoveItem.htm" style="color:green">ShoppingCartRemoveItem Stored Procedure</a></font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        public void</font> RemoveItem(string cartID, int productID) {
+<font color= "blue"></font>
+<font color= "green">            // Create Instance of Connection and Command Object</font>
+<font color= "blue">            </font>SqlConnection myConnection = new SqlConnection(ConfigurationSettings.AppSettings["ConnectionString"]);
+<font color= "blue">            </font>SqlCommand myCommand = new SqlCommand("ShoppingCartRemoveItem", myConnection);
+<font color= "blue"></font>
+<font color= "green">            // Mark the Command as a SPROC</font>
+<font color= "blue">            </font>myCommand.CommandType = CommandType.StoredProcedure;
+<font color= "blue"></font>
+<font color= "green">            // Add Parameters to SPROC</font>
+<font color= "blue">            </font>SqlParameter parameterProductID = new SqlParameter("@ProductID", SqlDbType.Int, 4);
+<font color= "blue">            </font>parameterProductID.Value = productID;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterProductID);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterCartID = new SqlParameter("@CartID", SqlDbType.NVarChar, 50);
+<font color= "blue">            </font>parameterCartID.Value = cartID;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterCartID);
+<font color= "blue"></font>
+<font color= "green">            // Open the connection and execute the Command</font>
+<font color= "blue">            </font>myConnection.Open();
+<font color= "blue">            </font>myCommand.ExecuteNonQuery();
+<font color= "blue">            </font>myConnection.Close();
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // ShoppingCartDB.GetItemCount() Method <a name="GetItemCount"></a></font>
+<font color= "green">        //</font>
+<font color= "green">        // The GetItemCount method returns the number of items</font>
+<font color= "green">        // within a shopping cart.</font>
+<font color= "green">        //</font>
+<font color= "green">        // Other relevant sources:</font>
+<font color= "green">        //     + <a href="ShoppingCartItemCount.htm" style="color:green">ShoppingCartItemCount Stored Procedure</a></font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        public </font>int GetItemCount(string cartID) {
+<font color= "blue"></font>
+<font color= "green">            // Create Instance of Connection and Command Object</font>
+<font color= "blue">            </font>SqlConnection myConnection = new SqlConnection(ConfigurationSettings.AppSettings["ConnectionString"]);
+<font color= "blue">            </font>SqlCommand myCommand = new SqlCommand("ShoppingCartItemCount", myConnection);
+<font color= "blue"></font>
+<font color= "green">            // Mark the Command as a SPROC</font>
+<font color= "blue">            </font>myCommand.CommandType = CommandType.StoredProcedure;
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterCartID = new SqlParameter("@CartID", SqlDbType.NVarChar, 50);
+<font color= "blue">            </font>parameterCartID.Value = cartID;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterCartID);
+<font color= "blue"></font>
+<font color= "green">            // Add Parameters to SPROC</font>
+<font color= "blue">            </font>SqlParameter parameterItemCount = new SqlParameter("@ItemCount", SqlDbType.Int, 4);
+<font color= "blue">            </font>parameterItemCount.Direction = ParameterDirection.Output;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterItemCount);
+<font color= "blue"></font>
+<font color= "green">            // Open the connection and execute the Command</font>
+<font color= "blue">            </font>myConnection.Open();
+<font color= "blue">            </font>myCommand.ExecuteNonQuery();
+<font color= "blue">            </font>myConnection.Close();
+<font color= "blue"></font>
+<font color= "green">            // Return the ItemCount (obtained as out paramter of SPROC)</font>
+<font color= "blue">            return</font> ((int)parameterItemCount.Value);
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // ShoppingCartDB.GetTotal() Method <a name="GetTotal"></a></font>
+<font color= "green">        //</font>
+<font color= "green">        // The GetTotal method returns the total price of all</font>
+<font color= "green">        // items within the shopping cart.</font>
+<font color= "green">        //</font>
+<font color= "green">        // Other relevant sources:</font>
+<font color= "green">        //     + <a href="ShoppingCartTotal.htm" style="color:green">ShoppingCartTotal Stored Procedure</a></font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        public </font>decimal GetTotal(string cartID) {
+<font color= "blue"></font>
+<font color= "green">            // Create Instance of Connection and Command Object</font>
+<font color= "blue">            </font>SqlConnection myConnection = new SqlConnection(ConfigurationSettings.AppSettings["ConnectionString"]);
+<font color= "blue">            </font>SqlCommand myCommand = new SqlCommand("ShoppingCartTotal", myConnection);
+<font color= "blue"></font>
+<font color= "green">            // Mark the Command as a SPROC</font>
+<font color= "blue">            </font>myCommand.CommandType = CommandType.StoredProcedure;
+<font color= "blue"></font>
+<font color= "green">            // Add Parameters to SPROC</font>
+<font color= "blue">            </font>SqlParameter parameterCartID = new SqlParameter("@CartID", SqlDbType.NVarChar, 50);
+<font color= "blue">            </font>parameterCartID.Value = cartID;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterCartID);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterTotalCost = new SqlParameter("@TotalCost", SqlDbType.Money, 8);
+<font color= "blue">            </font>parameterTotalCost.Direction = ParameterDirection.Output;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterTotalCost);
+<font color= "blue"></font>
+<font color= "green">            // Open the connection and execute the Command</font>
+<font color= "blue">            </font>myConnection.Open();
+<font color= "blue">            </font>myCommand.ExecuteNonQuery();
+<font color= "blue">            </font>myConnection.Close();
+<font color= "blue"></font>
+<font color= "green">            // Return the Total</font>
+<font color= "blue"></font><font color= "blue">            if </font>(parameterTotalCost.Value.ToString() != "") {<font color= "blue"></font>
+<font color= "blue">                return</font> (decimal)parameterTotalCost.Value;
+<font color= "blue">            </font>}
+<font color= "blue"></font><font color= "blue">            else </font>{<font color= "blue"></font>
+<font color= "blue">                return</font> 0;
+<font color= "blue">            </font>}
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // ShoppingCartDB.MigrateCart() Method <a name="MigrateCart"></a></font>
+<font color= "green">        //</font>
+<font color= "green">        // The MigrateCart method migrates the items from one</font>
+<font color= "green">        // cartId to another.  This is used during the login</font>
+<font color= "green">        // and/or registration process to transfer a user's</font>
+<font color= "green">        // temporary cart items to a permanent account.</font>
+<font color= "green">        //</font>
+<font color= "green">        // Other relevant sources:</font>
+<font color= "green">        //     + <a href="ShoppingCartMigrate.htm" style="color:green">ShoppingCartMigrate Stored Procedure</a></font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        public void</font> MigrateCart(String oldCartId, String newCartId) {
+<font color= "blue"></font>
+<font color= "green">            // Create Instance of Connection and Command Object</font>
+<font color= "blue">            </font>SqlConnection myConnection = new SqlConnection(ConfigurationSettings.AppSettings["ConnectionString"]);
+<font color= "blue">            </font>SqlCommand myCommand = new SqlCommand("ShoppingCartMigrate", myConnection);
+<font color= "blue"></font>
+<font color= "green">            // Mark the Command as a SPROC</font>
+<font color= "blue">            </font>myCommand.CommandType = CommandType.StoredProcedure;
+<font color= "blue"></font>
+<font color= "green">            // Add Parameters to SPROC</font>
+<font color= "blue">            </font>SqlParameter cart1 = new SqlParameter("@OriginalCartId ", SqlDbType.NVarChar, 50);
+<font color= "blue">            </font>cart1.Value = oldCartId;
+<font color= "blue">            </font>myCommand.Parameters.Add(cart1);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter cart2 = new SqlParameter("@NewCartId ", SqlDbType.NVarChar, 50);
+<font color= "blue">            </font>cart2.Value = newCartId;
+<font color= "blue">            </font>myCommand.Parameters.Add(cart2);
+<font color= "blue"></font>
+<font color= "green">             // Open the connection and execute the Command</font>
+<font color= "blue">            </font>myConnection.Open();
+<font color= "blue">            </font>myCommand.ExecuteNonQuery();
+<font color= "blue">            </font>myConnection.Close();
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // ShoppingCartDB.EmptyCart() Method <a name="EmptyCart"></a></font>
+<font color= "green">        //</font>
+<font color= "green">        // The EmptyCart method removes all current items within</font>
+<font color= "green">        // the shopping cart.</font>
+<font color= "green">        //</font>
+<font color= "green">        // Other relevant sources:</font>
+<font color= "green">        //     + <a href="ShoppingCartEmpty.htm" style="color:green">ShoppingCartEmpty Stored Procedure</a></font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        public void</font> EmptyCart(string cartID) {
+<font color= "blue"></font>
+<font color= "green">            // Create Instance of Connection and Command Object</font>
+<font color= "blue">            </font>SqlConnection myConnection = new SqlConnection(ConfigurationSettings.AppSettings["ConnectionString"]);
+<font color= "blue">            </font>SqlCommand myCommand = new SqlCommand("ShoppingCartEmpty", myConnection);
+<font color= "blue"></font>
+<font color= "green">            // Mark the Command as a SPROC</font>
+<font color= "blue">            </font>myCommand.CommandType = CommandType.StoredProcedure;
+<font color= "blue"></font>
+<font color= "green">            // Add Parameters to SPROC</font>
+<font color= "blue">            </font>SqlParameter cartid = new SqlParameter("@CartID", SqlDbType.NVarChar, 50);
+<font color= "blue">            </font>cartid.Value = cartID;
+<font color= "blue">            </font>myCommand.Parameters.Add(cartid);
+<font color= "blue"></font>
+<font color= "green">            // Open the connection and execute the Command</font>
+<font color= "blue">            </font>myConnection.Open();
+<font color= "blue">            </font>myCommand.ExecuteNonQuery();
+<font color= "blue">            </font>myConnection.Close();
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // ShoppingCartDB.GetShoppingCartId() Method <a name="GetShoppingCartId"></a></font>
+<font color= "green">        //</font>
+<font color= "green">        // The GetShoppingCartId method is used to calculate the</font>
+<font color= "green">        // "ShoppingCart" ID key used for a tracking a browser.</font>
+<font color= "green">        //</font>
+<font color= "green">        // The ShoppingCartID value is either the User's Identity</font>
+<font color= "green">        // Name (if they are a registered and authenticated user),</font>
+<font color= "green">        // or a random GUID calculated for guest visitors or</font>
+<font color= "green">        // customers who have not yet logged in.</font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        public </font>String GetShoppingCartId() {
+<font color= "blue"></font>
+<font color= "green">            // Obtain current HttpContext of ASP+ Request</font>
+<font color= "blue">            </font>System.Web.HttpContext context = System.Web.HttpContext.Current;
+<font color= "blue"></font>
+<font color= "green">            // If the user is authenticated, use their customerId as a permanent shopping cart id</font>
+<font color= "blue"></font><font color= "blue">            if </font>(context.User.Identity.Name != "") {<font color= "blue"></font>
+<font color= "blue">                return</font> context.User.Identity.Name;
+<font color= "blue">            </font>}
+<font color= "blue"></font>
+<font color= "green">            // If user is not authenticated, either fetch (or issue) a new temporary cartID</font>
+<font color= "blue"></font><font color= "blue">            if </font>(context.Request.Cookies["IBuySpy_CartID"] != null) {<font color= "blue"></font>
+<font color= "blue">                return</font> context.Request.Cookies["IBuySpy_CartID"].Value;
+<font color= "blue">            </font>}
+<font color= "blue"></font><font color= "blue">            else </font>{<font color= "blue"></font>
+<font color= "green">                // Generate a new random GUID using System.Guid Class</font>
+<font color= "blue">                </font>Guid tempCartId = Guid.NewGuid();
+<font color= "blue"></font>
+<font color= "green">                // Send tempCartId back to client as a cookie</font>
+<font color= "blue">                </font>context.Response.Cookies["IBuySpy_CartID"].Value = tempCartId.ToString();
+<font color= "blue"></font>
+<font color= "green">                // Return tempCartId</font>
+<font color= "blue">                return</font> tempCartId.ToString();
+<font color= "blue">            </font>}
+<font color= "blue">        </font>}
+<font color= "blue">    </font>}
+<font color= "blue"></font>}
+</pre>

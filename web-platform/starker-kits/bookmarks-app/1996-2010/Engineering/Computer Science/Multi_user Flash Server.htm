@@ -1,0 +1,293 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0032)http://www.shovemedia.com/multi/ -->
+<HTML><HEAD><TITLE>Untitled Document</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+<STYLE type=text/css>.text {
+	FONT-SIZE: 10pt; FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+.header {
+	FONT-SIZE: 12pt; FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+</STYLE>
+
+<META content="MSHTML 5.50.4134.600" name=GENERATOR></HEAD>
+<BODY bgColor=#ffcc00><SPAN class=header></SPAN><SPAN class=text><SPAN 
+class=text><SPAN class=header>***************</SPAN></SPAN><SPAN 
+class=header><BR>Multi-User Flash Server</SPAN><BR><SPAN 
+class=header>*************** </SPAN><BR><B><BR>All NEW!:</B> <BR>Flash 5 
+XmlSockets the easy way ! <BR>Want multi-user in Flash 4? Well, you <I>can</I> 
+<A href="http://www.shovemedia.com/multi/f4">do that too</A> 
+<BR><B><BR><BR>Dateline:</B><BR>Saturday Aug 16 2000 -- POSTED<BR><BR>Last 
+Update: Aug 16 2000<BR><BR><SPAN class=header>The Kung-Fu:</SPAN><BR>"Wax 
+On"<BR><BR><SPAN class=header>The Problem:</SPAN><BR><BR>The internet is 
+supposed to allow people to communicate in new and exciting ways, right? So how 
+come the best technology we've developed to take advantage of that is email and 
+chat rooms? We're smart people; we can do better. <BR><BR><SPAN class=header>The 
+Demo:</SPAN><BR><BR><A target=_blank href="http://www.theremediproject.com/">The 
+Remedi Project</A><BR><BR>Ok, ok, so this <I>is</I>, in fact, chat. We're 
+working on it...<BR>Type in a name and a message, hit enter, viola.<BR>Tre' 
+cool.<BR><BR>Download available at the end of the tutorial.<BR><BR><B>Notes:</B> 
+<BR>1) If your system says "connecting" and never connects, it's possible that 
+your DNS server still hasn't updated with the latest info...<BR>2) If your 
+system does connect, but you can't seem to send anything, <B>let us know!</B> 
+There have been reports that some people are unable to chat using MS IE5.0 on 
+the PC. It works fine for us in the lab, so we're anxious to hear from 
+you.<BR><BR><SPAN class=header><BR>The Toybox:</SPAN><BR><BR>After spending 
+numerous weeks hacking together a way for Flash 4 to communicate over sockets, 
+(and succeeding, mind you! You can read all about it by clicking on the Flash 4 
+link above) I find out that Flash 5 will have XmlSocket Objects...*sigh* and 
+after all that work. But, this is fabulous news as it means that any idiot 
+(hopefully) will be able to create multi-user content.<BR><BR>I've already 
+evangelized till I'm blue about why sockets are the way to go. Let's just get on 
+with it...<BR><SPAN class=header><BR>Flash XML: an overview</SPAN><BR><BR>(In my 
+best Magnum PI voice) Now, I know what you're thinking. "Oh goody, this guy's 
+going to give me everything I need..." Dream on. I'm not going to teach you XML, 
+I'm not going to give you any FLA's, (!) and I'm not going to write your chat 
+app for you. Why? Because you'll learn a lot more if I give you the tools and 
+let you build it yourself.<BR><BR><SPAN class=header>Flash things 
+First</SPAN><BR><BR>Ordinarily, I would start us off in Flash because that's 
+where non-programmer types are the most comfortable. But since there's a new 
+version out, it's not really familiar territory anymore. So, RTFM, yes that's 
+right, get the Actionscript manual, and read up on all the new XML stuff before 
+you even bother reading the rest of this.<BR><BR>All done? My, that was 
+quick...<BR>Ok then, we should just be able to skip straight to the 
+code:<BR><BR><SPAN class=header>Flash Code:</SPAN><BR><BR><PRE>//Server config
+port = 9999
+server = "xml.yourserver.com"
+
+function init() {
+// queue initialization
+xmlQueue = new Array()
+
+//xml initialization
+xsock = new XMLSocket()
+
+//once we connect to the server we call sockConnect
+//but nothing actually happens yet
+xsock.onConnect = sockConnect
+//when we receive new data we call handleXML
+//again...this doesn't do anything yet
+xsock.onXML = handleXML
+
+//try to connect
+//this kicks off the sockConnect function and NOW our
+//handleXML function will get called when new data arrives.
+xsock.connect(server, port)
+trace ("connecting...")
+}
+
+function sockConnect (success) {
+	if(success){
+		trace("Connected")
+	}
+	else {
+		trace ("UNSUCCESSFUL CONNECTION")
+	}
+}
+
+function handleXML (xmlDoc) {
+
+//if the queue is empty go ahead and process it.
+//if there's a line, wait your turn
+	if (xmlQueue.length==0) {
+		processXML (xmlDoc)
+	}
+	else {
+		xmlQueue[xmlQueue.length]=xmlDoc
+	}
+}
+
+function handleXMLQueue () {
+//get the next thing in the queue and deal with it.
+	var xmlDoc = xmlQueue.shift
+	if (xmlDoc!=null) {
+		processXML (xmlDoc)
+
+	//when you're done with that one, process the queue again
+	//yeah, I know, this could cause a recursive mess...
+	handleXMLQueue()
+	}
+}
+
+function processXML(xmlDoc) {
+
+trace ("RECIEVED: " + xmlDoc)
+
+var xml = xmlDoc.childNodes[0]
+trace ("node: " + xml.nodeName)
+
+	if (xml.nodeName == "broadcast") {
+		var username = xml.attributes["username"]
+		var msg = xml.attributes["msg"]
+		//call a function with this data
+		doSomethingWithThisData(username,msg)
+	}
+
+	if (xml.nodeName == "addUser") {
+		var id = xml.attribuites ["id"]
+		doSomethingElse(id)
+	}
+}
+
+function sendXmlExample (text) {
+trace ("text: " + text)
+	var obj = new Object ()
+	obj.username = myUsername
+	obj.msg = text
+	
+	var xml = objToXML(obj, "broadcast")
+
+	xsock.send(xml)
+}
+
+//Usefull library functions
+//object to xml ---- xml to object
+
+function objToXML (obj, name) {
+	var xml = new XML();
+	var xdata = xml.createElement(name);
+
+	for (i in obj) {
+		xdata.attributes[i] = obj[i]
+	}
+
+	xml.appendChild(xdata)
+
+	return xml
+}
+
+function xmlToObj (doc) {
+	
+	var xml = doc.childNodes[1]
+	var objName = xml.nodeName
+	var attribCount = xml.attributes.length
+
+	var returnObj = new Object ()
+
+	for (i in xml.attributes) {
+		set (returnObj[i], xml.attributes[i])
+	}
+
+	return returnObj
+}
+</PRE><BR>So what's all this, right? <BR>Ok, the code above is a stripped-down, 
+slightly modified version of the chat code being used at theremediproject.com 
+This should give you one helluva head start in creating your multi-user 
+masterpiece. Let's break it down.<BR><BR>First thing we do is set two variables, 
+port and server. These should be familiar from the Flash 5 manual. What?! Didn't 
+read the manual? Shame shame, I told you so.<BR><BR>init() <BR>This function 
+sets up our xml socket. You can have more than one if you want, but there's 
+really no point.<BR><BR>You can probably cut/paste this function as 
+is.<BR><BR>sockConnect(success)<BR>Flash automatically calls this function (we 
+told it to in init() ) after the call to connect either succeeds or fails... I 
+think this is called a "callback function" or something...whatever, the manual 
+doesn't explain it very well, but that's what happens. The "success" parameter 
+is a boolean (read the manual, ok?) that tells us if the connect worked or not. 
+Note that this function isn't doing anything in this example. In real life, you 
+would tell your app to allow sending/recieving data if everything is cool, and 
+if the connect failed, you'd offer a retry or something.<BR><BR>handleXML 
+(xmlDoc) &amp; handleXMLQueue ()<BR>Flash calls the handleXML function when new 
+xml is received. I've made it a bit more complex than it really needs to be and 
+added a queue. Since this function gets called everytime new xml arrives, we 
+want to be sure one request doesn't stomp on the processing of another. 
+Basically, I don't trust Macromedia on this one... If you want to make sense of 
+it, just follow the processing path with your finger...*be* the xml...Just keep 
+in mind that we're not processing the data at all in this function; all we're 
+doing is making a list of stuff that needs to get processed. That's pretty 
+easy.<BR><BR>processXML(xmlDoc)<BR>Now we're getting somewhere. This function 
+breaks the xml down and figures out what's in it. If it's just a simple one-node 
+message (and most of the stuff you build probably will be at first), this 
+function will figure out the node name, and process the data based on the node 
+name. So, If my XML looks like: <BR><B><PRE>&lt;broadcast username="paul" msg="whatever man, I just xml here." /&gt; </PRE></B>This 
+function will see that the node name is broadcast, and pull the username and 
+message attribute values out of the rest of the xml string. Neato, 
+huh?<BR><BR>sendXmlExample (text)<BR>I've included this for completeness sake, 
+even though I didn't include the functions that deal with how you display a new 
+piece of chat once you've got it. If you want to send XML, here's how. I've 
+included two pretty usefull (I think) library functions that convert xml into 
+objects and vice versa. The sendXmlExample function uses the objToXml function. 
+First, we build an object, that contains a username and a message, then we call 
+it "broadcast", convert it to xml, and send it down the pipe. More on how this 
+works in a sec.<BR><BR>objToXML (obj, name)<BR>The first library function 
+converts any object into an xml string. You just specify a node-name. This is 
+particularly usefull for pulling all the data out of a movie clip and sending it 
+to the server, without knowing exactly what data it contains. You simply pass 
+the movieclip as the "obj" parameter, and give it a node-name. The xml string is 
+returned. If this isn't making any sense, refer back to the code, and look up 
+the "for in" loop in the ActionScript guide. Keep in mind too, that you should 
+be able to use this function without completely understanding it...at least 
+that's my hope.<BR><BR>xmlToObj (doc)<BR>This function does the opposite, give 
+it an xml string (again, single node only) and it'll return an object containing 
+all the name/value pairs from that object. We grab the node-name, but we don't 
+do anything with it in this example, and as you might have noticed, I'm not even 
+using this function in the chat engine at all...it's just here as an analog to 
+the function above.<BR><BR><SPAN class=header>Java</SPAN><BR><BR>Deep breath. 
+Just chill, ok? I'm going to make this as painless as possible.<BR><BR>Included 
+in the download are a bunch of files that allow you to set up a java server. 
+It's not going to do anything cool unless you modify the code and tweak it, and 
+I'm not really going to explain it, because if you know java you'll get it, and 
+if you don't, you won't.<BR><BR>If you want to use it as is though, it 
+<I>will</I> work. Any message sent to this server from Flash with a node-name of 
+"broadcast" will be sent to all other connected users. Ta-Da! Multi-user. A log 
+file also gets created so you can troubleshoot and stuff.<BR><BR>To run the 
+server, copy all the .class files to your server. You need to have the java 
+runtime environment installed and be familiar with all that whoey. Download it 
+free from <A target=_blank href="http://java.sun.com/">java.sun.com</A> Refer to 
+macromedia's documentation regarding security and whatnot. It's important. It 
+won't work unless you follow the rules. The machine you're doing this on is the 
+one that your Flash file will connect to using the "server" variable we talked 
+about above.<BR><BR>type: <PRE>java XmlServer 9999</PRE><BR><BR>That assumes you want to run this bad boy 
+on port 9999. Unix users will want to add an "&amp;" to the end of that command 
+so that it spawns a new process.<BR><BR>You should now be able to connect to 
+your xmlServer ... give it a whirl.<BR><BR><SPAN class=header>Security 
+Restrictions</SPAN><BR><BR>Ok, so the fact that you can only connect back to 
+servers within <I>your</I> domain blows ass. What to do?<BR><BR>1) Get access to 
+your own DNS server so you can tweak everything. If you don't have control over 
+your own DNS, you *can*, and for *free* Visit <A target=_blank 
+href="http://www.granitecanyon.com/">granitecanyon.com</A><BR><BR>2) Add an 
+entry for whatever box has your xml server so that it appears that it's part of 
+the same domain as www.yourwebserver.com <BR><BR><SPAN class=header>Is this 
+thing on? TESTING:</SPAN><BR><BR>All this stuff is new. If you have trouble, let 
+me know. <BR>jon@shovemedia.com<BR><SPAN class=header><BR>Terms of 
+Use:</SPAN><BR><BR>The contents of this page and the associated download are 
+being released under GNU public license with the following additional 
+restrictions.<BR><BR><B>Artistic use:</B> Do whatever you want, straight-up GPL. 
+Just drop me an email so I can decide if I want to help 
+*grin*.<BR><BR><B>Non-commercial use:</B> Do what ever you want, just drop me an 
+email and let me know what you're doing and what URL you'll be operating 
+from.<BR><BR>All *modifications* to the codebase fall back under GNU public 
+license (this is a standard stipulation of GPL). Under the "Shove Public 
+License", you are also required to proactively submit your modifications back to 
+shovemedia.com so that the whole community is able to benefit from your 
+development effort.<BR><BR>*Implementaions* of the codebase are not subject to 
+GNU public license (i.e. your entire net application doesn't become GPL'ed just 
+because part of it uses this code.)<BR><BR><B>Commercial use:</B> Don't even 
+move. Contact <A href="mailto:jon@shovemedia.com">jon@shovemedia.com</A> before 
+you even think about it.<BR><BR><SPAN class=header>Huh?</SPAN><BR><BR>If you 
+know Flash 5 and Java and you're thinking to yourself "this sucks," I probably 
+need to make something clearer in the tutorial. Suggestions to<BR><A 
+href="mailto:jon@shovemedia.com">jon@shovemedia.com</A><BR><BR>If you *don't* 
+know Flash 5 and Java take special note of disclaimers number 1 and 
+4.<BR><BR>Please let me know of bugs/fixes. <BR><SPAN class=header><BR>The 
+Download:</SPAN><BR><BR>You'll need <A 
+href="http://www.shovemedia.com/multi/multi.zip">this zip file</A>. Don't get 
+all excited just yet. Without this tutorial, it'll be a pain in the ass to 
+figure out. Please read this tutorial before you download this stuff, install 
+it, find out it won't work, and bang away on my server crashing my example site 
+thus causing mayhem for everyone else trying to figure this out. <BR><BR><SPAN 
+class=header>The Disclaimers:</SPAN><BR><BR>1) This shit is complicated.<BR>2) 
+Despite the fact that I'm doing all this nutty stuff, I'm NOT a programmer by 
+profession.<BR>3) There's almost always a better way. If you get an idea, try 
+it. The answer to "why didn't you just..."is usually either "I didn't know how." 
+or "It didn't work."<BR>4) This shit is complicated.<BR>5) This tutorial is 
+currently in beta. <BR>&nbsp;&nbsp;a. The code may be unstable, unreliable, and 
+incompatible.<BR>&nbsp;&nbsp;b. I hope to add architecture diagrams 
+soon.<BR>&nbsp;&nbsp;c. To give you that full "under-whelmed" sensation, I 
+haven't even gotten around to a spell check yet.<BR><BR><SPAN class=header>Mucho 
+Kudos</SPAN><BR><BR><A target=_blank href="http://www.theremediproject.com/">The 
+Remedi Project</A><BR><A target=_blank 
+href="http://www.entropy8zuper.org/">Entropy8Zuper</A><BR><A target=_blank 
+href="http://www.moock.org/">Colin Moock</A><BR><A target=_blank 
+href="http://www.praystation.com/">Joshua Davis</A> etc <BR><A target=_blank 
+href="http://www.shockfusion.com/">The ShockFusion 
+alpha-something-or-others</A></SPAN> </BODY></HTML>

@@ -1,0 +1,224 @@
+using System;
+using System.Drawing;
+using System.Collections;
+using System.Collections.Specialized;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using AspNetForums;
+using AspNetForums.Controls;
+using AspNetForums.Components;
+using System.ComponentModel;
+using System.IO;
+using AspNetForums.Controls.BaseClasses;
+
+namespace AspNetForums.Controls.Moderation {
+
+    // *********************************************************************
+    //  ModerationHistory
+    //
+    /// <summary>
+    /// This server control provides details about the moderation history of a post.
+    /// </summary>
+    // ********************************************************************/ 
+    public class ModerationHistory : ForumDataListControl {
+
+
+        // *********************************************************************
+        //  RenderHeaderTemplate
+        //
+        /// <summary>
+        /// Renders each the header using a default template
+        /// </summary>
+        /// 
+        // ********************************************************************/
+        private Control RenderHeaderTemplate() {
+            Table table;
+            TableRow tr;
+            TableHeaderCell th;
+
+            table = new Table();
+            tr = new TableRow();
+
+            // Column - # of users
+            th = new TableHeaderCell();
+            th.CssClass = "tableHeaderText";
+            th.HorizontalAlign = HorizontalAlign.Left;
+            th.Text = "&nbsp;#&nbsp;";
+            tr.Controls.Add(th);
+
+            // Column - Username
+            th = new TableHeaderCell();
+            th.CssClass = "tableHeaderText";
+            th.Text = "&nbsp;Username&nbsp;";
+            th.HorizontalAlign = HorizontalAlign.Left;
+            tr.Controls.Add(th);
+            
+            // Column - Website
+            th = new TableHeaderCell();
+            th.CssClass = "tableHeaderText";
+            th.Text = "&nbsp;Website&nbsp;";
+            th.HorizontalAlign = HorizontalAlign.Left;
+            tr.Controls.Add(th);
+
+            // Column - Location
+            th = new TableHeaderCell();
+            th.CssClass = "tableHeaderText";
+            th.Text = "&nbsp;Location&nbsp;";
+            th.HorizontalAlign = HorizontalAlign.Left;
+            tr.Controls.Add(th);
+
+            // Column - Joined
+            th = new TableHeaderCell();
+            th.CssClass = "tableHeaderText";
+            th.Text = "&nbsp;Joined&nbsp;";
+            th.HorizontalAlign = HorizontalAlign.Left;
+            tr.Controls.Add(th);
+
+            // Column - Last Active
+            th = new TableHeaderCell();
+            th.CssClass = "tableHeaderText";
+            th.Text = "&nbsp;Last Active&nbsp;";
+            th.HorizontalAlign = HorizontalAlign.Left;
+            tr.Controls.Add(th);
+
+            // Column - Total Posts
+            th = new TableHeaderCell();
+            th.CssClass = "tableHeaderText";
+            th.Text = "&nbsp;Posts&nbsp;";
+            th.HorizontalAlign = HorizontalAlign.Left;
+            tr.Controls.Add(th);
+
+            table.Controls.Add(tr);
+
+            return table;
+        }
+
+        // *********************************************************************
+        //  RenderItemTempalte
+        //
+        /// <summary>
+        /// Renders each item using a default template
+        /// </summary>
+        /// 
+        // ********************************************************************/
+        private Control RenderItemTemplate() {
+
+            Table table;
+            TableRow tr;
+            TableCell td;
+            Label label;
+            HyperLink link;
+
+            // Create a new table
+            table = new Table();
+
+            // Create a new table row
+            tr = new TableRow();
+
+            // Column - User Count
+            td = new TableCell();
+            td.Width = 25;
+            td.HorizontalAlign = HorizontalAlign.Center;
+            td.VerticalAlign = VerticalAlign.Middle;
+            td.CssClass = "forumRow";
+            label = new Label();
+            label.CssClass = "normalTextSmallBold";
+            label.DataBinding += new System.EventHandler(HandleDataBindingForUserCount);
+            td.Controls.Add(label);
+            tr.Controls.Add(td);
+
+            // Column - Username
+            td = new TableCell();
+            td.CssClass = "forumRow";
+            link = new HyperLink();
+            link.CssClass = "linkSmallBold";
+            link.DataBinding += new System.EventHandler(HandleDatabindingForUsername);
+            td.Controls.Add(link);
+            tr.Controls.Add(td);
+
+            // Column - Web site
+            td = new TableCell();
+            td.CssClass = "forumRowHighlight";
+            td.HorizontalAlign = HorizontalAlign.Left;
+            link = new HyperLink();
+            link.CssClass = "linkSmallBold";
+            link.Target = "_blank";
+            link.DataBinding += new System.EventHandler(HandleDatabindingForWebsite);
+            td.Controls.Add(link);
+            tr.Controls.Add(td);
+
+            // Column - Location
+            td = new TableCell();
+            td.CssClass = "forumRowHighlight";
+            td.HorizontalAlign = HorizontalAlign.Left;
+            label = new Label();
+            label.CssClass = "normalTextSmall";
+            label.DataBinding += new System.EventHandler(HandleDatabindingForLocation);
+            td.Controls.Add(label);
+            tr.Controls.Add(td);
+
+            // Column - Date Joined
+            td = new TableCell();
+            td.CssClass = "forumRowHighlight";
+            td.HorizontalAlign = HorizontalAlign.Left;
+            label = new Label();
+            label.CssClass = "normalTextSmall";
+            label.DataBinding += new System.EventHandler(HandleDatabindingForDateJoined);
+            td.Controls.Add(label);
+            tr.Controls.Add(td);
+
+            // Column - Last Active
+            td = new TableCell();
+            td.CssClass = "forumRowHighlight";
+            td.HorizontalAlign = HorizontalAlign.Left;
+            label = new Label();
+            label.CssClass = "normalTextSmall";
+            label.DataBinding += new System.EventHandler(HandleDatabindingForLastActivtyDate);
+            td.Controls.Add(label);
+            tr.Controls.Add(td);
+
+            // Column - Total posts
+            td = new TableCell();
+            td.CssClass = "forumRowHighlight";
+            td.HorizontalAlign = HorizontalAlign.Left;
+            link = new HyperLink();
+            link.CssClass = "linkSmallBold";
+            link.DataBinding += new System.EventHandler(HandleDatabindingForTotalPosts);
+            td.Controls.Add(link);
+            tr.Controls.Add(td);
+
+            table.Controls.Add(tr);
+
+            return table;
+        }
+
+        // *********************************************************************
+        //  RenderFooterTempalte
+        //
+        /// <summary>
+        /// Renders each the footer using a default template
+        /// </summary>
+        /// 
+        // ********************************************************************/
+        private Control RenderFooterTemplate() {
+            Table table;
+            TableRow tr;
+            TableCell td;
+
+            table = new Table();
+            tr = new TableRow();
+
+            // Single column
+            td = new TableCell();
+            td.CssClass = "forumHeaderBackgroundAlternate";
+            td.ColumnSpan = 8;
+            tr.Controls.Add(td);
+
+            table.Controls.Add(tr);
+
+            return table;
+        }
+
+    }
+}

@@ -1,0 +1,69 @@
+<html>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <h1>
+            ReviewList User Control
+        </h1>
+        <P>
+            <b>Description:</b> The ReviewList user control displays a list of reviews 
+            written by customers about a specified product.&nbsp; It is registered and used 
+            on the IBuySpy ProductDetails page.&nbsp;
+        </P>
+        <p>
+            <A href="UserControls.htm"><STRONG>Click here to learn more about what user controls 
+                    are and how they are used within ASP.NET Web Applications</STRONG> </A>
+        </p>
+        <P>
+            <STRONG>Implementation Notes: </STRONG>The ReviewList user control logic is 
+            encapsulated entirely within its&nbsp;<strong>Page_Load</strong>
+        &nbsp;event handler.&nbsp; This event handler is called when a page containing 
+        the user control is accessed by a browser client.&nbsp;
+        <p>
+            <strong>Page_Load Event Handler:&nbsp;</strong>&nbsp;&nbsp;The ReviewList user 
+            control exposes a single public field -- ProductID -- at the top of the 
+            file.&nbsp; This enables consumers of the ReviewList user control -- like the <A href="productdetails_aspx.htm">
+                ProductDetails.aspx</A> page -- to either programmatically or declaratively 
+            (via a tag attribute) set the ProductID of the product to obtain a review 
+            list.&nbsp; Note that only those fields, properties and methods that have a 
+            "public" accessor declaration before them can be <EM>externally </EM>
+        accessed in this way (for example: the Page_Load event handler does not have a 
+        "public" keyword accessor before it -- and as such can not be called from the 
+        ProductDetails.aspx page).&nbsp;
+        <P>
+        The ReviewList's Page_Load event handler utilizes the ProductID argument to 
+        invoke the "GetReviews" method of the IBuySpy.ProductsDB class to obtain a 
+        collection of reviews by users of the specified product.&nbsp; This method 
+        internally uses the "ReviewsList" stored procedure to fetch the review 
+        information from the IBuySpy database.
+        <P>
+        The review collection is displayed using a templated &lt;asp:datalist&gt; 
+        server control.&nbsp; The &lt;asp:datalist&gt; server control contains a single 
+        user-defined customization templates: an "ItemTemplate" that defines what each 
+        item in the list should look like.
+        <P>
+            The data values returned from the ProductsDB.GetReviews() method are populated 
+            into the &lt;asp:datalist&gt; by setting the DataList's "Datasource" property 
+            and then calling its "DataBind()" method.&nbsp; The DataList will iterate over 
+            every row in the DataSource when the "DataBind()" method is called -- using an 
+            ItemTemplate to customize each row's appearance.
+        </P>
+        <P>
+            <B>Peformance Notes:</B>
+        </P>
+        <UL>
+            <LI>
+                The ReviewList user control does not cache the results of the 
+                ProductsDB.GetReviews() method.&nbsp; This is because the ReviewList user 
+                control is currently only used from the <A href="productdetails_aspx.htm">ProductDetails.aspx</A>
+            page -- which itself uses output caching.&nbsp; As such, the results generated 
+            by the ReviewList user control are already cached by the containing page.&nbsp; 
+            If in the future we choose to use the ReviewList user control on page's that 
+            were not output cached, then we would definitely want to insert data caching 
+            logic here.&nbsp;
+
+        </UL>
+    </BODY>
+</HTML>

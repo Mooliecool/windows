@@ -1,0 +1,195 @@
+<html><head><link rel=stylesheet href=style.css></head><body><div class=SourcePanel style='font-size:12'><pre style='background-color:white'>
+<font color= "blue">using</font> System;
+<font color= "blue">using</font> System.Collections;
+<font color= "blue">using</font> System.ComponentModel;
+<font color= "blue">using</font> System.Data;
+<font color= "blue">using</font> System.Data.SqlClient;
+<font color= "blue">using</font> System.Drawing;
+<font color= "blue">using</font> System.Web;
+<font color= "blue">using</font> System.Web.UI;
+<font color= "blue">using</font> System.Web.UI.WebControls;
+<font color= "blue">using</font> System.Web.UI.HtmlControls;
+<font color= "blue"></font>
+<font color= "blue">namespace</font> IBuySpy {
+<font color= "blue"></font>
+<font color= "blue">    public class</font> ShoppingCart : System.Web.UI.Page {
+<font color= "blue"></font>
+<font color= "blue">        protected </font>System.Web.UI.WebControls.Label MyError;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.DataGrid MyList;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.Label lblTotal;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.ImageButton UpdateBtn;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.ImageButton CheckoutBtn;
+<font color= "blue">        protected </font>System.Web.UI.WebControls.Panel DetailsPanel;
+<font color= "blue"></font>
+<font color= "blue">        public </font>ShoppingCart() {
+<font color= "blue">            </font>Page.Init += new System.EventHandler(Page_Init);
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // The Page_Load event on this page is used to load the</font>
+<font color= "green">        // ShoppingCart DataGrid *the first time* the page is</font>
+<font color= "green">        // accessed.</font>
+<font color= "green">        //</font>
+<font color= "green">        // Note that subsequent postbacks to the page *do not*</font>
+<font color= "green">        // reload the Datagrid.  Instead, we rely on the control's</font>
+<font color= "green">        // built-in viewstate management to rebuild the control</font>
+<font color= "green">        // on the server.</font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        private void</font> Page_Load(object sender, System.EventArgs e) {
+<font color= "blue"></font>
+<font color= "green">            // Populate the shopping cart the first time the page is accessed.</font>
+<font color= "blue"></font><font color= "blue">            if </font>(Page.IsPostBack == false) {<font color= "blue"></font>
+<font color= "blue">                </font>PopulateShoppingCartList();
+<font color= "blue">            </font>}
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // The UpdateBtn_Click event is raised when a user clicks</font>
+<font color= "green">        // the "update" button on the client.  The event handler</font>
+<font color= "green">        // updates all items in the cart back to the database,</font>
+<font color= "green">        // and then repopulates the datagrid with the current</font>
+<font color= "green">        // cart contents.</font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        private void</font> UpdateBtn_Click(object sender, System.Web.UI.ImageClickEventArgs e) {
+<font color= "blue"></font>
+<font color= "green">            // Update the Shopping Cart and then Repopulate the List</font>
+<font color= "blue">            </font>UpdateShoppingCartDatabase();
+<font color= "blue">            </font>PopulateShoppingCartList();
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // The CheckoutBtn_Click event is raised when a user clicks</font>
+<font color= "green">        // the "checkout" button on the client.  The event handler</font>
+<font color= "green">        // updates all items in the cart back to the database,</font>
+<font color= "green">        // and then redirects the user to the checkout.aspx page</font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        private void</font> CheckoutBtn_Click(object sender, System.Web.UI.ImageClickEventArgs e) {
+<font color= "blue"></font>
+<font color= "green">            // Update Shopping Cart</font>
+<font color= "blue">            </font>UpdateShoppingCartDatabase();
+<font color= "blue"></font>
+<font color= "green">            // If cart is not empty, proceed on to checkout page</font>
+<font color= "blue">            </font>IBuySpy.ShoppingCartDB cart = new IBuySpy.ShoppingCartDB();
+<font color= "blue"></font>
+<font color= "green">            // Calculate shopping cart ID</font>
+<font color= "blue">            </font>String cartId = cart.GetShoppingCartId();
+<font color= "blue"></font>
+<font color= "green">            // If the cart isn't empty, navigate to checkout page</font>
+<font color= "blue"></font><font color= "blue">            if </font>(cart.GetItemCount(cartId) !=0) {<font color= "blue"></font>
+<font color= "blue">                </font>Response.Redirect("Checkout.aspx");
+<font color= "blue">            </font>}
+<font color= "blue"></font><font color= "blue">            else </font>{<font color= "blue"></font>
+<font color= "blue">                </font>MyError.Text = "You can't proceed to the Check Out page with an empty cart.";
+<font color= "blue">            </font>}
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // The PopulateShoppingCartList helper method is used to</font>
+<font color= "green">        // dynamically populate a GridControl with the contents of</font>
+<font color= "green">        // the current user's shopping cart.</font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        void</font> PopulateShoppingCartList() {
+<font color= "blue"></font>
+<font color= "blue">            </font>IBuySpy.ShoppingCartDB cart = new IBuySpy.ShoppingCartDB();
+<font color= "blue"></font>
+<font color= "green">            // Obtain current user's shopping cart ID</font>
+<font color= "blue">            </font>String cartId = cart.GetShoppingCartId();
+<font color= "blue"></font>
+<font color= "green">            // If no items, hide details and display message</font>
+<font color= "blue"></font><font color= "blue">            if </font>(cart.GetItemCount(cartId) == 0) {<font color= "blue"></font>
+<font color= "blue">                </font>DetailsPanel.Visible = false;
+<font color= "blue">                </font>MyError.Text = "There are currently no items in your shopping cart.";
+<font color= "blue">            </font>}
+<font color= "blue"></font><font color= "blue">            else </font>{<font color= "blue"></font>
+<font color= "blue"></font>
+<font color= "green">                // Databind Gridcontrol with Shopping Cart Items</font>
+<font color= "blue">                </font>MyList.DataSource = cart.GetItems(cartId);
+<font color= "blue">                </font>MyList.DataBind();
+<font color= "blue"></font>
+<font color= "green">                //Update Total Price Label</font>
+<font color= "blue">                </font>lblTotal.Text = String.Format( "{0:c}", cart.GetTotal(cartId));
+<font color= "blue">            </font>}
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // The UpdateShoppingCartDatabase helper method is used to</font>
+<font color= "green">        // update a user's items within the shopping cart database</font>
+<font color= "green">        // using client input from the GridControl.</font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        void</font> UpdateShoppingCartDatabase() {
+<font color= "blue"></font>
+<font color= "blue">            </font>IBuySpy.ShoppingCartDB cart = new IBuySpy.ShoppingCartDB();
+<font color= "blue"></font>
+<font color= "green">            // Obtain current user's shopping cart ID</font>
+<font color= "blue">            </font>String cartId = cart.GetShoppingCartId();
+<font color= "blue"></font>
+<font color= "green">            // Iterate through all rows within shopping cart list</font>
+<font color= "blue">            for</font> (int i=0; i < MyList.Items.Count; i++) {
+<font color= "blue"></font>
+<font color= "green">                // Obtain references to row's controls</font>
+<font color= "blue">                </font>TextBox quantityTxt = (TextBox) MyList.Items[i].FindControl("Quantity");
+<font color= "blue">                </font>CheckBox remove = (CheckBox) MyList.Items[i].FindControl("Remove");
+<font color= "blue"></font>
+<font color= "green">                // Wrap in try/catch block to catch errors in the event that someone types in</font>
+<font color= "green">                // an invalid value for quantity</font>
+<font color= "blue">                </font>int quantity;
+<font color= "blue">                try</font> {
+<font color= "blue">                    </font>quantity = Int32.Parse(quantityTxt.Text);
+<font color= "blue"></font>
+<font color= "green">                    // If the quantity field is changed or delete is checked</font>
+<font color= "blue"></font><font color= "blue">                    if </font>(quantity != (int)MyList.DataKeys[i] || remove.Checked == true) {<font color= "blue"></font>
+<font color= "blue"></font>
+<font color= "blue">                        </font>Label lblProductID = (Label) MyList.Items[i].FindControl("ProductID");
+<font color= "blue"></font>
+<font color= "blue"></font><font color= "blue">                        if </font>(quantity == 0 || remove.Checked == true) {<font color= "blue"></font>
+<font color= "blue">                            </font>cart.RemoveItem(cartId, Int32.Parse(lblProductID.Text));
+<font color= "blue">                        </font>}
+<font color= "blue"></font><font color= "blue">                        else </font>{<font color= "blue"></font>
+<font color= "blue">                            </font>cart.UpdateItem(cartId, Int32.Parse(lblProductID.Text),quantity);
+<font color= "blue">                        </font>}
+<font color= "blue">                    </font>}
+<font color= "blue">                </font>}
+<font color= "blue">                catch</font> {
+<font color= "blue">                    </font>MyError.Text = "There has been a problem with one or more of your inputs.";
+<font color= "blue">                </font>}
+<font color= "blue">            </font>}
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "blue">        private void</font> Page_Init(object sender, EventArgs e) {
+<font color= "green">            //</font>
+<font color= "green">            // CODEGEN: This call is required by the ASP.NET Web Form Designer.</font>
+<font color= "green">            //</font>
+<font color= "blue">            </font>InitializeComponent();
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "blue">        </font>#region Web Form Designer generated code
+<font color= "green">        /// <summary></font>
+<font color= "green">        /// Required method for Designer support - do not modify</font>
+<font color= "green">        /// the contents of this method with the code editor.</font>
+<font color= "green">        /// </summary></font>
+<font color= "blue">        private void</font> InitializeComponent() {
+<font color= "blue">            </font>this.UpdateBtn.Click += new System.Web.UI.ImageClickEventHandler(this.UpdateBtn_Click);
+<font color= "blue">            </font>this.CheckoutBtn.Click += new System.Web.UI.ImageClickEventHandler(this.CheckoutBtn_Click);
+<font color= "blue">            </font>this.Load += new System.EventHandler(this.Page_Load);
+<font color= "blue"></font>
+<font color= "blue">        </font>}
+<font color= "blue">        </font>#endregion
+<font color= "blue"></font>
+<font color= "blue">    </font>}
+<font color= "blue"></font>}
+</pre>

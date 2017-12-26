@@ -1,0 +1,64 @@
+<html>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <h1>"ReviewsAdd" Stored Procedure</h1>
+
+        <b>Description:</b>
+
+        <P>This stored procedure adds an entry to the Reviews table for the product being
+        reviewed.&nbsp; It returns the newly added ReviewID in an output parameter.</P>
+
+        <b>Definition:</b>
+
+        <pre>
+
+    CREATE Procedure ReviewsAdd
+    (
+        @ProductID     int,
+        @CustomerName  nvarchar(50),
+        @CustomerEmail nvarchar(50),
+        @Rating        int,
+        @Comments      nvarchar(3850),
+        @ReviewID      int OUTPUT
+    )
+    AS
+
+    INSERT INTO Reviews
+    (
+        ProductID,
+        CustomerName,
+        CustomerEmail,
+        Rating,
+        Comments
+    )
+    VALUES
+    (
+        @ProductID,
+        @CustomerName,
+        @CustomerEmail,
+        @Rating,
+        @Comments
+    )
+
+    SELECT
+        @ReviewID = @@Identity
+        </pre>
+
+        <b>Database Tables Used: </b>
+
+        <P><i>Reviews:</i> &nbsp;&nbsp;The Reviews table has a many to one relationship to the Products table.&nbsp; The
+        Reviews table contains all product reviews written by users.&nbsp; We decided not to
+        create a relationship between CustomerName to the FullName in the Customers
+        table to allow for anyone to review a product without logging into the system.&nbsp;
+        The ratings used in our implementation range from 1 to 5 stars.&nbsp; The actual
+        review text is allowed to be as large as 3850 characters.
+
+        <p>
+
+        <img src="1x1.gif" width=25> <IMG src="../docs/images/Reviews.gif"></p>
+
+    </body>
+</html>

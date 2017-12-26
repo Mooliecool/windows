@@ -1,0 +1,205 @@
+<html><head><link rel=stylesheet href=style.css></head><body><div class=SourcePanel style='font-size:12'><pre style='background-color:white'>
+<font color= "blue">using</font> System;
+<font color= "blue">using</font> System.Configuration;
+<font color= "blue">using</font> System.Data;
+<font color= "blue">using</font> System.Data.SqlClient;
+<font color= "blue"></font>
+<font color= "blue">namespace</font> IBuySpy {
+<font color= "blue"></font>
+<font color= "green">    //*******************************************************</font>
+<font color= "green">    //</font>
+<font color= "green">    // CustomerDetails Class</font>
+<font color= "green">    //</font>
+<font color= "green">    // A simple data class that encapsulates details about</font>
+<font color= "green">    // a particular customer inside the IBuySpy Customer</font>
+<font color= "green">    // database.</font>
+<font color= "green">    //</font>
+<font color= "green">    //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">    public class</font> CustomerDetails {
+<font color= "blue"></font>
+<font color= "blue">        public </font>String FullName;
+<font color= "blue">        public </font>String Email;
+<font color= "blue">        public </font>String Password;
+<font color= "blue">    </font>}
+<font color= "blue"></font>
+<font color= "green">    //*******************************************************</font>
+<font color= "green">    //</font>
+<font color= "green">    // CustomersDB Class</font>
+<font color= "green">    //</font>
+<font color= "green">    // Business/Data Logic Class that encapsulates all data</font>
+<font color= "green">    // logic necessary to add/login/query customers within</font>
+<font color= "green">    // the IBuySpy Customer database.</font>
+<font color= "green">    //</font>
+<font color= "green">    //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">    public class</font> CustomersDB {
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // CustomersDB.GetCustomerDetails() Method <a name="GetCustomerDetails"></a></font>
+<font color= "green">        //</font>
+<font color= "green">        // The GetCustomerDetails method returns a CustomerDetails</font>
+<font color= "green">        // struct that contains information about a specific</font>
+<font color= "green">        // customer (name, email, password, etc).</font>
+<font color= "green">        //</font>
+<font color= "green">        // Other relevant sources:</font>
+<font color= "green">        //     + <a href="CustomerDetail.htm" style="color:green">CustomerDetail Stored Procedure</a></font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        public </font>CustomerDetails GetCustomerDetails(String customerID) 
+<font color= "blue">        </font>{
+<font color= "blue"></font>
+<font color= "green">            // Create Instance of Connection and Command Object</font>
+<font color= "blue">            </font>SqlConnection myConnection = new SqlConnection(ConfigurationSettings.AppSettings["ConnectionString"]);
+<font color= "blue">            </font>SqlCommand myCommand = new SqlCommand("CustomerDetail", myConnection);
+<font color= "blue"></font>
+<font color= "green">            // Mark the Command as a SPROC</font>
+<font color= "blue">            </font>myCommand.CommandType = CommandType.StoredProcedure;
+<font color= "blue"></font>
+<font color= "green">            // Add Parameters to SPROC</font>
+<font color= "blue">            </font>SqlParameter parameterCustomerID = new SqlParameter("@CustomerID", SqlDbType.Int, 4);
+<font color= "blue">            </font>parameterCustomerID.Value = Int32.Parse(customerID);
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterCustomerID);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterFullName = new SqlParameter("@FullName", SqlDbType.NVarChar, 50);
+<font color= "blue">            </font>parameterFullName.Direction = ParameterDirection.Output;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterFullName);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterEmail = new SqlParameter("@Email", SqlDbType.NVarChar, 50);
+<font color= "blue">            </font>parameterEmail.Direction = ParameterDirection.Output;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterEmail);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterPassword = new SqlParameter("@Password", SqlDbType.NVarChar, 50);
+<font color= "blue">            </font>parameterPassword.Direction = ParameterDirection.Output;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterPassword);
+<font color= "blue"></font>
+<font color= "blue">            </font>myConnection.Open();
+<font color= "blue">            </font>myCommand.ExecuteNonQuery();
+<font color= "blue">            </font>myConnection.Close();
+<font color= "blue"></font>
+<font color= "green">            // Create CustomerDetails Struct</font>
+<font color= "blue">            </font>CustomerDetails myCustomerDetails = new CustomerDetails();
+<font color= "blue"></font>
+<font color= "green">            // Populate Struct using Output Params from SPROC</font>
+<font color= "blue">            </font>myCustomerDetails.FullName = (string)parameterFullName.Value;
+<font color= "blue">            </font>myCustomerDetails.Password = (string)parameterPassword.Value;
+<font color= "blue">            </font>myCustomerDetails.Email = (string)parameterEmail.Value;
+<font color= "blue"></font>
+<font color= "blue">            return</font> myCustomerDetails;
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // CustomersDB.AddCustomer() Method <a name="AddCustomer"></a></font>
+<font color= "green">        //</font>
+<font color= "green">        // The AddCustomer method inserts a new customer record</font>
+<font color= "green">        // into the customers database.  A unique "CustomerId"</font>
+<font color= "green">        // key is then returned from the method.  This can be</font>
+<font color= "green">        // used later to place orders, track shopping carts,</font>
+<font color= "green">        // etc within the ecommerce system.</font>
+<font color= "green">        //</font>
+<font color= "green">        // Other relevant sources:</font>
+<font color= "green">        //     + <a href="CustomerAdd.htm" style="color:green">CustomerAdd Stored Procedure</a></font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        public </font>String AddCustomer(string fullName, string email, string password) 
+<font color= "blue">        </font>{
+<font color= "blue"></font>
+<font color= "green">            // Create Instance of Connection and Command Object</font>
+<font color= "blue">            </font>SqlConnection myConnection = new SqlConnection(ConfigurationSettings.AppSettings["ConnectionString"]);
+<font color= "blue">            </font>SqlCommand myCommand = new SqlCommand("CustomerAdd", myConnection);
+<font color= "blue"></font>
+<font color= "green">            // Mark the Command as a SPROC</font>
+<font color= "blue">            </font>myCommand.CommandType = CommandType.StoredProcedure;
+<font color= "blue"></font>
+<font color= "green">            // Add Parameters to SPROC</font>
+<font color= "blue">            </font>SqlParameter parameterFullName = new SqlParameter("@FullName", SqlDbType.NVarChar, 50);
+<font color= "blue">            </font>parameterFullName.Value = fullName;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterFullName);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterEmail = new SqlParameter("@Email", SqlDbType.NVarChar, 50);
+<font color= "blue">            </font>parameterEmail.Value = email;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterEmail);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterPassword = new SqlParameter("@Password", SqlDbType.NVarChar, 50);
+<font color= "blue">            </font>parameterPassword.Value = password;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterPassword);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterCustomerID = new SqlParameter("@CustomerID", SqlDbType.Int, 4);
+<font color= "blue">            </font>parameterCustomerID.Direction = ParameterDirection.Output;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterCustomerID);
+<font color= "blue"></font>
+<font color= "blue">            try</font> {
+<font color= "blue">                </font>myConnection.Open();
+<font color= "blue">                </font>myCommand.ExecuteNonQuery();
+<font color= "blue">                </font>myConnection.Close();
+<font color= "blue"></font>
+<font color= "green">                // Calculate the CustomerID using Output Param from SPROC</font>
+<font color= "blue">                </font>int customerId = (int)parameterCustomerID.Value;
+<font color= "blue"></font>
+<font color= "blue">                return</font> customerId.ToString();
+<font color= "blue">            </font>}
+<font color= "blue">            catch</font> {
+<font color= "blue">                return</font> String.Empty;
+<font color= "blue">            </font>}
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // CustomersDB.Login() Method <a name="Login"></a></font>
+<font color= "green">        //</font>
+<font color= "green">        // The Login method validates a email/password pair</font>
+<font color= "green">        // against credentials stored in the customers database.</font>
+<font color= "green">        // If the email/password pair is valid, the method returns</font>
+<font color= "green">        // the "CustomerId" number of the customer.  Otherwise</font>
+<font color= "green">        // it will throw an exception.</font>
+<font color= "green">        //</font>
+<font color= "green">        // Other relevant sources:</font>
+<font color= "green">        //     + <a href="CustomerLogin.htm" style="color:green">CustomerLogin Stored Procedure</a></font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        public </font>String Login(string email, string password) 
+<font color= "blue">        </font>{
+<font color= "blue"></font>
+<font color= "green">            // Create Instance of Connection and Command Object</font>
+<font color= "blue">            </font>SqlConnection myConnection = new SqlConnection(ConfigurationSettings.AppSettings["ConnectionString"]);
+<font color= "blue">            </font>SqlCommand myCommand = new SqlCommand("CustomerLogin", myConnection);
+<font color= "blue"></font>
+<font color= "green">            // Mark the Command as a SPROC</font>
+<font color= "blue">            </font>myCommand.CommandType = CommandType.StoredProcedure;
+<font color= "blue"></font>
+<font color= "green">            // Add Parameters to SPROC</font>
+<font color= "blue">            </font>SqlParameter parameterEmail = new SqlParameter("@Email", SqlDbType.NVarChar, 50);
+<font color= "blue">            </font>parameterEmail.Value = email;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterEmail);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterPassword = new SqlParameter("@Password", SqlDbType.NVarChar, 50);
+<font color= "blue">            </font>parameterPassword.Value = password;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterPassword);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterCustomerID = new SqlParameter("@CustomerID", SqlDbType.Int, 4);
+<font color= "blue">            </font>parameterCustomerID.Direction = ParameterDirection.Output;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterCustomerID);
+<font color= "blue"></font>
+<font color= "green">            // Open the connection and execute the Command</font>
+<font color= "blue">            </font>myConnection.Open();
+<font color= "blue">            </font>myCommand.ExecuteNonQuery();
+<font color= "blue">            </font>myConnection.Close();
+<font color= "blue"></font>
+<font color= "blue">            </font>int customerId = (int)(parameterCustomerID.Value);
+<font color= "blue"></font>
+<font color= "blue"></font><font color= "blue">            if </font>(customerId == 0) {<font color= "blue"></font>
+<font color= "blue">                return</font> null;
+<font color= "blue">            </font>}
+<font color= "blue"></font><font color= "blue">            else </font>{<font color= "blue"></font>
+<font color= "blue">                return</font> customerId.ToString();
+<font color= "blue">            </font>}
+<font color= "blue">        </font>}
+<font color= "blue">    </font>}
+<font color= "blue"></font>}
+<font color= "blue"></font>
+</pre>

@@ -1,0 +1,59 @@
+<html>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body class="NormalIndent">
+        <h1>"ShoppingCartTotal" Stored Procedure</h1>
+
+        <b>Description:</b>
+
+        <P><P>This stored procedure computes the total dollar amount of all the items in the
+        given CartID.  Used on the display of the Shopping Cart screen.</P> </P>
+
+        <b>Definition:</b>
+
+        <pre>
+
+    CREATE Procedure ShoppingCartTotal
+    (
+        @CartID    nvarchar(50),
+        @TotalCost money OUTPUT
+    )
+    AS
+
+    SELECT
+        @TotalCost = SUM(Products.UnitCost * ShoppingCart.Quantity)
+
+    FROM
+        ShoppingCart,
+        Products
+
+    WHERE
+        ShoppingCart.CartID = @CartID
+      AND
+        Products.ProductID = ShoppingCart.ProductID
+        </pre>
+
+        <b>Database Tables Used: </b>
+
+        <P><i>ShoppingCart:</i> &nbsp;The ShoppingCart table keeps track of the items a user has purchased. 
+        Its primary key is the RecordID field.  The CartID is a string which we use to
+        identify the user currently logged in.  There is a many to one
+        relationship between the ShoppingCart table and the Products table.  Note that
+        if not Quantity is supplied, a default of 1 is entered.
+
+        <p>
+
+        <img src="1x1.gif" width=25> <IMG src="../docs/images/ShoppingCart.gif">
+
+        <P><i>Products:</i> &nbsp;The Products table contains all of the information about all of the products
+        on the IBuySpy web site. Its primary key is the ProductID identity field.  Note
+        that product descriptions are limited to 3800 characters.
+
+        <p>
+
+        <img src="1x1.gif" width=25> <IMG src="../docs/images/products.gif">
+
+    </body>
+</html>

@@ -1,0 +1,115 @@
+<html>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <h1>
+            Register.aspx Page
+        </h1>
+        <p><b>Description:</b> &nbsp;&nbsp;The Register.aspx page enables users browsing 
+        IBuySpy to register as a customer.
+        <p>
+            <b>Implementation Notes:</b>&nbsp;&nbsp;The&nbsp;Register page logic is 
+            encapsulated entirely within its&nbsp;<strong>RegisterBtn_Click</strong>
+        &nbsp;event handler.&nbsp; This event handler is called on the server when a 
+        user clicks the Submit ImageButton on the client.&nbsp;
+        <p>
+            <strong>RegisterBtn_Click Event Handler:</strong> &nbsp;&nbsp;This event 
+            handler uses the AddCustomer method of the CustomersDB class to add a new 
+            customer into the IBuySpy database.&nbsp; This method internally uses the <A href="CustomerAdd.htm">
+                CustomerAdd</A>
+        &nbsp;stored procedure to insert a new customer record into the IBuySpy 
+        database.
+        <p>
+            After the new customer record is added, the RegisterBtn_Click event handler 
+            performs four important actions:
+            <ol>
+                <LI>
+                    <div>
+                        It migrates any items stored within a browser's temporary shopping cart into a 
+                        permanent shopping cart that is keyed off of the customer's new unique 
+                        CustomerID.&nbsp; This ensures that the shopping cart items are not lost if the 
+                        customer's browser crashes.&nbsp; It also enables customers to suspend their 
+                        shopping experience -- closing their browser or powering off their 
+                        machine&nbsp; --&nbsp;then resume it days later, or on another machine.&nbsp;
+                    </div>
+                <LI>
+                    <div>
+                        It sends a custom "IBuySpy_FullName" personalization cookie to the client that 
+                        contains the full user name of the newly registered user.&nbsp; The home page 
+                        of the IBuySpy application -- <A href="default_aspx.htm">Default.aspx</A>&nbsp;-- 
+                        will look for this cookie to optionally personalize a welcome message for the 
+                        user the next time they visit the page.
+                    </div>
+                <LI>
+                    <div>
+                        It invokes the<strong>SetAuthCookie()</strong>static method on the 
+                        CookieAuthentication class.&nbsp; This built-in ASP.NET method issues a 
+                        MAC-encrypted cookie authentication ticket to the browser client that 
+                        identifies their authenticated username&nbsp;of the customer.&nbsp; In IBuySpy, 
+                        we use the CustomerID value returned from the CustomersDB.Login method as the 
+                        username identity of the client.&nbsp; This is passed as the first argument to 
+                        the SetAuthCookie() method.&nbsp;&nbsp;On subsequent&nbsp;requests to the 
+                        application we are able to&nbsp;gain access to the CustomerID user 
+                        token&nbsp;through the built-in&nbsp;<strong>User.Identity.Name</strong>&nbsp;property 
+                        of the ASP.NET page.&nbsp;
+                    </div>
+                <LI>
+                    <DIV>
+                        It redirect the browser to the <A href="ShoppingCart_aspx.htm">ShoppingCart.aspx</A>&nbsp;page 
+                        -- where they can then optionally proceed on to checkout and purchase items 
+                        stored within their shopping cart.
+                    </DIV>
+                </LI>
+            </ol>
+        <P>
+            <strong>Validating User Input: &nbsp;</strong>The page requires that users 
+            enter a name and email address. If you look at the source for the 
+            LoginBtn_Click event handler, you'll see that there is no input validation 
+            code. Instead, we use the built-in ASP.NET validation controls, which enable 
+            you to declaratively specify validation constraints on any input control.
+        </P>
+        <p>
+            ASP.NET comes with built-in validation controls to handle almost any validation 
+            requirement: the RequiredField, CompareValidator, RegularExpressionValidator, 
+            RangeValidator, and CustomValidator controls. The validation control 
+            architecture is extensible, so that other situation-specific controls (ZIP code 
+            validators, country code validators, etc) can also be developed by third 
+            parties.
+        </p>
+        <p>
+            You can put a validation control anywhere on a page and declaratively link it 
+            to a target input control using the validator's ControlToValidate property. You 
+            can optionally specify a Text property that displays in place of the validation 
+            control if the input data fails the validation test. If necessary, you can use 
+            multiple validators to chain validation logic for a single control (for 
+            example, a field is required and must meet a specified pattern).
+        </p>
+        <p>
+            If the page is displayed in a browser that supports EcmaScript 1.2 and the 
+            Dynamic HTML (DHTML) 4.0, the validation controls can perform client-side 
+            validation, which provides immediate feedback to the user.&nbsp; The validators 
+            also perform their check in server code, so if the browser does not support 
+            DHMTL, or if client-side scripting is disabled, the validation check is still 
+            performed. No code changes are required to enable either scenario -- all logic 
+            required to handle the checks on both basic and DHTML-compatible browsers is 
+            built into the controls themselves.
+        </p>
+        <p>
+            If you are using validation controls, your server code&nbsp;can determine 
+            whether the user's input passed the check by testing the IsValid property of 
+            the validation control. Additionally, you can check the page's IsValid 
+            property; this property is an aggregate of the IsValid properties of all the 
+            validators on the page. If any one validation has detected a failure, the 
+            page's IsValid property is set to false.
+        </p>
+        <p>
+            That's how the&nbsp;Register page works. Only if all controls on the page are 
+            valid will we go ahead and add the new customer. If one of the input fields is 
+            invalid, then the page will simply be redisplayed again, with the validation 
+            controls automatically taking care of displaying the appropriate error message 
+            to the user.
+        </p>
+    </body>
+</html>

@@ -1,0 +1,76 @@
+<html>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <h1>"CustomerAlsoBought" Stored Procedure</h1>
+
+        <b>Description:</b>
+
+        <P>This is the most interesting and involved of the Customer stored procedures.  It
+        accepts a ProductID as an input.  First, in the inner nested SELECT statement,
+        it builds a set of all orders containing the ProductID.  Then of those records,
+        it returns the top 5 distinct products in those orders.  This stored procedure
+        give the IBuySpy application the "Customers who bought this item also bought"
+        functionality.</P>
+
+        <b>Definition:</b>
+
+        <pre>
+
+    CREATE Procedure CustomerAlsoBought
+    (
+        @ProductID int
+    )
+    As
+
+    /* We want to take the top 5 products contained in
+        the orders where someone has purchased the given Product */
+    SELECT  TOP 5
+        OrderDetails.ProductID,
+        Products.ModelName,
+        SUM(OrderDetails.Quantity) as TotalNum
+
+    FROM
+        OrderDetails
+      INNER JOIN Products ON OrderDetails.ProductID = Products.ProductID
+
+    WHERE   OrderID IN
+    (
+        /* This inner query should retrieve all orders that have contained the productID */
+        SELECT DISTINCT OrderID
+        FROM OrderDetails
+        WHERE ProductID = @ProductID
+    )
+    AND OrderDetails.ProductID != @ProductID
+
+    GROUP BY OrderDetails.ProductID, Products.ModelName
+
+    ORDER BY TotalNum DESC
+        </pre>
+
+        <b>Database Tables Used: </b>
+
+        <P><i>Products:</i> &nbsp;The Products table contains all of the information about all of the products
+        on the IBuySpy web site. Its primary key is the ProductID identity field.  Note
+        that product descriptions are limited to 3800 characters.
+
+        <p>
+
+        <img src="1x1.gif" width=25> <IMG src="../docs/images/products.gif">
+
+        <P><i>OrderDetails:</i> &nbsp;The OrderDetails table contains detailed product information for each
+        order in the system.  For each product in an order, an entry is made into the
+        OrderDetails table containing the ProductID, Quantity and current UnitCost of
+        the item.  There is a many to one relationship between OrderDetails table and
+        the Orders table.  Note the primary key in the table is both OrderID and
+        ProductID (since those two columns are the minimum required to guarantee
+        uniqueness of a record).
+
+        <p>
+
+        <img src="1x1.gif" width=25> <IMG src="../docs/images/OrderDetails.gif">
+
+    </body>
+</html>

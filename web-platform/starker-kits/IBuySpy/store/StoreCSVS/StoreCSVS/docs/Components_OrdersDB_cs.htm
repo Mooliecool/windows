@@ -1,0 +1,219 @@
+<html><head><link rel=stylesheet href=style.css></head><body><div class=SourcePanel style='font-size:12'><pre style='background-color:white'>
+<font color= "blue">using</font> System;
+<font color= "blue">using</font> System.Configuration;
+<font color= "blue">using</font> System.Data;
+<font color= "blue">using</font> System.Data.SqlClient;
+<font color= "blue"></font>
+<font color= "blue">namespace</font> IBuySpy {
+<font color= "blue"></font>
+<font color= "green">    //*******************************************************</font>
+<font color= "green">    //</font>
+<font color= "green">    // OrderDetails Class</font>
+<font color= "green">    //</font>
+<font color= "green">    // A simple data class that encapsulates details about</font>
+<font color= "green">    // a particular order inside the IBuySpy Orders</font>
+<font color= "green">    // database.</font>
+<font color= "green">    //</font>
+<font color= "green">    //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">    public class</font> OrderDetails {
+<font color= "blue"></font>
+<font color= "blue">        public </font>DateTime  OrderDate;
+<font color= "blue">        public </font>DateTime  ShipDate;
+<font color= "blue">        public </font>decimal   OrderTotal;
+<font color= "blue">        public </font>DataSet   OrderItems;
+<font color= "blue">    </font>}
+<font color= "blue"></font>
+<font color= "green">    //*******************************************************</font>
+<font color= "green">    //</font>
+<font color= "green">    // OrderHistoryDB Class</font>
+<font color= "green">    //</font>
+<font color= "green">    // Business/Data Logic Class that encapsulates all data</font>
+<font color= "green">    // logic necessary to query past orders within the</font>
+<font color= "green">    // IBuySpy Orders database.</font>
+<font color= "green">    //</font>
+<font color= "green">    //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">    public class</font> OrdersDB {
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // CustomerDB.GetCustomerOrders() Method <a name="GetCustomerOrders"></a></font>
+<font color= "green">        //</font>
+<font color= "green">        // The GetCustomerOrders method returns a struct containing</font>
+<font color= "green">        // a forward-only, read-only DataReader.  This displays a list of all</font>
+<font color= "green">        // past orders placed by a specified customer.</font>
+<font color= "green">        // The SQLDataReaderResult struct also returns the SQL connection,</font>
+<font color= "green">        // which must be explicitly closed after the data from the DataReader</font>
+<font color= "green">        // is bound into the controls.</font>
+<font color= "green">        //</font>
+<font color= "green">        // Other relevant sources:</font>
+<font color= "green">        //     + <a href="OrdersList.htm" style="color:green">OrdersList Stored Procedure</a></font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        public </font>SqlDataReader GetCustomerOrders(String customerID) 
+<font color= "blue">        </font>{
+<font color= "blue"></font>
+<font color= "green">            // Create Instance of Connection and Command Object</font>
+<font color= "blue">            </font>SqlConnection myConnection = new SqlConnection(ConfigurationSettings.AppSettings["ConnectionString"]);
+<font color= "blue">            </font>SqlCommand myCommand = new SqlCommand("OrdersList", myConnection);
+<font color= "blue"></font>
+<font color= "green">            // Mark the Command as a SPROC</font>
+<font color= "blue">            </font>myCommand.CommandType = CommandType.StoredProcedure;
+<font color= "blue"></font>
+<font color= "green">            // Add Parameters to SPROC</font>
+<font color= "blue">            </font>SqlParameter parameterCustomerid = new SqlParameter("@CustomerID", SqlDbType.Int, 4);
+<font color= "blue">            </font>parameterCustomerid.Value = Int32.Parse(customerID);
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterCustomerid);
+<font color= "blue"></font>
+<font color= "green">            // Execute the command</font>
+<font color= "blue">            </font>myConnection.Open();
+<font color= "blue">            </font>SqlDataReader result = myCommand.ExecuteReader(CommandBehavior.CloseConnection);
+<font color= "blue"></font>
+<font color= "green">            // Return the datareader result</font>
+<font color= "blue">            return</font> result;
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // OrdersDB.GetOrderDetails() Method <a name="GetOrderDetails"></a></font>
+<font color= "green">        //</font>
+<font color= "green">        // The GetOrderDetails method returns an OrderDetails</font>
+<font color= "green">        // struct containing information about the specified</font>
+<font color= "green">        // order.</font>
+<font color= "green">        //</font>
+<font color= "green">        // Other relevant sources:</font>
+<font color= "green">        //     + <a href="OrdersDetail.htm" style="color:green">OrdersDetail Stored Procedure</a></font>
+<font color= "green">        // </font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        public </font>OrderDetails GetOrderDetails(int orderID, string customerID) 
+<font color= "blue">        </font>{
+<font color= "blue"></font>
+<font color= "green">            // Create Instance of Connection and Command Object</font>
+<font color= "blue">            </font>SqlConnection myConnection = new SqlConnection(ConfigurationSettings.AppSettings["ConnectionString"]);
+<font color= "blue">            </font>SqlDataAdapter myCommand = new SqlDataAdapter("OrdersDetail", myConnection);
+<font color= "blue"></font>
+<font color= "green">            // Mark the Command as a SPROC</font>
+<font color= "blue">            </font>myCommand.SelectCommand.CommandType = CommandType.StoredProcedure;
+<font color= "blue"></font>
+<font color= "green">            // Add Parameters to SPROC</font>
+<font color= "blue">            </font>SqlParameter parameterOrderID = new SqlParameter("@OrderID", SqlDbType.Int, 4);
+<font color= "blue">            </font>parameterOrderID.Value = orderID;
+<font color= "blue">            </font>myCommand.SelectCommand.Parameters.Add(parameterOrderID);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterCustomerID = new SqlParameter("@CustomerID", SqlDbType.Int, 4);
+<font color= "blue">            </font>parameterCustomerID.Value = Int32.Parse(customerID);
+<font color= "blue">            </font>myCommand.SelectCommand.Parameters.Add(parameterCustomerID);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterOrderDate = new SqlParameter("@OrderDate", SqlDbType.DateTime, 8);
+<font color= "blue">            </font>parameterOrderDate.Direction = ParameterDirection.Output;
+<font color= "blue">            </font>myCommand.SelectCommand.Parameters.Add(parameterOrderDate);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterShipDate = new SqlParameter("@ShipDate", SqlDbType.DateTime, 8);
+<font color= "blue">            </font>parameterShipDate.Direction = ParameterDirection.Output;
+<font color= "blue">            </font>myCommand.SelectCommand.Parameters.Add(parameterShipDate);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterOrderTotal = new SqlParameter("@OrderTotal", SqlDbType.Money, 8);
+<font color= "blue">            </font>parameterOrderTotal.Direction = ParameterDirection.Output;
+<font color= "blue">            </font>myCommand.SelectCommand.Parameters.Add(parameterOrderTotal);
+<font color= "blue"></font>
+<font color= "green">            // Create and Fill the DataSet</font>
+<font color= "blue">            </font>DataSet myDataSet = new DataSet();
+<font color= "blue">            </font>myCommand.Fill(myDataSet, "OrderItems");
+<font color= "blue">            </font>
+<font color= "green">            // ship date is null if order doesn't exist, or belongs to a different user</font>
+<font color= "blue"></font><font color= "blue">            if </font>(parameterShipDate.Value != DBNull.Value) {<font color= "blue"></font>
+<font color= "blue">            </font>
+<font color= "green">                // Create and Populate OrderDetails Struct using</font>
+<font color= "green">                // Output Params from the SPROC, as well as the</font>
+<font color= "green">                // populated dataset from the SqlDataAdapter</font>
+<font color= "blue"></font>
+<font color= "blue">                </font>OrderDetails myOrderDetails = new OrderDetails();
+<font color= "blue"></font>
+<font color= "blue">                </font>myOrderDetails.OrderDate = (DateTime)parameterOrderDate.Value;
+<font color= "blue">                </font>myOrderDetails.ShipDate = (DateTime)parameterShipDate.Value;
+<font color= "blue">                </font>myOrderDetails.OrderTotal = (decimal)parameterOrderTotal.Value;
+<font color= "blue">                </font>myOrderDetails.OrderItems = myDataSet;
+<font color= "blue"></font>
+<font color= "green">                // Return the DataSet</font>
+<font color= "blue">                return</font> myOrderDetails;
+<font color= "blue">            </font>}
+<font color= "blue"></font><font color= "blue">            else</font><font color= "blue"></font>
+<font color= "blue">                return</font> null;
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // OrdersDB.CalculateShippingDate() Method <a name="CalculateShippingDate"></a></font>
+<font color= "green">        //</font>
+<font color= "green">        // The CalculateShippingDate method would be where you would</font>
+<font color= "green">        // place all of the code necessary to calculate the shipping</font>
+<font color= "green">        // ETA.  For now, we are just making up a random date.</font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        public </font>DateTime CalculateShippingDate(String customerID, string cartID) {
+<font color= "blue"></font>
+<font color= "blue">            </font>Random x = new Random();
+<font color= "blue">            </font>double myrandom = (double)x.Next(0,3);
+<font color= "blue">            return</font> DateTime.Now.AddDays(myrandom);
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // OrdersDB.PlaceOrder() Method <a name="PlaceOrder"></a></font>
+<font color= "green">        //</font>
+<font color= "green">        // The PlaceOrder method places an order within the</font>
+<font color= "green">        // IBuySpy Orders Database and then clears out the current</font>
+<font color= "green">        // items within the shopping cart.</font>
+<font color= "green">        //</font>
+<font color= "green">        // Other relevant sources:</font>
+<font color= "green">        //     + <a href="OrdersAdd.htm" style="color:green">OrdersAdd Stored Procedure</a></font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        public </font>int PlaceOrder(string customerID, string cartID) 
+<font color= "blue">        </font>{
+<font color= "blue"></font>
+<font color= "green">            // Create Instance of Connection and Command Object</font>
+<font color= "blue">            </font>SqlConnection myConnection = new SqlConnection(ConfigurationSettings.AppSettings["ConnectionString"]);
+<font color= "blue">            </font>SqlCommand myCommand = new SqlCommand("OrdersAdd", myConnection);
+<font color= "blue"></font>
+<font color= "green">            // Mark the Command as a SPROC</font>
+<font color= "blue">            </font>myCommand.CommandType = CommandType.StoredProcedure;
+<font color= "blue"></font>
+<font color= "green">            // Add Parameters to SPROC</font>
+<font color= "blue">            </font>SqlParameter parameterCustomerID = new SqlParameter("@CustomerID", SqlDbType.Int, 4);
+<font color= "blue">            </font>parameterCustomerID.Value = Int32.Parse(customerID);
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterCustomerID);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterCartID = new SqlParameter("@CartID", SqlDbType.NVarChar, 50);
+<font color= "blue">            </font>parameterCartID.Value = cartID;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterCartID);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterShipDate = new SqlParameter("@ShipDate", SqlDbType.DateTime, 8);
+<font color= "blue">            </font>parameterShipDate.Value = CalculateShippingDate(customerID, cartID);
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterShipDate);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterOrderDate = new SqlParameter("@OrderDate", SqlDbType.DateTime, 8);
+<font color= "blue">            </font>parameterOrderDate.Value = DateTime.Now;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterOrderDate);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterOrderID = new SqlParameter("@OrderID", SqlDbType.Int, 4);
+<font color= "blue">            </font>parameterOrderID.Direction = ParameterDirection.Output;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterOrderID);
+<font color= "blue"></font>
+<font color= "green">            // Open the connection and execute the Command</font>
+<font color= "blue">            </font>myConnection.Open();
+<font color= "blue">            </font>myCommand.ExecuteNonQuery();
+<font color= "blue">            </font>myConnection.Close();
+<font color= "blue"></font>
+<font color= "green">            // Return the OrderID</font>
+<font color= "blue">            return</font> (int)parameterOrderID.Value;
+<font color= "blue">        </font>}
+<font color= "blue">    </font>}
+<font color= "blue"></font>}
+<font color= "blue"></font>
+</pre>

@@ -1,0 +1,1433 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>System.ServiceModel.DomainServices.Client.Web</name>
+    </assembly>
+    <members>
+        <member name="T:System.ServiceModel.DomainServices.Client.AsyncResultBase">
+            <summary>
+            Internal type used as a common <see cref="T:System.IAsyncResult"/> base for all cancellable asynchronous operations.
+            </summary>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.AsyncResultBase.#ctor(System.AsyncCallback,System.Object)">
+            <summary>
+            Default constructor.
+            </summary>
+            <param name="callback">Optional callback to invoke upon completion.</param>
+            <param name="asyncState">Optional user state to pass to <paramref name="callback"/>.</param>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.AsyncResultBase.EndAsyncOperation``1(System.IAsyncResult)">
+            <summary>
+            Transitions an <see cref="T:System.IAsyncResult"/> instance to mark the operation as ended.
+            </summary>
+            <typeparam name="TAsyncResult">The <see cref="T:System.ServiceModel.DomainServices.Client.AsyncResultBase"/> type expected.</typeparam>
+            <param name="asyncResult">The <see cref="T:System.IAsyncResult"/> to examine.</param>
+            <returns>The <paramref name="asyncResult"/> cast as the <typeparamref name="TAsyncResult"/> type expected.</returns>
+            <exception cref="T:System.ArgumentNullException"> if <paramref name="asyncResult"/> is null.</exception>
+            <exception cref="T:System.ArgumentException"> if <paramref name="asyncResult"/> is not of type <typeparamref name="TAsyncResult"/>.</exception>
+            <exception cref="T:System.InvalidOperationException"> if <paramref name="asyncResult"/> has been canceled.</exception>
+            <exception cref="T:System.InvalidOperationException"> if <paramref name="asyncResult"/>'s End* method has already been invoked.</exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.AsyncResultBase.EndAsyncOperation``1(System.IAsyncResult,System.Boolean)">
+            <summary>
+            Transitions an <see cref="T:System.IAsyncResult"/> instance to mark the operation as ended (and optionally canceled).
+            </summary>
+            <typeparam name="TAsyncResult">The <see cref="T:System.ServiceModel.DomainServices.Client.AsyncResultBase"/> type expected.</typeparam>
+            <param name="asyncResult">The <see cref="T:System.IAsyncResult"/> to examine.</param>
+            <param name="cancel">Indicates whether the operation should be canceled.</param>
+            <returns>The <paramref name="asyncResult"/> cast as the <typeparamref name="TAsyncResult"/> type expected.</returns>
+            <exception cref="T:System.ArgumentNullException"> if <paramref name="asyncResult"/> is null.</exception>
+            <exception cref="T:System.ArgumentException"> if <paramref name="asyncResult"/> is not of type <typeparamref name="TAsyncResult"/>.</exception>
+            <exception cref="T:System.InvalidOperationException"> if <paramref name="asyncResult"/> has been canceled.</exception>
+            <exception cref="T:System.InvalidOperationException"> if <paramref name="asyncResult"/>'s End* method has already been invoked.</exception>
+            <exception cref="T:System.InvalidOperationException"> if <paramref name="asyncResult"/> has not completed.</exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.AsyncResultBase.Complete">
+            <summary>
+            Signals that the asynchronous operation has completed and invokes the callback.
+            </summary>
+            <exception cref="T:System.InvalidOperationException"> if Complete has already been called.</exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.AsyncResultBase.Cancel">
+            <summary>
+            Signals a cancellation request for this operation.
+            </summary>
+            <remarks>
+            If this operation is completing or has already completed, this method returns without modifying any state.
+            Cancellation is not guaranteed.
+            </remarks>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.AsyncResultBase.SetEndMethodInvokedFlag">
+            <summary>
+            Signals that the asynchronous EndXxx method has been invoked.
+            </summary>
+            <exception cref="T:System.InvalidOperationException"> if SetEndMethodInvokedFlag has already been called.</exception>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.AsyncResultBase.AsyncState">
+            <summary>
+            Gets the optional user state.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.AsyncResultBase.AsyncWaitHandle">
+            <summary>
+            Gets the assoicated <see cref="T:System.Threading.WaitHandle"/>.  Not supported.
+            </summary>
+            <exception cref="T:System.NotSupportedException"> is always thrown.</exception>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.AsyncResultBase.CompletedSynchronously">
+            <summary>
+            Gets a value indicating whether the asynchronous operation completed synchronously.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.AsyncResultBase.IsCompleted">
+            <summary>
+            Gets a value indicating whether the asynchronous operation is complete.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.AsyncResultBase.CancellationRequested">
+            <summary>
+            Gets a value indicating whether cancellation was requested.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.AsyncResultBase.InnerAsyncResult">
+            <summary>
+            Gets the inner <see cref="T:System.IAsyncResult"/>.
+            </summary>
+        </member>
+        <member name="T:System.ServiceModel.DomainServices.Client.AsyncOperationType">
+            <summary>
+            Internal enumeration used to qualify operation results.
+            </summary>
+        </member>
+        <member name="F:System.ServiceModel.DomainServices.Client.AsyncOperationType.None">
+            <summary>
+            No operation.
+            </summary>
+        </member>
+        <member name="F:System.ServiceModel.DomainServices.Client.AsyncOperationType.Invoke">
+            <summary>
+            An invoke operation.
+            </summary>
+        </member>
+        <member name="F:System.ServiceModel.DomainServices.Client.AsyncOperationType.Query">
+            <summary>
+            A query operation.
+            </summary>
+        </member>
+        <member name="F:System.ServiceModel.DomainServices.Client.AsyncOperationType.Submit">
+            <summary>
+            A submit operation.
+            </summary>
+        </member>
+        <member name="T:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult">
+            <summary>
+            Internal <see cref="T:System.IAsyncResult"/> used during <see cref="P:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.DomainClient"/> operations.
+            </summary>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.#ctor(System.ServiceModel.DomainServices.Client.DomainClient,System.AsyncCallback,System.Object)">
+            <summary>
+            Initializes a new <see cref="T:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult"/> instance used for Query operations.
+            </summary>
+            <param name="domainClient">The associated <see cref="P:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.DomainClient"/>.</param>
+            <param name="callback">Optional <see cref="T:System.AsyncCallback"/> to invoke upon completion.</param>
+            <param name="asyncState">Optional user state information that will be passed to the <paramref name="callback"/>.</param>
+            <exception cref="T:System.ArgumentNullException">if <paramref name="domainClient"/> is null.</exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.#ctor(System.ServiceModel.DomainServices.Client.DomainClient,System.ServiceModel.DomainServices.Client.EntityChangeSet,System.AsyncCallback,System.Object)">
+            <summary>
+            Initializes a new <see cref="T:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult"/> instance used for Submit operations.
+            </summary>
+            <param name="domainClient">The associated <see cref="P:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.DomainClient"/>.</param>
+            <param name="entityChangeSet">The Submit operation <see cref="P:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.EntityChangeSet"/>.</param>
+            <param name="callback">Optional <see cref="T:System.AsyncCallback"/> to invoke upon completion.</param>
+            <param name="asyncState">Optional user state information that will be passed to the <paramref name="callback"/>.</param>
+            <exception cref="T:System.ArgumentNullException">if <paramref name="domainClient"/> is null.</exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.#ctor(System.ServiceModel.DomainServices.Client.DomainClient,System.ServiceModel.DomainServices.Client.InvokeArgs,System.AsyncCallback,System.Object)">
+            <summary>
+            Initializes a new <see cref="T:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult"/> instance used for Invoke operations.
+            </summary>
+            <param name="domainClient">The associated <see cref="P:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.DomainClient"/>.</param>
+            <param name="invokeArgs">The arguments to the Invoke operation.</param>
+            <param name="callback">The <see cref="T:System.AsyncCallback"/> to invoke upon completion.</param>
+            <param name="asyncState">Optional user state information that will be passed to the <paramref name="callback"/>.</param>
+            <exception cref="T:System.ArgumentNullException">if <paramref name="domainClient"/> is null.</exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.CreateQueryResult(System.ServiceModel.DomainServices.Client.DomainClient,System.AsyncCallback,System.Object)">
+            <summary>
+            Creates a new <see cref="T:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult"/> used for Query operations.
+            </summary>
+            <param name="domainClient">The <see cref="P:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.DomainClient"/> associated with this result.</param>
+            <param name="callback">The <see cref="T:System.AsyncCallback"/> to invoke upon completion.</param>
+            <param name="asyncState">Optional user state information that will be passed to the <paramref name="callback"/>.</param>
+            <returns>A <see cref="T:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult"/> used for Query operations</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.CreateSubmitResult(System.ServiceModel.DomainServices.Client.DomainClient,System.ServiceModel.DomainServices.Client.EntityChangeSet,System.AsyncCallback,System.Object)">
+            <summary>
+            Creates a new <see cref="T:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult"/> used for Submit operations.
+            </summary>
+            <param name="domainClient">The associated <see cref="P:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.DomainClient"/>.</param>
+            <param name="entityChangeSet">The Submit operation <see cref="P:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.EntityChangeSet"/>.</param>
+            <param name="callback">The <see cref="T:System.AsyncCallback"/> to invoke upon completion.</param>
+            <param name="asyncState">Optional user state information that will be passed to the <paramref name="callback"/>.</param>
+            <returns>A <see cref="T:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult"/> used for Submit operations</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.CreateInvokeResult(System.ServiceModel.DomainServices.Client.DomainClient,System.ServiceModel.DomainServices.Client.InvokeArgs,System.AsyncCallback,System.Object)">
+            <summary>
+            Creates a new <see cref="T:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult"/> used for Invoke operations.
+            </summary>
+            <param name="domainClient">The associated <see cref="P:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.DomainClient"/>.</param>
+            <param name="invokeArgs">The arguments to the Invoke operation.</param>
+            <param name="callback">The <see cref="T:System.AsyncCallback"/> to invoke upon completion.</param>
+            <param name="asyncState">Optional user state information that will be passed to the <paramref name="callback"/>.</param>
+            <returns>A <see cref="T:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult"/> used for Invoke operations</returns>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.DomainClient">
+            <summary>
+            Gets the <see cref="P:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.DomainClient"/> associated with this result.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.EntityChangeSet">
+            <summary>
+            Gets the <see cref="P:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.EntityChangeSet"/> used with Submit operations.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.InvokeArgs">
+            <summary>
+            Gets the arguments for Invoke operations.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.AsyncOperationType">
+            <summary>
+            Gets the <see cref="P:System.ServiceModel.DomainServices.Client.DomainClientAsyncResult.AsyncOperationType"/> describing this operation.
+            </summary>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.Utility.IsNullableType(System.Type)">
+            <summary>
+            Returns <c>true</c> if the given type is a <see cref="T:System.Nullable"/>
+            </summary>
+            <param name="type">The type to test</param>
+            <returns><c>true</c> if the given type is a nullable type</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.Utility.GetNonNullableType(System.Type)">
+            <summary>
+            If the given type is <see cref="T:System.Nullable"/>, returns the element type,
+            otherwise simply returns the input type
+            </summary>
+            <param name="type">The type to test that may or may not be Nullable</param>
+            <returns>Either the input type or, if it was Nullable, its element type</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.Utility.IsPredefinedType(System.Type)">
+            <summary>
+            Returns <c>true</c> if the given type is a primitive type or one
+            of our standard acceptable simple types, such as <see cref="T:System.String"/>,
+            <see cref="T:System.Guid"/>, or one of our standard generic types whose generic
+            argument is primitive or simple (e.g. Nullable, IEnumerable, IDictionary&lt;TKey,TValue&gt;).
+            </summary>
+            <param name="type">The type to test</param>
+            <returns><c>true</c> if the type is a primitive or standard acceptable types</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.Utility.IsPredefinedListType(System.Type)">
+            <summary>
+            Returns <c>true</c> if the given type is <see cref="T:System.Collections.Generic.IEnumerable`1"/> or an <see cref="T:System.Collections.IList"/> type, 
+            and is either an interface, an array, or has a default constructor.
+            </summary>
+            <param name="type">The type to test</param>
+            <returns><c>true</c> if the type is a primitive or standard acceptable types</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.Utility.IsSupportedCollectionType(System.Type)">
+            <summary>
+            Returns <c>true</c> if specified type is a supported collection Type. This method only checks the collection
+            Type itself, not whether the element Type is supported.
+            </summary>
+            <param name="type">The type to test</param>
+            <returns><c>true</c> if the type is a suppored collection Type.</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.Utility.IsPredefinedDictionaryType(System.Type)">
+            <summary>
+            Returns <c>true</c> if <paramref name="type"/> implements <see cref="T:System.Collections.Generic.IDictionary`2"/> and
+            its generic type arguments are acceptable predefined simple types.
+            </summary>
+            <param name="type">The type to test.</param>
+            <returns><c>true</c> if the type is a <see cref="T:System.Collections.Generic.IDictionary`2"/> with supported generic type arguments.</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.Utility.GetDictionaryGenericArgumentTypes(System.Type)">
+            <summary>
+            Returns an array of types that represent the generic type arguments used in <paramref name="type"/>'s
+            implementation of <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+            </summary>
+            <param name="type">The type to examine.</param>
+            <returns>An array of types that represent the generic type arguments used in <paramref name="type"/>'s
+            implementation of <see cref="T:System.Collections.Generic.IDictionary`2"/>. Returns null if <paramref name="type"/> does 
+            not implement <see cref="T:System.Collections.Generic.IDictionary`2"/>.</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.Utility.IsPredefinedSimpleType(System.Type)">
+            <summary>
+            Returns <c>true</c> if the given type is either primitive or one of our
+            standard acceptable simple types, such as <see cref="T:System.String"/>,
+            <see cref="T:System.Guid"/>, etc
+            </summary>
+            <param name="type">The type to test</param>
+            <returns><c>true</c> if the type is a primitive or standard acceptable types</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.Utility.GetElementType(System.Type)">
+            <summary>
+            Returns the underlying element type starting from a given type.
+            </summary>
+            <remarks>
+            Simple types simply return the input type.
+            If the given type is an array, this method returns the array's
+            element type.
+            If the type is a generic type of <see cref="T:System.Collections.IEnumerable"/>, 
+            or <see cref="T:System.Nullable"/>, this method returns the element
+            type of the generic parameter
+            </remarks>
+            <param name="type"><see cref="T:System.Type"/> to examine.</param>
+            <returns>The underlying element type starting from the given type</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.Utility.DefinitionIsAssignableFrom(System.Type,System.Type)">
+            <summary>
+            Determines whether the generic type definition is assignable from the derived type.
+            </summary>
+            <remarks>
+            This behaves just like <see cref="M:System.Type.IsAssignableFrom(System.Type)"/> except that it determines
+            whether any generic type that can be made from the <paramref name="genericTypeDefinition"/>
+            is assignable from <paramref name="derivedType"/>.
+            </remarks>
+            <param name="genericTypeDefinition">The generic type definition</param>
+            <param name="derivedType">The type to determine assignability from</param>
+            <returns>Whether the type definition is assignable from the derived type</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.Utility.DefinitionIsAssignableFrom(System.Type,System.Type,System.Type@)">
+            <summary>
+            Determines whether the generic type definition is assignable from the derived type.
+            </summary>
+            <remarks>
+            This behaves just like <see cref="M:System.Type.IsAssignableFrom(System.Type)"/> except that it determines
+            whether any generic type that can be made from the <paramref name="genericTypeDefinition"/>
+            is assignable from <paramref name="derivedType"/>.
+            </remarks>
+            <param name="genericTypeDefinition">The generic type definition</param>
+            <param name="derivedType">The type to determine assignability from</param>
+            <param name="genericType">The generic base class or interface implemented by the derived
+            type that can be made from the <paramref name="genericTypeDefinition"/>. This value is
+            null when the method return false.
+            </param>
+            <returns>Whether the type definition is assignable from the derived type</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.Utility.IsTypeBinary(System.Type)">
+            <summary>
+            Returns whether the <paramref name="type"/> <c>is System.Data.Linq.Binary</c>.
+            </summary>
+            <remarks>
+            We test Binary by Type Name so our client framework assembly can avoid taking an
+            assembly reference to <c>System.Data.Linq</c>. If a type is determined to be
+            binary, that type will be used to check reference equality for all subsequent
+            invocations.
+            </remarks>
+            <param name="type">The type to check</param>
+            <returns>Whether the <paramref name="type"/> is binary</returns>
+        </member>
+        <member name="T:System.ServiceModel.DomainServices.Client.PoxBinaryMessageEncodingBindingElement">
+            <summary>
+            The binding element that specifies the .NET Binary Format for XML used to encode messages.
+            </summary>
+        </member>
+        <member name="F:System.ServiceModel.DomainServices.Client.WebHttpQueryInspector.MaximumUriLength">
+            <summary>
+            For cross-browser compatibility support, the maximum supported URI length is 2083 characters.
+            </summary>
+        </member>
+        <member name="T:System.ServiceModel.DomainServices.Client.Resource">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resource.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resource.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resource.DomainClient_UnableToDetermineHostUri">
+            <summary>
+              Looks up a localized string similar to The current application or application host is null and the host Uri cannot be determined..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resource.DomainContext_InvalidServiceUri">
+            <summary>
+              Looks up a localized string similar to The specified service URI is not correctly formatted..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resource.DomainContext_LoadOperationFailed">
+            <summary>
+              Looks up a localized string similar to Load operation failed for query &apos;{0}&apos;. {1}.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resource.DomainContext_SubmitOperationFailed">
+            <summary>
+              Looks up a localized string similar to Submit operation failed. {0}.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resource.PoxBinaryMessageEncoder_InvalidContentType">
+            <summary>
+              Looks up a localized string similar to The PoxBinaryMessageEncoder only supports content type {0}..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resource.PoxBinaryMessageEncoder_InvalidMessageVersion">
+            <summary>
+              Looks up a localized string similar to The message has MessageVersion {0} but the encoder is configured for MessageVersion {1}..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resource.PoxBinaryMessageEncoder_MessageVersionNotSupported">
+            <summary>
+              Looks up a localized string similar to The PoxBinaryMessageEncoder only supports MessageVersion.None..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resource.WebDomainClient_MaximumUriLengthExceeded">
+            <summary>
+              Looks up a localized string similar to The maximum uri length of {0} was exceeded..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resource.WebDomainClient_OperationDoesNotExist">
+            <summary>
+              Looks up a localized string similar to Operation &apos;{0}&apos; does not exist..
+            </summary>
+        </member>
+        <member name="T:System.ServiceModel.DomainServices.Client.ApplicationServices.AuthenticationDomainContextBase">
+            <summary>
+            <see cref="T:System.ServiceModel.DomainServices.Client.DomainContext"/> generated as the base class for providers implementing
+            <c>System.ServiceModel.DomainServices.Server.ApplicationServices.IAuthentication&lt;T&gt;</c>.
+            </summary>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.AuthenticationDomainContextBase.#ctor(System.ServiceModel.DomainServices.Client.DomainClient)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.ServiceModel.DomainServices.Client.ApplicationServices.AuthenticationDomainContextBase"/> class.
+            </summary>
+            <param name="domainClient">The <see cref="T:System.ServiceModel.DomainServices.Client.DomainClient"/> instance this <see cref="T:System.ServiceModel.DomainServices.Client.ApplicationServices.AuthenticationDomainContextBase"/> should use</param>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.ApplicationServices.AuthenticationDomainContextBase.UserType">
+            <summary>
+            Gets the type of the user entity.
+            </summary>
+            <remarks>
+            Since the user type is only declared in the generated class, this accessor
+            allows the <see cref="T:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService"/> to take type-specific actions.
+            </remarks>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.ApplicationServices.AuthenticationDomainContextBase.UserSet">
+            <summary>
+            Gets the <see cref="T:System.ServiceModel.DomainServices.Client.EntitySet"/> for the user entity.
+            </summary>
+            <remarks>
+            This allows <see cref="T:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService"/> to deal with users in a
+            type-agnostic way.
+            </remarks>
+        </member>
+        <member name="T:System.ServiceModel.DomainServices.Client.ApplicationServices.FormsAuthentication">
+            <summary>
+            <see cref="T:System.ServiceModel.DomainServices.Client.ApplicationServices.AuthenticationService"/> that performs Forms authentication using
+            a <see cref="T:System.ServiceModel.DomainServices.Client.DomainContext"/> generated from a domain service
+            implementing <c>System.ServiceModel.DomainServices.Server.ApplicationServices.IAuthentication&lt;T&gt;</c>.
+            </summary>
+        </member>
+        <member name="T:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService">
+            <summary>
+            Abstract extension of the <see cref="T:System.ServiceModel.DomainServices.Client.ApplicationServices.AuthenticationService"/> that
+            interacts with a <see cref="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.DomainContext"/> generated from a domain
+            service implementing
+            <c>System.ServiceModel.DomainServices.Server.ApplicationServices.IAuthentication&lt;T&gt;</c>.
+            </summary>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService"/> class.
+            </summary>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.CreateDefaultUser">
+            <summary>
+            Creates a default user.
+            </summary>
+            <remarks>
+            Creates a user using the default constructor.
+            </remarks>
+            <returns>A default user</returns>
+            <exception cref="T:System.InvalidOperationException"> is thrown if the
+            <see cref="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.DomainContext"/> is <c>null</c> and a new instance
+            cannot be created.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.BeginLogin(System.ServiceModel.DomainServices.Client.ApplicationServices.LoginParameters,System.AsyncCallback,System.Object)">
+            <summary>
+            Begins an asynchronous <c>Login</c> operation.
+            </summary>
+            <param name="parameters">Login parameters that specify the user to authenticate</param>
+            <param name="callback">The callback to invoke when the asynchronous call completes</param>
+            <param name="state">The optional result state</param>
+            <returns>An <see cref="T:System.IAsyncResult"/> that represents the asynchronous call</returns>
+            <exception cref="T:System.InvalidOperationException"> is thrown if the
+            <see cref="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.DomainContext"/> is <c>null</c> and a new instance
+            cannot be created.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.CancelLogin(System.IAsyncResult)">
+            <summary>
+            Cancels an asynchronous <c>Login</c> operation.
+            </summary>
+            <param name="asyncResult">A result returned from <see cref="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.BeginLogin(System.ServiceModel.DomainServices.Client.ApplicationServices.LoginParameters,System.AsyncCallback,System.Object)"/> that represents
+            the asynchronous call to cancel.
+            </param>
+            <exception cref="T:System.InvalidOperationException"> is thrown if <paramref name="asyncResult"/>
+            was not returned from <see cref="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.BeginLogin(System.ServiceModel.DomainServices.Client.ApplicationServices.LoginParameters,System.AsyncCallback,System.Object)"/> or the asynchronous call has already been
+            concluded with a previous call to cancel or end.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.EndLogin(System.IAsyncResult)">
+            <summary>
+            Ends an asynchronous <c>Login</c> operation.
+            </summary>
+            <param name="asyncResult">A result returned from <see cref="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.BeginLogin(System.ServiceModel.DomainServices.Client.ApplicationServices.LoginParameters,System.AsyncCallback,System.Object)"/> that represents
+            the asynchronous call to conclude.
+            </param>
+            <returns>The result of the asynchronous <c>Login</c> call</returns>
+            <exception cref="T:System.InvalidOperationException"> is thrown if <paramref name="asyncResult"/>
+            was not returned from <see cref="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.BeginLogin(System.ServiceModel.DomainServices.Client.ApplicationServices.LoginParameters,System.AsyncCallback,System.Object)"/> or the asynchronous call has already been
+            concluded with a previous call to cancel or end.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.BeginLogout(System.AsyncCallback,System.Object)">
+            <summary>
+            Begins an asynchronous <c>Logout</c> operation.
+            </summary>
+            <param name="callback">The callback to invoke when the asynchronous call completes</param>
+            <param name="state">The optional result state</param>
+            <returns>An <see cref="T:System.IAsyncResult"/> that represents the asynchronous call</returns>
+            <exception cref="T:System.InvalidOperationException"> is thrown if the
+            <see cref="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.DomainContext"/> is <c>null</c> and a new instance
+            cannot be created.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.CancelLogout(System.IAsyncResult)">
+            <summary>
+            Cancels an asynchronous <c>Logout</c> operation.
+            </summary>
+            <param name="asyncResult">A result returned from <see cref="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.BeginLogout(System.AsyncCallback,System.Object)"/> that represents
+            the asynchronous call to cancel.
+            </param>
+            <exception cref="T:System.InvalidOperationException"> is thrown if <paramref name="asyncResult"/>
+            was not returned from <see cref="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.BeginLogout(System.AsyncCallback,System.Object)"/> or the asynchronous call has already been
+            concluded with a previous call to cancel or end.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.EndLogout(System.IAsyncResult)">
+            <summary>
+            Ends an asynchronous <c>Logout</c> operation.
+            </summary>
+            <param name="asyncResult">A result returned from <see cref="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.BeginLogout(System.AsyncCallback,System.Object)"/> that represents
+            the asynchronous call to conclude.
+            </param>
+            <returns>The result of the asynchronous <c>Logout</c> call</returns>
+            <exception cref="T:System.InvalidOperationException"> is thrown if <paramref name="asyncResult"/>
+            was not returned from <see cref="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.BeginLogout(System.AsyncCallback,System.Object)"/> or the asynchronous call has already been
+            concluded with a previous call to cancel or end.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.BeginLoadUser(System.AsyncCallback,System.Object)">
+            <summary>
+            Begins an asynchronous <c>LoadUser</c> operation.
+            </summary>
+            <param name="callback">The callback to invoke when the asynchronous call completes</param>
+            <param name="state">The optional result state</param>
+            <returns>An <see cref="T:System.IAsyncResult"/> that represents the asynchronous call</returns>
+            <exception cref="T:System.InvalidOperationException"> is thrown if the
+            <see cref="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.DomainContext"/> is <c>null</c> and a new instance
+            cannot be created.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.CancelLoadUser(System.IAsyncResult)">
+            <summary>
+            Cancels an asynchronous <c>LoadUser</c> operation.
+            </summary>
+            <param name="asyncResult">A result returned from <see cref="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.BeginLoadUser(System.AsyncCallback,System.Object)"/> that represents
+            the asynchronous call to cancel.
+            </param>
+            <exception cref="T:System.InvalidOperationException"> is thrown if <paramref name="asyncResult"/>
+            was not returned from <see cref="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.BeginLoadUser(System.AsyncCallback,System.Object)"/> or the asynchronous call has already been
+            concluded with a previous call to cancel or end.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.EndLoadUser(System.IAsyncResult)">
+            <summary>
+            Ends an asynchronous <c>LoadUser</c> operation.
+            </summary>
+            <param name="asyncResult">A result returned from <see cref="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.BeginLoadUser(System.AsyncCallback,System.Object)"/> that represents
+            the asynchronous call to conclude.
+            </param>
+            <returns>The result of the asynchronous <c>LoadUser</c> call</returns>
+            <exception cref="T:System.InvalidOperationException"> is thrown if <paramref name="asyncResult"/>
+            was not returned from <see cref="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.BeginLoadUser(System.AsyncCallback,System.Object)"/> or the asynchronous call has already been
+            concluded with a previous call to cancel or end.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.BeginSaveUser(System.Security.Principal.IPrincipal,System.AsyncCallback,System.Object)">
+            <summary>
+            Begins an asynchronous <c>SaveUser</c> operation.
+            </summary>
+            <param name="user">The authenticated user to save</param>
+            <param name="callback">The callback to invoke when the asynchronous call completes</param>
+            <param name="state">The optional result state</param>
+            <returns>An <see cref="T:System.IAsyncResult"/> that represents the asynchronous call</returns>
+            <exception cref="T:System.InvalidOperationException"> is thrown if the user is anonymous.</exception>
+            <exception cref="T:System.InvalidOperationException"> is thrown if the
+            <see cref="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.DomainContext"/> is <c>null</c> and a new instance
+            cannot be created.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.CancelSaveUser(System.IAsyncResult)">
+            <summary>
+            Cancels an asynchronous <c>SaveUser</c> operation.
+            </summary>
+            <param name="asyncResult">A result returned from <see cref="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.BeginSaveUser(System.Security.Principal.IPrincipal,System.AsyncCallback,System.Object)"/> that represents
+            the asynchronous call to cancel.
+            </param>
+            <exception cref="T:System.InvalidOperationException"> is thrown if <paramref name="asyncResult"/>
+            was not returned from <see cref="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.BeginSaveUser(System.Security.Principal.IPrincipal,System.AsyncCallback,System.Object)"/> or the asynchronous call has already been
+            concluded with a previous call to cancel or end.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.EndSaveUser(System.IAsyncResult)">
+            <summary>
+            Ends an asynchronous <c>SaveUser</c> operation.
+            </summary>
+            <param name="asyncResult">A result returned from <see cref="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.BeginSaveUser(System.Security.Principal.IPrincipal,System.AsyncCallback,System.Object)"/> that represents
+            the asynchronous call to conclude.
+            </param>
+            <returns>The result of the asynchronous <c>SaveUser</c> call</returns>
+            <exception cref="T:System.InvalidOperationException"> is thrown if <paramref name="asyncResult"/>
+            was not returned from <see cref="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.BeginSaveUser(System.Security.Principal.IPrincipal,System.AsyncCallback,System.Object)"/> or the asynchronous call has already been
+            concluded with a previous call to cancel or end.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.HandleOperationComplete(System.ServiceModel.DomainServices.Client.OperationBase)">
+            <summary>
+            Handles completion of the underlying operation in the <see cref="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.DomainContext"/>.
+            </summary>
+            <param name="operation">The operation that completed</param>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.Initialize">
+            <summary>
+            Initializes this authentication service.
+            </summary>
+            <remarks>
+            This method is invoked before the service is used for the first time from
+            <see cref="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.CreateDefaultUser"/> and the <c>BeginXx</c> methods. It can also
+            be called earlier to ensure the service is ready for use. Subsequent
+            invocations will not reinitialize the service.
+            </remarks>
+            <exception cref="T:System.InvalidOperationException"> is thrown if the
+            <see cref="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.DomainContext"/> is <c>null</c> and a new instance
+            cannot be created.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.InitializeDomainContext">
+            <summary>
+            Initializes the domain context.
+            </summary>
+            <remarks>
+            If the domain context has not already been set, this method trys to instantiate
+            one specified by the <see cref="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.DomainContextType"/> string.
+            </remarks>
+            <exception cref="T:System.InvalidOperationException"> is thrown if the
+            <see cref="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.DomainContext"/> is <c>null</c> and a new instance
+            cannot be created.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.AssertIsNotActive">
+            <summary>
+            Throws an exception if the service is active.
+            </summary>
+            <exception cref="T:System.InvalidOperationException"> is thrown if the service is active.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.PrepareUser(System.Security.Principal.IPrincipal)">
+            <summary>
+            Prepares the deserialized user to return from an End method.
+            </summary>
+            <remarks>
+            This methods ensures only a single user is present in the entity set of the
+            <see cref="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.DomainContext"/>.
+            </remarks>
+            <param name="user">The user to prepare</param>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.ClearOldUsers(System.Security.Principal.IPrincipal)">
+            <summary>
+            Clears all users but the one specified from the user entity set in the <see cref="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.DomainContext"/>.
+            </summary>
+            <param name="user">The single user to keep in the user entity set</param>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.DomainContextType">
+            <summary>
+            Gets or sets the type of the domain context.
+            </summary>
+            <remarks>
+            If the <see cref="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.DomainContext"/> is not set when this service is
+            started, it will instantiate a context specified by the
+            <see cref="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.DomainContextType"/>. In determining the type, this
+            string is treated as the full name of a type in the application 
+            assembly. If the initial search does not return a valid type, this 
+            string is treated as the assembly qualified name of a type.
+            </remarks>
+            <exception cref="T:System.InvalidOperationException"> is thrown if this
+            property is set after the service is started.
+            </exception>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.DomainContext">
+            <summary>
+            Gets the domain context this service delegates authenticating, loading, 
+            and saving to.
+            </summary>
+            <exception cref="T:System.InvalidOperationException"> is thrown if this
+            property is set after the service is started.
+            </exception>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.SupportsCancellation">
+            <summary>
+            Gets a value that indicates whether this service supports cancellation.
+            </summary>
+            <remarks>
+            This implementation always returns <c>true</c>.
+            </remarks>
+        </member>
+        <member name="T:System.ServiceModel.DomainServices.Client.ApplicationServices.WebAuthenticationService.WebAsyncResult">
+            <summary>
+            The <see cref="T:System.IAsyncResult"/> type used by this authentication service.
+            </summary>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.FormsAuthentication.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.ServiceModel.DomainServices.Client.ApplicationServices.FormsAuthentication"/> class.
+            </summary>
+        </member>
+        <member name="T:System.ServiceModel.DomainServices.Client.ApplicationServices.WebContextBase">
+            <summary>
+            Context for the application.
+            </summary>
+            <remarks>
+            This context makes services and other values available from code and xaml. When
+            a context is created, it should be registered as a lifetime-object with
+            <see cref="P:System.Windows.Application.ApplicationLifetimeObjects"/>.
+            </remarks>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebContextBase.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.ServiceModel.DomainServices.Client.ApplicationServices.WebContextBase"/> class.
+            </summary>
+            <remarks>
+            This first context that is created will become the current instance. If more than
+            one context is created, an exception will be thrown.
+            </remarks>
+            <exception cref="T:System.InvalidOperationException"> is thrown if the constructor is invoked
+            when <see cref="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebContextBase.Current"/> is valid.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebContextBase.#ctor(System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.ServiceModel.DomainServices.Client.ApplicationServices.WebContextBase"/> class.
+            </summary>
+            <exception cref="T:System.InvalidOperationException"> is thrown if the constructor is invoked
+            when <see cref="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebContextBase.Current"/> is valid and <paramref name="setAsCurrent"/>
+            is <c>true</c>.
+            </exception>
+            <param name="setAsCurrent">Whether to use this context as the current instance</param>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebContextBase.RaisePropertyChanged(System.String)">
+            <summary>
+            Raises an <see cref="E:System.ComponentModel.INotifyPropertyChanged.PropertyChanged"/> event for the specified property.
+            </summary>
+            <param name="propertyName">The property to raise an event for</param>
+            <exception cref="T:System.ArgumentNullException"> is thrown if the 
+            <paramref name="propertyName"/> is <c>null</c>.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebContextBase.OnPropertyChanged(System.ComponentModel.PropertyChangedEventArgs)">
+            <summary>
+            Raises an <see cref="E:System.ComponentModel.INotifyPropertyChanged.PropertyChanged"/> event.
+            </summary>
+            <param name="e">The event to raise</param>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebContextBase.AuthenticationService_PropertyChanged(System.Object,System.ComponentModel.PropertyChangedEventArgs)">
+            <summary>
+            Handles property changed events raised by the <see cref="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebContextBase.Authentication"/> context.
+            </summary>
+            <param name="sender">The authentication context</param>
+            <param name="e">The event that occurred</param>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebContextBase.System#Windows#IApplicationService#StartService(System.Windows.ApplicationServiceContext)">
+            <summary>
+            Starts the context as an application service
+            </summary>
+            <param name="context">The service context</param>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WebContextBase.System#Windows#IApplicationService#StopService">
+            <summary>
+            Stops the context as an application service
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebContextBase.Current">
+            <summary>
+            Gets the current context.
+            </summary>
+            <exception cref="T:System.InvalidOperationException"> is thrown if no contexts have been added.
+            </exception>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebContextBase.User">
+            <summary>
+            Gets a principal representing the authenticated identity.
+            </summary>
+            <remarks>
+            This value is the same one available in <see cref="P:System.ServiceModel.DomainServices.Client.ApplicationServices.AuthenticationService.User"/>.
+            </remarks>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.ApplicationServices.WebContextBase.Authentication">
+            <summary>
+            Gets or sets the authentication context for the application.
+            </summary>
+            <exception cref="T:System.ArgumentNullException"> is thrown if <paramref name="value"/> is <c>null</c>.
+            </exception>
+        </member>
+        <member name="E:System.ServiceModel.DomainServices.Client.ApplicationServices.WebContextBase.System#ComponentModel#INotifyPropertyChanged#PropertyChanged">
+            <summary>
+            Occurs when a property value changes.
+            </summary>
+        </member>
+        <member name="T:System.ServiceModel.DomainServices.Client.ApplicationServices.WindowsAuthentication">
+            <summary>
+            <see cref="T:System.ServiceModel.DomainServices.Client.ApplicationServices.AuthenticationService"/> that performs Windows authentication using
+            a <see cref="T:System.ServiceModel.DomainServices.Client.DomainContext"/> generated from a domain service
+            implementing <c>System.ServiceModel.DomainServices.Server.ApplicationServices.IAuthentication&lt;T&gt;</c>.
+            </summary>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WindowsAuthentication.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.ServiceModel.DomainServices.Client.ApplicationServices.WindowsAuthentication"/> class.
+            </summary>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WindowsAuthentication.BeginLogin(System.ServiceModel.DomainServices.Client.ApplicationServices.LoginParameters,System.AsyncCallback,System.Object)">
+            <summary>
+            <c>Login</c> is not an operation supported for Windows authentication
+            </summary>
+            <param name="parameters">The parameter is not used.</param>
+            <param name="callback">The parameter is not used.</param>
+            <param name="state">The parameter is not used.</param>
+            <returns>The result.</returns>
+            <exception cref="T:System.NotSupportedException"> is always thrown.</exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ApplicationServices.WindowsAuthentication.BeginLogout(System.AsyncCallback,System.Object)">
+            <summary>
+            <c>Logout</c> is not an operation supported for Windows authentication
+            </summary>
+            <param name="callback">The parameter is not used.</param>
+            <param name="state">The parameter is not used.</param>
+            <returns>The result.</returns>
+            <exception cref="T:System.NotSupportedException"> is always thrown.</exception>
+        </member>
+        <member name="T:System.ServiceModel.DomainServices.Client.DomainServiceFault">
+            <summary>
+            Message type used to communicate exception results between server and client.
+            </summary>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.DomainServiceFault.#ctor">
+            <summary>
+            Default constructor
+            </summary>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.DomainServiceFault.GetValidationErrors">
+            <summary>
+            Get the validation errors 
+            </summary>
+            <returns>
+            Collection of validation errors as <see cref="T:System.Collections.IEnumerable"/>.
+            </returns>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.DomainServiceFault.ErrorCode">
+            <summary>
+            Gets or sets the custom code for the error.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.DomainServiceFault.ErrorMessage">
+            <summary>
+            Gets or sets the message giving details on the error.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.DomainServiceFault.IsDomainException">
+            <summary>
+            Gets or sets a value indicating whether the fault indicates that the error information 
+            should be reconstructed on the client as a <see cref="T:System.ServiceModel.DomainServices.Client.DomainException"/> type.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.DomainServiceFault.StackTrace">
+            <summary>
+            Gets or sets the stack trace for the error.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.DomainServiceFault.OperationErrors">
+            <summary>
+            Gets or sets the validation errors that occurred during this request.
+            </summary>
+            <remarks>This is only used when a request invokes a single method, such as an invoke operation.</remarks>
+        </member>
+        <member name="T:System.ServiceModel.DomainServices.Client.ServiceQueryPart">
+            <summary>
+            Represents a single query operator to be applied to a query
+            </summary>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ServiceQueryPart.#ctor">
+            <summary>
+            Public constructor
+            </summary>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.ServiceQueryPart.ToString">
+            <summary>
+            Returns a string representation of this <see cref="T:System.ServiceModel.DomainServices.Client.ServiceQueryPart"/>
+            </summary>
+            <returns>The string representation of this <see cref="T:System.ServiceModel.DomainServices.Client.ServiceQueryPart"/></returns>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.ServiceQueryPart.QueryOperator">
+            <summary>
+            Gets or sets the query operator. Must be one of the supported operators : "where", "orderby", "skip", or "take".
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.ServiceQueryPart.Expression">
+            <summary>
+            Gets or sets the query expression.
+            </summary>
+        </member>
+        <member name="T:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1">
+            <summary>
+            Internal <see cref="T:System.IAsyncResult"/> used during <see cref="T:System.ServiceModel.DomainServices.Client.WebDomainClient`1"/> operations.
+            </summary>
+            <typeparam name="TContract">The contract type.</typeparam>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1.#ctor(System.ServiceModel.DomainServices.Client.WebDomainClient{`0},`0,System.Reflection.MethodInfo,System.AsyncCallback,System.Object)">
+            <summary>
+            Initializes a new <see cref="T:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1"/> instance used for Query operations.
+            </summary>
+            <param name="domainClient">The <see cref="T:System.ServiceModel.DomainServices.Client.WebDomainClient`1"/> associated with this result.</param>
+            <param name="channel">The channel used to communicate with the server.</param>
+            <param name="endOperationMethod">The method that completes an asynchronous operation.</param>
+            <param name="callback">Optional <see cref="T:System.AsyncCallback"/> to invoke upon completion.</param>
+            <param name="asyncState">Optional user state information that will be passed to the <paramref name="callback"/>.</param>
+            <exception cref="T:System.ArgumentNullException">if <paramref name="domainClient"/> is null.</exception>
+            <exception cref="T:System.ArgumentNullException">if <paramref name="endOperationMethod"/> is null.</exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1.#ctor(System.ServiceModel.DomainServices.Client.WebDomainClient{`0},`0,System.Reflection.MethodInfo,System.ServiceModel.DomainServices.Client.EntityChangeSet,System.Collections.Generic.IEnumerable{System.ServiceModel.DomainServices.Client.ChangeSetEntry},System.AsyncCallback,System.Object)">
+            <summary>
+            Initializes a new <see cref="T:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1"/> instance used for Submit operations.
+            </summary>
+            <param name="domainClient">The <see cref="T:System.ServiceModel.DomainServices.Client.WebDomainClient`1"/> associated with this result.</param>
+            <param name="channel">The channel used to communicate with the server.</param>
+            <param name="endOperationMethod">The method that completes an asynchronous operation.</param>
+            <param name="entityChangeSet">The Submit operation <see cref="T:System.ServiceModel.DomainServices.Client.EntityChangeSet"/>.</param>
+            <param name="changeSetEntries">The collection of <see cref="T:System.ServiceModel.DomainServices.Client.ChangeSetEntry"/>s to submit.</param>
+            <param name="callback">Optional <see cref="T:System.AsyncCallback"/> to invoke upon completion.</param>
+            <param name="asyncState">Optional user state information that will be passed to the <paramref name="callback"/>.</param>
+            <exception cref="T:System.ArgumentNullException">if <paramref name="domainClient"/> is null.</exception>
+            <exception cref="T:System.ArgumentNullException">if <paramref name="endOperationMethod"/> is null.</exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1.#ctor(System.ServiceModel.DomainServices.Client.WebDomainClient{`0},`0,System.Reflection.MethodInfo,System.ServiceModel.DomainServices.Client.InvokeArgs,System.AsyncCallback,System.Object)">
+            <summary>
+            Initializes a new <see cref="T:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1"/> instance used for Invoke operations.
+            </summary>
+            <param name="domainClient">The <see cref="T:System.ServiceModel.DomainServices.Client.WebDomainClient`1"/> associated with this result.</param>
+            <param name="channel">The channel used to communicate with the server.</param>
+            <param name="endOperationMethod">The method that completes an asynchronous operation.</param>
+            <param name="invokeArgs">The arguments to the Invoke operation.</param>
+            <param name="callback">Optional <see cref="T:System.AsyncCallback"/> to invoke upon completion.</param>
+            <param name="asyncState">Optional user state information that will be passed to the <paramref name="callback"/>.</param>
+            <exception cref="T:System.ArgumentNullException">if <paramref name="domainClient"/> is null.</exception>
+            <exception cref="T:System.ArgumentNullException">if <paramref name="endOperationMethod"/> is null.</exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1.CreateQueryResult(System.ServiceModel.DomainServices.Client.WebDomainClient{`0},`0,System.Reflection.MethodInfo,System.AsyncCallback,System.Object)">
+            <summary>
+            Creates a new <see cref="T:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1"/> used for Query operations.
+            </summary>
+            <param name="domainClient">The <see cref="T:System.ServiceModel.DomainServices.Client.WebDomainClient`1"/> associated with this result.</param>
+            <param name="channel">The channel used to communicate with the server.</param>
+            <param name="endOperationMethod">The method that completes an asynchronous operation.</param>
+            <param name="callback">The <see cref="T:System.AsyncCallback"/> to invoke upon completion.</param>
+            <param name="asyncState">Optional user state information that will be passed to the <paramref name="callback"/>.</param>
+            <returns>A <see cref="T:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1"/> used for Query operations</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1.CreateSubmitResult(System.ServiceModel.DomainServices.Client.WebDomainClient{`0},`0,System.Reflection.MethodInfo,System.ServiceModel.DomainServices.Client.EntityChangeSet,System.Collections.Generic.IEnumerable{System.ServiceModel.DomainServices.Client.ChangeSetEntry},System.AsyncCallback,System.Object)">
+            <summary>
+            Creates a new <see cref="T:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1"/> used for Submit operations.
+            </summary>
+            <param name="domainClient">The <see cref="T:System.ServiceModel.DomainServices.Client.WebDomainClient`1"/> associated with this result.</param>
+            <param name="channel">The channel used to communicate with the server.</param>
+            <param name="endOperationMethod">The method that completes an asynchronous operation.</param>
+            <param name="entityChangeSet">The Submit operation <see cref="T:System.ServiceModel.DomainServices.Client.EntityChangeSet"/>.</param>
+            <param name="changeSetEntries">The collection of <see cref="T:System.ServiceModel.DomainServices.Client.ChangeSetEntry"/>s to submit.</param>
+            <param name="callback">The <see cref="T:System.AsyncCallback"/> to invoke upon completion.</param>
+            <param name="asyncState">Optional user state information that will be passed to the <paramref name="callback"/>.</param>
+            <returns>A <see cref="T:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1"/> used for Submit operations</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1.CreateInvokeResult(System.ServiceModel.DomainServices.Client.WebDomainClient{`0},`0,System.Reflection.MethodInfo,System.ServiceModel.DomainServices.Client.InvokeArgs,System.AsyncCallback,System.Object)">
+            <summary>
+            Creates a new <see cref="T:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1"/> used for Invoke operations.
+            </summary>
+            <param name="domainClient">The <see cref="T:System.ServiceModel.DomainServices.Client.WebDomainClient`1"/> associated with this result.</param>
+            <param name="channel">The channel used to communicate with the server.</param>
+            <param name="endOperationMethod">The method that completes an asynchronous operation.</param>
+            <param name="invokeArgs">The arguments to the Invoke operation.</param>
+            <param name="callback">The <see cref="T:System.AsyncCallback"/> to invoke upon completion.</param>
+            <param name="asyncState">Optional user state information that will be passed to the <paramref name="callback"/>.</param>
+            <returns>A <see cref="T:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1"/> used for Invoke operations</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1.Cancel">
+            <summary>
+            Attempts to cancel this operation and aborts the underlying request if cancellation was successfully requested.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1.ChangeSetEntries">
+            <summary>
+            Gets a collection of <see cref="T:System.ServiceModel.DomainServices.Client.ChangeSetEntry"/>s used with Submit operations.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1.Channel">
+            <summary>
+            Gets the channel used to communicate with the server.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1.EndOperationMethod">
+            <summary>
+            Gets the method that completes an asynchronous operation.
+            </summary>
+        </member>
+        <member name="T:System.ServiceModel.DomainServices.Client.WebDomainClient`1">
+            <summary>
+            Default <see cref="T:System.ServiceModel.DomainServices.Client.DomainClient"/> implementation using WCF
+            </summary>
+            <typeparam name="TContract">The contract type.</typeparam>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClient`1.#ctor(System.Uri)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.ServiceModel.DomainServices.Client.WebDomainClient`1"/> class.
+            </summary>
+            <param name="serviceUri">The domain service Uri</param>
+            <exception cref="T:System.ArgumentNullException"> is thrown if <paramref name="serviceUri"/>
+            is null.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClient`1.#ctor(System.Uri,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.ServiceModel.DomainServices.Client.WebDomainClient`1"/> class.
+            </summary>
+            <param name="serviceUri">The domain service Uri</param>
+            <param name="usesHttps">A value indicating whether the client should contact
+            the service using an HTTP or HTTPS scheme.
+            </param>
+            <exception cref="T:System.ArgumentNullException"> is thrown if <paramref name="serviceUri"/>
+            is null.
+            </exception>
+            <exception cref="T:System.ArgumentException"> is thrown if <paramref name="serviceUri"/>
+            is absolute and <paramref name="usesHttps"/> is true.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClient`1.#ctor(System.Uri,System.Boolean,System.ServiceModel.ChannelFactory{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.ServiceModel.DomainServices.Client.WebDomainClient`1"/> class.
+            </summary>
+            <param name="serviceUri">The domain service Uri</param>
+            <param name="usesHttps">A value indicating whether the client should contact
+            the service using an HTTP or HTTPS scheme.
+            </param>
+            <param name="channelFactory">The channel factory that creates channels to communicate with the server.</param>
+            <exception cref="T:System.ArgumentNullException"> is thrown if <paramref name="serviceUri"/>
+            is null.
+            </exception>
+            <exception cref="T:System.ArgumentException"> is thrown if <paramref name="serviceUri"/>
+            is absolute and <paramref name="usesHttps"/> is true.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClient`1.Initialize">
+            <summary>
+            Initializes this domain client
+            </summary>
+            <exception cref="T:System.InvalidOperationException"> is thrown if the current application
+            or its host are <c>null</c>.
+            </exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClient`1.CreateDefaultChannelFactory">
+            <summary>
+            Creates a default channel factory.
+            </summary>
+            <returns>The channel used to communicate with the server.</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClient`1.BeginQueryCore(System.ServiceModel.DomainServices.Client.EntityQuery,System.AsyncCallback,System.Object)">
+            <summary>
+            Method called by the framework to begin an asynchronous query operation
+            </summary>
+            <param name="query">The query to invoke.</param>
+            <param name="callback">The callback to invoke when the query has been executed.</param>
+            <param name="userState">Optional state associated with this operation.</param>
+            <returns>An asynchronous result that identifies this query.</returns>
+            <exception cref="T:System.InvalidOperationException">The specified query does not exist.</exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClient`1.CancelQueryCore(System.IAsyncResult)">
+            <summary>
+            Attempts to cancel the query request specified by the <paramref name="asyncResult"/>.
+            </summary>
+            <param name="asyncResult">An <see cref="T:System.IAsyncResult"/> specifying what query operation to cancel.</param>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClient`1.EndQueryCore(System.IAsyncResult)">
+            <summary>
+            Gets the results of a query.
+            </summary>
+            <param name="asyncResult">An asynchronous result that identifies a query.</param>
+            <returns>The results returned by the query.</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClient`1.BeginSubmitCore(System.ServiceModel.DomainServices.Client.EntityChangeSet,System.AsyncCallback,System.Object)">
+            <summary>
+            Submit the specified <see cref="T:System.ServiceModel.DomainServices.Client.EntityChangeSet"/> to the DomainService, with the results of the operation
+            being returned on the SubmitCompleted event args.
+            </summary>
+            <param name="changeSet">The changeset to submit. If the changeset is empty, an <see cref="T:System.InvalidOperationException"/> will
+            be thrown.</param>
+            <param name="callback">The callback to invoke when the submit has been executed.</param>
+            <param name="userState">Optional state that will flow through to the SubmitCompleted event</param>
+            <returns>An asynchronous result that identifies this submit.</returns>
+            <exception cref="T:System.InvalidOperationException">The changeset is empty.</exception>
+            <exception cref="T:System.InvalidOperationException">The specified query does not exist.</exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClient`1.CancelSubmitCore(System.IAsyncResult)">
+            <summary>
+            Attempts to cancel the submit request specified by the <paramref name="asyncResult"/>.
+            </summary>
+            <param name="asyncResult">An <see cref="T:System.IAsyncResult"/> specifying what submit operation to cancel.</param>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClient`1.EndSubmitCore(System.IAsyncResult)">
+            <summary>
+            Gets the results of a submit.
+            </summary>
+            <param name="asyncResult">An asynchronous result that identifies a submit.</param>
+            <returns>The results returned by the submit.</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClient`1.BeginInvokeCore(System.ServiceModel.DomainServices.Client.InvokeArgs,System.AsyncCallback,System.Object)">
+            <summary>
+            Invokes an operation asynchronously.
+            </summary>
+            <param name="invokeArgs">The arguments to the Invoke operation.</param>
+            <param name="callback">The callback to invoke when the invocation has been completed.</param>
+            <param name="userState">Optional user state that will be passed through on the <see cref="T:System.ServiceModel.DomainServices.Client.InvokeCompletedResult"/>.</param>
+            <returns>An asynchronous result that identifies this invocation.</returns>
+            <exception cref="T:System.InvalidOperationException">The specified query does not exist.</exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClient`1.CancelInvokeCore(System.IAsyncResult)">
+            <summary>
+            Attempts to cancel the invocation request specified by the <paramref name="asyncResult"/>.
+            </summary>
+            <param name="asyncResult">An <see cref="T:System.IAsyncResult"/> specifying what invocation operation to cancel.</param>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClient`1.EndInvokeCore(System.IAsyncResult)">
+            <summary>
+            Gets the results of an invocation.
+            </summary>
+            <param name="asyncResult">An asynchronous result that identifies an invocation.</param>
+            <returns>The results returned by the invocation.</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClient`1.EndAsyncResult(System.IAsyncResult,System.ServiceModel.DomainServices.Client.AsyncOperationType,System.Boolean)">
+            <summary>
+            Transitions an <see cref="T:System.IAsyncResult"/> instance to a completed state.
+            </summary>
+            <param name="asyncResult">An asynchronous result that identifies an invocation.</param>
+            <param name="operationType">The expected operation type.</param>
+            <param name="cancel">Boolean indicating whether or not the operation has been canceled.</param>
+            <returns>A <see cref="T:System.ServiceModel.DomainServices.Client.WebDomainClientAsyncResult`1"/> reference.</returns>
+            <exception cref="T:System.ArgumentNullException"> if <paramref name="asyncResult"/> is null.</exception>
+            <exception cref="T:System.ArgumentException"> if <paramref name="asyncResult"/> is not of type <cref name="TAsyncResult"/>.</exception>
+            <exception cref="T:System.InvalidOperationException"> if <paramref name="asyncResult"/> has been canceled.</exception>
+            <exception cref="T:System.InvalidOperationException"> if <paramref name="asyncResult"/>'s End* method has already been invoked.</exception>
+            <exception cref="T:System.InvalidOperationException"> if <paramref name="asyncResult"/> has not completed.</exception>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClient`1.GetExceptionFromServiceFault(System.ServiceModel.DomainServices.Client.DomainServiceFault)">
+            <summary>
+            Constructs an exception based on a service fault.
+            </summary>
+            <param name="serviceFault">The fault received from a service.</param>
+            <returns>The constructed exception.</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.WebDomainClient`1.ComposeAbsoluteServiceUri">
+            <summary>
+            If the service Uri is relative, this method uses the application
+            source to create an absolute Uri.
+            </summary>
+            <remarks>
+            If usesHttps in the constructor was true, the Uri will be created using
+            a https scheme instead.
+            </remarks>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.WebDomainClient`1.ServiceUri">
+            <summary>
+            Gets the absolute path to the domain service.
+            </summary>
+            <remarks>
+            The value returned is either the absolute Uri passed into the constructor, or
+            an absolute Uri constructed from the relative Uri passed into the constructor.
+            Relative Uris will be made absolute using the Application Host source.
+            </remarks>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.WebDomainClient`1.SupportsCancellation">
+            <summary>
+            Gets a value that indicates whether the <see cref="T:System.ServiceModel.DomainServices.Client.DomainClient"/> supports cancellation.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.WebDomainClient`1.UsesHttps">
+            <summary>
+            Gets whether a secure connection should be used.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.WebDomainClient`1.KnownTypes">
+            <summary>
+            Gets the list of known types.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.WebDomainClient`1.ChannelFactory">
+            <summary>
+            Gets the channel factory that is used to create channels for communication 
+            with the server.
+            </summary>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.Evaluator.PartialEval(System.Linq.Expressions.Expression,System.Func{System.Linq.Expressions.Expression,System.Boolean})">
+            <summary>
+            Performs evaluation and replacement of independent sub-trees
+            </summary>
+            <param name="expression">The root of the expression tree.</param>
+            <param name="funcCanBeEvaluated">A function that decides whether a given expression 
+            node can be part of the local function.</param>
+            <returns>A new tree with sub-trees evaluated and replaced.</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.Evaluator.PartialEval(System.Linq.Expressions.Expression)">
+            <summary>
+            Performs evaluation and replacement of independent sub-trees
+            </summary>
+            <param name="expression">The root of the expression tree.</param>
+            <returns>A new tree with sub-trees evaluated and replaced.</returns>
+        </member>
+        <member name="T:System.ServiceModel.DomainServices.Client.Evaluator.SubtreeEvaluator">
+            <summary>
+            Evaluates and replaces sub-trees when first candidate is reached (top-down)
+            </summary>
+        </member>
+        <member name="T:System.ServiceModel.DomainServices.Client.Evaluator.Nominator">
+            <summary>
+            Performs bottom-up analysis to determine which nodes can possibly
+            be part of an evaluated sub-tree.
+            </summary>
+        </member>
+        <member name="T:System.ServiceModel.DomainServices.Client.QuerySerializer">
+            <summary>
+            This serializer supports Where, OrderBy, Skip and Take.
+            </summary>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.QuerySerializer.Visitor.GetQueryRoot(System.Linq.Expressions.Expression)">
+            <summary>
+            Drill through MethodCallExpression chain searching for the root of
+            the query.
+            </summary>
+            <param name="expr">The <see cref="T:System.Linq.Expressions.Expression"/> to search.</param>
+            <returns>root of the query</returns>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.QuerySerializer.Visitor.VerifyMethodAccessibility(System.Linq.Expressions.MethodCallExpression)">
+            <summary>
+            Verify that the declaring type of the method is one of the supported types.
+            Note that this list of types corresponds to the list of accessible types
+            defined by the server query parser.
+            </summary>
+            <param name="mce">The method call expression.</param>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.QuerySerializer.Visitor.ValidateConstant(System.Object)">
+            <summary>
+            Ensure that the specified constant value is of a Type
+            supported by the server query serializer - we don't want
+            to serialize a value that the server can't handle.
+            </summary>
+            <param name="value">The constant value</param>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.QuerySerializer.Visitor.FlattenOrderExpressions">
+            <summary>
+            Unify all ordering expressions into a single order expression
+            </summary>
+        </member>
+        <member name="T:System.ServiceModel.DomainServices.Client.QuerySerializer.MethodCallConverter">
+            <summary>
+            This visitor is used to make any required method call translations.
+            </summary>
+        </member>
+        <member name="M:System.ServiceModel.DomainServices.Client.QuerySerializer.MethodCallConverter.MakeVBCompare(System.Linq.Expressions.Expression,System.Linq.Expressions.Expression,System.Boolean)">
+            <summary>
+            For the specified arguments and case sensitivity, return a expression
+            representing an equivalent call to string.Compare.
+            </summary>
+            <param name="left">The expression on the left-hand side.</param>
+            <param name="right">The expression on the right-hand side.</param>
+            <param name="caseSensitive">Indicates whether to do a case-sensitive comparison.</param>
+            <returns>Returns the expression.</returns>
+        </member>
+        <member name="T:System.ServiceModel.DomainServices.Client.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.ApplicationServices_CannotInitializeDomainContext">
+            <summary>
+              Looks up a localized string similar to The DomainContextType is null or invalid and there are no contexts generated from AuthenticationBase&lt;T&gt;..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.ApplicationServices_CannotInitializeUser">
+            <summary>
+              Looks up a localized string similar to The User type must extend UserBase and provide a default constructor..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.ApplicationServices_CannotSaveAnonymous">
+            <summary>
+              Looks up a localized string similar to The current user is anonymous. Data may only be saved for authenticated users..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.ApplicationServices_LoadNoUser">
+            <summary>
+              Looks up a localized string similar to GetUser should have returned a single user..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.ApplicationServices_LogoutNoUser">
+            <summary>
+              Looks up a localized string similar to Logout should have returned a single, anonymous user..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.ApplicationServices_NoLoadUserMethod">
+            <summary>
+              Looks up a localized string similar to Derived service does not contain a LoadUser method..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.ApplicationServices_SaveErrors">
+            <summary>
+              Looks up a localized string similar to Errors occurred while submitting the user changes..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.ApplicationServices_ServiceMustNotBeActive">
+            <summary>
+              Looks up a localized string similar to The service must be inactive to update state..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.ApplicationServices_WANoLogin">
+            <summary>
+              Looks up a localized string similar to Windows authentication does not support logging in..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.ApplicationServices_WANoLogout">
+            <summary>
+              Looks up a localized string similar to Windows authentication does not support logging out..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.MethodCanOnlyBeInvokedOnce">
+            <summary>
+              Looks up a localized string similar to Method can only be invoked once..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.OperationCancelled">
+            <summary>
+              Looks up a localized string similar to The operation was canceled..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.OperationNotComplete">
+            <summary>
+              Looks up a localized string similar to The operation has not completed..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.QuerySerialization_BitwiseOperatorsNotSupported">
+            <summary>
+              Looks up a localized string similar to Bitwise operators are not supported in queries..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.QuerySerialization_MethodNotAccessible">
+            <summary>
+              Looks up a localized string similar to Method &apos;{0}&apos; on type &apos;{1}&apos; is not accessible. Only methods on primitive types, System.Math and System.Convert are supported in queries..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.QuerySerialization_NestedQueriesNotSupported">
+            <summary>
+              Looks up a localized string similar to Nested query expressions are not supported..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.QuerySerialization_NewExpressionsNotSupported">
+            <summary>
+              Looks up a localized string similar to &apos;New&apos; Expressions are not supported in queries..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.QuerySerialization_ProjectionsNotSupported">
+            <summary>
+              Looks up a localized string similar to Select projections are not supported..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.QuerySerialization_UnsupportedBinaryOp">
+            <summary>
+              Looks up a localized string similar to Binary operation &apos;{0}&apos; is not supported..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.QuerySerialization_UnsupportedQueryOperator">
+            <summary>
+              Looks up a localized string similar to Query operator &apos;{0}&apos; is not supported..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.QuerySerialization_UnsupportedType">
+            <summary>
+              Looks up a localized string similar to Value of type &apos;{0}&apos; cannot be serialized as part of the query. &apos;{0}&apos; is not a supported Type..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.QuerySerialization_UnsupportedUnaryOp">
+            <summary>
+              Looks up a localized string similar to Unary operation &apos;{0}&apos; is not supported..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.WebContext_AuthenticationNotSet">
+            <summary>
+              Looks up a localized string similar to WebContextBase.Authentication has not been initialized. This member is only supported in valid implementations..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.WebContext_CannotModifyAuthentication">
+            <summary>
+              Looks up a localized string similar to Authentication cannot be set after the Application.Startup event has occurred..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.WebContext_NoContexts">
+            <summary>
+              Looks up a localized string similar to The current instance of WebContext is not available.  You must instantiate a WebContext and add it to Application.ApplicationLifetimeObjects within the default App constructor..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.WebContext_OnlyOne">
+            <summary>
+              Looks up a localized string similar to Only one WebContextBase can be created per application..
+            </summary>
+        </member>
+        <member name="P:System.ServiceModel.DomainServices.Client.Resources.WrongAsyncResult">
+            <summary>
+              Looks up a localized string similar to IAsyncResult object did not come from the corresponding async method on this type..
+            </summary>
+        </member>
+    </members>
+</doc>

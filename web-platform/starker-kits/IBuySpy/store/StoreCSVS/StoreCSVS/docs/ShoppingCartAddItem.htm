@@ -1,0 +1,79 @@
+<html>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body class="NormalIndent">
+        <h1>"ShoppingCartAddItem" Stored Procedure</h1>
+
+        <b>Description:</b>
+
+        <P>This stored procedure adds a product to the ShoppingCart for the given CartID.&nbsp;
+        If the product does not exist in the current cart, it adds a new entry.&nbsp; If the
+        product does already exist in the current CartID, it adds the quantity to the
+        quantity currently in the database. </P>
+
+        <b>Definition:</b>
+
+        <pre>
+
+    CREATE Procedure ShoppingCartAddItem
+    (
+        @CartID nvarchar(50),
+        @ProductID int,
+        @Quantity int
+    )
+    As
+
+    DECLARE @CountItems int
+
+    SELECT
+        @CountItems = Count(ProductID)
+    FROM
+        ShoppingCart
+    WHERE
+        ProductID = @ProductID
+      AND
+        CartID = @CartID
+
+    IF @CountItems > 0  /* There are items - update the current quantity */
+
+        UPDATE
+            ShoppingCart
+        SET
+            Quantity = (@Quantity + ShoppingCart.Quantity)
+        WHERE
+            ProductID = @ProductID
+          AND
+            CartID = @CartID
+
+    ELSE  /* New entry for this Cart.  Add a new record */
+
+        INSERT INTO ShoppingCart
+        (
+            CartID,
+            Quantity,
+            ProductID
+        )
+        VALUES
+        (
+            @CartID,
+            @Quantity,
+            @ProductID
+        )
+        </pre>
+
+        <b>Database Tables Used: </b>
+
+        <P><i>ShoppingCart:</i> &nbsp;&nbsp;The ShoppingCart table keeps track of the items a user has purchased.&nbsp;
+        Its primary key is the RecordID field.&nbsp; The CartID is a string which we use to
+        identify the user currently logged in.&nbsp; There is a many to one
+        relationship between the ShoppingCart table and the Products table.&nbsp; Note that
+        if not Quantity is supplied, a default of 1 is entered.
+
+        <p>
+
+        <img src="1x1.gif" width=25> <IMG src="../docs/images/ShoppingCart.gif"></p>
+
+    </body>
+</html>

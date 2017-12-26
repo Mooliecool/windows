@@ -1,0 +1,75 @@
+<html><head><link rel=stylesheet href=style.css></head><body><div class=SourcePanel style='font-size:12'><pre style='background-color:white'>
+<font color= "blue">using</font> System;
+<font color= "blue">using</font> System.Web.Services;
+<font color= "blue">using</font> IBuySpy;
+<font color= "blue"></font>
+<font color= "blue">public class</font> InstantOrder : WebService {
+<font color= "blue"></font>
+<font color= "green">    //*******************************************************</font>
+<font color= "green">    //</font>
+<font color= "green">    // InstantOrder.OrderItem() Method </font>
+<font color= "green">    //</font>
+<font color= "green">    // The OrderItem method enables a remote client to programmatically</font>
+<font color= "green">    // place an order using a webservice. </font>
+<font color= "green">    //</font>
+<font color= "green">    //*******************************************************      </font>
+<font color= "blue"></font>
+<font color= "blue">    </font>[WebMethod(Description="The OrderItem method enables a remote client to programmatically place an order using a WebService.", EnableSession=false)]
+<font color= "blue">    public </font>OrderDetails OrderItem(string userName, string password, int productID, int quantity) {
+<font color= "blue">        </font>
+<font color= "green">        // Login client using provided username and password</font>
+<font color= "blue">        </font>IBuySpy.CustomersDB accountSystem = new IBuySpy.CustomersDB();
+<font color= "blue">        </font>String customerId = accountSystem.Login(userName, password);
+<font color= "blue">        </font>
+<font color= "blue"></font><font color= "blue">        if </font>(customerId == null) {<font color= "blue"></font>
+<font color= "blue">            </font>throw new Exception("Error: Invalid Login!");
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        // Wrap in try/catch block to catch errors in the event that someone types in</font>
+<font color= "green">        // an invalid value for quantity</font>
+<font color= "blue">        </font>int qty = System.Math.Abs(quantity);
+<font color= "blue"></font><font color= "blue">        if </font>(qty == quantity && qty < 1000) {<font color= "blue"></font>
+<font color= "blue">        </font>
+<font color= "green">            // Add Item to Shopping Cart</font>
+<font color= "blue">            </font>IBuySpy.ShoppingCartDB myShoppingCart = new IBuySpy.ShoppingCartDB();
+<font color= "blue">            </font>myShoppingCart.AddItem(customerId, productID, qty);
+<font color= "blue"></font>
+<font color= "green">            // Place Order</font>
+<font color= "blue">            </font>IBuySpy.OrdersDB orderSystem = new IBuySpy.OrdersDB();
+<font color= "blue">            </font>int orderID = orderSystem.PlaceOrder(customerId, customerId);
+<font color= "blue">            </font>
+<font color= "green">            // Return OrderDetails</font>
+<font color= "blue">            return</font> orderSystem.GetOrderDetails(orderID, customerId);
+<font color= "blue">        </font>}
+<font color= "blue"></font><font color= "blue">        else </font>{<font color= "blue"></font>
+<font color= "green">            // invalid input </font>
+<font color= "blue">            return</font> null;
+<font color= "blue">        </font>}
+<font color= "blue">    </font>}
+<font color= "blue">     </font>
+<font color= "green">    //*******************************************************</font>
+<font color= "green">    //</font>
+<font color= "green">    // InstantOrder.CheckStatus() Method </font>
+<font color= "green">    //</font>
+<font color= "green">    // The CheckStatus method enables a remote client to programmatically</font>
+<font color= "green">    // query the current status of an order in the IBuySpy System. </font>
+<font color= "green">    //</font>
+<font color= "green">    //*******************************************************  </font>
+<font color= "blue">     </font>
+<font color= "blue">    </font>[WebMethod(Description="The CheckStatus method enables a remote client to programmatically query the current status of an order in the IBuySpy System.", EnableSession=false)]
+<font color= "blue">    public </font>OrderDetails CheckStatus(string userName, string password, int orderID) {
+<font color= "blue">     </font>
+<font color= "green">        // Login client using provided username and password</font>
+<font color= "blue">        </font>IBuySpy.CustomersDB accountSystem = new IBuySpy.CustomersDB();
+<font color= "blue">        </font>String customerId = accountSystem.Login(userName, password);
+<font color= "blue">        </font>
+<font color= "blue"></font><font color= "blue">        if </font>(customerId == null) {<font color= "blue"></font>
+<font color= "blue">            </font>throw new Exception("Error: Invalid Login!");
+<font color= "blue">        </font>}
+<font color= "blue">        </font>
+<font color= "green">        // Return OrderDetails Status for Specified Order</font>
+<font color= "blue">        </font>IBuySpy.OrdersDB orderSystem = new IBuySpy.OrdersDB();
+<font color= "blue">        return</font> orderSystem.GetOrderDetails(orderID, customerId);
+<font color= "blue">    </font>}
+<font color= "blue"></font>}
+</pre>

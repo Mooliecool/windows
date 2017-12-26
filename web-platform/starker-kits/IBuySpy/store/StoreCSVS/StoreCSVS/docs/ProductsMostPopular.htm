@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <h1>"ProductsMostPopular" Stored Procedure</h1>
+
+        <b>Description:</b>
+
+        <P>This stored procedure returns the top 5 most purchased items in the IBuySpy
+        application.  It is the engine behind the "Most popular items" user control.</P>
+
+        <b>Definition:</b>
+
+        <pre>
+
+    CREATE Procedure ProductsMostPopular
+
+    AS
+
+    SELECT TOP 5
+        OrderDetails.ProductID,
+        SUM(OrderDetails.Quantity) as TotalNum,
+        Products.ModelName
+
+    FROM
+        OrderDetails
+      INNER JOIN Products ON OrderDetails.ProductID = Products.ProductID
+
+    GROUP BY
+        OrderDetails.ProductID,
+        Products.ModelName
+
+    ORDER BY
+        TotalNum DESC
+        </pre>
+
+        <b>Database Tables Used: </b>
+
+        <P><i>OrderDetails:</i> &nbsp;The OrderDetails table contains detailed product information for each
+        order in the system.  For each product in an order, an entry is made into the
+        OrderDetails table containing the ProductID, Quantity and current UnitCost of
+        the item.  There is a many to one relationship between OrderDetails table and
+        the Orders table.  Note the primary key in the table is both OrderID and
+        ProductID (since those two columns are the minimum required to guarantee
+        uniqueness of a record).
+
+        <p>
+
+        <img src="1x1.gif" width=25> <IMG src="../docs/images/OrderDetails.gif">
+
+        <P><i>Products:</i> &nbsp;The Products table contains all of the information about all of the products
+        on the IBuySpy web site. It's primary key is the ProductID identity field.  Note
+        that product descriptions are limited to 3800 characters.
+
+        <p>
+
+        <img src="1x1.gif" width=25> <IMG src="../docs/images/products.gif">
+
+    </body>
+</html>

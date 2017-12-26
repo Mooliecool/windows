@@ -1,0 +1,50 @@
+<HTML>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <h1>
+            SearchResults.aspx Page
+        </h1>
+        <P>
+            <B>Description:</B>
+        &nbsp;&nbsp;The SearchResults page displays a list of all products whose names 
+        or descriptions match a specified search criteria.&nbsp;
+        <p>
+            <strong>Implementation Notes:&nbsp;</strong> &nbsp;This page appears when a 
+            user clicks&nbsp;the "search" button that appears at the top of most pages in 
+            IBuySpy. The search form itself is not actually part of the page; instead it is 
+            part of the Header user control ( <A href="_header_ascx.htm">_Header.ascx</A>
+        )&nbsp;that is incorporated into the page.
+        <p>
+            The ProductsList page logic is encapsulated entirely within its&nbsp;<strong>Page_Load</strong>
+        &nbsp;event handler.&nbsp; This event handler is called when the page is 
+        accessed by a browser client.&nbsp;
+        <P>
+            <strong>Page_Load Event Handler:&nbsp;</strong>&nbsp;The Page_Load event 
+            handler obtains the text clause to search the product database using the&nbsp;<strong>Params</strong>&nbsp;collection 
+            of the page's&nbsp;<strong>Request</strong>
+        &nbsp;object.&nbsp; The Params collection contains all query string, form 
+        field, cookie, and server variables sent from a client during an HTTP request. 
+        This the typical API through which page developers access arguments when doing 
+        page to page navigation transfers.
+        <p>
+            After converting the CategoryID into an Integer, the Page_Load event handler 
+            creates an instance of the ProductDB class and calls its GetProducts method, 
+            passing it the product ID. This method internally uses the <A href="ProductSearch.htm">
+                ProductSearch</A>&nbsp;stored procedure to fetch the 
+            product&nbsp;information from the IBuySpy database.
+        </p>
+        <p>
+            The product collection is displayed using a templated &lt;asp:DataList&gt; 
+            server control.&nbsp; The DataList server control contains a user-defined&nbsp;<strong>ItemTemplate</strong>&nbsp;that 
+            describes what each item in the list should look like.&nbsp; The data values 
+            returned from the ProductsDB.GetProducts() method are populated into the 
+            DataList by setting its Datasource property, and then calling its&nbsp;<strong>DataBind()</strong>
+        &nbsp;method.&nbsp; When DataBind() is called, the DataList will iterate over 
+        the DataSource and render a copy ofthe ItemTemplate for each row, populating it 
+        data from the row.&nbsp;&nbsp;
+        <P>
+    </body>
+</HTML>

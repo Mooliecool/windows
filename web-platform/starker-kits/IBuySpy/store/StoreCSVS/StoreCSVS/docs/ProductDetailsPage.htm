@@ -1,0 +1,97 @@
+<html>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body class="NormalIndent">
+        <h1>
+            ProductDetails.aspx Page
+        </h1>
+        <P>
+            <b>Description:&nbsp;</b>The ProductDetails page displays detailed information 
+            about a particular product.
+        </P>
+        <p>
+            <strong>Implementation Notes:&nbsp;</strong> &nbsp;This page appears when a 
+            user clicks&nbsp;a link to a specific product in the ProductsList.aspx 
+            page.&nbsp; The ProductID of the product to display is passed to the page as a 
+            URL querystring argument (ie: "ProductDetails.aspx?ProductID=363").&nbsp; 
+            Please review the <A href="ProductsList_aspx.htm">ProductsList.aspx</A>
+        &nbsp; page to see how this argument is added when constructing the hyperlink 
+        to this page.
+        <p>
+            The ProductsList page logic is encapsulated entirely within its&nbsp;<strong>Page_Load</strong>
+        &nbsp;event handler.&nbsp; This event handler is called when the page is 
+        accessed by a browser client.&nbsp;
+        <p>
+            <strong>Page_Load Event Handler:&nbsp;</strong>&nbsp;The Page_Load event 
+            handler obtains the specified ProductID parameter using the&nbsp;<strong>Params</strong>&nbsp;collection 
+            of the page's&nbsp;<strong>Request</strong>
+        &nbsp;object.&nbsp; The Params collection contains all query string, form 
+        field, cookie, and server variables sent from a client during an HTTP request. 
+        This the typical API through which page developers access arguments when doing 
+        page to page navigation transfers.
+        <p>
+        </p>
+        <p>
+            After converting the ProductID into an Integer, the Page_Load event handler 
+            creates an instance of the ProductDB class and calls its GetProductDetails 
+            method, passing it the product ID. This method internally uses the <A href="ProductDetail.htm">
+                ProductDetail</A> &nbsp;stored procedure to fetch the 
+            product&nbsp;information from the IBuySpy database.
+        </p>
+        <p>
+            Once the product data is fetched from the database, it is pushed into a number 
+            of server controls on the page.&nbsp; Most of these server controls are 
+            standard ASP.NET ones (labels, images, hyperlinks, etc).&nbsp; Two of the 
+            server controls, however, are custom IBuySpy user controls that we have written 
+            to encapsulate the " <A href="_ReviewList_ascx.htm">Review List</A> "&nbsp;of a 
+            product, as well as a list of products that people who bought the current 
+            product <A href="_AlsoBought_ascx.htm">Also Bought</A>. Note that these user 
+            controls can be programmatically manipulated (property sets/gets, methods 
+            called, events sunk and raised) just like any other standard server 
+            control.&nbsp; They provide a very nice way to encapsulate and reuse 
+            functionality, as well as to cleanly partition work up among multiple 
+            developers.
+        </p>
+        <P>
+            <strong>Add to Cart:&nbsp;</strong> &nbsp;&nbsp;The third-to-the-last line of 
+            code in the Page_Load event handler dynamically constructs&nbsp;an "Add To 
+            Cart" link that, when clicked, adds the product to the user's shopping 
+            cart.&nbsp; This link references the <A href="AddToCart_aspx.htm">AddToCart.aspx</A>
+            &nbsp;page, and passes the ProductID of the product to add as a 
+            dynamically-generated querystring argument to the hyperlink.&nbsp;
+        </P>
+        <p>
+            Note that while it is possible to implement this functionality as an 
+            ImageButton that posts back to the ProductsList.aspx page, we choose to 
+            implement it this way for the following reasons:
+            <ol>
+                <li>
+                    <u>Better reuse of the AddToCart logic</u>.&nbsp; IBuySpy lets the user add 
+                products to his cart from the ProductsList.aspx, ProductDetails.aspx and 
+                SearchResults.aspx pages.&nbsp; These pages share the logic in the AddToCart 
+                page.
+                <li>
+                    <u>Better use of the Output Cache</u>.&nbsp; If each "AddToCart" link posted 
+                    back to it's respective page,&nbsp;there would be many more output cache 
+                    entries for the page -- one for each unique querystring value.
+                </li>
+            </ol>
+        <p>
+            <b>Peformance Notes:</b>
+            <ul>
+                <li>
+                    We output cache the results of this page in order to maximize its 
+                    performance.&nbsp; This is accomplished by adding an OutputCache directive at 
+                    the top of the page.&nbsp; In this case we elected to output cache the page for 
+                    a duration of 1 minute (60 seconds).&nbsp; ASP.NET will automatically store 
+                    a separate cache entry for each different querystring value -- and will 
+                    automatically render the appropriate output for subsequent requests.
+                    <pre>
+                    
+        &lt;%@ OutputCache Duration="60" VaryByParam="ProductID" %&gt;
+                    </pre>
+            </ul>
+    </body>
+</html>

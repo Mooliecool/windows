@@ -1,0 +1,113 @@
+<html><head><link rel=stylesheet href=style.css></head><body><div class=SourcePanel style='font-size:12'><pre style='background-color:white'>
+<font color= "blue">using</font> System;
+<font color= "blue">using</font> System.Configuration;
+<font color= "blue">using</font> System.Data;
+<font color= "blue">using</font> System.Data.SqlClient;
+<font color= "blue"></font>
+<font color= "blue">namespace</font> IBuySpy {
+<font color= "blue"></font>
+<font color= "green">    //*******************************************************</font>
+<font color= "green">    //</font>
+<font color= "green">    // ReviewsDB Class</font>
+<font color= "green">    //</font>
+<font color= "green">    // Business/Data Logic Class that encapsulates all data</font>
+<font color= "green">    // logic necessary to list/access/add reviews from</font>
+<font color= "green">    // the IBuySpy Reviews database.</font>
+<font color= "green">    //</font>
+<font color= "green">    //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">    public class</font> ReviewsDB {
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // ReviewsDB.GetReviews() Method <a name="GetReviews"></a></font>
+<font color= "green">        //</font>
+<font color= "green">        // The GetReviews method returns a struct containing</font>
+<font color= "green">        // a forward-only, read-only DataReader.  This displays a list of all</font>
+<font color= "green">        // user-submitted reviews for a specified product.</font>
+<font color= "green">        // The SQLDataReaderResult struct also returns the SQL connection,</font>
+<font color= "green">        // which must be explicitly closed after the data from the DataReader</font>
+<font color= "green">        // is bound into the controls.</font>
+<font color= "green">        //</font>
+<font color= "green">        // Other relevant sources:</font>
+<font color= "green">        //     + <a href="ReviewsList.htm" style="color:green">ReviewsList Stored Procedure</a></font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        public </font>SqlDataReader GetReviews(int productID) {
+<font color= "blue"></font>
+<font color= "green">            // Create Instance of Connection and Command Object</font>
+<font color= "blue">            </font>SqlConnection myConnection = new SqlConnection(ConfigurationSettings.AppSettings["ConnectionString"]);
+<font color= "blue">            </font>SqlCommand myCommand = new SqlCommand("ReviewsList", myConnection);
+<font color= "blue"></font>
+<font color= "green">            // Mark the Command as a SPROC</font>
+<font color= "blue">            </font>myCommand.CommandType = CommandType.StoredProcedure;
+<font color= "blue"></font>
+<font color= "green">            // Add Parameters to SPROC</font>
+<font color= "blue">            </font>SqlParameter parameterProductID = new SqlParameter("@ProductID", SqlDbType.Int, 4);
+<font color= "blue">            </font>parameterProductID.Value = productID;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterProductID);
+<font color= "blue"></font>
+<font color= "green">            // Execute the command</font>
+<font color= "blue">            </font>myConnection.Open();
+<font color= "blue">            </font>SqlDataReader result = myCommand.ExecuteReader(CommandBehavior.CloseConnection);
+<font color= "blue"></font>
+<font color= "green">            // Return the datareader result</font>
+<font color= "blue">            return</font> result;
+<font color= "blue">        </font>}
+<font color= "blue"></font>
+<font color= "green">        //*******************************************************</font>
+<font color= "green">        //</font>
+<font color= "green">        // ReviewsDB.AddReview() Method <a name="AddReview"></a></font>
+<font color= "green">        //</font>
+<font color= "green">        // The AddReview method adds a new review into the</font>
+<font color= "green">        // IBuySpy Reviews database.</font>
+<font color= "green">        //</font>
+<font color= "green">        // Other relevant sources:</font>
+<font color= "green">        //     + <a href="ReviewsAdd.htm" style="color:green">ReviewsAdd Stored Procedure</a></font>
+<font color= "green">        //</font>
+<font color= "green">        //*******************************************************</font>
+<font color= "blue"></font>
+<font color= "blue">        public void</font> AddReview(int productID, string customerName, string customerEmail, int rating, string comments) {
+<font color= "blue"></font>
+<font color= "green">            // Create Instance of Connection and Command Object</font>
+<font color= "blue">            </font>SqlConnection myConnection = new SqlConnection(ConfigurationSettings.AppSettings["ConnectionString"]);
+<font color= "blue">            </font>SqlCommand myCommand = new SqlCommand("ReviewsAdd", myConnection);
+<font color= "blue"></font>
+<font color= "green">            // Mark the Command as a SPROC</font>
+<font color= "blue">            </font>myCommand.CommandType = CommandType.StoredProcedure;
+<font color= "blue"></font>
+<font color= "green">            // Add Parameters to SPROC</font>
+<font color= "blue">            </font>SqlParameter parameterProductID = new SqlParameter("@ProductID", SqlDbType.Int, 4);
+<font color= "blue">            </font>parameterProductID.Value = productID;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterProductID);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterCustomerName = new SqlParameter("@CustomerName", SqlDbType.NVarChar, 50);
+<font color= "blue">            </font>parameterCustomerName.Value = customerName;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterCustomerName);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterEmail = new SqlParameter("@CustomerEmail", SqlDbType.NVarChar, 50);
+<font color= "blue">            </font>parameterEmail.Value = customerEmail;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterEmail);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterRating = new SqlParameter("@Rating", SqlDbType.Int, 4);
+<font color= "blue">            </font>parameterRating.Value = rating;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterRating);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterComments = new SqlParameter("@Comments", SqlDbType.NVarChar, 3850);
+<font color= "blue">            </font>parameterComments.Value = comments;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterComments);
+<font color= "blue"></font>
+<font color= "blue">            </font>SqlParameter parameterReviewID = new SqlParameter("@ReviewID", SqlDbType.Int, 4);
+<font color= "blue">            </font>parameterReviewID.Direction = ParameterDirection.Output;
+<font color= "blue">            </font>myCommand.Parameters.Add(parameterReviewID);
+<font color= "blue"></font>
+<font color= "green">            // Open the connection and execute the Command</font>
+<font color= "blue">            </font>myConnection.Open();
+<font color= "blue">            </font>myCommand.ExecuteNonQuery();
+<font color= "blue">            </font>myConnection.Close();
+<font color= "blue">        </font>}
+<font color= "blue">    </font>}
+<font color= "blue"></font>}
+<font color= "blue"></font>
+</pre>

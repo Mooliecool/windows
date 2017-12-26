@@ -1,0 +1,67 @@
+<html>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body class="NormalIndent">
+        <h1>"ShoppingCartList" Stored Procedure</h1>
+
+        <b>Description:</b>
+
+        <P>This stored procedure returns a recordset containing all the items in the
+        given CartID.  It is called whenever the Shopping Cart screen is displayed.</P> </P>
+
+        <b>Definition:</b>
+
+        <pre>
+
+    CREATE Procedure ShoppingCartList
+    (
+        @CartID nvarchar(50)
+    )
+    AS
+
+    SELECT
+        Products.ProductID,
+        Products.ModelName,
+        Products.ModelNumber,
+        ShoppingCart.Quantity,
+        Products.UnitCost,
+        Cast((Products.UnitCost * ShoppingCart.Quantity) as money) as ExtendedAmount
+
+    FROM
+        Products,
+        ShoppingCart
+
+    WHERE
+        Products.ProductID = ShoppingCart.ProductID
+      AND
+        ShoppingCart.CartID = @CartID
+
+    ORDER BY
+        Products.ModelName,
+        Products.ModelNumber
+        </pre>
+
+        <b>Database Tables Used: </b>
+
+        <P><i>Products:</i> &nbsp;The Products table contains all of the information about all of the products
+        on the IBuySpy web site. Its primary key is the ProductID identity field.  Note
+        that product descriptions are limited to 3800 characters.
+
+        <p>
+
+        <img src="1x1.gif" width=25> <IMG src="../docs/images/products.gif">
+
+        <P><i>ShoppingCart:</i> &nbsp;The ShoppingCart table keeps track of the items a user has purchased. 
+        Its primary key is the RecordID field.  The CartID is a string which we use to
+        identify the user currently logged in.  There is a many to one
+        relationship between the ShoppingCart table and the Products table.  Note that
+        if not Quantity is supplied, a default of 1 is entered.
+
+        <p>
+
+        <img src="1x1.gif" width=25> <IMG src="../docs/images/ShoppingCart.gif">
+
+    </body>
+</html>

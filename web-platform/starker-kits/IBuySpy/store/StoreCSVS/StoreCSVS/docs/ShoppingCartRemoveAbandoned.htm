@@ -1,0 +1,43 @@
+<html>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body class="NormalIndent">
+        <h1>"ShoppingCartRemoveAbandoned" Stored Procedure</h1>
+
+        <b>Description:</b>
+
+        <P>This stored procedure is run nightly by a scheduled SQL job called "RemoveAbandonedCarts."
+        It deletes all entries in the ShoppingCart table that are more than one day old.&nbsp; Since
+        the items in a shopping cart are move to the Orders and OrderDetails tables when an order
+        is placed, only abandoned carts are removed. </P>
+
+        <b>Definition:</b>
+
+        <pre>
+
+    CREATE Procedure ShoppingCartRemoveAbandoned
+
+    AS
+
+    DELETE FROM ShoppingCart
+
+    WHERE
+        DATEDIFF(dd, DateCreated, GetDate()) > 1
+       </pre>
+
+        <b>Database Tables Used: </b>
+
+        <P><i>ShoppingCart:</i> &nbsp;&nbsp;The ShoppingCart table keeps track of the items a user has purchased.&nbsp;
+        Its primary key is the RecordID field.&nbsp; The CartID is a string which we use to
+        identify the user currently logged in.&nbsp; There is a many to one
+        relationship between the ShoppingCart table and the Products table.&nbsp; Note that
+        if not Quantity is supplied, a default of 1 is entered.
+
+        <p>
+
+        <img src="1x1.gif" width=25> <IMG src="../docs/images/ShoppingCart.gif"></p>
+
+    </body>
+</html>

@@ -1,0 +1,54 @@
+<html>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <h1>"CustomerLogin" Stored Procedure</h1>
+
+        <b>Description:</b>
+
+        <P>This stored procedure provides the engine for the authentication step in the
+        IBuySpy application.  It accepts Email and Password and returns the CustomerID
+        if successful.  If unsuccessful, it returns 0.</P>
+
+        <b>Definition:</b>
+
+        <pre>
+
+    CREATE Procedure CustomerLogin
+    (
+        @Email      nvarchar(50),
+        @Password   nvarchar(50),
+        @CustomerID int OUTPUT
+    )
+    AS
+
+    SELECT
+        @CustomerID = CustomerID
+
+    FROM
+        Customers
+
+    WHERE
+        EmailAddress = @Email
+      AND
+        Password = @Password
+
+    IF @@Rowcount < 1
+    SELECT
+        @CustomerID = 0
+        </pre>
+
+        <b>Database Tables Used: </b>
+
+        <P><i>Customers:</i> &nbsp;The Customers table keeps track of all customer information in the system. 
+        The primary key is CustomerID and we store the users' full name, email address
+        and password.  It has a one to many relationship with the Orders table.
+
+        <p>
+
+        <img src="1x1.gif" width=25> <IMG src="../docs/images/Customers.gif">
+
+    </body>
+</html>

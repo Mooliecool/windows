@@ -1,0 +1,89 @@
+<HTML>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body class="NormalIndent">
+        <h1>
+            ShoppingCart.aspx Page
+        </h1>
+        <b>Description:</b> &nbsp;The ShoppingCart.aspx page enables customers to view 
+        the current state of their shopping cart. They can also change quantities and 
+        remove items.
+        <br>
+        <br>
+        <b>Implementation Notes</b>:&nbsp; To change quantities, users change the value 
+        in a text box, and then click the "Update Your Shopping Cart" button. If they 
+        are finished shopping, they can click the "Final Check Out" button.
+        <br>
+        <br>
+        The logic for this page is encapsulated in three event handlers: Page_Load 
+        event, the UpdateBtn_Click event handler for the Update button, and the 
+        CheckoutBtn_Click event handler for the Checkout button. The page includes some 
+        internal methods used to maintain the shopping cart information.
+        <br>
+        <br>
+        <strong>Displaying Current Items:&nbsp;</strong> &nbsp;Shopping cart 
+        information is maintained in the IBuySpy database. When users add items to 
+        their cart, the application is actually writing records to the database. In 
+        order to keep track of which items belong to which cart, the application tags 
+        each record with a "cart ID," which is created in the ShoppingCartDB class 
+        either from the user's login name, or if the user has not yet logged in, from a 
+        dynamically-generated GUID.
+        <br>
+        <br>
+        When the ShoppingCart.aspx page is first displayed, the&nbsp;<b>Page_Load</b>&nbsp; 
+        event handler calls the internal&nbsp;<b>PopulateShoppingCartList</b>&nbsp;method 
+        to populate the shopping cart. That method first checks that there are items in 
+        the cart. If not, an error is displayed by setting the text of a&nbsp;<b>Label</b>&nbsp;control.
+        <br>
+        <br>
+        The shopping cart items are displayed in a&nbsp;<b>DataGrid</b>&nbsp;control, 
+        which includes built-in support for headers and footers, embedded controls in a 
+        column, alternating item display (the gray bar), and data binding.
+        <br>
+        <br>
+        The PopulateShoppingCartList method obtains a collection of all items in the 
+        user's shopping cart by calling the GetItems method of the ShoppingCartDB 
+        class. The GetItems method in turn uses the <A href="ShoppingCartList.htm">ShoppingCartList</A>&nbsp; 
+        stored procedure to retrieve the items from the database.
+        <br>
+        <br>
+        Once the collection of items is retrieved, it is bound to the&nbsp;<b>DataGrid</b>&nbsp; 
+        control by setting the control's&nbsp;<b>DataSource</b>&nbsp;property. Data is 
+        copied from the collection to the grid by calling the grid's&nbsp;<b>DataBind</b>&nbsp; 
+        method, which causes grid to loop through the data source generate a row for 
+        each item. The layout of each item is determined by a set of individual column 
+        definitions in the DataGrid control.
+        <br>
+        <br>
+        <strong>Updating Item Information:&nbsp;</strong>When users click the "Update 
+        Your Shopping Cart" button, it invokes the <strong>UpdateBtn_Click</strong> event 
+        handler, which in turn calls the internal UpdateShoppingCartDatabase method to 
+        write the shopping cart items back into the database. After the update, the 
+        handler calls the same PopulateShoppingCartList method used when the page is 
+        first displayed in order to refresh the shopping cart grid on the page. The 
+        update is performed by looping through the Items collection of the DataGrid 
+        control. Each item corresponds logically to a row in the grid. To get the value 
+        of an individual control in an item, the process calls the Items collection's 
+        FindControl method, which is a shorthand way to locate a control that might be 
+        in any column. For each item, the update process determines whether to remove 
+        or update that item in the shopping cart.
+        <br>
+        <br>
+        <strong>Checking Out:&nbsp;</strong>If the user clicks the "Final Check Out" 
+        button, it invokes the <strong>CheckoutBtn_Click</strong> event handler. The 
+        handler performs an update of the cart to make sure the database is current and 
+        then redirects the client to the Checkout.aspx page.
+        <br>
+        <br>
+        <strong>Performance Notes:</strong>&nbsp;&nbsp;A possible optimization would be 
+        to store the original (pre-update) quantity value of each row in a hidden field 
+        of the grid. Doing so would enable us to determine if the Quantity text box 
+        value had changed, and would allow us to call the UpdateItem method of the 
+        ShoppingCartDB class only if the quantity value of that specific row had 
+        actually changed. As currently implemented, the page updates every item and 
+        refreshes the grid each time the user clicks the "Update Your Shopping Cart" 
+        button, even if there is no change.
+    </body>
+</HTML>

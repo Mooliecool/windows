@@ -1,0 +1,1 @@
+<%@ WebService class="AspNetForums.Moderation.WebServices.QueueStatus" %>

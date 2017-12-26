@@ -1,0 +1,67 @@
+<html>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body class="NormalIndent">
+        <h1>
+            "OrdersList" Stored Procedure
+        </h1>
+        <b>Description:</b>
+        <P>
+            This stored procedure accepts a CustomerID as input and returns a list of all
+            the user's orders in the Orders table. This procedure is used on the
+            OrdersList.aspx page.
+        </P>
+        <b>Definition:</b>
+        <pre>
+
+    CREATE Procedure OrdersList
+    (
+        @CustomerID int
+    )
+    As
+
+    SELECT
+        Orders.OrderID,
+        Cast(sum(orderdetails.quantity*orderdetails.unitcost) as money) as OrderTotal,
+        Orders.OrderDate,
+        Orders.ShipDate
+
+    FROM
+        Orders
+      INNER JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
+
+    GROUP BY
+        CustomerID,
+        Orders.OrderID,
+        Orders.OrderDate,
+        Orders.ShipDate
+    HAVING
+        Orders.CustomerID = @CustomerID
+        </pre>
+        <b>Database Tables Used: </b>
+        <P>
+            <i>Orders:</i>
+        &nbsp;The Orders table contains the header information about all the orders in
+        the system (i.e., all items that are actually purchased. Users must check out
+        their cart to place an order in the system). When an order is created, an entry
+        is made in the Orders table with the CustomerID, OrderDate and ShipDate. Then,
+        any information about the products in the order is added to the OrderDetails
+        table as discussed below. Note that if no OrderDate or ShipDate is provided,
+        the current date is entered as default.
+        <p>
+            <img src="1x1.gif" width="25"> <IMG src="../docs/images/Orders.gif">
+        <P>
+            <i>OrderDetails:</i>
+        &nbsp;The OrderDetails table contains detailed product information for each
+        order in the system. For each product in an order, an entry is made into the
+        OrderDetails table containing the ProductID, Quantity and current UnitCost of
+        the item. There is a many to one relationship between OrderDetails table and
+        the Orders table. Note the primary key in the table is both OrderID and
+        ProductID (since those two columns are the minimum required to guarantee
+        uniqueness of a record).
+        <p>
+            <img src="1x1.gif" width="25"> <IMG src="../docs/images/OrderDetails.gif">
+    </body>
+</html>

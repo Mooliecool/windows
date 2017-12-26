@@ -1,0 +1,68 @@
+<html>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body class="NormalIndent">
+        <h1>
+            AddToCart.aspx Page
+        </h1>
+        <b>Description:</b> The AddToCart page adds the currently displayed product to 
+        the user's shopping cart and then immediately redirects the browser to the <A href="ShoppingCart_aspx.htm">
+            ShoppingCart.aspx</A> &nbsp; page.
+        <br>
+        <br>
+        <strong>Implementation Notes:&nbsp;</strong> The AddToCart page is invoked when 
+        users click the "Add to Cart" link in the product list page (<A href="ProductsList_aspx.htm">ProductsList.aspx</A>) 
+        or in a product details page (<A href="ProductDetails_aspx.htm">ProductDetails.aspx</A>). 
+        The page displays no text. It simply gathers information, calls a process to 
+        update the shopping cart, and then navigates to the shopping cart summary page 
+        (<A href="ShoppingCart_aspx.htm">ShoppingCart.aspx</A>).
+        <br>
+        <br>
+        The ID of the product to add to the cart is passed to this page in the query 
+        string. For example, if the user wants to add the "Mighty, Mighty Pen" to the 
+        shopping cart, the URL to invoke this page would be 
+        AddToCart.aspx?productID=371). Please review the referring pages to see how 
+        this argument is added when constructing the hyperlink to this page.
+        <br>
+        <br>
+        The ProductsList page logic is encapsulated entirely within its&nbsp;<strong>Page_Load</strong>&nbsp;event 
+        handler.&nbsp; This event handler is called when the page is accessed by a 
+        browser client.&nbsp;
+        <br>
+        <br>
+        <strong>Page_Load Event Handler:&nbsp;</strong>&nbsp;The Page_Load event 
+        handler obtains the specified ProductID parameter using the&nbsp;<strong>Params</strong>&nbsp;collection 
+        of the page's&nbsp;<strong>Request</strong>&nbsp;object.&nbsp; The Params 
+        collection contains all query string, form field, cookie, and server variables 
+        sent from a client during an HTTP request. This the typical API through which 
+        page developers access arguments when doing page to page navigation transfers.
+        <br>
+        <br>
+        The Page_Load event handler creates an instance of the ShoppingCartDB class and 
+        calls its GetShoppingCartId method to get a "cart ID." The cart ID is created 
+        either from the user's login name, or if the user has not yet logged in, from a 
+        dynamically-generated GUID. If the cart ID is a GUID, the cart is a "temporary 
+        shopping cart" that is good for the current session. This temporary cart is 
+        automatically converted to a permanent cart when the user logs in and provides 
+        their user name and password.
+        <br>
+        <br>
+        To actually add the item to the cart, the handler calls the AddItem method of 
+        the ShoppingCartDB class, passing it the cart ID, the product ID, and the 
+        quantity 1. Because the AddItem method expects an integer, the product ID, 
+        which is a string when passed in the query string, is converted to an integer. 
+        The AddItem method internally uses the <A href="ShoppingCartAddItem.htm">ShoppingCartAddItem</A>&nbsp;stored 
+        procedure to update the shopping cart in the IBuySpy database.
+        <br>
+        <br>
+        Immediately after the item is added to the shopping cart, the user is 
+        redirected to the <A href="ShoppingCart_aspx.htm">ShoppingCart.aspx</A> &nbsp; 
+        page. The redirection is done using the Request object's Redirect method, which 
+        causes a client-side redirect to the supplied URL. Causing this redirect to 
+        occur immediately ensures that customers cannot accidentally re-add items to 
+        the cart by clicking the Refresh button in the browser, because the URL will be 
+        different after the redirect takes place.
+    </body>
+</html>

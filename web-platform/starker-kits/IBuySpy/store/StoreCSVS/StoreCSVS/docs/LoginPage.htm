@@ -1,0 +1,273 @@
+<HTML>
+    <head>
+        <title>IBuySpy Store Documentation</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <BODY>
+        <h1>
+            Login.aspx Page
+        </h1>
+        <P>
+            <strong>Description:</strong>&nbsp;The Login page authenticates a customer's 
+            username and password credentials against a database. Users can log in at any 
+            time by clicking the "Sign In" button in the header (<A href="_header_ascx.htm">_Header.ascx</A>), but login is not required in order to view IBuySpy items or add them to a 
+        shopping cart. If users are not logged in, the shopping cart is created using a 
+        temporary user ID.
+        <p>
+            Users must be logged in to perform certain restricted tasks in the application. 
+            For example, if a user wants to check out but has not already logged in, the 
+            checkout page (<A href="checkout_aspx.htm">Checkout.aspx</A>) displays the login page and asks the user to enter a user name and password.
+        <p>
+            After the user has logged in, the checkout page migrates items from the 
+            temporary shopping cart to the user's permanent account. The login page then 
+            redirects back to the originating page.
+        </p>
+        <p>
+            <strong>Forms-Based Security Notes:</strong>
+        &nbsp;The Login.aspx page provides customers with a forms-based login page 
+        through which they can authenticate themselves in the IBuySpy application. 
+        IBuySpy authentication uses ASP.NET forms-based authentication. When a 
+        user has been authenticated, a cookie is created that maintains the 
+        authentication information for the current user for the current session.
+        <p>
+            Forms-based authentication is enabled by making a &lt;security&gt; entry in 
+            the application's <A href="Web_config.htm">Web.config</A>
+        &nbsp;file that looks like this:
+        <p>
+        &nbsp;&nbsp;&nbsp;<FONT color="blue">&lt;</FONT><FONT color="maroon">system.web</FONT><FONT color="blue">&gt;</FONT>
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;</FONT><FONT color="maroon">authentication</FONT><font color="#000000">&nbsp;</font>mode="Forms"<FONT color="blue">&gt;</FONT>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;</FONT><FONT color="maroon">forms</FONT><font color="#000000">&nbsp;</font>name="IBuySpyStoreAuth" 
+        loginUrl="login.aspx" protection="All" path="/"<FONT color="blue">&gt;</FONT><FONT color="blue">&lt;/</FONT><FONT color="maroon">forms</FONT><FONT color="blue">&gt;</FONT>
+        <BR>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;/</FONT><FONT color="maroon">authentication</FONT><FONT color="blue">&gt;</FONT>
+        <BR>
+        &nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;/</FONT><FONT color="maroon">system.web</FONT><FONT color="blue">&gt;</FONT></P> 
+        </p>
+        <p>
+            The <b>loginurl</b> attribute specifies the login page that the application 
+            should redirect to any time a user attempts to access an application resource 
+            that does not allow anonymous access.
+        </p>
+        <p>
+            For example, within the IBuySpy application we have configured three pages -- 
+            account order history (OrderList.aspx), account order details 
+            (OrderDetails.aspx), and order checkout (CheckOut.aspx) -- to explicitly 
+            require authenticated user access. To create these restrictions, we made an 
+            entry for each restricted page in the Web.config, as shown below (the "?" user 
+            stands for "anonymous" -- non-authenticated -- users):
+        </p>
+        <p>
+            &nbsp;&nbsp;&nbsp;<FONT color="blue">&lt;</FONT><FONT color="maroon">location</FONT><font color="#000000">&nbsp;</font>path="OrderList.aspx"<FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;</FONT><FONT color="maroon">system.web</FONT><FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">
+                &lt;</FONT><FONT color="maroon">authorization</FONT><FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <FONT color="blue">&lt;</FONT><FONT color="maroon">deny</FONT><font color="#000000">&nbsp;</font>users="?"<FONT color="blue">/&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">
+                &lt;/</FONT><FONT color="maroon">authorization</FONT><FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;/</FONT><FONT color="maroon">system.web</FONT><FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;/</FONT><FONT color="maroon">location</FONT><FONT color="blue">&gt;</FONT>
+        </p>
+        <p>
+            &nbsp;&nbsp;&nbsp;<FONT color="blue">&lt;</FONT><FONT color="maroon">location</FONT><font color="#000000">&nbsp;</font>path="OrderDetails.aspx"<FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;</FONT><FONT color="maroon">system.web</FONT><FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">
+                &lt;</FONT><FONT color="maroon">authorization</FONT><FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <FONT color="blue">&lt;</FONT><FONT color="maroon">deny</FONT><font color="#000000">&nbsp;</font>users="?"<FONT color="blue">/&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">
+                &lt;/</FONT><FONT color="maroon">authorization</FONT><FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;/</FONT><FONT color="maroon">system.web</FONT><FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;/</FONT><FONT color="maroon">location</FONT><FONT color="blue">&gt;</FONT>
+        </p>
+        <p>
+            &nbsp;&nbsp;&nbsp;<FONT color="blue">&lt;</FONT><FONT color="maroon">location</FONT><font color="#000000">&nbsp;</font>path="CheckOut.aspx"<FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;</FONT><FONT color="maroon">system.web</FONT><FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">
+                &lt;</FONT><FONT color="maroon">authorization</FONT><FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <FONT color="blue">&lt;</FONT><FONT color="maroon">deny</FONT><font color="#000000">&nbsp;</font>users="?"<FONT color="blue">/&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">
+                &lt;/</FONT><FONT color="maroon">authorization</FONT><FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;/</FONT><FONT color="maroon">system.web</FONT><FONT color="blue">&gt;</FONT>
+            <BR>
+            &nbsp;&nbsp;&nbsp; <FONT color="blue">&lt;/</FONT><FONT color="maroon">location</FONT><FONT color="blue">&gt;</FONT>
+        </p>
+        <p>
+        When a user attempts to access any of these pages, the ASP.NET forms-based 
+        security system will automatically redirect them to the Login.aspx page, and 
+        will continue to prevent them from accessing those restricted pages until they 
+        have successfully validated their user name and password credentials to the 
+        IBuySpy application.
+        <p>
+        An important feature of this type of authentication is that the mechanism is 
+        entirely up to you. You (not ASP.NET) determine exactly what the login page 
+        looks like. For example, the login page in the IBuySpy has been created to have 
+        the same look and feel as the rest of the application. As the application 
+        developer, you (not ASP.NET) can also decide what credential store the supplied 
+        username and password should be verified against. In the IBuySpy example, we 
+        keep the user name and password in our CustomersDB table.
+        <p>
+            <strong>Advantages of Forms-Based Authentication:&nbsp;&nbsp;&nbsp;</strong>The 
+            ASP.NET authentication mechanism used here is preferable to the HTTP 
+            Basic/Digest Authentication solutions supported by IIS and ASP today because it 
+            enables developers to:
+            <ol>
+                <li>
+                Customize the login UI. HTTP Basic/Digest authentication schemes automatically 
+                display an ugly popup dialog on the browser, providing no opportunity for 
+                application branding, user-oriented Help, or links to registration pages. By 
+                using the ASP.NET forms-based authentication solution instead, you have 
+                full flexibility over what the authentication page looks like.
+                <li>
+                    Check the username and password using any back-end credential store.&nbsp; HTTP 
+                    Basic/Digest authentication with IIS and ASP supports only validating 
+                    usernames/passwords against either the NT SAM or Active Directory DS (meaning 
+                    you have to have an NT account for each user).&nbsp; Developers using the 
+                    ASP.NET forms-based authentication solution can&nbsp;store 
+                    usernames/passwords in Databases, XML files,&nbsp;Legacy&nbsp;mainframe 
+                    systems, or the NT SAM or Active Directory DS.&nbsp;
+                </li>
+            </ol>
+        <p>
+            <u>Note</u> : Basic/Digest authentication is still fully supported by 
+            ASP.NET.&nbsp; The forms-based authentication solution used by IBuySpy, as well as 
+            Passport authentication support, are simply <em>additional </em>
+        authentication options now built into ASP.NET.
+        <p>
+            <STRONG>Implementation Notes:</STRONG>&nbsp;The&nbsp;Login page logic is 
+            encapsulated entirely within its&nbsp;<strong>LoginBtn_Click</strong>
+        &nbsp;event handler.&nbsp; This event handler is called on the server when a 
+        user clicks the "Sign In Now" ImageButton on the client.&nbsp;
+        <p>
+            The LoginBtn_Click event handler attempts to authenticate a client user using 
+            the values entered within the Email and Password textbox server controls.&nbsp; 
+            This authentication check is done using the Login() method of the 
+            IBuySpy.CustomersDB class.&nbsp; This method internally uses the <A href="CustomerLogin.htm">
+                CustomerLogin</A>
+        &nbsp; stored procedure to verify the email and password values against those 
+        stored in the IBuySpy database.
+        <p>
+            If the login was successful (i.e., the email and password values match those 
+            stored in the database), the LoginBtn_Click event handler performs three 
+            important actions:
+            <UL>
+                <LI>
+                    <div>
+                        Migrates any items stored within a browser's temporary shopping cart into a 
+                        permanent shopping cart that is keyed off of the customer's new unique 
+                        CustomerID.&nbsp; This ensures that the shopping cart items are not lost if the 
+                        customer's browser crashes.&nbsp; It also enables customers to suspend their 
+                        shopping experience -- closing their browser or powering off their 
+                        machine&nbsp; --&nbsp;then resume it days later, or on another machine.&nbsp;
+                    </div>
+                <li>
+                    <div>
+                        Sends a custom "IBuySpy_FullName" personalization cookie to the client that 
+                        contains the full user name of the newly logged on user.&nbsp; The home page of 
+                        the IBuySpy application -- <a href="default_aspx.htm">Default.aspx</a> &nbsp;-- 
+                        will look for this cookie to optionally personalize a welcome message for the 
+                        user the next time they visit the page.
+                    </div>
+                <li>
+                    <div>
+                        Invokes the&nbsp;<strong>RedirectFromLoginPage()&nbsp;</strong>static method on 
+                        the FormsAuthentication class.&nbsp; This built-in ASP.NET class performs two 
+                        steps:
+                    </div>
+                </li>
+            </UL>
+            <ul>
+                <ol>
+                    <li>
+                    It issues a MAC encrypted cookie authentication ticket to the browser client 
+                    that identifies their authenticated username&nbsp;of the customer.&nbsp; In 
+                    this IBuySpy application we are using the "CustomerID" value returned from the 
+                    CustomersDB.Login method as the username identity of the client (it is passed 
+                    as the first argument to the "RedirectFromLoginPage" method).&nbsp;&nbsp;On 
+                    subsequent&nbsp;requests to the application we will then be able to&nbsp;gain 
+                    access to this CustomerID user token&nbsp;by 
+                    calling&nbsp;"User.Identity.Name"&nbsp;from the page.&nbsp;
+                    <li>
+                        After it has issued the cookie authentication ticket to the client, the 
+                        "RedirectFromLoginPage" method will then cause the browser to redirect back to 
+                        the originating page from which the login page navigation came from.&nbsp;
+                    </li>
+                </ol>
+            </ul>
+        <p>
+            If the login was unsuccessful (ie: either the email name was unknown or the 
+            password did not match the one stored in the IBuySpy customers database), the 
+            LoginBtn_Click event handler will customize the page with a "Login Failed" 
+            error message and redisplay the page.&nbsp;
+        </p>
+        <P>
+            <strong>Validating User Input: &nbsp;</strong>
+        The page requires that users enter a name and email address. If you look at the 
+        source for the LoginBtn_Click event handler, you'll see that there is no input 
+        validation code. Instead, we use the built-in ASP.NET validation controls, 
+        which enable you to declaratively specify validation constraints on any input 
+        control.
+        <p>
+            ASP.NET comes with built-in validation controls to handle almost any validation 
+            requirement: the RequiredField, CompareValidator, RegularExpressionValidator, 
+            RangeValidator, and CustomValidator controls. The validation control 
+            architecture is extensible, so that other situation-specific controls (ZIP code 
+            validators, country code validators, etc) can also be developed by third 
+            parties.
+        </p>
+        <p>
+            You can put a validation control anywhere on a page and declaratively link it 
+            to a target input control using the validator's ControlToValidate property. You 
+            can optionally specify a Text property that displays in place of the validation 
+            control if the input data fails the validation test. If necessary, you can use 
+            multiple validators to chain validation logic for a single control (for 
+            example, a field is required and must meet a specified pattern).
+        </p>
+        <p>
+            If the page is displayed in a browser that supports EcmaScript 1.2 and the 
+            Dynamic HTML (DHTML) 4.0, the validation controls can perform client-side 
+            validation, which provides immediate feedback to the user.&nbsp; The validators 
+            also perform their check in server code, so if the browser does not support 
+            DHMTL, or if client-side scripting is disabled, the validation check is still 
+            performed. No code changes are required to enable either scenario -- all logic 
+            required to handle the checks on both basic and DHTML-compatible browsers is 
+            built into the controls themselves.
+        </p>
+        <p>
+            If you are using validation controls, your server code&nbsp;can determine 
+            whether the user's input passed the check by testing the IsValid property of 
+            the validation control. Additionally, you can check the page's IsValid 
+            property; this property is an aggregate of the IsValid properties of all the 
+            validators on the page. If any one validation has detected a failure, the 
+            page's IsValid property is set to false.
+        </p>
+        <p>
+            That's how the&nbsp;Login page works. Only if all controls on the page are 
+            valid will we go ahead and log the customer in. If one of the input fields is 
+            invalid, then the page will simply be redisplayed again, with the validation 
+            controls automatically taking care of displaying the appropriate error message 
+            to the user.
+        </p>
+    </BODY>
+</HTML>
