@@ -1,0 +1,277 @@
+﻿<Page x:Class="SamplePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:my="clr-namespace:Postcard3D"
+    Title="Postcard3D" Background="{StaticResource GoldenBrownGradient}">
+  <Viewbox Margin="0,20,0,0">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition/>
+        <RowDefinition MinHeight="440"/>
+      </Grid.RowDefinitions>
+      <Grid Grid.Row="0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition/>
+          <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <!-- High Contrast InkCanvas for rendering ink onto the photo -->
+        <my:HighContrastInkCanvas x:Name="icFront" Grid.Column="0" Width="400" Height="300" >
+          <Grid Width="{Binding ElementName=icFront,Path=Width}" Height="{Binding ElementName=icFront,Path=Height}">
+            <Border BorderBrush="White" BorderThickness="5" >
+              <Image Source="seattle_rainier.jpg"/>
+            </Border>
+          </Grid>
+        </my:HighContrastInkCanvas>
+
+        <!-- Regular InkCanvas for rendering ink onto the backside of the postcard -->
+        <InkCanvas Name="icBack" Grid.Column="1"
+                   Width="{Binding ElementName=icFront,Path=Width}"
+                   Height="{Binding ElementName=icFront,Path=Height}">
+          <InkCanvas.DefaultDrawingAttributes>
+            <DrawingAttributes Color="Blue" Width="1" Height="1"/>
+          </InkCanvas.DefaultDrawingAttributes>
+          <Border BorderBrush="LightGray" BorderThickness="2"
+                  Width="{Binding ElementName=icBack,Path=Width}"
+                  Height="{Binding ElementName=icBack,Path=Height}">
+            <Grid Background="WhiteSmoke" >
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="100"/>
+                <RowDefinition />
+              </Grid.RowDefinitions>
+              <Image HorizontalAlignment="Right" Margin="10,10" Grid.Column="1" Grid.Row="0" Source="stamp.jpg"/>
+              <TextBlock FontSize="18" Margin="10,0" Grid.Column="1" Grid.Row="2">To:</TextBlock>
+              <Line X1="10" Y1="80" X2="190" Y2="80" Stroke="Gray" StrokeThickness="1" Grid.Column="1" Grid.Row="2"/>
+              <Line X1="10" Y1="130" X2="190" Y2="130" Stroke="Gray" StrokeThickness="1" Grid.Column="1" Grid.Row="2"/>
+              <Line X1="10" Y1="180" X2="190" Y2="180" Stroke="Gray" StrokeThickness="1" Grid.Column="1" Grid.Row="2"/>
+              <Line X1="0" Y1="0" X2="0" Y2="300" Stroke="LightGray" StrokeThickness="1" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"/>
+            </Grid>
+          </Border>
+        </InkCanvas>
+
+      </Grid>
+      <Grid Grid.Row="1">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition />
+          <ColumnDefinition MinWidth="200"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- StackPanel with a couple of elements to control the Postcard -->
+        <StackPanel Grid.Column="1" Margin="20,20" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <WrapPanel HorizontalAlignment="Right">
+            <Label HorizontalAlignment="Left">Rotate X</Label>
+            <Slider Name="sliderX" Minimum="0" Maximum="360" Value="150" MinWidth="180"/>
+          </WrapPanel>
+          <WrapPanel HorizontalAlignment="Right">
+            <Label HorizontalAlignment="Left">Rotate Y</Label>
+            <Slider Name="sliderY" Minimum="0" Maximum="360" Value="150" MinWidth="180"/>
+          </WrapPanel>
+          <WrapPanel HorizontalAlignment="Right">
+            <Label HorizontalAlignment="Left">Rotate Z</Label>
+            <Slider Name="sliderZ" Minimum="0" Maximum="360" Value="180" MinWidth="180"/>
+          </WrapPanel>
+          <WrapPanel HorizontalAlignment="Right">
+            <Label HorizontalAlignment="Left">Zoom</Label>
+            <Slider Name="sliderScale" Minimum="0.1" Maximum="3" Value="1.3" MinWidth="180"/>
+          </WrapPanel>
+          <Rectangle Height="15"/>
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Margin="2,2" Name="startButton" IsEnabled="True">Start Animation</Button>
+            <Button Margin="2,2" Name="stopButton" IsEnabled="False">Stop Animation</Button>
+          </StackPanel>
+          <Rectangle Height="15"/>
+        </StackPanel>
+
+        <Viewbox Grid.Column="0">
+          <Viewbox.RenderTransform>
+            <ScaleTransform ScaleX  = "{Binding ElementName=sliderScale,Path=Value}"
+                            ScaleY  = "{Binding ElementName=sliderScale,Path=Value}"
+                            CenterX = "200"
+                            CenterY = "300"/>
+          </Viewbox.RenderTransform>
+
+          <!-- Viewport3D to host the 3D model of the Postcard -->
+          <Viewport3D Width="600" Height="400">
+            <Viewport3D.Camera>
+              <PerspectiveCamera LookDirection = "0,0,-1"
+                                 UpDirection   = "0,1,0"
+                                 Position      = "0,0,3"
+                                 FieldOfView   = "45"/>
+            </Viewport3D.Camera>
+            <ModelVisual3D>
+              <ModelVisual3D.Children>
+                <ModelVisual3D>
+                  <ModelVisual3D.Content>
+                    <DirectionalLight Color="#FFFFFF" Direction="0,0,-1"/>
+                  </ModelVisual3D.Content>
+                </ModelVisual3D>
+                <ModelVisual3D>
+                  <ModelVisual3D.Content>
+                    <DirectionalLight Color="#FFFFFF" Direction="0,0,1"/>
+                  </ModelVisual3D.Content>
+                </ModelVisual3D>
+                <ModelVisual3D>
+                  <ModelVisual3D.Content>
+                    <GeometryModel3D>
+                      <GeometryModel3D.Geometry>
+                        <MeshGeometry3D TriangleIndices    = "0,1,2 3,4,5"
+                                        Normals            = "0,0,1 0,0,1 0,0,1 0,0,1 0,0,1 0,0,1"
+                                        TextureCoordinates = "0,0 1,0 1,1 1,1 0,1 0,0"
+                                        Positions          = "-0.66,-0.5,0 0.66,-0.5,0 0.66,0.5,0 0.66,0.5,0 -0.66,0.5,0 -0.66,-0.5,0"/>
+                      </GeometryModel3D.Geometry>
+                      <GeometryModel3D.Material>
+                        <DiffuseMaterial>
+                          <DiffuseMaterial.Brush>
+                            <VisualBrush Visual="{Binding ElementName=icFront}">
+                              <VisualBrush.RelativeTransform>
+                                <TransformGroup>
+                                  <ScaleTransform ScaleX="1" ScaleY="-1"/>
+                                  <TranslateTransform Y="1"/>
+                                </TransformGroup>
+                              </VisualBrush.RelativeTransform>
+                            </VisualBrush>
+                          </DiffuseMaterial.Brush>
+                        </DiffuseMaterial>
+                      </GeometryModel3D.Material>
+                    </GeometryModel3D>
+                  </ModelVisual3D.Content>
+                </ModelVisual3D>
+                <ModelVisual3D>
+                  <ModelVisual3D.Content>
+                    <GeometryModel3D>
+                      <GeometryModel3D.Geometry>
+                        <MeshGeometry3D TriangleIndices    = "0,1,2 3,4,5"
+                                        Normals            = "0,0,-1 0,0,-1 0,0,-1 0,0,-1 0,0,-1 0,0,-1"
+                                        TextureCoordinates = "1,0 1,1 0,1 0,1 0,0 1,0"
+                                        Positions          = "-0.66,-0.5,0 -0.66,0.5,0 0.66,0.5,0 0.66,0.5,0 0.66,-0.5,0 -0.66,-0.5,0"/>
+                      </GeometryModel3D.Geometry>
+                      <GeometryModel3D.Material>
+                        <DiffuseMaterial>
+                          <DiffuseMaterial.Brush>
+                            <VisualBrush Visual="{Binding ElementName=icBack}">
+                              <VisualBrush.RelativeTransform>
+                                <TransformGroup>
+                                  <ScaleTransform ScaleX="1" ScaleY="-1"/>
+                                  <TranslateTransform Y="1"/>
+                                </TransformGroup>
+                              </VisualBrush.RelativeTransform>
+                            </VisualBrush>
+                          </DiffuseMaterial.Brush>
+                        </DiffuseMaterial>
+                      </GeometryModel3D.Material>
+                    </GeometryModel3D>
+                  </ModelVisual3D.Content>
+                </ModelVisual3D>
+              </ModelVisual3D.Children>
+              <ModelVisual3D.Transform>
+                <Transform3DGroup >
+                  <Transform3DGroup.Children>
+                    <RotateTransform3D>
+                      <RotateTransform3D.Rotation>
+                        <AxisAngleRotation3D x:Name = "xRotate"
+                                             Angle  = "{Binding ElementName=sliderX,Path=Value}"
+                                             Axis   = "1 0 0"/>
+                      </RotateTransform3D.Rotation>
+                    </RotateTransform3D>
+                    <RotateTransform3D>
+                      <RotateTransform3D.Rotation>
+                        <AxisAngleRotation3D x:Name = "yRotate"
+                                             Angle  = "{Binding ElementName=sliderY,Path=Value}"
+                                             Axis   = "0 1 0"/>
+                      </RotateTransform3D.Rotation>
+                    </RotateTransform3D>
+                    <RotateTransform3D>
+                      <RotateTransform3D.Rotation>
+                        <AxisAngleRotation3D x:Name = "zRotate"
+                                             Angle  = "{Binding ElementName=sliderZ,Path=Value}"
+                                             Axis   = "0 0 1"/>
+                      </RotateTransform3D.Rotation>
+                    </RotateTransform3D>
+                  </Transform3DGroup.Children>
+                </Transform3DGroup>
+              </ModelVisual3D.Transform>
+            </ModelVisual3D>
+          </Viewport3D>
+
+        </Viewbox>
+      </Grid>
+
+      <!-- Event triggers to control the animation of the Postcard -->
+      <Grid.Triggers>
+        <EventTrigger SourceName="startButton" RoutedEvent="Button.Click">
+          <BeginStoryboard>
+            <Storyboard>
+              <BooleanAnimationUsingKeyFrames 
+                  Storyboard.TargetName="startButton"
+                  Storyboard.TargetProperty="(Button.IsEnabled)"
+                  Duration="0:0:0">
+                <DiscreteBooleanKeyFrame Value="False" KeyTime="0:0:0" />
+              </BooleanAnimationUsingKeyFrames>
+              <BooleanAnimationUsingKeyFrames 
+                  Storyboard.TargetName="stopButton"
+                  Storyboard.TargetProperty="(Button.IsEnabled)"
+                  Duration="0:0:0">
+                <DiscreteBooleanKeyFrame Value="True" KeyTime="0:0:0" />
+              </BooleanAnimationUsingKeyFrames>
+            </Storyboard>
+          </BeginStoryboard>
+          <BeginStoryboard Name="xRotateStoryboard">
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetName     = "xRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "0"
+                               To                        = "360" 
+                               Duration                  = "0:0:57"
+                               RepeatBehavior            = "Forever"/>
+            </Storyboard>
+          </BeginStoryboard>
+          <BeginStoryboard Name="yRotateStoryboard">
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetName     = "yRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "0"
+                               To                        = "360" 
+                               Duration                  = "0:0:13"
+                               RepeatBehavior            = "Forever"/>
+            </Storyboard>
+          </BeginStoryboard>
+          <BeginStoryboard Name="zRotateStoryboard">
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetName     = "zRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "0"
+                               To                        = "360" 
+                               Duration                  = "0:0:37"
+                               RepeatBehavior            = "Forever"/>
+            </Storyboard>
+          </BeginStoryboard>
+        </EventTrigger>
+        <EventTrigger SourceName="stopButton" RoutedEvent="Button.Click">
+          <BeginStoryboard>
+            <Storyboard>
+              <BooleanAnimationUsingKeyFrames 
+                  Storyboard.TargetName="startButton"
+                  Storyboard.TargetProperty="(Button.IsEnabled)"
+                  Duration="0:0:0">
+                <DiscreteBooleanKeyFrame Value="True" KeyTime="0:0:0" />
+              </BooleanAnimationUsingKeyFrames>
+              <BooleanAnimationUsingKeyFrames 
+                  Storyboard.TargetName="stopButton"
+                  Storyboard.TargetProperty="(Button.IsEnabled)"
+                  Duration="0:0:0">
+                <DiscreteBooleanKeyFrame Value="False" KeyTime="0:0:0" />
+              </BooleanAnimationUsingKeyFrames>
+            </Storyboard>
+          </BeginStoryboard>
+          <StopStoryboard BeginStoryboardName="xRotateStoryboard"/>
+          <StopStoryboard BeginStoryboardName="yRotateStoryboard"/>
+          <StopStoryboard BeginStoryboardName="zRotateStoryboard"/>
+        </EventTrigger>
+      </Grid.Triggers>
+    </Grid>
+  </Viewbox>
+</Page>

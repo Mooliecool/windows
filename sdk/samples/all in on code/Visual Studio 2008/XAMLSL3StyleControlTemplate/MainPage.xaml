@@ -1,0 +1,115 @@
+﻿<UserControl x:Class="XAMLSL3StyleControlTemplate.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+	xmlns:sampleControls="clr-namespace:CSSL3CustomControl;assembly=CSSL3CustomControl"
+    mc:Ignorable="d" d:DesignWidth="640" d:DesignHeight="480">
+    <UserControl.Resources>
+        <!-- A basic style. -->
+        <Style x:Key="baseStyle" TargetType="Button">
+            <Setter Property="Background" Value="Red"/>
+            <Setter Property="Foreground" Value="Blue"/>
+            <Setter Property="Margin" Value="10,10,10,0"/>
+        </Style>
+
+        <!-- A style containing a ControlTemplate. The style itself derives from baseStyle. -->
+        <Style x:Key="derivedStyle" TargetType="Button" BasedOn="{StaticResource baseStyle}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <!-- Must write the Normal state here even if it is empty. Without it, your Button will not go to the Normal state when the mouse leaves the Button. -->
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="MouseOver">
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetName="border" Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)" To="#FF0000FF" Duration="00:00:00"/>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetName="border" Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)" To="#FF00FF00" Duration="00:00:00"/>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <!-- Use Templatebinding to allow users customizing various properties. For more information, please refer to the data binding sample. -->
+                            <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="#00FFFFFF" BorderThickness="3">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+		<!-- A custom control template for the HighLightTextBlock custom control shipped in the CSSL3CustomControl sample. -->
+		<ControlTemplate x:Key="CustomizedHighLightTextBlockControlTemplate" TargetType="sampleControls:HighLightTextBlock">
+        	<Grid x:Name="grid" Background="#00C5E5FF">
+        		<VisualStateManager.VisualStateGroups>
+        			<VisualStateGroup x:Name="HightLightStates">
+        				<VisualState x:Name="NonHighLight"/>
+        				<VisualState x:Name="HighLight">
+        					<Storyboard>
+        						<ColorAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="textBlock" Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)">
+        							<EasingColorKeyFrame KeyTime="00:00:00" Value="Red"/>
+        						</ColorAnimationUsingKeyFrames>
+        						<ColorAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetName="grid" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)">
+        							<EasingColorKeyFrame KeyTime="00:00:00" Value="#FFC5E5FF"/>
+        						</ColorAnimationUsingKeyFrames>
+        					</Storyboard>
+        				</VisualState>
+        			</VisualStateGroup>
+        		</VisualStateManager.VisualStateGroups>
+        		<TextBlock x:Name="textBlock" Text="{TemplateBinding Text}" TextWrapping="Wrap" d:LayoutOverrides="Width, Height" Foreground="Black"/>
+        	</Grid>
+        </ControlTemplate>
+    </UserControl.Resources>
+
+    <ScrollViewer  VerticalScrollBarVisibility="Auto">
+        <StackPanel x:Name="LayoutRoot">
+            <!-- Two Buttons using the basicStyle. -->
+            <TextBlock TextWrapping="Wrap" Margin="10,0,0,0" Text="Styles are used to apply the same group of properties to multiple Controls in one place. A style contains zero or more setters. You can set the value for a property in a setter."/>
+            <TextBlock TextWrapping="Wrap" Margin="10,10,0,0" Text="The following two Buttons have the same style:"/>
+
+            <Button Content="Button1" Style="{StaticResource baseStyle}"/>
+            <Button Content="Button2" Style="{StaticResource baseStyle}"/>
+
+            <TextBlock TextWrapping="Wrap" Margin="10,10,0,0" Text="To create the style, please refer to the following code:"/>
+            <TextBox TextWrapping="Wrap" Margin="10,10,0,0" Style="{StaticResource NoBorderTextBoxStyle}" Text="  &lt;Style x:Key=&quot;baseStyle&quot; TargetType=&quot;Button&quot;&gt;&#xd;&#xa;   &lt;Setter Property=&quot;Background&quot; Value=&quot;Red&quot;/&gt;&#xd;&#xa;   &lt;Setter Property=&quot;Foreground&quot; Value=&quot;Blue&quot;/&gt;&#xd;&#xa;   &lt;Setter Property=&quot;Margin&quot; Value=&quot;10,10,10,0&quot;/&gt;&#xd;&#xa;  &lt;/Style&gt;"/>
+
+            <!-- A Buttons using the derivedStyle with a custom ControlTemplate. -->
+            <TextBlock TextWrapping="Wrap" Margin="10,10,0,0" Text="Style can be cascaded using the BasedOn property. Refer to the next sample please."/>
+            <TextBlock TextWrapping="Wrap" Margin="10,10,0,0" Text="ControlTemplates are used to completely override the look and feel of a Control. It is usually used together with style. You create a setter for the Template property, whose value is a ControlTemplate."/>
+            <TextBlock TextWrapping="Wrap" Margin="10,10,0,0" Text="ControlTemplates are usually created by designers and/or interactive developers using Expression Blend. It is discouraged to manually type XAML, because it is very difficult to create nice templates this way."/>
+            <TextBlock TextWrapping="Wrap" Margin="10,10,0,0" Text="Below is a Button with a simple ControlTemplate created by manually typing XAML. It's not very good. But it demostrate the essence of ControlTemplate. For a better template that is created using Expression Blend, please refer to the Blend sample."/>
+
+            <Button Content="Button3" Style="{StaticResource derivedStyle}"/>
+
+            <TextBlock TextWrapping="Wrap" Margin="10,10,0,0" Text="To create the ControlTemplate, please refer to the following code. Note we're using BasedOn on derivedStyle, so the setters created in baseStyle also applies to derivedStyle."/>
+            <TextBox TextWrapping="Wrap" Margin="10,10,0,0" Style="{StaticResource NoBorderTextBoxStyle}" Text="  &lt;Style x:Key=&quot;derivedStyle&quot; TargetType=&quot;Button&quot; BasedOn=&quot;{StaticResource baseStyle}&quot;&gt;&#xd;&#xa;   &lt;Setter Property=&quot;Template&quot;&gt;&#xd;&#xa;    &lt;Setter.Value&gt;&#xd;&#xa;     &lt;ControlTemplate TargetType=&quot;Button&quot;&gt;&#xd;&#xa;      &lt;Grid&gt;&#xd;&#xa;       &lt;VisualStateManager.VisualStateGroups&gt;&#xd;&#xa;        &lt;VisualStateGroup x:Name=&quot;CommonStates&quot;&gt;&#xd;&#xa;         &lt;VisualState x:Name=&quot;Normal&quot;/&gt;&#xd;&#xa;         &lt;VisualState x:Name=&quot;MouseOver&quot;&gt;&#xd;&#xa;          &lt;Storyboard&gt;&#xd;&#xa;           &lt;ColorAnimation Storyboard.TargetName=&quot;border&quot; Storyboard.TargetProperty=&quot;(Border.BorderBrush).(SolidColorBrush.Color)&quot; To=&quot;#FF0000FF&quot; Duration=&quot;00:00:00&quot;/&gt;&#xd;&#xa;          &lt;/Storyboard&gt;&#xd;&#xa;         &lt;/VisualState&gt;&#xd;&#xa;         &lt;VisualState x:Name=&quot;Pressed&quot;&gt;&#xd;&#xa;          &lt;Storyboard&gt;&#xd;&#xa;           &lt;ColorAnimation Storyboard.TargetName=&quot;border&quot; Storyboard.TargetProperty=&quot;(Border.BorderBrush).(SolidColorBrush.Color)&quot; To=&quot;#FF00FF00&quot; Duration=&quot;00:00:00&quot;/&gt;&#xd;&#xa;          &lt;/Storyboard&gt;&#xd;&#xa;         &lt;/VisualState&gt;&#xd;&#xa;        &lt;/VisualStateGroup&gt;&#xd;&#xa;       &lt;/VisualStateManager.VisualStateGroups&gt;&#xd;&#xa;       &lt;Border x:Name=&quot;border&quot; Background=&quot;{TemplateBinding Background}&quot; BorderBrush=&quot;#00FFFFFF&quot; BorderThickness=&quot;3&quot;&gt;&#xd;&#xa;        &lt;ContentPresenter HorizontalAlignment=&quot;Center&quot; VerticalAlignment=&quot;Center&quot;/&gt;&#xd;&#xa;       &lt;/Border&gt;&#xd;&#xa;      &lt;/Grid&gt;&#xd;&#xa;     &lt;/ControlTemplate&gt;&#xd;&#xa;    &lt;/Setter.Value&gt;&#xd;&#xa;   &lt;/Setter&gt;&#xd;&#xa;  &lt;/Style&gt;"/>
+
+            <!-- More descriptions... -->
+            <TextBlock TextWrapping="Wrap" Margin="10,10,0,0" Text="ControlTemplate are usually associated with visual states, so the Control will render differently based on user interactivity. There're two concepts regarding visual states."/>
+            <TextBlock TextWrapping="Wrap" Margin="10,10,0,0" Text="VisualStateGroup: Used to group several similar visual states in the same container, such as CommonStates and FocusedStates."/>
+            <TextBlock TextWrapping="Wrap" Margin="10,10,0,0" Text="VisualState: The actual state which is entered during a certain user interactivity."/>
+            <TextBlock TextWrapping="Wrap" Margin="10,10,0,0" Text="Each VisualState can have an associated Storyboard, which is used to change how the Control renders. For more information about Storyboard, please refer to the animation sample."/>
+            <TextBlock TextWrapping="Wrap" Margin="10,10,0,0" Text="Each VisualStateGroup can have one or more transitions, which is Storyboards displayed when a certain state goes to another. This is not demostrated in the above sample, because in most advanced scenarios, you will use Expression Blend to design the ControlTemplates, rather than manually typing XAML."/>
+            <TextBlock TextWrapping="Wrap" Margin="10,10,0,0" Text="You don't worry about when to go to a particular state when designing the ControlTemplate. This task is for the Control author. For information about how to go to a particular state, please refer to the custom Control sample."/>
+            <TextBlock TextWrapping="Wrap" Margin="10,10,0,0" Text="There's another kind of template: The DataTemplate. This will be demostrated in the data binding sample."/>
+
+			<!-- Customize the template of a CustomControl -->
+			<TextBlock TextWrapping="Wrap" Margin="10,10,0,0" Text="Other than built-in Controls, you can also customize the template of a CustomControl. Below are two HighLightTextBlocks come from the CSSL3CustomControl sample.Try to check the corresponding CheckBoxes to highlight them. The first one uses the default template, so when highlighted, the text will become bold. The second one uses a custom template, os when highlighted, the text will become red, and background will become light blue."/>
+
+			<CheckBox Margin="10,10,0,0" Content="Should the text be highlighted?" IsChecked="{Binding IsHighlighted, ElementName=NormalHighlightTextBlock, Mode=TwoWay}"/>
+			<sampleControls:HighLightTextBlock x:Name="NormalHighlightTextBlock" Margin="10,10,0,0" Text="This is a HighLightTextBlock using the default template."/>
+			<CheckBox Margin="10,10,0,0" Content="Should the text be highlighted?" IsChecked="{Binding IsHighlighted, ElementName=CustomizedHighlightTextBlock, Mode=TwoWay}"/>
+			<sampleControls:HighLightTextBlock x:Name="CustomizedHighlightTextBlock" Margin="10,10,0,0" Text="This is a HighLightTextBlock whose template is customized." Template="{StaticResource CustomizedHighLightTextBlockControlTemplate}"/>
+			
+			<!-- Q&A -->
+			<TextBlock TextWrapping="Wrap" Margin="10,10,0,0" Text="Question: Can I work with styles and ControlTemplates in code behind?"/>
+			<TextBlock TextWrapping="Wrap" Margin="10,10,0,0" Text="Answer: You cannot construct a ControlTemplate in code, unless you use XamlReader to load a XAML piece. While you can create setters and add them dynamically to a style using the object model, this is generally discouraged. It destorys the developer and designer's workflow. As a solution developer, it is prefered to focus on creating code logic, and leave the work of creating nice UX to designers and/or interactive developers with Expression Blend."/>
+		</StackPanel>
+    </ScrollViewer>
+</UserControl>

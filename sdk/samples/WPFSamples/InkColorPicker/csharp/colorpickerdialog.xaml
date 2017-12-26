@@ -1,0 +1,106 @@
+﻿<Canvas x:Class="InkColorPicker.ColorPicker"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ink="clr-namespace:System.Windows.Ink;assembly=PresentationCore" 
+    xmlns:app="clr-namespace:InkColorPicker" 
+    Background="{x:Static SystemColors.ControlBrush}" 
+    Width="315"
+    >
+  <Canvas.Resources>
+    <LinearGradientBrush x:Key="BrightnessGradient" StartPoint="0,0" EndPoint="1,0" 
+        ColorInterpolationMode="ScRgbLinearInterpolation">
+      <LinearGradientBrush.GradientStops>
+        <GradientStop Offset="0" Color="sc# 1,0,0,0" />
+        <GradientStop Offset="1" Color="sc# 1,1,1,1" />
+      </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="OpacityGradient" StartPoint="0,0" EndPoint="1,0" 
+        ColorInterpolationMode="ScRgbLinearInterpolation">
+      <LinearGradientBrush.GradientStops>
+        <GradientStop Offset="0" Color="sc# 0,0,0,0" />
+        <GradientStop Offset="1" Color="sc# 1,0,0,0" />
+      </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <!-- The sample swatch. -->
+    <DrawingBrush x:Key="CheckerboardBrush" 
+        Stretch="None" TileMode="Tile" AlignmentX="Left" AlignmentY="Top" 
+        Viewport="0,0,10,10" ViewportUnits="Absolute">
+      <DrawingBrush.Drawing>
+        <DrawingGroup>
+          <DrawingGroup.Children>
+            <GeometryDrawing Brush="#FFFFFF">
+              <GeometryDrawing.Geometry>
+                <RectangleGeometry Rect="0,0,10,10" />
+              </GeometryDrawing.Geometry>
+            </GeometryDrawing>
+            <GeometryDrawing Brush="#888888">
+              <GeometryDrawing.Geometry>
+                <RectangleGeometry Rect="0,0,5,5" />
+              </GeometryDrawing.Geometry>
+            </GeometryDrawing>
+            <GeometryDrawing Brush="#888888">
+              <GeometryDrawing.Geometry>
+                <RectangleGeometry Rect="5,5,5,5" />
+              </GeometryDrawing.Geometry>
+            </GeometryDrawing>
+          </DrawingGroup.Children>
+        </DrawingGroup>
+      </DrawingBrush.Drawing>
+    </DrawingBrush>
+  </Canvas.Resources>
+
+  <StackPanel Orientation="Vertical">
+
+    <!-- Opacity Control -->
+    <GroupBox Header="_Opacity" Margin="20,10,20,0">
+      <Border CornerRadius="3" BorderBrush="{x:Static SystemColors.ControlDarkDarkBrush}" BorderThickness="1.33"  Margin="10,8,10,8"
+        Background="{StaticResource CheckerboardBrush}">
+        <Border Margin="0" Background="{StaticResource OpacityGradient}">
+          <Slider Name="opacitySlider" Margin="3" 
+            Orientation="Horizontal" IsMoveToPointEnabled="True" 
+            Minimum="0.0" Maximum="1.0" />
+        </Border>
+      </Border>
+    </GroupBox>
+
+    <!-- Color Comb -->
+    <app:ColorComb x:Name="colorComb" Margin="10,10,10,0" />
+
+    <!-- Brightness Control -->
+    <GroupBox Header="_Brightness" Margin="20,10,20,0">
+      <Border CornerRadius="3" BorderBrush="{x:Static SystemColors.ControlDarkDarkBrush}" BorderThickness="1.33"  Margin="5,5,5,5"
+          Background="{StaticResource BrightnessGradient}">
+        <Slider Name="brightnessSlider" Margin="3" 
+          Orientation="Horizontal" IsMoveToPointEnabled="True" 
+          Minimum="0.0" Maximum="1.0" />
+      </Border>
+    </GroupBox>
+
+    <!-- Ink Characteristics -->
+    <GroupBox Header="Characteristics" Margin="20,10,20,0">
+      <StackPanel>
+        <WrapPanel>
+          <StackPanel Orientation="Vertical" Margin="15,0,15,0">
+            <RadioButton Name="ellipticalRadio" Margin="5,5,5,0" GroupName="StylusShape" IsChecked="True">_Elliptical</RadioButton>
+            <RadioButton Name="rectangularRadio" Margin="5,5,5,0" GroupName="StylusShape">_Rectangular</RadioButton>
+          </StackPanel>
+          <StackPanel Margin="15,0,15,0">
+            <CheckBox Name="ignorepsiCheckbox" Margin="5,5,5,0">Pressure sensitive</CheckBox>
+            <CheckBox Name="fitcurveCheckbox" Margin="5,5,5,0">Smooth ink</CheckBox>
+          </StackPanel>
+        </WrapPanel>
+        <WrapPanel Orientation="Horizontal" Margin="5,10,5,8">
+          <Label Margin="10,10,10,0">Thickness:</Label>
+          <TextBox Name="thicknessTextbox" IsReadOnly="True" Background="{x:Static SystemColors.ControlLightBrush}" 
+                   FontWeight="Medium" Width="40" Height="23"  Margin="0,0,5,0">5</TextBox>
+          <RepeatButton Name="decrementThickness" Width="27" Height="25" Margin="2,0,0,0" FontWeight="Bold" FontSize="14">_-</RepeatButton>
+          <RepeatButton Name="incrementThickness" Width="27" Height="25" Margin="2,0,0,0" FontWeight="Bold" FontSize="14">_+</RepeatButton>
+        </WrapPanel>
+      </StackPanel>
+    </GroupBox>
+
+  </StackPanel>
+  
+</Canvas>

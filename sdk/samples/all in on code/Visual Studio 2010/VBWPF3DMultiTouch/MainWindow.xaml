@@ -1,0 +1,60 @@
+﻿<Window x:Class="MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:shapes="clr-namespace:VBWPF3DMultiTouch"
+        Title="Wpf3DMultiTouch">
+    <Window.Resources>
+        <Storyboard x:Key="sb">
+            <DoubleAnimation Storyboard.TargetName="InfoScale" Storyboard.TargetProperty="ScaleX" From="0" To="1">
+                <DoubleAnimation.EasingFunction>
+                    <BounceEase/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="InfoScale" Storyboard.TargetProperty="ScaleY" From="0" To="1">
+                <DoubleAnimation.EasingFunction>
+                    <BounceEase/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+    </Window.Resources>
+
+    <Grid Background="White" IsManipulationEnabled="True" ManipulationDelta="OnManipulationDelta" TouchUp="OnTouchUp" MouseLeftButtonDown="Grid_MouseLeftButtonDown" MouseMove="Grid_MouseMove" MouseLeftButtonUp="Grid_MouseLeftButtonUp" MouseWheel="Grid_MouseWheel">
+        <Viewport3D x:Name="viewport">
+            <Viewport3D.Camera>
+                <PerspectiveCamera Position="0,0,5"/>
+            </Viewport3D.Camera>
+            
+            <ModelVisual3D x:Name="Light">
+                <ModelVisual3D.Content>
+                    <Model3DGroup>
+                        <AmbientLight Color="White"/>
+                    </Model3DGroup>
+                </ModelVisual3D.Content>
+            </ModelVisual3D>
+
+            <shapes:Sphere x:Name="earth">
+                <shapes:Sphere.Material>
+                    <DiffuseMaterial>
+                        <DiffuseMaterial.Brush>
+                            <ImageBrush ImageSource="Map.png"/>
+                        </DiffuseMaterial.Brush>
+                    </DiffuseMaterial>
+                </shapes:Sphere.Material>
+                <shapes:Sphere.Transform>
+                    <Transform3DGroup x:Name="transformGroup">
+                        <ScaleTransform3D x:Name="scaleTransform"/>
+                    </Transform3DGroup>
+                </shapes:Sphere.Transform>
+            </shapes:Sphere>
+        </Viewport3D>
+
+        <Rectangle Fill="Transparent"/>
+        <CheckBox x:Name="MouseSimulationCheckBox" Content="Allow mouse simulation" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10"/>
+        <TextBlock x:Name="InfoTextBox" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10" FontSize="24" Foreground="Red" FontWeight="Bold" RenderTransformOrigin="0.5,0.5">
+            <TextBlock.RenderTransform>
+                <ScaleTransform x:Name="InfoScale"/>
+            </TextBlock.RenderTransform>
+        </TextBlock>
+        <Line x:Name="TouchLine" Stroke="Red" StrokeThickness="2"/>
+    </Grid>
+</Window>

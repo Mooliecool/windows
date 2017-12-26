@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="TravelModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityContainer Name="TravelModelStoreContainer">
+          <EntitySet Name="TravelView" EntityType="TravelModel.Store.TravelView" store:Type="Views" store:Schema="dbo" store:Name="TravelView">
+            <DefiningQuery>SELECT 
+      [TravelView].[PartitionKey] AS [PartitionKey], 
+      [TravelView].[RowKey] AS [RowKey], 
+      [TravelView].[Place] AS [Place], 
+      [TravelView].[GeoLocation] AS [GeoLocation], 
+      [TravelView].[Time] AS [Time]
+      FROM [dbo].[TravelView] AS [TravelView]</DefiningQuery>
+          </EntitySet>
+        </EntityContainer>
+        <!--Errors Found During Generation:
+      warning 6002: The table/view 'AzureBingMaps.dbo.TravelView' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+        <EntityType Name="TravelView">
+          <Key>
+            <PropertyRef Name="PartitionKey" />
+            <PropertyRef Name="RowKey" />
+          </Key>
+          <Property Name="PartitionKey" Type="nvarchar" Nullable="false" MaxLength="200" />
+          <Property Name="RowKey" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Place" Type="nvarchar" Nullable="false" MaxLength="200" />
+          <Property Name="GeoLocation" Type="varbinary(max)" />
+          <Property Name="Time" Type="datetime" Nullable="false" />
+        </EntityType>
+        <Function Name="DeleteFromTravel" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="PartitionKey" Type="nvarchar" Mode="In" />
+          <Parameter Name="RowKey" Type="uniqueidentifier" Mode="In" />
+        </Function>
+        <Function Name="InsertIntoTravel" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="PartitionKey" Type="nvarchar" Mode="In" />
+          <Parameter Name="Place" Type="nvarchar" Mode="In" />
+          <Parameter Name="GeoLocation" Type="varchar(max)" Mode="In" />
+          <Parameter Name="Time" Type="datetime" Mode="In" />
+        </Function>
+        <Function Name="UpdateTravel" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="PartitionKey" Type="nvarchar" Mode="In" />
+          <Parameter Name="RowKey" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="Place" Type="nvarchar" Mode="In" />
+          <Parameter Name="GeoLocation" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="Time" Type="datetime" Mode="In" />
+        </Function>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema xmlns="http://schemas.microsoft.com/ado/2008/09/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="TravelModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation">
+        <EntityContainer Name="TravelModelContainer" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Travels" EntityType="TravelModel.Travel" />
+          <FunctionImport Name="DeleteFromTravel">
+            <Parameter Name="PartitionKey" Mode="In" Type="String" />
+            <Parameter Name="RowKey" Mode="In" Type="Guid" />
+          </FunctionImport>
+          <FunctionImport Name="InsertIntoTravel">
+            <Parameter Name="PartitionKey" Mode="In" Type="String" />
+            <Parameter Name="Place" Mode="In" Type="String" />
+            <Parameter Name="GeoLocation" Mode="In" Type="String" />
+            <Parameter Name="Time" Mode="In" Type="DateTime" />
+          </FunctionImport>
+          <FunctionImport Name="UpdateTravel">
+            <Parameter Name="PartitionKey" Mode="In" Type="String" />
+            <Parameter Name="RowKey" Mode="In" Type="Guid" />
+            <Parameter Name="Place" Mode="In" Type="String" />
+            <Parameter Name="GeoLocation" Mode="In" Type="String" />
+            <Parameter Name="Time" Mode="In" Type="DateTime" />
+          </FunctionImport>
+        </EntityContainer>
+        <EntityType Name="Travel">
+          <Key>
+            <PropertyRef Name="PartitionKey" />
+            <PropertyRef Name="RowKey" />
+          </Key>
+          <Property Type="String" Name="PartitionKey" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="Guid" Name="RowKey" Nullable="false" />
+          <Property Type="String" Name="Place" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Type="Binary" Name="GeoLocation" MaxLength="Max" FixedLength="false" />
+          <Property Type="DateTime" Name="Time" Nullable="false" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs" Space="C-S">
+        <Alias Key="Model" Value="TravelModel" />
+        <Alias Key="Target" Value="TravelModel.Store" />
+        <EntityContainerMapping CdmEntityContainer="TravelModelContainer" StorageEntityContainer="TravelModelStoreContainer">
+          <EntitySetMapping Name="Travels">
+            <EntityTypeMapping TypeName="TravelModel.Travel">              
+              <MappingFragment StoreEntitySet="TravelView">
+                <ScalarProperty Name="Time" ColumnName="Time" />
+                <ScalarProperty Name="GeoLocation" ColumnName="GeoLocation" />
+                <ScalarProperty Name="Place" ColumnName="Place" />
+                <ScalarProperty Name="RowKey" ColumnName="RowKey" />
+                <ScalarProperty Name="PartitionKey" ColumnName="PartitionKey" />
+              </MappingFragment>
+            </EntityTypeMapping>
+            <EntityTypeMapping TypeName="TravelModel.Travel">
+              <ModificationFunctionMapping>                
+              </ModificationFunctionMapping>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="DeleteFromTravel" FunctionName="TravelModel.Store.DeleteFromTravel" />
+          <FunctionImportMapping FunctionImportName="InsertIntoTravel" FunctionName="TravelModel.Store.InsertIntoTravel" />
+          <FunctionImportMapping FunctionImportName="UpdateTravel" FunctionName="TravelModel.Store.UpdateTravel" />
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams>
+      <Diagram Name="TravelModel" >
+        <EntityTypeShape EntityType="TravelModel.Travel" Width="1.5" PointX="0.75" PointY="0.75" Height="2.172587890625" />
+      </Diagram>
+    </Diagrams>
+  </Designer>
+</edmx:Edmx>

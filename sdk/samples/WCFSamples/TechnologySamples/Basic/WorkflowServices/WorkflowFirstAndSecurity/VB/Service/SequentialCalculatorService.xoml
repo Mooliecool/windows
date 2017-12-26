@@ -1,0 +1,45 @@
+﻿<SequentialWorkflowActivity x:Class="Microsoft.WorkflowServices.Samples.SequentialCalculatorService" x:Name="SequentialCalculatorService" xmlns:ns0="clr-namespace:System.Workflow.Activities;Assembly=System.WorkflowServices, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/workflow">
+	<ns0:ReceiveActivity.WorkflowServiceAttributes>
+		<ns0:WorkflowServiceAttributes ConfigurationName="SequentialCalculatorService" />
+	</ns0:ReceiveActivity.WorkflowServiceAttributes>
+	<WhileActivity x:Name="WhileCalculating">
+		<WhileActivity.Condition>
+			<RuleConditionReference ConditionName="WhileNotComplete" />
+		</WhileActivity.Condition>
+		<ListenActivity x:Name="WaitForNextOperation">
+			<EventDrivenActivity x:Name="WaitForAdd">
+				<ns0:ReceiveActivity x:Name="ReceiveAdd" OperationValidation="ValidateOwner" CanCreateInstance="True">
+					<ns0:ReceiveActivity.ServiceOperationInfo>
+						<ns0:OperationInfo PrincipalPermissionRole="Administrators" Name="Add" ContractName="ICalculator">
+							<ns0:OperationInfo.Parameters>
+								<ns0:OperationParameterInfo Attributes="In" ParameterType="{x:Type p15:Int32}" Name="value" Position="0" xmlns:p15="clr-namespace:System;Assembly=mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+								<ns0:OperationParameterInfo Attributes="Out" ParameterType="{x:Type p15:Int32}" Name="returnValue" Position="1" xmlns:p15="clr-namespace:System;Assembly=mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+							</ns0:OperationInfo.Parameters>
+						</ns0:OperationInfo>
+					</ns0:ReceiveActivity.ServiceOperationInfo>
+					<ns0:ReceiveActivity.ParameterBindings>
+						<WorkflowParameterBinding ParameterName="value">
+							<WorkflowParameterBinding.Value>
+								<ActivityBind Name="SequentialCalculatorService" Path="inputValue" />
+							</WorkflowParameterBinding.Value>
+						</WorkflowParameterBinding>
+						<WorkflowParameterBinding ParameterName="returnValue">
+							<WorkflowParameterBinding.Value>
+								<ActivityBind Name="SequentialCalculatorService" Path="currentValue" />
+							</WorkflowParameterBinding.Value>
+						</WorkflowParameterBinding>
+					</ns0:ReceiveActivity.ParameterBindings>
+					<CodeActivity x:Name="DoAdd" ExecuteCode="Add" />
+				</ns0:ReceiveActivity>
+			</EventDrivenActivity>
+			<EventDrivenActivity x:Name="WaitForComplete">
+				<ns0:ReceiveActivity x:Name="ReceiveComplete" OperationValidation="ValidateOwner">
+					<ns0:ReceiveActivity.ServiceOperationInfo>
+						<ns0:OperationInfo PrincipalPermissionRole="Administrators" Name="Complete" ContractName="ICalculator" />
+					</ns0:ReceiveActivity.ServiceOperationInfo>
+					<CodeActivity x:Name="DoComplete" ExecuteCode="Complete" />
+				</ns0:ReceiveActivity>
+			</EventDrivenActivity>
+		</ListenActivity>
+	</WhileActivity>
+</SequentialWorkflowActivity>

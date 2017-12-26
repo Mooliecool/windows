@@ -1,0 +1,43 @@
+﻿<phone:PhoneApplicationPage 
+    x:Class="WindowsPhoneClient.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
+    xmlns:Microsoft_Phone_Controls="clr-namespace:Microsoft.Phone.Controls.Maps;assembly=Microsoft.Phone.Controls.Maps"
+    xmlns:System_Device_Location="clr-namespace:System.Device.Location;assembly=System.Device"
+    xmlns:local="clr-namespace:WindowsPhoneClient"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="728" 
+    d:DataContext="{d:DesignData SampleData/MainViewModelSampleData.xaml}"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait"  Orientation="Portrait"
+    shell:SystemTray.IsVisible="False">
+
+    <phone:PhoneApplicationPage.Resources>
+        <local:LocationConverter x:Key="locationConverter"/>
+
+        <DataTemplate x:Key="MapItemDataTemplate">
+            <Microsoft_Phone_Controls:Pushpin Cursor="Hand" Content="{Binding Place}" Location="{Binding Converter={StaticResource locationConverter}}" />
+        </DataTemplate>
+    </phone:PhoneApplicationPage.Resources>
+
+    <Grid x:Name="LayoutRoot" Background="Transparent">
+        <Microsoft_Phone_Controls:Map x:Name="map" Loaded="Map_Loaded" ZoomLevel="6" Margin="0,0,-12,0" MouseLeftButtonDown="map_MouseLeftButtonDown" MouseLeftButtonUp="map_MouseLeftButtonUp">
+            <Microsoft_Phone_Controls:Map.Center>
+                <System_Device_Location:GeoCoordinate Altitude="0" Latitude="31" Longitude="121"/>
+            </Microsoft_Phone_Controls:Map.Center>
+            <Microsoft_Phone_Controls:MapItemsControl x:Name="mapItems" ItemTemplate="{StaticResource MapItemDataTemplate}"/>
+        </Microsoft_Phone_Controls:Map>
+    </Grid>
+
+    <phone:PhoneApplicationPage.ApplicationBar>
+        <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True">
+            <shell:ApplicationBarIconButton IconUri="appbar.next.rest.png" Text="Stops List" Click="ApplicationBarIconButton_Click"/>
+        </shell:ApplicationBar>
+    </phone:PhoneApplicationPage.ApplicationBar>
+</phone:PhoneApplicationPage>

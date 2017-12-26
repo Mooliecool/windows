@@ -1,0 +1,59 @@
+﻿<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="SDKSample.MainWindow"
+    Title="IE7-Style Tabbed Browser Sample"
+    Width="350" Height="150" >
+
+  <Window.Resources>
+
+    <!-- For NavigationCommands.NavigateJournal -->
+    <JournalEntryUnifiedViewConverter x:Key="JournalEntryUnifiedViewConverter" />
+    <DataTemplate x:Key="journalMenuItemTemplate">
+      <TextBlock>
+        <TextBlock FontWeight="Bold" Text="{Binding (JournalEntry.Name)}" />
+        <TextBlock Text=" - " />
+        <TextBlock FontStyle="Italic" Text="{Binding (JournalEntryUnifiedViewConverter.JournalEntryPosition)}" />
+      </TextBlock>
+    </DataTemplate>
+    <Style x:Key="journalMenuItemContainerStyle">
+      <Setter Property="MenuItem.Command" Value="NavigationCommands.NavigateJournal" />
+      <Setter Property="MenuItem.CommandTarget" Value="{Binding ElementName=browserPagesTabControl, Path=SelectedContent}" />
+      <Setter Property="MenuItem.CommandParameter" Value="{Binding RelativeSource={RelativeSource Self}}" />
+    </Style>
+
+  </Window.Resources>
+
+  <DockPanel>
+
+    <Menu DockPanel.Dock="Top" VerticalAlignment="Center">
+
+      <MenuItem Header="_File">
+        <MenuItem Header="E_xit" Click="fileExitMenuItem_Click" />
+      </MenuItem>
+
+      <!-- Tabs menu items to add and remove tabs -->
+      <MenuItem Header="_Tabs">
+        <MenuItem Header="_Add Tab" Click="fileAddTabMenuItem_Click" />
+        <MenuItem Header="_Remove Tab" Click="fileRemoveTabMenuItem_Click" />
+      </MenuItem>
+
+      <!-- Navigation menu items, using NavigationCommands.Xxx -->
+      <MenuItem Header="_Back" Command="NavigationCommands.BrowseBack" CommandTarget="{Binding ElementName=browserPagesTabControl, Path=SelectedContent}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" />
+      <MenuItem Header="Forwar_d" Command="NavigationCommands.BrowseForward" CommandTarget="{Binding ElementName=browserPagesTabControl, Path=SelectedContent}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" />
+      <MenuItem Header="_Recent" ItemTemplate="{StaticResource journalMenuItemTemplate}" ItemContainerStyle="{StaticResource journalMenuItemContainerStyle}" >
+        <MenuItem.ItemsSource>
+          <MultiBinding Converter="{StaticResource JournalEntryUnifiedViewConverter}" >
+            <Binding ElementName="browserPagesTabControl" Path="SelectedContent.BackStack" />
+            <Binding ElementName="browserPagesTabControl" Path="SelectedContent.ForwardStack" />
+          </MultiBinding>
+        </MenuItem.ItemsSource>
+      </MenuItem>
+    </Menu>
+
+    <!-- Tab control that will host tab items with frames -->
+    <TabControl Name="browserPagesTabControl" Background="Gray" Padding="1,2,1,1" />
+
+  </DockPanel>
+
+</Window>

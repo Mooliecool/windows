@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>MFCActiveX</title>
+
+    <script language="javascript" type="text/javascript">
+        function SetFloatProperty() {
+            var fVal = parseFloat(floatPropInput.value);
+            if (!isNaN(fVal)) {
+                MFCActiveX1.FloatProperty = fVal;
+            }
+        }
+        function GetFloatProperty() {
+            alert("MFCActiveX1.FloatProperty = " +
+                MFCActiveX1.FloatProperty.toString());
+        }
+    </script>
+
+    <script language="vbscript" type="text/vbscript" for="MFCActiveX1" event="FloatPropertyChanging(NewValue, byref Cancel)">
+'       http://support.microsoft.com/kb/253282
+'       we do not use jscript or javascript because they passes all variables
+'       by value (not by reference). The FloatPropertyChanging event requires 
+'       passing the cancel param by reference.
+        If confirm("FloatProperty is being changed to " & Cstr(NewValue)) Then
+            Cancel = false
+        Else
+            Cancel = true
+        End If
+'       'Cancel' does not seem to work [to be fixed in future, Jialiang]        
+    </script>
+
+    <style type="text/css">
+        body
+        {
+            font-family: Calibri;
+        }
+        #MFCActiveX1
+        {
+            height: 96px;
+            width: 291px;
+        }
+    </style>
+</head>
+<body>
+    <object id="MFCActiveX1" classid="CLSID:E389AD6C-4FB6-47AF-B03A-A5A5C6B2B820">
+    </object>
+    <p>
+    </p>
+    FloatProperty:
+    <input type="text" name="floatPropInput" value="" style="width: 120px" />
+    <input type="button" name="submit" value="Set" onclick="SetFloatProperty()" />
+    <input type="button" name="retrieve" value="Get" onclick="GetFloatProperty()" />
+</body>
+</html>

@@ -1,0 +1,214 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<title>Overview</title>
+<style type="text/css">
+
+		H2
+		{
+			color: #003399;
+			font-size: 125%;
+		}
+		
+		H3
+		{
+			color: #0033DD;
+			font-size: 110%;
+		}
+	.BorderedTable {
+	border-style: solid;
+	border-width: 1px;
+}
+    .BorderedTable td {
+		border-style: solid;
+		border-width: 1px;
+		padding: 2px;
+	}
+}
+	.auto-style1 {
+	text-align: center;
+}
+	</style>
+</head>
+
+<body>
+
+<h2>Overview</h2>
+<p>This sample demonstrates how to use Windows 7 multi-touch to create a simple 
+but modern image viewer. You can use your fingers to translate (pan), scale 
+(zoom), rotate, and skew the image. The image is rendered using modern Windows 7 technologies such as Direct2D and WIC.</p>
+<p>If you don&#39;t have a touch screen, the sample still allows you to perform very 
+simple interactions with the image by clicking the ribbon commands using your mouse. 
+In order to keep the code file simple, the sample does not implement complex 
+mouse interactivity as you can find in programs such as Expression Design.</p>
+<p><img alt="Screenshot" src="Screenshot.png" style="width: 800px;" /></p>
+<h2>Prerequisites</h2>
+<p>For this sample to work, you must have Visual Studio 2010. You must use 
+Windows 7. You also need to have a Windows 7 compatible multi-touch screen.</p>
+<h2>Sample Relationships</h2>
+<p>Windows 7 has built-in support for multi-touch screens. If you don&#39;t have 
+much experience in using a multi-touch screen, it is highly recommended that you 
+watch this video:
+<a href="http://windows.microsoft.com/en-us/windows7/help/videos/using-windows-touch">
+http://windows.microsoft.com/en-us/windows7/help/videos/using-windows-touch</a>. 
+It tells you how to use multi-touch as an end user.</p>
+<p>As a developer, you can also create your own applications that support 
+multi-touch. You can use Windows native APIs in native applications, or you can 
+use WPF APIs in managed applications. This sample uses native code. For a 
+managed 
+sample, please 
+refer to the &quot;Creating Your First Touch Application&quot; tutorial on
+<a href="http://msdn.microsoft.com/en-us/library/ee649090.aspx">MSDN</a>. It 
+walks through how to create a graphic viewer that supports multi-touch, similar 
+to what we demonstrate in this sample. You can change the 
+Rectangle in the tutorial to an Image, a MediaElement, or whatever you like.</p>
+<p>In addition, we have a CS/VBWpf3DMultiTouch sample in All-In-One Code Framework, 
+which demonstrates a more advanced 3D manipulation scenario using WPF. In native 
+code, however, due to the complex of Direct3D, and the fact that there&#39;re no 
+getting started tutorial on MSDN for native applications, we decided to create a simple 
+but modern 2D image viewer sample that supports multi-touch.</p>
+<p>You can also find several code samples in the 
+<a href="http://msdn.microsoft.com/en-us/windows/bb980924.aspx">Windows SDK</a> 
+demonstrating how to use multi-touch gestures, manipulations, and inertias. 
+Those samples focus on the touching part. But to build a modern image viewer, 
+it is recommended to use modern graphic APIs such as Direct2D and WIC. Direct2D 
+allows you to take advantage of hardware acceleration, especially for 
+transforms, which are used heavily in multi-touch enabled image viewers. So this 
+sample focus on how to integrate multi-touch with Direct2D, instead of building 
+a clone of the SDK samples. If you&#39;re not familiar with Direct2D, please refer 
+to the Direct2D samples in the Windows SDK, and our CppWin7Direct2D sample in 
+the All-In-One Code Framework.</p>
+<h2>Description</h2>
+<p>The most important code files in the sample are D2DWindows.h and 
+D2DWindow.cpp. It is in the D2DWindow that all touching and rendering occurs. 
+There&#39;re 3 kinds of touch related concepts: raw touching messages, gestures, and 
+manipulations. Note gestures 
+cannot be used together with manipulations and raw touch messages, so this sample only demonstrates the 
+gestures. But the document below will discuss all the concepts.</p>
+<h3>Multi-touch</h3>
+<h4>Raw touch messages</h4>
+<p>You can handle the WM_TOUCH message directly. Unlike mouse, though, touch only 
+generates a single WM_TOUCH message. There&#39;s no WM_TOUCH_DOWN, WM_TOUCH_MOVE, 
+WM_TOUCH_UP, etc. This is different from managed code, where the raw touch 
+events are encapsulated to simulate mouse events. You handle the WM_TOUCH message, and call the 
+GetTouchInputInfo function to get the status of the touched points. This 
+function contains an output parameter which returns an array of TOUCHINPUT 
+structures. Each TOUCHINPUT represents one fingers. You can then obtain the 
+status of each finger. For more information, please 
+refer to <a href="http://msdn.microsoft.com/en-us/library/dd317341(VS.85).aspx">
+MSDN document</a>.</p>
+<h4>Gesture messages</h4>
+<p>If you&#39;re working with a 2D application, you can translate/rotate/scale the 
+scene using the data reported in the gesture messages without any custom 
+calculation! That&#39;s why we say touch is easier than mouse. There&#39;re several 
+predefined gestures. This
+<a href="http://msdn.microsoft.com/en-us/library/dd940543(VS.85).aspx">MSDN 
+document</a> provides a graphical description of all these gestures.</p>
+<p>In order to work with gestures, first you need to handle the WM_GESTURENOTIFY 
+message to tell the operating system what gestures you want to enable in your 
+application. By default, gestures other than rotation and single finger pan are 
+all enabled. This sample enables all gestures except the GC_PAN_WITH_GUTTER 
+gesture. If GC_PAN_WITH_GUTTER is enabled, when you pan the image, touch engine 
+tries its best to move the object along with a horizontal or vertical line. This 
+is usually not an intended behavior in an image viewer application. For more 
+information, please refer to the D2DWindow::OnGestureNotify method.</p>
+<p>After you registered what gestures you want to enable, you can handle the 
+WM_GESTURE message to handle the actual gestures. Please refer to the 
+D2DWindows::OnGestureNotify method for more information.</p>
+<p>Gestures cannot be used in managed code directly (without manual P/Invoke). 
+The WPF managed API only exposes raw touch messages and manipulation.</p>
+<h4>Manipulation and Intertia</h4>
+<p>Manipulation allows your application to combine several gestures at the same 
+time. For example, you can scale and translate an image at the same time. This 
+can 
+provide a smoother user experience. Note, however, to enable manipulation,&nbsp; you 
+must disable gesture, and manipulation must be used together with raw touch 
+messages. In the WM_TOUCH message handler, after you call GetTouchInputInfo to 
+get the touch points information, you call 
+ManipulationProcessor::ProcessDown/Move/Up methods, respectively. Manipulation 
+does not have its own messages. You need to create a class that implements 
+_IManipulationEvents. The ManipulationProcessor::ProcessDown/Move/Up methods 
+will callback to this class. For more information, please refer to the
+<a href="http://msdn.microsoft.com/en-us/library/dd940545(VS.85).aspx">
+MTManipulation sample</a> in the Windows SDK. Note this is different from 
+managed code. In managed code, the WPF manipulation APIs have written almost 
+everything for you, and you only need to handle several manipulation events.</p>
+<p>Inertia allow you to &quot;throw&quot; an object on the screen. Imagine you&#39;re moving 
+an image. After you release your finger, the image can still move for a short 
+amount of time. The velocity will become lower and lower and eventually it 
+stops. This allows you to create the acceleration/deceleration behavior. Inertia 
+must be used together with manipulation. For more information, please refer to 
+the <a href="http://msdn.microsoft.com/en-us/library/dd562174(VS.85).aspx">
+MTManipulationInertia sample</a> in the Windows SDK.</p>
+<h4>Mouse simulation</h4>
+<p>Finally, when building a multi-touch enabled application, please bare in mind 
+that lots of users do not have a touch screen yet. So you should provide 
+alternative ways to interact with your application. In order to provide a clean 
+code file, this sample does not handle mouse messages. Instead, it creates some 
+simple ribbon commands that allows you to do some basic navigation, such as translate left 100 pixels, scale up 10%, rotate 
+left 90 degrees, etc. Ribbon allows you to separate UI markup with application 
+logic in your native application, similar to WPF/Silverlight. If you&#39;re 
+interested in the ribbon part of the sample, please refer to Ribbon.xml, 
+Application.h/cpp, CommandHandler.h/cpp.</p>
+<h3>Integrate multi-touch with Direct2D</h3>
+<p>To build a modern application with great user experience, it is recommended 
+to use modern graphic frameworks such as Direct2D and WIC. WIC allows you to 
+encode/decode bitmaps very efficiently, but it doesn&#39;t have much to do with 
+multi-touch. Direct2D allows you to transform rendered objects such as images. 
+So the following document focuses on Direct2D.</p>
+<p>Direct2D provides standard transform operations. Multi-touch gestures is 
+intended to transform the object. But the names used in Direct2D and multi-touch 
+are different. The following table compares the names.</p>
+<table class="BorderedTable">
+	<tr>
+		<td class="auto-style1">Direct2D Transforms</td>
+		<td class="auto-style1">Multi-Touch Gestures</td>
+	</tr>
+	<tr>
+		<td class="auto-style1">Translate</td>
+		<td class="auto-style1">Pan</td>
+	</tr>
+	<tr>
+		<td class="auto-style1">Scale</td>
+		<td class="auto-style1">Zoom</td>
+	</tr>
+	<tr>
+		<td class="auto-style1">Rotate</td>
+		<td class="auto-style1">Rotate</td>
+	</tr>
+	<tr>
+		<td class="auto-style1">Skew</td>
+		<td class="auto-style1">No pre-defined gestures</td>
+	</tr>
+	</table>
+<p>As you can see, Direct2D transforms are named after WPF/Silverlight 
+transforms, while multi-touch gestures provide more friendly names to end users.</p>
+<p>The data in the Pan and Zoom gesture can be translated to Direct2D&#39;s 
+Translate and Scale transforms directly. But Rotate can&#39;t. In Direct2D, a 
+positive angle results in a clockwise rotation, which is consistent with WPF and 
+Silverlight. But the rotate gesture assumes a positive angle results in a 
+counter-clockwise rotation, which is consistent with GDI. So we must get the 
+opposite number. In addition, Direct2D&#39;s rotate transform uses degrees instead 
+of radians. So we must convert the radians angle to a degree angle.</p>
+<p>Multi-touch doesn&#39;t provide a standard skew gesture. In this sample, we use 
+the TwoFingerTap and PressAndTap gestures to toggle the skew transform.</p>
+<p>For more information, please refer to the OnGesture and 
+OnTranslate/Scale/Rotate methods.</p>
+<h2>Conclusion</h2>
+<p>In the future, natural inputs such as multi-touch, camera, and voice will 
+become more and more popular. We&#39;re no longer living in a world where computer 
+input only supports mouse and keyboard. To build future aware applications, you 
+should consider to optimize your application for new input solutions such as 
+multi-touch, camera, and voice.</p>
+<p>Windows 7 provides out of box support for multi-touch input. You can work 
+with touch devices from both native applications and managed applications. 
+Managed applications are much easier to write because of the robust framework 
+provided by WPF. But using native code allows you to easily take advantage of 
+the latest Windows 7 features that have not been exposed via managed APIs, such 
+as Direct2D.</p>
+
+</body>
+
+</html>

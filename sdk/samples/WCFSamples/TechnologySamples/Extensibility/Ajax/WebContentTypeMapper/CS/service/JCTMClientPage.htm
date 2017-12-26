@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>JsonContentTypeMapper Client Page</title>
+
+    <script type="text/javascript">
+    // <![CDATA[
+    
+    // This function creates an asynchronous call to the service
+    function makeCall(contentType){
+        var n1 = document.getElementById("num1").value;
+        var n2 = document.getElementById("num2").value;
+       
+        if(n1 && n2){
+            // Create HTTP request
+            var xmlHttp;
+            try {
+                xmlHttp = new XMLHttpRequest();
+            } catch (e) {
+                try {
+                    xmlHttp = new ActiveXObject("Msxml2.XMLHTTP");
+                } catch (e) {
+                    try {
+                        xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+                    } catch (e) {
+                        alert("This sample only works in browsers with AJAX support"); 
+                        return false;
+                    }
+                }
+            }
+
+
+            // Create result handler 
+            xmlHttp.onreadystatechange=function(){
+                if(xmlHttp.readyState == 4){
+                    var doMathResult = eval("(" + xmlHttp.responseText + " )").DoMathResult;
+                    document.getElementById("sum").value = doMathResult.sum;
+                    document.getElementById("difference").value = doMathResult.difference;
+                    document.getElementById("product").value = doMathResult.product;
+                    document.getElementById("quotient").value = doMathResult.quotient;
+                }
+            }
+         
+            // Build the operation URL
+            var url = "service.svc/ajaxEndpoint/DoMath";
+
+            // Build the body of the JSON message
+            var body = '{"n1":';
+            body = body + document.getElementById("num1").value + ',"n2":';
+            body = body + document.getElementById("num2").value + '}';
+            
+            // Send the HTTP request
+            xmlHttp.open("POST", url, true);
+            xmlHttp.setRequestHeader("Content-type", contentType);
+            xmlHttp.send(body);
+        }
+    }
+
+    // ]]>
+    </script>
+
+</head>
+<body>
+    <h1>
+        JsonContentTypeMapper Client Page</h1>
+    <p>
+        First Number:
+        <input type="text" id="num1" /></p>
+    <p>
+        Second Number:
+        <input type="text" id="num2" /></p>
+    <input type="button" onclick="return makeCall('application/json');" value="Perform calculation using 'application/json'" /><br /><br />
+    <input type="button" onclick="return makeCall('text/javascript');" value="Perform calculation using 'text/javascript'" />
+    <p>
+        Sum:
+        <input type="text" id="sum" /></p>
+    <p>
+        Difference:
+        <input type="text" id="difference" /></p>
+    <p>
+        Product:
+        <input type="text" id="product" /></p>
+    <p>
+        Quotient:
+        <input type="text" id="quotient" /></p>
+</body>
+</html>

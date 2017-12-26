@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>VBAzureServiceBusProtocolBridging Readme</title>
+</head>
+<body>
+
+<h1>WINDOWS AZURE APPLICATION : VBAzureServiceBusProtocolBridging Project Overview</h1>
+
+<h2>Prerequisites</h2>
+<ol>
+    <li>Visual Studio 2010. The trial version can be downloaded from <a href="http://www.microsoft.com/visualstudio/en-us/try">Visual Studio 2010 Trial Downloads</a></li>
+    <li>Windows Azure AppFabric SDK V1.0 which can be downloaded from <a href="http://www.microsoft.com/downloads/en/details.aspx?FamilyID=39856a03-1490-4283-908f-c8bf0bfad8a5&displaylang=en">Windows Azure AppFabric SDK V1.0</a></li>
+</ol>
+
+<h2>Summary</h2>
+
+<p>The <b>AppFabric Service Bus</b> provides the communication infrastructure that protects developers from having to create the complex code necessary to achieve seamless connectivity. It allows you to expose a service to the Internet from behind your firewall or NAT.</p>
+
+<p>WCF4 includes a new routing service found in the <b>System.ServiceModel.Routing</b> namespace. The Routing Service is designed to act as a generic, configurable SOAP intermediary. It allows you to configure Content Based Routing, set up Protocol Bridging, and handle communication errors that you encounter. The Routing Service also makes it possible for you to update your Routing Configuration while the Routing Service is running without restarting the service.</p>
+
+<p>This sample demos how to combine <b>AppFabric Service Bus</b> and <b>WCF4 Routing Service</b> to expose an existing net.tcp WCF service through Service Bus using http protocol. For the technical detail, please see the <a href="#references">References</a> section.</p>
+
+<p>This solution contains 4 projects:</p>
+<ul>
+    <li><b>Common</b> is a class library, contains classes which are shared by all projects.</li>
+    <li><b>Service</b> is a console application that hosts a WCF service on local machine.</li>
+    <li><b>RouterService</b> is a console application, exposes a Routing Service through Service Bus and routes requests to <b>Service</b> that is running on the same machine as <b>RouterService</b>.</li>
+    <li><b>Client</b> is a console application, consumes the WCF service through Service Bus.</li>
+</ul>
+
+<h2>How to run this sample</h2>
+
+<h4>Step 1: Please open the solution (VBAzureServiceBusProtocolBridging.sln) via Visual Studio. [NOTE: Open Visual Studio in elevated administrator mode ]</h4>
+
+<h4>Step 2: Input your Service Bus settings.</h4>
+<p>Please open <b>Settings.vb</b> class file which belongs to <b>Common</b> project by double clicking it in <b>Solution Explorer</b>.
+Then please input your Service Bus namespace, issuer name and issuer secret. If you don't know how to get these, please refer to <a href="http://msdn.microsoft.com/en-us/gg282248">Getting Started: Creating a Service Bus Namespace</a>.</p>
+
+<h4>Step 3: Run applications.</h4>
+<p>Please right-click the solution in <b>Solution Explorer</b> then click <b>Properties</b> to open the <b>Solution Property Pages</b> window.
+ In the <b>Solution Property Pages</b> window, select <b>Startup Project</b> tab and select <b>Multiple startup projects</b> option. 
+ Set the <b>RouterService</b> project as <b>Start without debugging</b> (<a href="#debug_both_routerservice_client">Why cannot debug both RouterService project and Client project</a>), the <b>Service</b> project as <b>Start</b> and finally click the <b>OK</b> button to close <b>Solution Property Pages</b> window.</p>
+<p>Click <b>Debug &gt; Start Debugging</b> (or press <b>F5</b>) to start up <b>Service</b> project and <b>RouterService</b> project. Wait until both console applications say "Service is Ready...". It may need several seconds for <b>RouterService</b> application to connect to Service Bus and expose the service on it. Back to the <b>Solution Explorer</b>, please right-click the <b>Client</b> project and select <b>Debug &gt; Start new instance</b> to start up the <b>Client</b> application.</p>
+<p>It also may needs seconds for <b>Client</b> application to connect to Service Bus and consume the service. Finally you will get similar outputs like below.</p>
+<p><b>Client application console:</b></p>
+<pre>
+Initializing proxy.
+Calling Add(36, 15) via https://[namespace].servicebus.windows.net/MyService
+Result: 51
+Please press [Enter] to exit.
+</pre>
+<p><b>Service application console:</b></p>
+<pre>
+Starting service.
+Service is ready at net.tcp://localhost:9090/MyService
+Please press [Enter] to exit.
+Add(36, 15) is called.
+</pre>
+<h2 id="debug_both_routerservice_client">Why cannot debug both RouterService project and Client project.</h2>
+<p>We have issue for debugging both <b>RouterService</b> project and <b>Client</b> project. If we do this, the <b>Client</b> application will receive the following error when consuming the service.</p>
+<pre>
+Multiple headers with name 'VsDebuggerCausalityData'
+and namespace 'http://schemas.microsoft.com/vstudio/diagnostics/servicemodelsink' found.
+</pre>
+<p>This happens because when debugging WCF client application (WCF service consumer) in Visual Studio, Visual Studio will append a 'VsDebuggerCausalityData' header to the request. In this sample, <b>Client</b> sends request to Service Bus and <b>RouterService</b> receives request from Service Bus and sends request to <b>Service</b>. The same request is sent twice, thus, if we debug both <b>Client</b> and <b>RouterService</b>, the 'VsDebuggerCausalityData' header will be appended twice.</p>
+<p>Solution will be either of following options:</p>
+<ul>
+    <li>
+    <p>Do not debug them at the same time, either debug <b>Client</b> project or <b>Service</b> project. 
+    That means one of them needs to start up without debugging.</p>
+    </li>
+    <li>
+    <p>Temporarily disable debugger support for WCF by running the following command:</p>
+<pre>
+"C:\Program Files\Microsoft Visual Studio 10.0\Common7\IDE\vsdiag_regwcf.exe" -u
+</pre>
+<p>Then we can debug both <b>Client</b> project and <b>Service</b> project. After debugging, you may need to rollback the change and enable debugger support for WCF:</p>
+<pre>
+"C:\Program Files\Microsoft Visual Studio 10.0\Common7\IDE\vsdiag_regwcf.exe" -i
+</pre>
+    </li>
+</ul>
+
+<h2 id="references">References</h2>
+<ul>
+    <li><a href="http://msdn.microsoft.com/en-us/library/ee732537.aspx">AppFabric Service Bus</a></li>
+    <li><a href="http://msdn.microsoft.com/en-us/gg282251">Introduction to the AppFabric Service Bus > Exercise 1: Getting a Basic Client and Service Working</a></li>
+    <li><a href="http://msdn.microsoft.com/en-us/gg465230">What's New in WCF 4? > Exercise 8: Protocol Bridging</a></li>
+</ul>
+
+</body>
+</html>

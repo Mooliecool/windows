@@ -1,0 +1,52 @@
+!IF 0
+------------------------------------------------------------------------------
+  Microsoft WPF
+  Copyright (C) 2001 Microsoft Corporation
+------------------------------------------------------------------------------
+!ENDIF
+
+BUILD_PASS2_PRODUCES=TestSrc_WindowsTest_Client_WcpTests_HLS_WPFNotepad
+
+AVPERFTEST=0
+
+!IF "$(AVPERFTEST)"=="1"
+!include $(WINDOWS_TST_CLIENT_ROOT)\common.inc
+!include $(WCPDEV_PERF_PATH)\common.inc
+
+TARGETNAME=WPFNotepad
+!ENDIF
+
+#TARGETTYPE needs to be set for build purposes. Set to NOTARGET for MSBuild compilation.
+TARGETTYPE=NOTARGET
+TARGETPATH=$(_OBJ_DIR)
+
+SOURCES=WPFNotepad.proj
+
+USENEW_WINFX_TARGET=1
+
+#TargetName for the executable to be generated. Keep the name same as specified in .proj file. 
+#This is a requirement for build.exe and needs to be set.
+MSBUILD_TARGETNAME=WPFNotepad
+
+MSBUILD_TARGET=RazzleCheckUid;Build
+
+#valid TargetType : winexe, exe, library, netmodule or container.
+MSBUILD_TARGETTYPE=winexe
+
+!IF "$(AVPERFTEST)"=="1"
+MSBUILD_BINPLACE_DIRECTORY=$(O)
+MSBUILD_FLAGS=$(MSBUILD_FLAGS) /p:AVPERFTEST=$(AVPERFTEST)
+
+PASS2_BINPLACE=\
+    -:DEST Client\WCPDev                $(O)\*.exe \
+    -:DEST Client\WCPDev                $(O)\*.pdb \
+    -:DEST Client\WCPDev\en-US      $(O)\en-US\*.dll \
+    -:DEST Client\WCPDev  $(O)\eula.txt \
+    -:DEST Client\WCPDev  $(O)\notepad.ico \
+
+NTTARGETFILES=$(O)\CLRProfilerControl.cs
+_NTTARGETFILES=$(NTTARGETFILES)
+
+!ELSE
+NO_BINPLACE=1
+!ENDIF

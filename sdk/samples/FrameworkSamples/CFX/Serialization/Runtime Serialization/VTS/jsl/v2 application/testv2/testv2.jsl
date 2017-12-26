@@ -1,0 +1,62 @@
+package Microsoft.Samples;
+
+import System.*;
+import System.IO.*;
+import System.Runtime.Serialization.*;
+import System.Runtime.Serialization.Formatters.Binary.*;
+import Microsoft.Samples.Test.*;
+
+/// <summary>
+/// Summary description for Class1.
+/// </summary>
+class TestV2
+{
+    /// <summary>
+    /// The main entry point for the application.
+    /// </summary>
+    /** @attribute STAThread()
+     */
+    public static void main(String[] args)
+    {
+        //
+        // TODO: Add code to start application here
+        //
+        BinaryFormatter formatter = new BinaryFormatter();
+        Person aPerson = null;
+        FileStream v1File = null;
+        try {
+            v1File = new FileStream("..\\..\\..\\..\\Output\\v1Output.bin",
+                FileMode.Open);
+            aPerson = (Person)formatter.Deserialize(v1File);
+            aPerson.set_Age(98);
+        }
+        catch (FileNotFoundException e) {
+            Console.WriteLine("An error occured:\n" + e.ToString());
+        }
+        finally {
+            if (v1File != null) {
+                v1File.Close();
+            }
+        }
+        FileStream v2File = null;
+
+        try {
+            v2File = new FileStream("..\\..\\..\\..\\Output\\v2Output.bin",
+                FileMode.Create);
+            if (aPerson != null) {
+                formatter.Serialize(v2File, aPerson);
+                Console.WriteLine();
+                Console.WriteLine("Person v2 written out to..\\..\\..\\.."
+                    + "\\Output\\v2Output.bin");
+            }
+        }
+        catch (FileNotFoundException e) {
+            Console.WriteLine("An error occured:\n" + e.ToString());
+        }
+        finally {
+            if (v2File != null) {
+                v2File.Close();
+            }
+        }
+    } //main
+} //TestV2

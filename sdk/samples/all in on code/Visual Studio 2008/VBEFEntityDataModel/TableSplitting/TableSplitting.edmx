@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="EFTblSplitModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2005" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2006/04/edm/ssdl">
+        <EntityContainer Name="EFTblSplitModelStoreContainer">
+          <EntitySet Name="Person" EntityType="EFTblSplitModel.Store.Person" store:Type="Tables" Schema="dbo" />
+        </EntityContainer>
+        <EntityType Name="Person">
+          <Key>
+            <PropertyRef Name="PersonID" />
+          </Key>
+          <Property Name="PersonID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="LastName" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="FirstName" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="PersonCategory" Type="smallint" Nullable="false" />
+          <Property Name="HireDate" Type="datetime" />
+          <Property Name="EnrollmentDate" Type="datetime" />
+          <Property Name="Picture" Type="image" />
+          <Property Name="BusinessCredits" Type="varchar" MaxLength="50" />
+          <Property Name="AdminDate" Type="datetime" />
+        </EntityType>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="EFTblSplitModel" Alias="Self" xmlns="http://schemas.microsoft.com/ado/2006/04/edm">
+        <EntityContainer Name="EFTblSplitEntitie">
+          <EntitySet Name="Person" EntityType="EFTblSplitModel.Person" />
+          <EntitySet Name="PersonDetailSet" EntityType="EFTblSplitModel.PersonDetail" />
+          <AssociationSet Name="PersonPersonDetail" Association="EFTblSplitModel.PersonPersonDetail">
+            <End Role="Person" EntitySet="Person" />
+            <End Role="PersonDetail" EntitySet="PersonDetailSet" /></AssociationSet></EntityContainer>
+        <EntityType Name="Person">
+          <Key>
+            <PropertyRef Name="PersonID" />
+          </Key>
+          <Property Name="PersonID" Type="Int32" Nullable="false" />
+          <Property MaxLength="50" Unicode="true" FixedLength="false" Name="LastName" Type="String" Nullable="false" />
+          <Property MaxLength="50" Unicode="true" FixedLength="false" Name="FirstName" Type="String" Nullable="false" />
+          <NavigationProperty Name="PersonDetail" Relationship="EFTblSplitModel.PersonPersonDetail" FromRole="Person" ToRole="PersonDetail" /></EntityType>
+        <EntityType Name="PersonDetail">
+          <Key>
+            <PropertyRef Name="PersonID" /></Key>
+          <Property Name="PersonID" Type="Int32" Nullable="false" />
+          <Property Name="PersonCategory" Type="Int16" Nullable="false" />
+          <Property Name="HireDate" Type="DateTime" Nullable="true" />
+          <Property Name="EnrollmentDate" Type="DateTime" Nullable="true" />
+          <Property Name="Picture" Type="Binary" Nullable="true" />
+          <Property Name="BusinessCredits" Type="String" Nullable="true" />
+          <Property Name="AdminDate" Type="DateTime" Nullable="true" />
+          <NavigationProperty Name="Person" Relationship="EFTblSplitModel.PersonPersonDetail" FromRole="PersonDetail" ToRole="Person" /></EntityType>
+        <Association Name="PersonPersonDetail">
+          <End Type="EFTblSplitModel.Person" Role="Person" Multiplicity="1" />
+          <End Type="EFTblSplitModel.PersonDetail" Role="PersonDetail" Multiplicity="1" />
+          <ReferentialConstraint>
+            <Principal Role="Person">
+              <PropertyRef Name="PersonID"/>
+            </Principal>
+            <Dependent Role="PersonDetail">
+              <PropertyRef Name="PersonID"/>
+            </Dependent>
+          </ReferentialConstraint>
+        </Association></Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="urn:schemas-microsoft-com:windows:storage:mapping:CS">
+        <EntityContainerMapping StorageEntityContainer="EFTblSplitModelStoreContainer" CdmEntityContainer="EFTblSplitEntitie">
+          <EntitySetMapping Name="Person">
+            <EntityTypeMapping TypeName="IsTypeOf(EFTblSplitModel.Person)">
+              <MappingFragment StoreEntitySet="Person">
+                <ScalarProperty Name="PersonID" ColumnName="PersonID" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PersonDetailSet">
+            <EntityTypeMapping TypeName="IsTypeOf(EFTblSplitModel.PersonDetail)">
+              <MappingFragment StoreEntitySet="Person">
+                <ScalarProperty Name="AdminDate" ColumnName="AdminDate" />
+                <ScalarProperty Name="BusinessCredits" ColumnName="BusinessCredits" />
+                <ScalarProperty Name="Picture" ColumnName="Picture" />
+                <ScalarProperty Name="EnrollmentDate" ColumnName="EnrollmentDate" />
+                <ScalarProperty Name="HireDate" ColumnName="HireDate" />
+                <ScalarProperty Name="PersonCategory" ColumnName="PersonCategory" />
+                <ScalarProperty Name="PersonID" ColumnName="PersonID" /></MappingFragment></EntityTypeMapping></EntitySetMapping>
+          <AssociationSetMapping Name="PersonPersonDetail" TypeName="EFTblSplitModel.PersonPersonDetail" StoreEntitySet="Person">
+            <EndProperty Name="PersonDetail">
+              <ScalarProperty Name="PersonID" ColumnName="PersonID" /></EndProperty>
+            <EndProperty Name="Person">
+              <ScalarProperty Name="PersonID" ColumnName="PersonID" /></EndProperty></AssociationSetMapping></EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2007/06/edmx">
+    <edmx:Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+      </DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram Name="EFTblSplitEntitie">
+        <EntityTypeShape EntityType="EFTblSplitModel.Person" PointX="0.75" PointY="0.75" Width="1.5" Height="1.4535937500000005" IsExpanded="true" />
+        <EntityTypeShape EntityType="EFTblSplitModel.PersonDetail" Width="1.5" PointX="3.375" PointY="0.75" Height="2.128072916666667" />
+        <AssociationConnector Association="EFTblSplitModel.PersonPersonDetail">
+          <ConnectorPoint PointX="2.25" PointY="1.4767968750000002" />
+          <ConnectorPoint PointX="3.375" PointY="1.4767968750000002" /></AssociationConnector></Diagram></edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

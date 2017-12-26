@@ -1,0 +1,657 @@
+<#
+'*********************************************************
+'
+'    Copyright (c) Microsoft. All rights reserved.
+'    This code is licensed under the Microsoft Public License.
+'    THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
+'    ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
+'    IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
+'    PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
+'
+'*********************************************************
+#>
+<#@ template language="VB" debug="false" hostspecific="true"#>
+<#@ include file="EF.Utility.VB.ttinclude"#><#@
+ output extension=".vb"#><#
+
+Dim code As New CodeGenerationTools(Me)
+Dim loader As New MetadataLoader(Me)
+Dim region As New CodeRegion(Me, 1)
+Dim ef As New MetadataTools(Me)
+
+Dim inputFile As String = "POCOChangeTracking.edmx"
+Dim ItemCollection As EdmItemCollection = loader.CreateEdmItemCollection(inputFile)
+Dim namespaceName As String = code.VsNamespaceSuggestion()
+
+Dim fileManager As EntityFrameworkTemplateFileManager = EntityFrameworkTemplateFileManager.Create(Me)
+
+' Write out support code to primary template output file
+WriteHeader(fileManager)
+BeginNamespace(namespaceName, code)
+WriteCustomObservableCollection()
+EndNamespace(namespaceName)
+
+' Emit Entity Types
+For Each loopEntity As EntityType In ItemCollection.GetItems(Of EntityType)().OrderBy(Function(e) e.Name)
+    Dim entity as EntityType = loopEntity
+    fileManager.StartNewFile(entity.Name & ".vb")
+    BeginNamespace(namespaceName, code)
+    Dim entityHasNullableFKs As Boolean = entity.NavigationProperties.Any(Function(np) np.GetDependentProperties().Any(Function(p) ef.IsNullable(p)))
+
+#>
+Partial <#=Accessibility.ForType(entity)#> <#=code.SpaceAfter(code.MustInheritOption(entity))#>Class <#=code.Escape(entity)#><#=code.StringBefore(Environment.NewLine & CodeRegion.GetIndent(region.CurrentIndentLevel + 2) & " Inherits ", code.Escape(entity.BaseType))#>
+<#
+    region.Begin("Primitive Properties")
+
+    For Each edmProperty As EdmProperty In entity.Properties.Where(Function(p) TypeOf p.TypeUsage.EdmType Is PrimitiveType AndAlso p.DeclaringType Is entity)
+        Dim edmPropertyTemp As EdmProperty = edmProperty
+        Dim isForeignKey As Boolean = entity.NavigationProperties.Any(Function(p) p.GetDependentProperties().Contains(edmPropertyTemp))
+        Dim isBinaryType As Boolean = DirectCast(edmProperty.TypeUsage.EdmType, PrimitiveType).PrimitiveTypeKind = PrimitiveTypeKind.Binary
+        Dim getterAccess As String = Accessibility.ForGetter(edmProperty)
+        Dim setterAccess As String = Accessibility.ForSetter(edmProperty)
+
+        If Not isForeignKey AndAlso String.IsNullOrEmpty(getterAccess) AndAlso String.IsNullOrEmpty(setterAccess) Then
+#>
+
+    <#=PropertyAccessibilityAndVirtual(edmProperty)#> Property <#=code.Escape(edmProperty)#> As <#=code.Escape(edmProperty.TypeUsage)#><#=code.StringBefore(" = ", code.CreateLiteral(edmProperty.DefaultValue))#>
+<#
+        Else If Not isForeignKey AndAlso (Not String.IsNullOrEmpty(getterAccess) OrElse Not String.IsNullOrEmpty(setterAccess)) Then
+#>
+
+    <#=PropertyAccessibilityAndVirtual(edmProperty)#> Property <#=code.Escape(edmProperty)#> As <#=code.Escape(edmProperty.TypeUsage)#>
+        <#=code.SpaceAfter(getterAccess)#>Get
+            Return <#=code.FieldName(edmProperty)#>
+        End Get
+        <#=code.SpaceAfter(setterAccess)#>Set(ByVal value As <#=code.Escape(edmProperty.TypeUsage)#>)
+            <#=code.FieldName(edmProperty)#> = value
+        End Set
+    End Property
+    Private <#=code.FieldName(edmProperty)#> As <#=code.Escape(edmProperty.TypeUsage)#><#=code.StringBefore(" = ", code.CreateLiteral(edmProperty.DefaultValue))#>
+<#
+        Else
+#>
+
+    <#=PropertyAccessibilityAndVirtual(edmProperty)#> Property <#=code.Escape(edmProperty)#> As <#=code.Escape(edmProperty.TypeUsage)#>
+        <#=code.SpaceAfter(getterAccess)#>Get
+            Return <#=code.FieldName(edmProperty)#>
+        End Get
+        <#=code.SpaceAfter(setterAccess)#>Set(ByVal value As <#=code.Escape(edmProperty.TypeUsage)#>)
+<#
+            If entityHasNullableFKs Then
+#>
+            Try
+                _settingFK = True
+<#
+                PushIndent(CodeRegion.GetIndent(1))
+            End If
+
+            If isBinaryType AndAlso isForeignKey Then
+#>
+            If Not StructuralComparisons.StructuralEqualityComparer.Equals(<#=code.FieldName(edmProperty)#>, value) Then
+<#
+            Else
+#>
+            If Not Equals (<#=code.FieldName(edmProperty)#>, value) Then
+<#
+            End If
+
+            Dim ep As EdmProperty = edmProperty
+            For Each np As NavigationProperty In entity.NavigationProperties.Where(Function(p) p.GetDependentProperties().Contains(ep))
+                Dim principalProperty As EdmProperty = ef.GetCorrespondingPrincipalProperty(np, edmProperty)
+                If DirectCast(principalProperty.TypeUsage.EdmType, PrimitiveType).PrimitiveTypeKind = PrimitiveTypeKind.Binary Then
+#>
+                If <#=code.Escape(np)#> IsNot Nothing AndAlso Not StructuralComparisons.StructuralEqualityComparer.Equals(<#=code.Escape(np)#>.<#=code.Escape(principalProperty)#>, value) Then
+<#
+                Else
+#>
+                If <#=code.Escape(np)#> IsNot Nothing AndAlso Not Equals(<#=code.Escape(np)#>.<#=code.Escape(principalProperty)#>, value) Then
+<#
+                End If
+
+                If Not (np.GetDependentProperties().Where(Function(p) ef.IsNullable(p)).Any() AndAlso np.GetDependentProperties().Count() > 1) Then
+#>
+                    <#=code.Escape(np)#> = Nothing
+<#
+                Else
+#>
+                    Dim previousValue As <#=code.Escape(np.TypeUsage)#> = <#=code.FieldName(np)#>
+                    <#=code.FieldName(np)#> = Nothing
+                    Fixup<#=np.Name#>(previousValue, skipKeys:=True)
+<#
+
+                End If
+#>
+                End If
+<#
+            Next
+#>
+                <#=code.FieldName(edmProperty)#> = value
+            End If
+<#
+            If entityHasNullableFKs Then
+                PopIndent()
+#>
+            Finally
+                _settingFK = False
+            End Try
+<#
+            End If
+#>
+        End Set
+    End Property
+    Private <#=code.FieldName(edmProperty)#> As <#=code.Escape(edmProperty.TypeUsage)#><#=code.StringBefore(" = ", code.CreateLiteral(edmProperty.DefaultValue))#>
+<#
+        End If
+    Next
+    region.End()
+
+    region.Begin("Complex Properties")
+
+    For Each edmProperty As EdmProperty In entity.Properties.Where(Function(p) TypeOf p.TypeUsage.EdmType Is ComplexType AndAlso p.DeclaringType Is entity)
+#>
+
+    <#=PropertyAccessibilityAndVirtual(edmProperty)#> Property <#=code.Escape(edmProperty)#> As <#=code.Escape(edmProperty.TypeUsage)#>
+        <#=code.SpaceAfter(Accessibility.ForGetter(edmProperty))#>Get
+            Return <#=code.FieldName(edmProperty)#>
+        End Get
+        <#=code.SpaceAfter(Accessibility.ForSetter(edmProperty))#>Set(ByVal value As <#=code.Escape(edmProperty.TypeUsage)#>)
+            <#=code.FieldName(edmProperty)#> = value
+        End Set
+    End Property
+    Private <#=code.FieldName(edmProperty)#> As New <#=code.Escape(edmProperty.TypeUsage)#>
+<#
+    Next
+    region.End()
+    region.Begin("Navigation Properties")
+
+    For Each navProperty As NavigationProperty In entity.NavigationProperties.Where(Function(np) np.DeclaringType Is entity)
+        Dim inverse As NavigationProperty = ef.Inverse(navProperty)
+        Dim fromType As EntityType = navProperty.FromEndMember.GetEntityType()
+        Dim toType As EntityType = navProperty.ToEndMember.GetEntityType()
+
+        If inverse IsNot Nothing AndAlso Not IsReadWriteAccessibleProperty(inverse) Then
+            inverse = Nothing
+        End If
+        If navProperty.ToEndMember.RelationshipMultiplicity = RelationshipMultiplicity.Many Then
+ #>
+    <#=PropertyAccessibilityAndVirtual(navProperty)#> Property <#=code.Escape(navProperty)#> As ICollection(Of <#=code.Escape(toType)#>)
+        <#=code.SpaceAfter(Accessibility.ForGetter(navProperty))#>Get
+            If <#=code.FieldName(navProperty)#> Is Nothing Then
+<#
+            If inverse IsNot Nothing OrElse DirectCast(navProperty.RelationshipType, AssociationType).IsForeignKey Then
+#>
+                Dim newCollection As New FixupCollection(Of <#=code.Escape(toType)#>)
+                AddHandler newCollection.CollectionChanged, AddressOf Fixup<#=navProperty.Name #>
+                <#=code.FieldName(navProperty)#> = newCollection
+<#
+            Else
+#>
+                <#=code.FieldName(navProperty)#> = New FixupCollection(Of <#=code.Escape(toType)#>)()
+<#
+            End If
+#>
+            End If
+            Return <#=code.FieldName(navProperty)#>
+        End Get
+        <#=code.SpaceAfter(Accessibility.ForSetter(navProperty))#>Set(ByVal value As ICollection(Of <#=code.Escape(toType)#>))
+<#
+            If inverse IsNot Nothing OrElse DirectCast(navProperty.RelationshipType, AssociationType).IsForeignKey Then
+#>
+            If <#=code.FieldName(navProperty)#> IsNot value Then
+                Dim previousValue As FixupCollection(Of <#=code.Escape(toType)#>) = TryCast(<#=code.FieldName(navProperty)#>, FixupCollection(Of <#=code.Escape(toType)#>))
+                If previousValue IsNot Nothing Then
+                    RemoveHandler previousValue.CollectionChanged, AddressOf Fixup<#=navProperty.Name #>
+                End If
+                <#=code.FieldName(navProperty)#> = value
+                Dim newValue As FixupCollection(Of <#=code.Escape(toType)#>) = TryCast(value, FixupCollection(Of <#=code.Escape(toType)#>))
+                If newValue IsNot Nothing Then
+                    AddHandler newValue.CollectionChanged, AddressOf Fixup<#=navProperty.Name #>
+                End If
+            End If
+<#
+            Else
+#>
+            <#=code.FieldName(navProperty)#> = value
+<#
+            End If
+#>
+        End Set
+    End Property
+    Private <#=code.FieldName(navProperty)#> As ICollection(Of <#=code.Escape(toType)#>)
+<#
+        Else
+#>
+
+    <#=PropertyAccessibilityAndVirtual(navProperty)#> Property <#=code.Escape(navProperty)#> As <#=code.Escape(toType)#>
+<#
+            If inverse IsNot Nothing OrElse DirectCast(navProperty.RelationshipType, AssociationType).IsForeignKey Then
+#>
+        <#=code.SpaceAfter(Accessibility.ForGetter(navProperty))#>Get
+            Return <#=code.FieldName(navProperty)#>
+        End Get
+        <#=code.SpaceAfter(Accessibility.ForSetter(navProperty))#>Set(ByVal value As <#=code.Escape(toType)#>)
+            If <#=code.FieldName(navProperty)#> IsNot value Then
+                Dim previousValue As <#=code.Escape(toType)#> = <#=code.FieldName(navProperty)#>
+                <#=code.FieldName(navProperty)#> = value
+                Fixup<#=navProperty.Name #>(previousValue)
+            End If
+        End Set
+    End Property
+    Private <#=code.FieldName(navProperty)#> As <#=code.Escape(toType)#>
+<#
+            End If
+        End If
+    Next
+    region.End()
+
+    region.Begin("Association Fixup")
+
+    If entityHasNullableFKs Then
+#>
+    Private _settingFK As Boolean = False
+<#
+    End If
+
+    For Each navProperty As NavigationProperty In entity.NavigationProperties.Where(Function(np) np.DeclaringType Is entity)
+        Dim inverse As NavigationProperty = ef.Inverse(navProperty)
+        If inverse IsNot Nothing AndAlso Not IsReadWriteAccessibleProperty(inverse) Then
+            inverse = Nothing
+        End If
+
+        If (inverse IsNot Nothing OrElse DirectCast(navProperty.RelationshipType, AssociationType).IsForeignKey) AndAlso navProperty.ToEndMember.RelationshipMultiplicity <> RelationshipMultiplicity.Many Then
+            Dim skipKeysArgument As String = If(navProperty.GetDependentProperties().Where(Function(p) ef.IsNullable(p)).Any() AndAlso navProperty.GetDependentProperties().Count() > 1, ", Optional ByVal skipKeys As Boolean = False", String.Empty)
+#>
+
+    Private Sub Fixup<#=navProperty.Name #>(ByVal previousValue As <#=code.Escape(navProperty.ToEndMember.GetEntityType())#><#= skipKeysArgument #>)
+<#
+        If inverse IsNot Nothing Then
+            If inverse.ToEndMember.RelationshipMultiplicity = RelationshipMultiplicity.Many Then
+#>
+        If previousValue IsNot Nothing AndAlso previousValue.<#=code.Escape(inverse)#>.Contains(Me) Then
+            previousValue.<#=code.Escape(inverse)#>.Remove(Me)
+        End If
+<#
+            Else
+#>
+        If previousValue IsNot Nothing AndAlso previousValue.<#=code.Escape(inverse)#> Is Me Then
+            previousValue.<#=code.Escape(inverse)#> = Nothing
+        End If
+<#
+            End If
+
+            If inverse.ToEndMember.RelationshipMultiplicity = RelationshipMultiplicity.Many Then
+#>
+        If <#=code.Escape(navProperty)#> IsNot Nothing Then
+            If Not <#=code.Escape(navProperty)#>.<#=code.Escape(inverse)#>.Contains(Me) Then
+                <#=code.Escape(navProperty)#>.<#=code.Escape(inverse)#>.Add(Me)
+            End If
+<#
+                For Each dependentProperty As EdmProperty In navProperty.GetDependentProperties()
+                    Dim principalProperty As EdmProperty = ef.GetCorrespondingPrincipalProperty(navProperty, dependentProperty)
+                    If DirectCast(principalProperty.TypeUsage.EdmType, PrimitiveType).PrimitiveTypeKind = PrimitiveTypeKind.Binary Then
+#>
+            If Not StructuralComparisons.StructuralEqualityComparer.Equals(<#=code.Escape(dependentProperty)#>, <#=code.Escape(navProperty)#>.<#=code.Escape(principalProperty)#>) Then
+<#
+                    Else
+#>
+            If Not Equals(<#=code.Escape(dependentProperty)#>, <#=code.Escape(navProperty)#>.<#=code.Escape(principalProperty)#>) Then
+<#
+                    End If
+#>
+                <#=code.Escape(dependentProperty)#> = <#=code.Escape(navProperty)#>.<#=code.Escape(principalProperty)#>
+            End If
+<#
+                Next
+                If navProperty.GetDependentProperties().Where(Function(p) ef.IsNullable(p)).Any() Then
+                    If navProperty.GetDependentProperties().Count() > 1 Then
+#>
+        ElseIf Not skipKeys AndAlso Not _settingFK Then
+<#
+                    Else
+#>
+        ElseIf Not _settingFK Then
+<#
+                    End If
+                    For Each dependentProperty As EdmProperty In navProperty.GetDependentProperties().Where(Function(p) ef.IsNullable(p))
+#>
+            <#=code.Escape(dependentProperty)#> = Nothing
+<#
+                    Next
+                End If
+#>
+        End If
+<#
+            Else
+#>
+        If <#=code.Escape(navProperty)#> IsNot Nothing Then
+            <#=code.Escape(navProperty)#>.<#=code.Escape(inverse)#> = Me
+<#
+                For Each dependentProperty As EdmProperty In navProperty.GetDependentProperties()
+                    Dim principalProperty As EdmProperty = ef.GetCorrespondingPrincipalProperty(navProperty, dependentProperty)
+                    If DirectCast(principalProperty.TypeUsage.EdmType, PrimitiveType).PrimitiveTypeKind = PrimitiveTypeKind.Binary Then
+#>
+            If Not StructuralComparisons.StructuralEqualityComparer.Equals(<#=code.Escape(dependentProperty)#>, <#=code.Escape(navProperty)#>.<#=code.Escape(principalProperty)#>) Then
+<#
+                    Else
+#>
+            If Not Equals(<#=code.Escape(dependentProperty)#>, <#=code.Escape(navProperty)#>.<#=code.Escape(principalProperty)#>) Then
+<#
+                    End If
+#>
+                <#=code.Escape(dependentProperty)#> = <#=code.Escape(navProperty)#>.<#=code.Escape(principalProperty)#>
+            End If
+<#
+                Next
+#>
+        End If
+<#
+            End If
+        Else
+            If navProperty.GetDependentProperties().Any() Then
+#>
+        If <#=code.Escape(navProperty)#> IsNot Nothing Then
+<#
+                For Each dependentProperty As EdmProperty In navProperty.GetDependentProperties()
+                    Dim principalProperty As EdmProperty = ef.GetCorrespondingPrincipalProperty(navProperty, dependentProperty)
+                    If DirectCast(principalProperty.TypeUsage.EdmType, PrimitiveType).PrimitiveTypeKind = PrimitiveTypeKind.Binary Then
+#>
+            If Not StructuralComparisons.StructuralEqualityComparer.Equals(<#=code.Escape(dependentProperty)#>, <#=code.Escape(navProperty)#>.<#=code.Escape(principalProperty)#>) Then
+<#
+                    Else
+#>
+            If Not Equals(<#=code.Escape(dependentProperty)#>, <#=code.Escape(navProperty)#>.<#=code.Escape(principalProperty)#>) Then
+<#
+                    End If
+#>
+                <#=code.Escape(dependentProperty)#> = <#=code.Escape(navProperty)#>.<#=code.Escape(principalProperty)#>
+            End If
+<#
+                Next
+
+                If navProperty.GetDependentProperties().Where(Function(p) ef.IsNullable(p)).Any() Then
+                    If navProperty.GetDependentProperties().Count() > 1 Then
+#>
+        ElseIf Not skipKeys AndAlso Not _settingFK Then
+<#
+                    Else
+#>
+        ElseIf Not _settingFK Then
+<#
+                    End If
+                    For Each dependentProperty As EdmProperty In navProperty.GetDependentProperties().Where(Function(p) ef.IsNullable(p))
+#>
+            <#=code.Escape(dependentProperty)#> = Nothing
+<#
+                    Next
+                End If
+#>
+        End If
+<#
+            ElseIf DirectCast(navProperty.RelationshipType, AssociationType).IsForeignKey Then
+#>
+        If <#=code.Escape(navProperty)#> IsNot Nothing Then
+<#
+                For Each fromProperty As EdmProperty In ef.GetPrincipalProperties(navProperty)
+#>
+            <#=code.Escape(navProperty)#>.<#=code.Escape(ef.GetCorrespondingDependentProperty(navProperty, fromProperty))#> = <#=code.Escape(fromProperty)#>
+<#
+                Next
+#>
+        End If
+<#
+            End If
+        End If
+#>
+    End Sub
+<#
+        End If
+    Next
+    For Each navProperty As NavigationProperty In entity.NavigationProperties.Where(Function(np) np.DeclaringType Is entity)
+        Dim inverse As NavigationProperty = ef.Inverse(navProperty)
+        If inverse IsNot Nothing AndAlso Not IsReadWriteAccessibleProperty(inverse) Then
+            inverse = Nothing
+        End If
+
+        If (inverse IsNot Nothing OrElse DirectCast(navProperty.RelationshipType, AssociationType).IsForeignKey) AndAlso navProperty.ToEndMember.RelationshipMultiplicity = RelationshipMultiplicity.Many Then
+#>
+    Private Sub Fixup<#=navProperty.Name #>(ByVal sender As Object, ByVal e As NotifyCollectionChangedEventArgs)
+        If e.NewItems IsNot Nothing Then
+            For Each item As <#=code.Escape(navProperty.ToEndMember.GetEntityType())#> In e.NewItems
+<#
+            If inverse IsNot Nothing Then
+                If inverse.ToEndMember.RelationshipMultiplicity <> RelationshipMultiplicity.Many Then
+#>
+                item.<#=code.Escape(inverse)#> = Me
+<#
+                Else
+#>
+                If Not item.<#=code.Escape(inverse)#>.Contains(Me) Then
+                    item.<#=code.Escape(inverse)#>.Add(Me)
+                End If
+<#
+                End If
+            ElseIf DirectCast(navProperty.RelationshipType, AssociationType).IsForeignKey Then
+                For Each fromProperty As EdmProperty In ef.GetPrincipalProperties(navProperty)
+#>
+                item.<#=code.Escape(ef.GetCorrespondingDependentProperty(navProperty, fromProperty))#> = <#=code.Escape(fromProperty)#>
+<#
+                Next
+            End If
+#>
+            Next
+        End If
+        If e.OldItems IsNot Nothing Then
+            For Each item As <#=code.Escape(navProperty.ToEndMember.GetEntityType())#> In e.OldItems
+<#
+                If inverse IsNot Nothing Then
+                    If inverse.ToEndMember.RelationshipMultiplicity <> RelationshipMultiplicity.Many Then
+#>
+                If item.<#=code.Escape(inverse)#> Is Me Then
+                    item.<#=code.Escape(inverse)#> = Nothing
+                End If
+<#
+                    Else
+#>
+                If item.<#=code.Escape(inverse)#>.Contains(Me) Then
+                    item.<#=code.Escape(inverse)#>.Remove(Me)
+                End If
+<#
+                    End If
+                ElseIf DirectCast(navProperty.RelationshipType, AssociationType).IsForeignKey Then
+                    For Each fromProperty As EdmProperty In ef.GetPrincipalProperties(navProperty)
+                        Dim p As EdmProperty = ef.GetCorrespondingDependentProperty(navProperty, fromProperty)
+                        If ef.IsNullable(p.TypeUsage) Then
+#>
+                item.<#=code.Escape(p)#> = Nothing
+<#
+                        End If
+                    Next
+                End If
+#>
+            Next
+        End If
+    End Sub
+<#
+        End If
+    Next
+    region.End()
+#>
+End Class
+<#
+    EndNamespace(namespaceName)
+Next
+
+' Emit Complex Types
+For Each loopComplex As ComplexType In ItemCollection.GetItems(Of ComplexType)().OrderBy(Function(e) e.Name)
+    Dim complex as ComplexType = loopComplex
+    fileManager.StartNewFile(complex.Name & ".vb")
+    BeginNamespace(namespaceName, code)
+
+#>
+Partial <#=Accessibility.ForType(complex)#> Class <#=code.Escape(complex)#>
+<#
+    region.Begin("Primitive Properties")
+    For Each edmProperty As EdmProperty In complex.Properties.Where(Function(p) TypeOf p.TypeUsage.EdmType Is PrimitiveType AndAlso p.DeclaringType Is complex)
+        Dim getterAccess As String = Accessibility.ForGetter(edmProperty)
+        Dim setterAccess As String = Accessibility.ForSetter(edmProperty)
+
+        If String.IsNullOrEmpty(getterAccess) AndAlso String.IsNullOrEmpty(setterAccess) Then
+#>
+
+    <#=Accessibility.ForProperty(edmProperty)#> Property <#=code.Escape(edmProperty)#> As <#=code.Escape(edmProperty.TypeUsage)#><#=code.StringBefore(" = ", code.CreateLiteral(edmProperty.DefaultValue))#>
+<#
+        Else
+#>
+
+    <#=Accessibility.ForProperty(edmProperty)#> Property <#=code.Escape(edmProperty)#> As <#=code.Escape(edmProperty.TypeUsage)#>
+        <#=code.SpaceAfter(getterAccess)#>Get
+            Return <#=code.FieldName(edmProperty)#>
+        End Get
+        <#=code.SpaceAfter(setterAccess)#>Set(ByVal value As <#=code.Escape(edmProperty.TypeUsage)#>)
+            <#=code.FieldName(edmProperty)#> = value
+        End Set
+    End Property
+    Private <#=code.FieldName(edmProperty)#> As <#=code.Escape(edmProperty.TypeUsage)#><#=code.StringBefore(" = ", code.CreateLiteral(edmProperty.DefaultValue))#>
+<#
+        End If
+    Next
+    region.End()
+#>
+
+<#
+    region.Begin("Complex Properties")
+    For Each edmProperty As EdmProperty In complex.Properties.Where(Function(p) TypeOf p.TypeUsage.EdmType Is ComplexType AndAlso p.DeclaringType Is complex)
+#>
+
+    <#=Accessibility.ForProperty(edmProperty)#> Property <#=code.Escape(edmProperty)#> As <#=code.Escape(edmProperty.TypeUsage)#>
+        <#=code.SpaceAfter(Accessibility.ForGetter(edmProperty))#>Get
+            Return <#=code.FieldName(edmProperty)#>
+        End Get
+        <#=code.SpaceAfter(Accessibility.ForSetter(edmProperty))#>Set(ByVal value As <#=code.Escape(edmProperty.TypeUsage)#>)
+            <#=code.FieldName(edmProperty)#> = Value
+        End Set
+    End Property
+    Private <#=code.FieldName(edmProperty)#> As New <#=code.Escape(edmProperty.TypeUsage)#>
+<#
+    Next
+    region.End()
+#>
+End Class
+<#
+    EndNamespace(namespaceName)
+Next
+
+If Not VerifyTypesAreCaseInsensitiveUnique(ItemCollection) Then
+    Return ""
+End If
+
+fileManager.Process()
+#>
+<#+
+
+Private Sub WriteHeader(ByVal fileManager As EntityFrameworkTemplateFileManager, ByVal ParamArray extraUsings As String())
+    fileManager.StartHeader()
+#>
+'------------------------------------------------------------------------------
+' <auto-generated>
+'     This code was generated from a template.
+'
+'     Changes to this file may cause incorrect behavior and will be lost if
+'     the code is regenerated.
+' </auto-generated>
+'------------------------------------------------------------------------------
+Imports System
+Imports System.Collections
+Imports System.Collections.Generic
+Imports System.Collections.ObjectModel
+Imports System.Collections.Specialized
+<#=String.Join(string.Empty, extraUsings.Select(Function(u) "Imports " + u + Environment.NewLine).ToArray())#>
+<#+
+    FileManager.EndBlock()
+End Sub
+
+Private Sub BeginNamespace(ByVal namespaceName As String, ByVal code As CodeGenerationTools)
+    Dim region As CodeRegion = New CodeRegion(Me)
+    If Not String.IsNullOrEmpty(namespaceName) Then
+#>
+Namespace <#=code.EscapeNamespace(namespaceName)#>
+<#+
+        PushIndent(CodeRegion.GetIndent(1))
+    End If
+End Sub
+
+Private Sub EndNamespace(namespaceName As String)
+    If Not String.IsNullOrEmpty(namespaceName) Then
+        PopIndent()
+#>
+End Namespace
+<#+
+    End If
+End Sub
+
+Private Function PropertyAccessibilityAndVirtual(ByVal member As EdmMember) As String
+    Dim propertyAccess As String = Accessibility.ForProperty(member)
+    Dim setAccess as String = Accessibility.ForSetter(member)
+    Dim getAccess as String = Accessibility.ForGetter(member)
+    If propertyAccess <> "Private" AndAlso setAccess <> "Private" AndAlso getAccess <> "Private" Then
+        Return propertyAccess & " Overridable"
+    End If
+
+    Return propertyAccess
+End Function
+
+Private Function ReadOnlyPropertyAccessibilityAndVirtual(ByVal member As EdmMember) As String
+    Dim access As String = Accessibility.ForReadOnlyProperty(member)
+    If access <> "Private" Then
+        Return access & " Overridable"
+    End If
+
+    Return access
+End Function
+
+Private Function IsReadWriteAccessibleProperty(ByVal member As EdmMember) As Boolean
+    Dim setter As String = Accessibility.ForWriteOnlyProperty(member)
+    Dim getter As String = Accessibility.ForReadOnlyProperty(member)
+
+    Return getter <> "Private" AndAlso getter <> "Protected" AndAlso setter <> "Private" AndAlso setter <> "Protected"
+End Function
+
+Private Function VerifyTypesAreCaseInsensitiveUnique(ByVal itemCollection As EdmItemCollection) As Boolean
+    Dim alreadySeen As New Dictionary(Of String, Boolean)(StringComparer.OrdinalIgnoreCase)
+
+    For Each type As StructuralType In itemCollection.GetItems(Of StructuralType)()
+        If Not (TypeOf type Is EntityType OrElse TypeOf type Is ComplexType) Then
+            Continue For
+        End If
+
+        If alreadySeen.ContainsKey(type.FullName) Then
+            [Error](String.Format("This template does not support types that differ only by case, the types {0} are not supported", type.FullName))
+            Return False
+        Else
+            alreadySeen.Add(type.FullName, True)
+        End If
+    Next
+
+    Return True
+End Function
+
+Private Sub WriteCustomObservableCollection()
+#>
+' An System.Collections.ObjectModel.ObservableCollection that raises
+' individual item removal notifications on clear and prevents adding duplicates.
+Public Class FixupCollection(Of T)
+    Inherits ObservableCollection(Of T)
+    Protected Overrides Sub ClearItems()
+        Dim items As New List(Of T)(Me)
+        items.ForEach(Sub(t) Remove(t))
+    End Sub
+
+    Protected Overloads Overrides Sub InsertItem(ByVal index As Integer, ByVal item As T)
+        If Not Me.Contains(item) Then
+            MyBase.InsertItem(index, item)
+        End If
+    End Sub
+End Class
+<#+
+End Sub
+#>

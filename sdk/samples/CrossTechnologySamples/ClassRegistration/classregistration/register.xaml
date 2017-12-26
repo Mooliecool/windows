@@ -1,0 +1,71 @@
+﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="clr-namespace:Microsoft.Samples.ClassRegistration" 
+        x:Class="Microsoft.Samples.ClassRegistration.Register"
+        Title="ClassRegistration"
+        SizeToContent="WidthAndHeight"
+        Loaded="PageLoad">
+
+  <Window.Resources>
+    <!-- Date Converter-->
+    <c:DateConverter x:Key="myDateConverter" />
+
+    <!-- Data Templates -->
+    <DataTemplate x:Key="ClassItemTemplate">
+      <DockPanel>
+        <TextBlock Text="{Binding Path=CoursePrefix}" />
+        <TextBlock Text=" " />
+        <TextBlock Text="{Binding Path=CourseNumber}" />
+        <TextBlock Text=": " />
+        <TextBlock Text="{Binding Path=Title}" />
+      </DockPanel>
+    </DataTemplate>
+    <DataTemplate x:Key="SessionItemTemplate">
+      <DockPanel>
+        <TextBlock Text="{Binding Path=SessionId}" />
+        <TextBlock Text=" Starts: " />
+        <TextBlock Text="{Binding Path=StartDate, Converter={StaticResource myDateConverter}}" />
+        <TextBlock Text=" " />
+        <TextBlock Text="{Binding Path=Length}" />
+        <TextBlock Text="min (" />
+        <TextBlock Text="{Binding Path=SeatCount}" />
+        <TextBlock Text=" seats available)" />
+      </DockPanel>
+    </DataTemplate>
+  </Window.Resources>
+  
+  <StackPanel Orientation="Vertical" Margin="10,10,10,10">
+    <!-- Window Heading -->
+    <DockPanel Background="#CCCCCC">
+      <Label Background="#00FFFFFF" HorizontalContentAlignment="Center">Class Registration</Label>
+    </DockPanel>
+
+    <!-- Class List-->
+    <Label>Select a class:</Label>
+    <ComboBox Name="ClassList"
+              ItemsSource="{Binding Path=Class}"
+              ItemTemplate="{StaticResource ClassItemTemplate}"
+              Width="400"
+              SelectionChanged="OnClassChanged">
+    </ComboBox>
+
+    <!-- Session List -->
+    <Label>Select a session:</Label>
+    <ListBox Name="SessionList"
+             ItemsSource="{Binding Path=ClassSession}"
+             ItemTemplate="{StaticResource SessionItemTemplate}"
+             Height="80"                     
+             Width="400"
+             SelectionChanged="OnSessionChanged">
+    </ListBox>
+
+    <Button Name="AddSession" Width="200" Margin="10,10,10,10" Click="OnSessionAdded">Sign up for Session</Button>
+
+    <!-- Pending Registration List -->
+    <Label>Classes Pending Registration</Label>
+    <ListBox Name="PendingRegistrations" Height="80" />
+
+    <!-- Submit Registration -->
+    <Button Name="SubmitRegistration" Margin="10,10,10,10" Click="OnSubmitRegistration">Register</Button>
+  </StackPanel>
+</Window>

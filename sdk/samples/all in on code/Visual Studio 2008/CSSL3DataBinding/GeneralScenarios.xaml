@@ -1,0 +1,80 @@
+﻿<UserControl xmlns:dataFormToolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Data.DataForm.Toolkit"  xmlns:dataInput="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Data.Input"  xmlns:data="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Data"  x:Class="CSSL3DataBinding.GeneralScenarios"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+             xmlns:local="clr-namespace:CSSL3DataBinding"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <local:MyConverter x:Key="myconverter"></local:MyConverter>
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
+            <RowDefinition Height="1*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <StackPanel BindingValidationError="BindingModeStackPanel_BindingValidationError" Background="Gray" Grid.Row="0" x:Name="BindingModeStackPanel">
+           <dataInput:ValidationSummary></dataInput:ValidationSummary> 
+            <TextBlock HorizontalAlignment="Left" Margin="0" FontSize="21.333" Text="Binding Mode" TextWrapping="Wrap"/>
+            <TextBlock HorizontalAlignment="Left" Margin="0" FontSize="11" Text="Name must be between 1 and 30 characters long. You can verfiy that by removing the Text in the following TextBox and click the right button." TextWrapping="Wrap"/>
+            
+            <StackPanel Orientation="Horizontal">
+                <TextBlock HorizontalAlignment="Left" Margin="0" FontSize="11" Text="One Time DataBinding:" TextWrapping="Wrap" FontWeight="Bold"/>
+                <TextBlock HorizontalAlignment="Left" Margin="20,0" FontSize="11" TextWrapping="Wrap" Text="{Binding Name, Mode=OneTime}"/>
+                <TextBlock HorizontalAlignment="Left" Margin="0" FontSize="11" Text="One Way DataBinding:" TextWrapping="Wrap" FontWeight="Bold"/>
+                <TextBlock HorizontalAlignment="Left" Margin="20,0" FontSize="11" TextWrapping="Wrap" Text="{Binding Name, Mode=OneWay}"/>
+                <TextBlock HorizontalAlignment="Left" Margin="0" FontSize="11" Text="Two Way DataBinding:" TextWrapping="Wrap" FontWeight="Bold"/>
+                <TextBox HorizontalAlignment="Left" Margin="20,0,0,0" FontSize="11" TextWrapping="Wrap" Text="{Binding Name, Mode=TwoWay,ValidatesOnExceptions=true, NotifyOnValidationError=true}"/>
+                <Button Margin="20,0,0,0" Content="Edit left TextBox and click Me" Width="180" Height="20" Click="Button_Click"></Button>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Background="AliceBlue" Grid.Row="1" x:Name="IValueConverterStackPanel">
+            <TextBlock HorizontalAlignment="Left" Margin="0" FontSize="21.333" Text="IValueConverter" TextWrapping="Wrap"/>
+            <data:DataGrid AutoGenerateColumns="False" x:Name="ConverterScenarioDataGrid">
+                <data:DataGrid.Columns>
+                    <data:DataGridTemplateColumn Header="ID" Width="80">
+                        <data:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Background="{Binding ID,Converter={StaticResource myconverter}}">
+<!--You can also specify ConverterParameter, for example if the DataContext has a property of DateTime type,
+you can create a date converter and pass date format as the parameter:
+
+<TextBlock Text="{Binding Birthday,Converter={StaticResource dateconverter},ConverterParameter='dd-MMM-yyyy'}" ></TextBlock>
+                                    
+public object Convert(object value,Type targetType,object parameter,System.Globalization.CultureInfo culture)
+        {
+            DateTime date = (DateTime)value;
+            return date.ToString(parameter.ToString());
+        }
+-->
+                                    <TextBlock Text="{Binding ID}"></TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </data:DataGridTemplateColumn.CellTemplate>
+                    </data:DataGridTemplateColumn>
+                    <data:DataGridTemplateColumn Header="Name" Width="80">
+                        <data:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Name}"></TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </data:DataGridTemplateColumn.CellTemplate>
+                    </data:DataGridTemplateColumn>
+                </data:DataGrid.Columns>
+            </data:DataGrid>
+            <TextBlock HorizontalAlignment="Left" Margin="0" FontSize="21.333" Text="ObservableCollection" TextWrapping="Wrap"/>
+            <TextBlock HorizontalAlignment="Left" Margin="0" FontSize="11" Text="ID cannot be set to 11. Try it to verify. It's achieved by CustomValidation. See MyValidation class for more details." TextWrapping="Wrap" FontWeight="Bold"/>
+            <StackPanel x:Name="InsertStackPanel" Orientation="Horizontal">
+                <TextBlock HorizontalAlignment="Left" Margin="0" FontSize="11" Text="ID:" TextWrapping="Wrap" FontWeight="Bold"/>
+                <TextBox Margin="20,0" x:Name="InsertIDTextBox" Text="{Binding ID,Mode=TwoWay,ValidatesOnExceptions=true, NotifyOnValidationError=true}"></TextBox>
+                <TextBlock HorizontalAlignment="Left" Margin="20,0" FontSize="11" Text="Name:" TextWrapping="Wrap" FontWeight="Bold"/>
+                <TextBox Margin="20,0" x:Name="InsertNameTextBox" Text="{Binding Name,Mode=TwoWay,ValidatesOnExceptions=true, NotifyOnValidationError=true}"></TextBox>
+                <Button Width="100" Height="20" Click="Button_Click_1"  Content="Add Customer"></Button>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Background="Beige">
+            <TextBlock HorizontalAlignment="Left" Margin="0" FontSize="21.333" Text="Element Binding" TextWrapping="Wrap"/>
+            <TextBlock HorizontalAlignment="Left" Margin="0" FontSize="11" Text="Please click one row of above DataGrid" TextWrapping="Wrap" FontWeight="Bold"/>
+            <TextBlock Text="{Binding SelectedItem.Name, ElementName=ConverterScenarioDataGrid}"></TextBlock>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TraceLibrary</name>
+    </assembly>
+    <members>
+        <member name="T:AttributeSample.TraceLibrary.TraceAttribute">
+            <summary>
+            This class defines the custom attribute in this sample.
+            </summary>
+        </member>
+        <member name="M:AttributeSample.TraceLibrary.TraceAttribute.#ctor">
+            <summary>
+            Create a new instance of this attribute. Classes that inherit from ContextBoundObject
+            and apply this attribute will make this call automatically.
+            </summary>
+        </member>
+        <member name="M:AttributeSample.TraceLibrary.TraceAttribute.GetPropertiesForNewContext(System.Runtime.Remoting.Activation.IConstructionCallMessage)">
+            <summary>
+            Add a context property to the context bound object.  This context property
+            defines an "aspect" in AOP that can modify the behavior of the object or
+            provide additional services to the object.
+            </summary>
+            <param name="ctorMsg">The construction call to the object this attribute is
+            applied to</param>
+        </member>
+        <member name="T:AttributeSample.TraceLibrary.TraceOutput">
+            <summary>
+            The TraceOutput class defines the core behavior implied by the TraceAttribute.
+            For each call to an object that the TraceAttribute is applied to, this class
+            will intercept method calls to and from that object, and will write out
+            trace information appropriate to the level setting currently in effect.
+            </summary>
+        </member>
+        <member name="M:AttributeSample.TraceLibrary.TraceOutput.SyncProcessMessage(System.Runtime.Remoting.Messaging.IMessage)">
+            <summary>
+            This method intercepts method calls to the target object and adds on
+            the trace output behavior desired.
+            </summary>
+            <param name="msg"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AttributeSample.TraceLibrary.TraceOutput.AsyncProcessMessage(System.Runtime.Remoting.Messaging.IMessage,System.Runtime.Remoting.Messaging.IMessageSink)">
+            <summary>
+            Trace logging for asynchronous calls is not supported in this sample.
+            </summary>
+            <param name="msg"></param>
+            <param name="replySink"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AttributeSample.TraceLibrary.TraceOutput.TraceMethodCall(System.Runtime.Remoting.Messaging.IMessage)">
+            <summary>
+            Provide trace output for the incoming method call.
+            </summary>
+            <param name="msg">The message representing the incoming method call.</param>
+        </member>
+        <member name="M:AttributeSample.TraceLibrary.TraceOutput.Write(System.Diagnostics.TraceLevel,System.Object)">
+            <summary>
+            This functionality is used by the ContextBoundObject to which this
+            behavior is attached.
+            </summary>
+            <param name="minimumTraceLevel">The minimum trace level for which
+            the output is intended</param>
+            <param name="value">The value to write to the trace output</param>
+        </member>
+        <member name="M:AttributeSample.TraceLibrary.TraceOutput.WriteLine(System.Diagnostics.TraceLevel,System.Object)">
+            <summary>
+            This functionality is used by the ContextBoundObject to which this
+            behavior is attached.
+            </summary>
+            <param name="minimumTraceLevel">The minimum trace level for which
+            the output is intended</param>
+            <param name="value">The value to write to the trace output</param>
+        </member>
+        <member name="M:AttributeSample.TraceLibrary.TraceOutput.Write(System.Diagnostics.TraceLevel,System.String)">
+            <summary>
+            This functionality is used by the ContextBoundObject to which this
+            behavior is attached.
+            </summary>
+            <param name="minimumTraceLevel">The minimum trace level for which
+            the output is intended</param>
+            <param name="message">The message to write to the trace output</param>
+        </member>
+        <member name="M:AttributeSample.TraceLibrary.TraceOutput.WriteLine(System.Diagnostics.TraceLevel,System.String)">
+            <summary>
+            This functionality is used by the ContextBoundObject to which this
+            behavior is attached.
+            </summary>
+            <param name="minimumTraceLevel">The minimum trace level for which
+            the output is intended</param>
+            <param name="message">The nessage to write to the trace output</param>
+        </member>
+        <member name="M:AttributeSample.TraceLibrary.TraceOutput.TraceMethodReturn(System.Runtime.Remoting.Messaging.IMessage,System.Runtime.Remoting.Messaging.IMessage)">
+            <summary>
+            Provide trace output for the method return.  It is at this point that
+            exceptions and return values will be logged (if available), and the
+            elapsed time for the method to execute is calculated.
+            </summary>
+            <param name="msg">The incoming method call</param>
+            <param name="returnMsg">The method return</param>
+        </member>
+        <member name="P:AttributeSample.TraceLibrary.TraceOutput.NextSink">
+            <summary>
+            This property is used by the remoting framework to obtain the next
+            bit of behavior that is attached to the ContextBoundObject.
+            </summary>
+        </member>
+        <member name="P:AttributeSample.TraceLibrary.TraceOutput.ContextName">
+            <summary>
+            The ContextName is used by the objects to which this behavior is attached
+            to obtain a reference to the behavior.  This allows the object to participate
+            in the behaviors that surround it.
+            </summary>
+        </member>
+        <member name="T:AttributeSample.TraceLibrary.TraceOutputProperty">
+            <summary>
+            The TraceOutputProperty describes a specific behavior that can be applied
+            to a ContextBoundObject.  In this sample, it is the "glue" between the
+            custom TraceAttribute and the functionality of TraceOutput.
+            </summary>
+        </member>
+        <member name="M:AttributeSample.TraceLibrary.TraceOutputProperty.#ctor(System.Diagnostics.TraceLevel)">
+            <summary>
+            Creates an instance of the TraceOutputProperty with the specified TraceLevel.
+            </summary>
+            <param name="traceLevel">The level of tracing desired</param>
+        </member>
+        <member name="M:AttributeSample.TraceLibrary.TraceOutputProperty.GetObjectSink(System.MarshalByRefObject,System.Runtime.Remoting.Messaging.IMessageSink)">
+            <summary>
+            Returns an instance of TraceOutput
+            </summary>
+            <param name="obj"></param>
+            <param name="nextSink">The next sink in the chain of "interested" code</param>
+            <returns></returns>
+        </member>
+        <member name="M:AttributeSample.TraceLibrary.TraceOutputProperty.IsNewContextOK(System.Runtime.Remoting.Contexts.Context)">
+            <summary>
+            Provided as an implementation of the IContextProperty interface
+            </summary>
+            <param name="newCtx"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AttributeSample.TraceLibrary.TraceOutputProperty.Freeze(System.Runtime.Remoting.Contexts.Context)">
+            <summary>
+            Provided as an implementation of the IContextProperty interface
+            </summary>
+            <param name="newCtx"></param>
+        </member>
+        <member name="P:AttributeSample.TraceLibrary.TraceOutputProperty.Name">
+            <summary>
+            Provided as an implementation of the IContextProperty interface
+            </summary>
+        </member>
+    </members>
+</doc>

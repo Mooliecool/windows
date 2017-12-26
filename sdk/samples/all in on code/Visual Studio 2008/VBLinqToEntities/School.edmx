@@ -1,0 +1,295 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="SchoolBModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2005" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2006/04/edm/ssdl">
+        <EntityContainer Name="SchoolBModelStoreContainer">
+          <EntitySet Name="Course" EntityType="SchoolBModel.Store.Course" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="CourseGrade" EntityType="SchoolBModel.Store.CourseGrade" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="CourseInstructor" EntityType="SchoolBModel.Store.CourseInstructor" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Person" EntityType="SchoolBModel.Store.Person" store:Type="Tables" Schema="dbo" />
+          <AssociationSet Name="FK_CourseGrade_Course" Association="SchoolBModel.Store.FK_CourseGrade_Course">
+            <End Role="Course" EntitySet="Course" />
+            <End Role="CourseGrade" EntitySet="CourseGrade" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CourseGrade_Student" Association="SchoolBModel.Store.FK_CourseGrade_Student">
+            <End Role="Person" EntitySet="Person" />
+            <End Role="CourseGrade" EntitySet="CourseGrade" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CourseInstructor_Course" Association="SchoolBModel.Store.FK_CourseInstructor_Course">
+            <End Role="Course" EntitySet="Course" />
+            <End Role="CourseInstructor" EntitySet="CourseInstructor" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CourseInstructor_Person" Association="SchoolBModel.Store.FK_CourseInstructor_Person">
+            <End Role="Person" EntitySet="Person" />
+            <End Role="CourseInstructor" EntitySet="CourseInstructor" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Course">
+          <Key>
+            <PropertyRef Name="CourseID" />
+          </Key>
+          <Property Name="CourseID" Type="int" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Credits" Type="int" Nullable="false" />
+          <Property Name="DepartmentID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="CourseGrade">
+          <Key>
+            <PropertyRef Name="EnrollmentID" />
+          </Key>
+          <Property Name="EnrollmentID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="CourseID" Type="int" Nullable="false" />
+          <Property Name="StudentID" Type="int" Nullable="false" />
+          <Property Name="Grade" Type="decimal" Precision="3" Scale="2" />
+        </EntityType>
+        <EntityType Name="CourseInstructor">
+          <Key>
+            <PropertyRef Name="CourseID" />
+            <PropertyRef Name="PersonID" />
+          </Key>
+          <Property Name="CourseID" Type="int" Nullable="false" />
+          <Property Name="PersonID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Person">
+          <Key>
+            <PropertyRef Name="PersonID" />
+          </Key>
+          <Property Name="PersonID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="LastName" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="FirstName" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="HireDate" Type="datetime" />
+          <Property Name="EnrollmentDate" Type="datetime" />
+          <Property Name="Picture" Type="image" />
+          <Property Name="PersonCategory" Type="smallint" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_CourseGrade_Course">
+          <End Role="Course" Type="SchoolBModel.Store.Course" Multiplicity="1" />
+          <End Role="CourseGrade" Type="SchoolBModel.Store.CourseGrade" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Course">
+              <PropertyRef Name="CourseID" />
+            </Principal>
+            <Dependent Role="CourseGrade">
+              <PropertyRef Name="CourseID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CourseGrade_Student">
+          <End Role="Person" Type="SchoolBModel.Store.Person" Multiplicity="1" />
+          <End Role="CourseGrade" Type="SchoolBModel.Store.CourseGrade" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Person">
+              <PropertyRef Name="PersonID" />
+            </Principal>
+            <Dependent Role="CourseGrade">
+              <PropertyRef Name="StudentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CourseInstructor_Course">
+          <End Role="Course" Type="SchoolBModel.Store.Course" Multiplicity="1" />
+          <End Role="CourseInstructor" Type="SchoolBModel.Store.CourseInstructor" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Course">
+              <PropertyRef Name="CourseID" />
+            </Principal>
+            <Dependent Role="CourseInstructor">
+              <PropertyRef Name="CourseID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CourseInstructor_Person">
+          <End Role="Person" Type="SchoolBModel.Store.Person" Multiplicity="1" />
+          <End Role="CourseInstructor" Type="SchoolBModel.Store.CourseInstructor" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Person">
+              <PropertyRef Name="PersonID" />
+            </Principal>
+            <Dependent Role="CourseInstructor">
+              <PropertyRef Name="PersonID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="SchoolBModel" Alias="Self" xmlns="http://schemas.microsoft.com/ado/2006/04/edm">
+        <EntityContainer Name="SchoolEntities">
+          <EntitySet Name="Course" EntityType="SchoolBModel.Course" />
+          <EntitySet Name="CourseGrade" EntityType="SchoolBModel.CourseGrade" />
+          <EntitySet Name="Person" EntityType="SchoolBModel.Person" />
+          <AssociationSet Name="FK_CourseGrade_Course" Association="SchoolBModel.FK_CourseGrade_Course">
+            <End Role="Course" EntitySet="Course" />
+            <End Role="CourseGrade" EntitySet="CourseGrade" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CourseGrade_Student" Association="SchoolBModel.FK_CourseGrade_Student">
+            <End Role="Person" EntitySet="Person" />
+            <End Role="CourseGrade" EntitySet="CourseGrade" />
+          </AssociationSet>
+          <AssociationSet Name="CourseInstructor" Association="SchoolBModel.CourseInstructor">
+            <End Role="Course" EntitySet="Course" />
+            <End Role="Person" EntitySet="Person" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Course">
+          <Key>
+            <PropertyRef Name="CourseID" />
+          </Key>
+          <Property Name="CourseID" Type="Int32" Nullable="false" />
+          <Property Name="Title" Type="String" Nullable="false" MaxLength="100" Unicode="true" FixedLength="false" />
+          <Property Name="Credits" Type="Int32" Nullable="false" />
+          <Property Name="DepartmentID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="CourseGrade" Relationship="SchoolBModel.FK_CourseGrade_Course" FromRole="Course" ToRole="CourseGrade" />
+          <NavigationProperty Name="Person" Relationship="SchoolBModel.CourseInstructor" FromRole="Course" ToRole="Person" />
+        </EntityType>
+        <EntityType Name="CourseGrade">
+          <Key>
+            <PropertyRef Name="EnrollmentID" />
+          </Key>
+          <Property Name="EnrollmentID" Type="Int32" Nullable="false" />
+          <Property Name="Grade" Type="Decimal" Precision="3" Scale="2" />
+          <NavigationProperty Name="Course" Relationship="SchoolBModel.FK_CourseGrade_Course" FromRole="CourseGrade" ToRole="Course" />
+          <NavigationProperty Name="Person" Relationship="SchoolBModel.FK_CourseGrade_Student" FromRole="CourseGrade" ToRole="Person" />
+        </EntityType>
+        <EntityType Name="Person" Abstract="true">
+          <Key>
+            <PropertyRef Name="PersonID" />
+          </Key>
+          <Property Name="PersonID" Type="Int32" Nullable="false" />
+          <Property Name="LastName" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="FirstName" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Picture" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <NavigationProperty Name="CourseGrade" Relationship="SchoolBModel.FK_CourseGrade_Student" FromRole="Person" ToRole="CourseGrade" />
+          <NavigationProperty Name="Course" Relationship="SchoolBModel.CourseInstructor" FromRole="Person" ToRole="Course" />
+        </EntityType>
+        <Association Name="FK_CourseGrade_Course">
+          <End Role="Course" Type="SchoolBModel.Course" Multiplicity="1" />
+          <End Role="CourseGrade" Type="SchoolBModel.CourseGrade" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_CourseGrade_Student">
+          <End Role="Person" Type="SchoolBModel.Person" Multiplicity="1" />
+          <End Role="CourseGrade" Type="SchoolBModel.CourseGrade" Multiplicity="*" />
+        </Association>
+        <Association Name="CourseInstructor">
+          <End Role="Course" Type="SchoolBModel.Course" Multiplicity="*" />
+          <End Role="Person" Type="SchoolBModel.Person" Multiplicity="*" />
+        </Association>
+        <EntityType Name="Student" BaseType="SchoolBModel.Person" >
+          <Property Name="EnrollmentDate" Type="DateTime" Nullable="true" /></EntityType>
+        <EntityType Name="Instructor" BaseType="SchoolBModel.Person" >
+          <Property Name="HireDate" Type="DateTime" Nullable="true" /></EntityType></Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="urn:schemas-microsoft-com:windows:storage:mapping:CS">
+        <EntityContainerMapping StorageEntityContainer="SchoolBModelStoreContainer" CdmEntityContainer="SchoolEntities">
+          <EntitySetMapping Name="Course">
+            <EntityTypeMapping TypeName="IsTypeOf(SchoolBModel.Course)">
+              <MappingFragment StoreEntitySet="Course">
+                <ScalarProperty Name="CourseID" ColumnName="CourseID" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Credits" ColumnName="Credits" />
+                <ScalarProperty Name="DepartmentID" ColumnName="DepartmentID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CourseGrade">
+            <EntityTypeMapping TypeName="IsTypeOf(SchoolBModel.CourseGrade)">
+              <MappingFragment StoreEntitySet="CourseGrade">
+                <ScalarProperty Name="EnrollmentID" ColumnName="EnrollmentID" />
+                <ScalarProperty Name="Grade" ColumnName="Grade" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Person">
+            <EntityTypeMapping TypeName="IsTypeOf(SchoolBModel.Person)">
+              <MappingFragment StoreEntitySet="Person">
+                <ScalarProperty Name="PersonID" ColumnName="PersonID" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="Picture" ColumnName="Picture" />
+              </MappingFragment>
+            </EntityTypeMapping>
+            <EntityTypeMapping TypeName="IsTypeOf(SchoolBModel.Student)">
+              <MappingFragment StoreEntitySet="Person">
+                <ScalarProperty Name="PersonID" ColumnName="PersonID" />
+                <ScalarProperty Name="EnrollmentDate" ColumnName="EnrollmentDate" />
+                <Condition ColumnName="PersonCategory" Value="1" /></MappingFragment></EntityTypeMapping>
+            <EntityTypeMapping TypeName="IsTypeOf(SchoolBModel.Instructor)">
+              <MappingFragment StoreEntitySet="Person">
+                <ScalarProperty Name="PersonID" ColumnName="PersonID" />
+                <ScalarProperty Name="HireDate" ColumnName="HireDate" />
+                <Condition ColumnName="PersonCategory" Value="2" /></MappingFragment></EntityTypeMapping></EntitySetMapping>
+          <AssociationSetMapping Name="FK_CourseGrade_Course" TypeName="SchoolBModel.FK_CourseGrade_Course" StoreEntitySet="CourseGrade">
+            <EndProperty Name="Course">
+              <ScalarProperty Name="CourseID" ColumnName="CourseID" />
+            </EndProperty>
+            <EndProperty Name="CourseGrade">
+              <ScalarProperty Name="EnrollmentID" ColumnName="EnrollmentID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_CourseGrade_Student" TypeName="SchoolBModel.FK_CourseGrade_Student" StoreEntitySet="CourseGrade">
+            <EndProperty Name="Person">
+              <ScalarProperty Name="PersonID" ColumnName="StudentID" />
+            </EndProperty>
+            <EndProperty Name="CourseGrade">
+              <ScalarProperty Name="EnrollmentID" ColumnName="EnrollmentID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="CourseInstructor" TypeName="SchoolBModel.CourseInstructor" StoreEntitySet="CourseInstructor">
+            <EndProperty Name="Course">
+              <ScalarProperty Name="CourseID" ColumnName="CourseID" />
+            </EndProperty>
+            <EndProperty Name="Person">
+              <ScalarProperty Name="PersonID" ColumnName="PersonID" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2007/06/edmx">
+    <edmx:Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+      </DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram Name="School">
+        <EntityTypeShape EntityType="SchoolBModel.Course" Width="1.5" PointX="7.375" PointY="4.625" Height="1.9210009765625005" IsExpanded="true" />
+        <EntityTypeShape EntityType="SchoolBModel.CourseGrade" Width="1.5" PointX="5.375" PointY="2.375" Height="1.592306315104167" IsExpanded="true" />
+        <EntityTypeShape EntityType="SchoolBModel.Person" Width="1.5" PointX="3.125" PointY="5" Height="1.9210009765624996" IsExpanded="true" />
+        <AssociationConnector Association="SchoolBModel.FK_CourseGrade_Course" ManuallyRouted="false">
+          <ConnectorPoint PointX="8.125" PointY="4.625" />
+          <ConnectorPoint PointX="8.125" PointY="3.1711531575520837" />
+          <ConnectorPoint PointX="6.875" PointY="3.1711531575520837" /></AssociationConnector>
+        <AssociationConnector Association="SchoolBModel.FK_CourseGrade_Student" ManuallyRouted="false">
+          <ConnectorPoint PointX="3.875" PointY="5" />
+          <ConnectorPoint PointX="3.875" PointY="3.1711531575520837" />
+          <ConnectorPoint PointX="5.375" PointY="3.1711531575520837" /></AssociationConnector>
+        <AssociationConnector Association="SchoolBModel.CourseInstructor" ManuallyRouted="false">
+          <ConnectorPoint PointX="7.375" PointY="5.77300048828125" />
+          <ConnectorPoint PointX="4.625" PointY="5.77300048828125" />
+          </AssociationConnector>
+        <EntityTypeShape EntityType="SchoolBModel.Student" Width="1.5" PointX="2.125" PointY="8.375" Height="1.0992643229166657" />
+        <InheritanceConnector EntityType="SchoolBModel.Student">
+          <ConnectorPoint PointX="3.375" PointY="6.9210009765625" />
+          <ConnectorPoint PointX="3.375" PointY="8.375" />
+          </InheritanceConnector>
+        <EntityTypeShape EntityType="SchoolBModel.Instructor" Width="1.5" PointX="4.25" PointY="8.375" Height="1.0992643229166657" />
+        <InheritanceConnector EntityType="SchoolBModel.Instructor">
+          <ConnectorPoint PointX="4.4375" PointY="6.9210009765625" />
+          <ConnectorPoint PointX="4.4375" PointY="8.375" /></InheritanceConnector></Diagram></edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

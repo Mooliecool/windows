@@ -1,0 +1,74 @@
+<Page
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  Title="Button with Animated Scale Example"
+  Background="White">
+
+  <Page.Resources>
+    <Style x:Key="button" TargetType="{x:Type Button}">
+
+      <!-- This ScaleTransform is targeted by the Event Trigger. -->
+      <Setter Property="RenderTransform">
+        <Setter.Value>
+            <ScaleTransform CenterX="0" CenterY="0" ScaleX="1" ScaleY="1" />
+        </Setter.Value>
+      </Setter>
+
+      <!-- Applies the ScaleTransform to the button's center. -->
+      <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+
+      <!-- Enlarge the button when the mouse enters. -->
+      <Style.Triggers>
+        <EventTrigger RoutedEvent="Mouse.MouseEnter">
+          <EventTrigger.Actions>
+            <BeginStoryboard>
+              <Storyboard>
+                <DoubleAnimation 
+                  Storyboard.TargetProperty="RenderTransform.ScaleX" 
+                  Duration="0:0:0.5" To="1.25" AccelerationRatio="0.9" />
+                <DoubleAnimation 
+                  Storyboard.TargetProperty="RenderTransform.ScaleY" 
+                  Duration="0:0:0.5" To="1.25" AccelerationRatio="0.9"  />
+              </Storyboard>
+            </BeginStoryboard>
+          </EventTrigger.Actions>
+        </EventTrigger>
+
+        <!-- Return the button to its orginal size when the mouse leaves. -->
+        <EventTrigger RoutedEvent="Mouse.MouseLeave">
+          <EventTrigger.Actions>
+            <BeginStoryboard>
+              <Storyboard>
+                <DoubleAnimation 
+                  Storyboard.TargetProperty="RenderTransform.ScaleX" 
+                  Duration="0:0:0.5" To="1" AccelerationRatio=".9" />
+                <DoubleAnimation 
+                  Storyboard.TargetProperty="RenderTransform.ScaleY" 
+                  Duration="0:0:0.5" To="1" AccelerationRatio=".9"  />
+              </Storyboard>
+            </BeginStoryboard>
+          </EventTrigger.Actions>
+        </EventTrigger>
+      </Style.Triggers>
+
+    </Style>
+  </Page.Resources>
+
+  <StackPanel>
+    <Border Width="500" Margin="25" BorderBrush="Orange" 
+            BorderThickness="2" CornerRadius="10" 
+            Padding="10,10,10,10" Background="White">
+      <TextBlock TextWrapping="Wrap" TextAlignment="Left" FontWeight="Bold">
+        This example animates a ScaleTransform 
+        applied to the RenderTransform property of a Button. When the mouse
+        enters the button, it grows. When the mouse leaves the button, it is
+        animated back to its original size. 
+      </TextBlock>
+    </Border>
+
+    <Button Style="{StaticResource button}" 
+      FontSize="24" Content="Button"
+      HorizontalAlignment="Center" />
+
+  </StackPanel>
+</Page>

@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>Read Me</title>
+</head>
+<body>
+<h1>CSSharePointSilverlightIntegration Project Overview</h1>
+<h2>What is Silverlight ?</h2>
+<p>Silverlight is a powerful development platform for creating engaging, interactive user experiences for Web, desktop, and mobile applications when online or offline.</p>
+
+<h2>What is SharePoint?</h2>
+<p>Microsoft SharePoint 2010 makes it easier for people to work together. Using SharePoint 2010, your people can set up Web sites to share information with others, manage documents from start to finish, and publish reports to help everyone make better decisions</p>
+<h2>What brings Silverlight and SharePoint together?</h2>
+<ul>
+    <li> 
+     Users are expecting rich, compelling interfaces.
+	 <p>Silverlight is a perfect technology to create Web 2.0 applications in SharePoint</p>
+    </li>
+    <li> 
+        Limit page post backs.
+		<p>Silverlight applications do their processing on the client, eliminating page post backs.</p>
+    </li>
+    <li>
+        Silverlight applications offload processing to the client.
+		<p>Processing on the client reduces the load on the SharePoint server farm.</p>
+    </li>
+    <li> Silverlight isolates processing on the client<br /> </li>
+    <li> Separation of design and code.
+        <p>You can use the MVVM pattern to separate the presentation from the processing later.  This makes it easy to change the look and feel of Silverlight applications.</p>
+    </li>
+    <li>Common .NET development techniques.
+        <p>Silverlight applications are based on the .NET framework which makes it easy for .NET developers to create them.  The client object model may be used to access SharePoint resources from a Silverlight application.</p>
+    </li>
+    <li>Overcome Sandbox limitations.
+        <p>Silverlight applications may be used to overcome sandboxed limitations such as the ability to call an external service, or use parts of the .NET framework which are not permitted to run in a sandboxed solution.</p>
+    </li>
+    <li>Ease of deployment.
+        <p>Silverlight applications are very easy to deploy.  Anyone with the ability to upload a document to a document library can deploy a Silverlight application to a SharePoint site.  Additionally, the Silverlight Web Part makes it very easy to place Silverlight applications on SharePoint web pages.</p>
+    </li>
+</ul>
+<p>Let's see a simple project that helps us to understand how to use Silverlight along-with SharePoint.</p>
+<p>A Silverlight application can be hosted inside a SharePoint site and it is called as a Silverlight WebPart.</p>
+
+<h2>Prerequisites:</h2>
+<a href="http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=5970">Microsoft SharePoint Foundation 2010 </a> 
+<h2>Here are some steps to upload a Silverlight XAP to the SharePoint site:</h2>
+<ol>
+    <li>In Visual Studio 2010, Go to File menu -> New  -> Project -> under Installed Templates -> select Visual C# -> under SharePoint section-> 2010 -> select EMPTY SHAREPOINT PROJECT.</li>
+    <li>For example,in this case , lets name our SharePoint project as "CSSharePointSilverlightIntegration" .</li>
+    <li>Then you will be asked for the URL of your SharePoint site. Enter the URL and Select the "Deploy as sandboxed solution" option in the dialog and click Finish.
+        <p>
+            <img src="Images/2.jpg" />
+        </p>
+    </li>
+    <li>Hence, you can see the project created as in the Solution explorer of Visual Studio 2010 
+        <p>
+            <img src="Images/3.jpg" />
+        </p>
+    </li>
+    <li>Since our goal is to integrate Silverlight within SharePoint , let's add a Silverlight application without a website hosting it. Let's name our Silverlight application/project  as "SilverlightWebpart". Then our solution looks as following :
+        <p>
+            <img src="Images/4.jpg"/>
+        </p>
+    </li>
+    <li>Let's add the following code to "MainPage.xaml"  file in the Silverlight project :- 
+    <pre>
+     &lt;UserControl x:Class="SilverlightWebpart.MainPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        d:DesignHeight="300" d:DesignWidth="400"&gt
+
+        &ltGrid x:Name="LayoutRoot" Background="White"&gt
+            &ltButton Name="btnClk" Height="20" Width="50" Content="Click !!" Click="btnClk_Click"&gt&lt/Button&gt
+        &lt/Grid&gt
+    &lt/UserControl&gt
+    </pre>
+    </li>
+    <li>Also add the following code to "MainPage.xaml.cs" file :-
+    <pre>
+     using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Documents;
+    using System.Windows.Input;
+    using System.Windows.Media;
+    using System.Windows.Media.Animation;
+    using System.Windows.Shapes;
+
+    namespace SilverlightWebpart
+    {
+        public partial class MainPage : UserControl
+        {
+            public MainPage()
+            {
+                InitializeComponent();
+            }
+
+            private void btnClk_Click(object sender, RoutedEventArgs e)
+            {
+                MessageBox.Show("Hello from Silverlight within SharePoint !!");
+            }
+
+        }
+    }
+    </pre>
+    </li>
+    <li>Let's just SAVE ALL for now (and not Build).</li>
+    <li>Now, Add a Module to the SharePoint site. Right click the "CSSharePointSilverlightIntegration" SharePoint project and go to ADD NEW ITEM and in the dialog Select "Module " under installed templates for SharePoint -> 2010 .</li>
+    <li>Name the Module as "DemoModule".
+        <p>
+            <img src="Images/5.jpg" />
+        </p>
+    </li>
+    <li>After we add the Module it would contain two files under it by default:-
+      <ul>
+        <li>Elements.xml</li>
+	    <li>Sample.txt</li>
+      </ul>
+    </li>
+
+    <li>It's ok if you delete the Sample.txt file.</li>
+    <li>Again lets do SAVE ALL .</li>
+    <li>Let's jump to our Silverlight project "SilverlightWebpart" and right click it in the solution explorer window and select Properties.</li>
+    <li>Go to the "Build Events" tab and click the "Edit Post-build…" button and enter the following line in the dialog that appears :-
+    copy "$(TargetDir)SilverlightWebpart.xap" "$(SolutionDir)CSSharePointSilverlightIntegration\DemoModule" 
+        <p>
+            <img src="Images/6.jpg" />
+        </p>
+    </li>
+    <li>Click OK and Save it.</li>
+    <li>Adding the above content in the post-build events ensures that the visual studio adds the latest build of the XAP file generated from the "SilverlightWebpart" application to the "DemoModule" section of the "CSSharePointSilverlightIntegration" project.</li>
+    <li>So now if we build the Silverlight project, we would find the "SilverlightWebpart.xap" file under the "DemoModule".</li>
+    <li>Make sure the XAP file is included in the Module as following :
+        <p>
+            <img src="Images/16.jpg" />
+        </p>
+    </li>
+
+    <li>Now lets build the entire solution and then try to deploy the "CSSharePointSilverlightIntegration" project to the SharePoint site.</li>
+    <li>To achieve this, right-click the "CSSharePointSilverlightIntegration" project and click "Deploy"</li>
+    <li>Now the "CSSharePointSilverlightIntegration" project is deployed in the SharePoint site.</li>
+    <li>Let's open the SharePoint site in the browser and select  "Page" 
+        <p>
+            <img src="Images/11.jpg" />
+        </p>
+    </li>
+    <li>Select Edit.
+        <p>
+            <img src="Images/12.jpg" />
+        </p>
+    </li>
+    <li>Having done that Select "Insert" tab and click "Web Part" . 
+        <p>
+            <img src="Images/13.jpg" />
+        </p>
+    </li>
+    <li>In "Categories", select "Media and content"  and correspondingly in "Web Parts" column, Select "Silverlight Web Part" Having Selected the "Silverlight Web Part" , click on "Add" button that appears on the right side.
+        <p>
+            <img src="Images/14.jpg" />
+        </p>
+    </li>
+    <li>After clicking add, a small pop-up will appear asking for the URL of the Silverlight content(.xap) file. Enter the URL in the following format as :0
+    <a href="http://MySharePointSite/DemoModule/SilverlightWebpart.xap">http://MySharePointSite/DemoModule/SilverlightWebpart.xap</a>
+        <p>
+            <img src="Images/15.jpg" />
+        </p>
+    </li>
+    <li>Then click OK and then you can see your Silverlight web part appear in the SharePoint site as :
+        <p>
+            <img src="Images/17.jpg" />
+        </p>
+    </li>
+    <li>As you can see the blue border is the boundary of the Silverlight web part and the Silverlight application has a button in it. When you click the button, it acts like a normal Silverlight application and responds to the user interaction and a Message Box is popped, for which we wrote code in "MainPage.xaml.cs".
+        <p>
+            <img src="Images/18.jpg" />
+        </p>
+    </li>
+ 
+</ol>
+</body>
+</html>

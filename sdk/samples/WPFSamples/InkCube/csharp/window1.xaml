@@ -1,0 +1,672 @@
+﻿<Window x:Class="InkCubeSample.Window1"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="InkCubeSample" Height="635" Width="585">
+
+  <Window.Background>
+    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+      <LinearGradientBrush.GradientStops>
+        <GradientStop Color="SkyBlue" Offset="0"/>
+        <GradientStop Color="SlateBlue" Offset="1"/>
+      </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+  </Window.Background>
+
+  <!-- The entire application is put within a Viewbox so that the UI scales with the window--> 
+  <Viewbox>
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition/>
+        <RowDefinition/>
+        <RowDefinition/>
+      </Grid.RowDefinitions>
+
+      <Grid Grid.Row="0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition/>
+          <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Viewbox Grid.Column="1" Width="180" Height="180" Margin="110,70,150,0">
+
+          <!-- This ScaleTransform scales the entire Viewbox for a zoom effect-->
+          <Viewbox.RenderTransform>
+            <ScaleTransform ScaleX  = "{Binding ElementName=sliderScale,Path=Value}"
+                            ScaleY  = "{Binding ElementName=sliderScale,Path=Value}"
+                            CenterX = "75"
+                            CenterY = "80"/>
+          </Viewbox.RenderTransform>
+
+          <!-- The Viewport3D provides a rendering surface for 3-D visual content. -->
+          <Viewport3D ClipToBounds="True" Width="180" Height="180">
+
+            <!-- The camera used to view the 3D object. -->
+            <Viewport3D.Camera>
+              <PerspectiveCamera Position="0,0,3" LookDirection="0,0,-1" FieldOfView="50" />
+            </Viewport3D.Camera>
+
+            <!--  These ModelVisual3Ds define the light cast in the scene. Without light, the 3D 
+             object cannot be seen. Also, the direction of the light affects shadowing. If desired,
+             you can create multiple lights with different colors that shine from different directions.
+                Here there are two lights make the cube appear bright while also still giving a 
+             shadow effect. -->
+            <ModelVisual3D>
+              <ModelVisual3D.Children>
+                <ModelVisual3D>
+                  <ModelVisual3D.Content>
+                    <PointLight Color="#FFFFFF" Position="0,0,4"/>
+                  </ModelVisual3D.Content>
+                </ModelVisual3D>
+                <ModelVisual3D>
+                  <ModelVisual3D.Content>
+                    <PointLight Color="#FFFFFF" Position="0,0,6"/>
+                  </ModelVisual3D.Content>
+                </ModelVisual3D>
+
+                <!-- Front face of cube -->
+                <ModelVisual3D>
+                  <ModelVisual3D.Content>
+                    <GeometryModel3D>
+
+                      <!--  The geometry specifes the shape of the 3D plane. In this sample, the faces 
+                           of the cube are represented as flat sheets. -->
+                      <GeometryModel3D.Geometry>
+                        <MeshGeometry3D
+                         TriangleIndices="0,1,2 3,4,5 "
+                         Normals="0,0,1 0,0,1 0,0,1 0,0,1 0,0,1 0,0,1" 
+                         TextureCoordinates="0,0 1,0 1,1 1,1 0,1 0,0 "
+                         Positions="-0.5,-0.5,0.5 0.5,-0.5,0.5 0.5,0.5,0.5 0.5,0.5,0.5 -0.5,0.5,0.5 -0.5,-0.5,0.5 " />
+                      </GeometryModel3D.Geometry>
+
+                      <!--  The material specifies the material applied to the 3D object. In this sample 
+                           a VisualBrush is used to bind the contents of an InkCanvas to a face of the 
+                           cube. -->
+                      <GeometryModel3D.Material>
+                        <MaterialGroup>
+                          <DiffuseMaterial>
+                            <DiffuseMaterial.Brush>
+                              <VisualBrush Visual="{Binding ElementName=InkCanvasFront}">
+                                <VisualBrush.RelativeTransform>
+                                  <TransformGroup>
+                                    <ScaleTransform ScaleX="1" ScaleY="-1"/>
+                                    <TranslateTransform Y="1"/>
+                                  </TransformGroup>
+                                </VisualBrush.RelativeTransform>
+                              </VisualBrush>
+                            </DiffuseMaterial.Brush>
+                          </DiffuseMaterial>
+                        </MaterialGroup>
+                      </GeometryModel3D.Material>
+                    </GeometryModel3D>
+                  </ModelVisual3D.Content>
+
+                  <!--  Here the tranforms are applied. The transforms are applied to each face 
+                       individually rather than to the whole scene so that the lights remain 
+                       stationary while the cube rotates under the lights. This is done to get 
+                       shadows on the sides of the cube. -->
+                  <ModelVisual3D.Transform>
+                    <Transform3DGroup >
+                      <Transform3DGroup.Children>
+                        <RotateTransform3D>
+                          <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D x:Name = "FrontxRotate"
+                                       Angle  = "{Binding ElementName=sliderX,Path=Value}"
+                                       Axis   = "1 0 0"/>
+                          </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                        <RotateTransform3D>
+                          <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D x:Name = "FrontyRotate"
+                                       Angle  = "{Binding ElementName=sliderY,Path=Value}"
+                                       Axis   = "0 1 0"/>
+                          </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                        <RotateTransform3D>
+                          <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D x:Name = "FrontzRotate"
+                                       Angle  = "{Binding ElementName=sliderZ,Path=Value}"
+                                       Axis   = "0 0 1"/>
+                          </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                      </Transform3DGroup.Children>
+                    </Transform3DGroup>
+                  </ModelVisual3D.Transform>
+                </ModelVisual3D>
+
+                <!-- Rear face of cube -->
+                <ModelVisual3D>
+                  <ModelVisual3D.Content>
+                    <GeometryModel3D>
+                      <GeometryModel3D.Geometry>
+                        <MeshGeometry3D
+                         TriangleIndices="0,1,2 3,4,5 "
+                         Normals="0,0,-1 0,0,-1 0,0,-1 0,0,-1 0,0,-1 0,0,-1" 
+                         TextureCoordinates="1,0 1,1 0,1 0,1 0,0 1,0 "
+                         Positions="-0.5,-0.5,-0.5 -0.5,0.5,-0.5 0.5,0.5,-0.5 0.5,0.5,-0.5 0.5,-0.5,-0.5 -0.5,-0.5,-0.5 " />
+                      </GeometryModel3D.Geometry>
+                      <GeometryModel3D.Material>
+                        <MaterialGroup>
+                          <DiffuseMaterial>
+                            <DiffuseMaterial.Brush>
+                              <VisualBrush Visual="{Binding ElementName=InkCanvasRear}">
+                                <VisualBrush.RelativeTransform>
+                                  <TransformGroup>
+                                    <ScaleTransform ScaleX="1" ScaleY="-1"/>
+                                    <TranslateTransform Y="1"/>
+                                  </TransformGroup>
+                                </VisualBrush.RelativeTransform>
+                              </VisualBrush>
+                            </DiffuseMaterial.Brush>
+                          </DiffuseMaterial>
+                        </MaterialGroup>
+                      </GeometryModel3D.Material>
+                    </GeometryModel3D>
+                  </ModelVisual3D.Content>
+                  <ModelVisual3D.Transform>
+                    <Transform3DGroup >
+                      <Transform3DGroup.Children>
+                        <RotateTransform3D>
+                          <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D x:Name = "RearxRotate"
+                                       Angle  = "{Binding ElementName=sliderX,Path=Value}"
+                                       Axis   = "1 0 0"/>
+                          </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                        <RotateTransform3D>
+                          <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D x:Name = "RearyRotate"
+                                       Angle  = "{Binding ElementName=sliderY,Path=Value}"
+                                       Axis   = "0 1 0"/>
+                          </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                        <RotateTransform3D>
+                          <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D x:Name = "RearzRotate"
+                                       Angle  = "{Binding ElementName=sliderZ,Path=Value}"
+                                       Axis   = "0 0 1"/>
+                          </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                      </Transform3DGroup.Children>
+                    </Transform3DGroup>
+                  </ModelVisual3D.Transform>
+                </ModelVisual3D>
+
+                <!-- Right face of cube -->
+                <ModelVisual3D>
+                  <ModelVisual3D.Content>
+                    <GeometryModel3D>
+                      <GeometryModel3D.Geometry>
+                        <MeshGeometry3D
+                         TriangleIndices="0,1,2 3,4,5"
+                         Normals="1,0,0 1,0,0 1,0,0 1,0,0 1,0,0 1,0,0" 
+                         TextureCoordinates="1,0 1,1 0,1 0,1 0,0 1,0"
+                         Positions="0.5,-0.5,-0.5 0.5,0.5,-0.5 0.5,0.5,0.5 0.5,0.5,0.5 0.5,-0.5,0.5 0.5,-0.5,-0.5" />
+                      </GeometryModel3D.Geometry>
+                      <GeometryModel3D.Material>
+                        <MaterialGroup>
+                          <DiffuseMaterial>
+                            <DiffuseMaterial.Brush>
+                              <VisualBrush Visual="{Binding ElementName=InkCanvasRight}">
+                                <VisualBrush.RelativeTransform>
+                                  <TransformGroup>
+                                    <ScaleTransform ScaleX="1" ScaleY="-1"/>
+                                    <TranslateTransform Y="1"/>
+                                  </TransformGroup>
+                                </VisualBrush.RelativeTransform>
+                              </VisualBrush>
+                            </DiffuseMaterial.Brush>
+                          </DiffuseMaterial>
+                        </MaterialGroup>
+                      </GeometryModel3D.Material>
+                    </GeometryModel3D>
+                  </ModelVisual3D.Content>
+                  <ModelVisual3D.Transform>
+                    <Transform3DGroup >
+                      <Transform3DGroup.Children>
+                        <RotateTransform3D>
+                          <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D x:Name = "RightxRotate"
+                                       Angle  = "{Binding ElementName=sliderX,Path=Value}"
+                                       Axis   = "1 0 0"/>
+                          </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                        <RotateTransform3D>
+                          <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D x:Name = "RightyRotate"
+                                       Angle  = "{Binding ElementName=sliderY,Path=Value}"
+                                       Axis   = "0 1 0"/>
+                          </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                        <RotateTransform3D>
+                          <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D x:Name = "RightzRotate"
+                                       Angle  = "{Binding ElementName=sliderZ,Path=Value}"
+                                       Axis   = "0 0 1"/>
+                          </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                      </Transform3DGroup.Children>
+                    </Transform3DGroup>
+                  </ModelVisual3D.Transform>
+                </ModelVisual3D>
+
+                <!-- Left face of cube -->
+                <ModelVisual3D>
+                  <ModelVisual3D.Content>
+                    <GeometryModel3D>
+                      <GeometryModel3D.Geometry>
+                        <MeshGeometry3D
+                         TriangleIndices="0,1,2 3,4,5"
+                         Normals="-1,0,0 -1,0,0 -1,0,0 -1,0,0 -1,0,0 -1,0,0" 
+                         TextureCoordinates="0,0 1,0 1,1 1,1 0,1 0,0"
+                         Positions="-0.5,-0.5,-0.5 -0.5,-0.5,0.5 -0.5,0.5,0.5 -0.5,0.5,0.5 -0.5,0.5,-0.5 -0.5,-0.5,-0.5" />
+                      </GeometryModel3D.Geometry>
+                      <GeometryModel3D.Material>
+                        <MaterialGroup>
+                          <DiffuseMaterial>
+                            <DiffuseMaterial.Brush>
+                              <VisualBrush Visual="{Binding ElementName=InkCanvasLeft}">
+                                <VisualBrush.RelativeTransform>
+                                  <TransformGroup>
+                                    <ScaleTransform ScaleX="1" ScaleY="-1"/>
+                                    <TranslateTransform Y="1"/>
+                                  </TransformGroup>
+                                </VisualBrush.RelativeTransform>
+                              </VisualBrush>
+                            </DiffuseMaterial.Brush>
+                          </DiffuseMaterial>
+                        </MaterialGroup>
+                      </GeometryModel3D.Material>
+                    </GeometryModel3D>
+                  </ModelVisual3D.Content>
+                  <ModelVisual3D.Transform>
+                    <Transform3DGroup >
+                      <Transform3DGroup.Children>
+                        <RotateTransform3D>
+                          <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D x:Name = "LeftxRotate"
+                                       Angle  = "{Binding ElementName=sliderX,Path=Value}"
+                                       Axis   = "1 0 0"/>
+                          </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                        <RotateTransform3D>
+                          <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D x:Name = "LeftyRotate"
+                                       Angle  = "{Binding ElementName=sliderY,Path=Value}"
+                                       Axis   = "0 1 0"/>
+                          </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                        <RotateTransform3D>
+                          <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D x:Name = "LeftzRotate"
+                                       Angle  = "{Binding ElementName=sliderZ,Path=Value}"
+                                       Axis   = "0 0 1"/>
+                          </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                      </Transform3DGroup.Children>
+                    </Transform3DGroup>
+                  </ModelVisual3D.Transform>
+                </ModelVisual3D>
+
+                <!-- Bottom face of cube -->
+                <ModelVisual3D>
+                  <ModelVisual3D.Content>
+                    <GeometryModel3D>
+                      <GeometryModel3D.Geometry>
+                        <MeshGeometry3D
+                         TriangleIndices="0,1,2 3,4,5"
+                         Normals="0,-1,0 0,-1,0 0,-1,0 0,-1,0 0,-1,0 0,-1,0" 
+                         TextureCoordinates="1,0 1,1 0,1 0,1 0,0 1,0"
+                         Positions="0.5,-0.5,-0.5 0.5,-0.5,0.5 -0.5,-0.5,0.5 -0.5,-0.5,0.5 -0.5,-0.5,-0.5 0.5,-0.5,-0.5" />
+                      </GeometryModel3D.Geometry>
+                      <GeometryModel3D.Material>
+                        <MaterialGroup>
+                          <DiffuseMaterial>
+                            <DiffuseMaterial.Brush>
+                              <VisualBrush Visual="{Binding ElementName=InkCanvasBottom}">
+                                <VisualBrush.RelativeTransform>
+                                  <TransformGroup>
+                                    <ScaleTransform ScaleX="1" ScaleY="-1"/>
+                                    <TranslateTransform Y="1"/>
+                                  </TransformGroup>
+                                </VisualBrush.RelativeTransform>
+                              </VisualBrush>
+                            </DiffuseMaterial.Brush>
+                          </DiffuseMaterial>
+                        </MaterialGroup>
+                      </GeometryModel3D.Material>
+                    </GeometryModel3D>
+                  </ModelVisual3D.Content>
+                  <ModelVisual3D.Transform>
+                    <Transform3DGroup >
+                      <Transform3DGroup.Children>
+                        <RotateTransform3D>
+                          <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D x:Name = "BottomxRotate"
+                                       Angle  = "{Binding ElementName=sliderX,Path=Value}"
+                                       Axis   = "1 0 0"/>
+                          </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                        <RotateTransform3D>
+                          <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D x:Name = "BottomyRotate"
+                                       Angle  = "{Binding ElementName=sliderY,Path=Value}"
+                                       Axis   = "0 1 0"/>
+                          </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                        <RotateTransform3D>
+                          <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D x:Name = "BottomzRotate"
+                                       Angle  = "{Binding ElementName=sliderZ,Path=Value}"
+                                       Axis   = "0 0 1"/>
+                          </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                      </Transform3DGroup.Children>
+                    </Transform3DGroup>
+                  </ModelVisual3D.Transform>
+                </ModelVisual3D>
+
+                <!-- Top face of cube -->
+                <ModelVisual3D>
+                  <ModelVisual3D.Content>
+                    <GeometryModel3D>
+                      <GeometryModel3D.Geometry>
+                        <MeshGeometry3D
+                         TriangleIndices="0,1,2 3,4,5"
+                         Normals="0,1,0 0,1,0 0,1,0 0,1,0 0,1,0 0,1,0" 
+                         TextureCoordinates="0,0 1,0 1,1 1,1 0,1 0,0 "
+                         Positions="-0.5,0.5,0.5 0.5,0.5,0.5 0.5,0.5,-0.5 
+                                0.5,0.5,-0.5 -0.5,0.5,-0.5 -0.5,0.5,0.5" />
+                      </GeometryModel3D.Geometry>
+                      <GeometryModel3D.Material>
+                        <MaterialGroup>
+                          <DiffuseMaterial>
+                            <DiffuseMaterial.Brush>
+                              <VisualBrush Visual="{Binding ElementName=InkCanvasTop}">
+                                <VisualBrush.RelativeTransform>
+                                  <TransformGroup>
+                                    <ScaleTransform ScaleX="1" ScaleY="-1"/>
+                                    <TranslateTransform Y="1"/>
+                                  </TransformGroup>
+                                </VisualBrush.RelativeTransform>
+                              </VisualBrush>
+                            </DiffuseMaterial.Brush>
+                          </DiffuseMaterial>
+                        </MaterialGroup>
+                      </GeometryModel3D.Material>
+                    </GeometryModel3D>
+                  </ModelVisual3D.Content>
+                  <ModelVisual3D.Transform>
+                    <Transform3DGroup >
+                      <Transform3DGroup.Children>
+                        <RotateTransform3D>
+                          <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D x:Name = "TopxRotate"
+                                       Angle  = "{Binding ElementName=sliderX,Path=Value}"
+                                       Axis   = "1 0 0"/>
+                          </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                        <RotateTransform3D>
+                          <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D x:Name = "TopyRotate"
+                                       Angle  = "{Binding ElementName=sliderY,Path=Value}"
+                                       Axis   = "0 1 0"/>
+                          </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                        <RotateTransform3D>
+                          <RotateTransform3D.Rotation>
+                            <AxisAngleRotation3D x:Name = "TopzRotate"
+                                       Angle  = "{Binding ElementName=sliderZ,Path=Value}"
+                                       Axis   = "0 0 1"/>
+                          </RotateTransform3D.Rotation>
+                        </RotateTransform3D>
+                      </Transform3DGroup.Children>
+                    </Transform3DGroup>
+                  </ModelVisual3D.Transform>
+                </ModelVisual3D>
+              </ModelVisual3D.Children>
+            </ModelVisual3D>
+          </Viewport3D>
+        </Viewbox>
+
+        <!-- Controls for manipulating the 3D cube -->
+        <StackPanel Orientation="Vertical" Grid.Column="0" Margin="50,50,0,0">
+
+          <Label Content="X Rotation"></Label>
+          <Slider Name="sliderX" Orientation="Horizontal" Minimum="0" Maximum="360" Value="180">
+          </Slider>
+
+          <Label Content="Y Rotation"></Label>
+          <Slider Name="sliderY" Orientation="Horizontal" Minimum="0" Maximum="360" Value="205">
+          </Slider>
+
+          <Label Content="Z Rotation"></Label>
+          <Slider Name="sliderZ" Orientation="Horizontal" Minimum="0" Maximum="360" Value="180">
+          </Slider>
+
+          <Label Content="Zoom"></Label>
+          <Slider Name="sliderScale" Minimum="0.1" Maximum="4.0" Value="2.4" MinWidth="180" Orientation="Horizontal">
+          </Slider>
+
+        </StackPanel>
+
+      </Grid>
+
+      <Grid Grid.Row="1">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="360"/>
+          <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Animation control buttons -->
+        <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="0,50,0,0">
+          <Button Margin="2,2" Name="startButton" IsEnabled="True">Start Animation</Button>
+          <Button Margin="2,2" Name="stopButton" IsEnabled="False">Stop Animation</Button>
+        </StackPanel>
+
+      </Grid>
+
+      <Grid Grid.Row="2" Margin="50,0,0,50" MinHeight="320">
+
+        <!-- These are the InkCanvases that get mapped onto the 3D cube -->
+        <Canvas>
+          <Label Content="Write on the InkCanvases below" Canvas.Left="0" Canvas.Top="0"></Label>
+          <InkCanvas Name="InkCanvasLeft" Background="Brown" EditingMode="Ink" Width="100" Height="100" Canvas.Left="0" Canvas.Top="140"></InkCanvas>
+          <InkCanvas Name="InkCanvasFront" Background="Goldenrod" EditingMode="Ink"  Width="100" Height="100" Canvas.Left="100" Canvas.Top="140"></InkCanvas>
+          <InkCanvas Name="InkCanvasRight" Background="ForestGreen" EditingMode="Ink"  Width="100" Height="100" Canvas.Left="200" Canvas.Top="140"></InkCanvas>
+          <InkCanvas Name="InkCanvasRear" Background="MidnightBlue" EditingMode="Ink"  Width="100" Height="100" Canvas.Left="300" Canvas.Top="140">
+            <InkCanvas.DefaultDrawingAttributes>
+              <DrawingAttributes Color="White"/>
+            </InkCanvas.DefaultDrawingAttributes>
+          </InkCanvas>
+          <InkCanvas Name="InkCanvasBottom" Background="Linen" EditingMode="Ink"  Width="100" Height="100" Canvas.Left="100" Canvas.Top="240"></InkCanvas>
+          <InkCanvas Name="InkCanvasTop" Background="Violet" EditingMode="Ink"  Width="100" Height="100" Canvas.Left="100" Canvas.Top="40"></InkCanvas>
+        </Canvas>
+      </Grid>
+
+      <!-- Animation code -->
+      <Grid.Triggers>
+        <EventTrigger SourceName="startButton" RoutedEvent="Button.Click">
+          <BeginStoryboard>
+            <Storyboard>
+              
+              <!-- This toggles the animation buttons so that only one is clickable at a time-->
+              <BooleanAnimationUsingKeyFrames 
+                  Storyboard.TargetName="startButton"
+                  Storyboard.TargetProperty="(Button.IsEnabled)"
+                  Duration="0:0:0">
+                <DiscreteBooleanKeyFrame Value="False" KeyTime="0:0:0" />
+              </BooleanAnimationUsingKeyFrames>
+              <BooleanAnimationUsingKeyFrames 
+                  Storyboard.TargetName="stopButton"
+                  Storyboard.TargetProperty="(Button.IsEnabled)"
+                  Duration="0:0:0">
+                <DiscreteBooleanKeyFrame Value="True" KeyTime="0:0:0" />
+              </BooleanAnimationUsingKeyFrames>
+            </Storyboard>
+          </BeginStoryboard>
+          <BeginStoryboard Name="xRotateStoryboard">
+            <Storyboard>
+
+              <!-- Here is the code for utilizing the transforms named above to rotate the cube
+                  in all three dimensions. -->
+              <DoubleAnimation Storyboard.TargetName     = "FrontxRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "{Binding ElementName=sliderX, Path=Value}"
+                               By                        = "360" 
+                               Duration                  = "0:0:57"
+                               RepeatBehavior            = "Forever"/>
+
+              <DoubleAnimation Storyboard.TargetName     = "RearxRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "{Binding ElementName=sliderX, Path=Value}"
+                               By                        = "360" 
+                               Duration                  = "0:0:57"
+                               RepeatBehavior            = "Forever"/>
+
+              <DoubleAnimation Storyboard.TargetName     = "LeftxRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "{Binding ElementName=sliderX, Path=Value}"
+                               By                        = "360" 
+                               Duration                  = "0:0:57"
+                               RepeatBehavior            = "Forever"/>
+
+              <DoubleAnimation Storyboard.TargetName     = "RightxRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "{Binding ElementName=sliderX, Path=Value}"
+                               By                        = "360" 
+                               Duration                  = "0:0:57"
+                               RepeatBehavior            = "Forever"/>
+
+              <DoubleAnimation Storyboard.TargetName     = "TopxRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "{Binding ElementName=sliderX, Path=Value}"
+                               By                        = "360" 
+                               Duration                  = "0:0:57"
+                               RepeatBehavior            = "Forever"/>
+
+              <DoubleAnimation Storyboard.TargetName     = "BottomxRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "{Binding ElementName=sliderX, Path=Value}"
+                               By                        = "360" 
+                               Duration                  = "0:0:57"
+                               RepeatBehavior            = "Forever"/>
+            </Storyboard>
+          </BeginStoryboard>
+          <BeginStoryboard Name="yRotateStoryboard">
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetName     = "FrontyRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "{Binding ElementName=sliderY, Path=Value}"
+                               By                        = "360" 
+                               Duration                  = "0:0:13"
+                               RepeatBehavior            = "Forever"/>
+
+              <DoubleAnimation Storyboard.TargetName     = "RearyRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "{Binding ElementName=sliderY, Path=Value}"
+                               By                        = "360" 
+                               Duration                  = "0:0:13"
+                               RepeatBehavior            = "Forever"/>
+
+              <DoubleAnimation Storyboard.TargetName     = "LeftyRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "{Binding ElementName=sliderY, Path=Value}"
+                               By                        = "360" 
+                               Duration                  = "0:0:13"
+                               RepeatBehavior            = "Forever"/>
+
+              <DoubleAnimation Storyboard.TargetName     = "RightyRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "{Binding ElementName=sliderY, Path=Value}"
+                               By                        = "360" 
+                               Duration                  = "0:0:13"
+                               RepeatBehavior            = "Forever"/>
+
+              <DoubleAnimation Storyboard.TargetName     = "TopyRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "{Binding ElementName=sliderY, Path=Value}"
+                               By                        = "360" 
+                               Duration                  = "0:0:13"
+                               RepeatBehavior            = "Forever"/>
+
+              <DoubleAnimation Storyboard.TargetName     = "BottomyRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "{Binding ElementName=sliderY, Path=Value}"
+                               By                        = "360" 
+                               Duration                  = "0:0:13"
+                               RepeatBehavior            = "Forever"/>
+            </Storyboard>
+          </BeginStoryboard>
+          <BeginStoryboard Name="zRotateStoryboard">
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetName     = "FrontzRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "{Binding ElementName=sliderZ, Path=Value}"
+                               By                        = "360" 
+                               Duration                  = "0:0:37"
+                               RepeatBehavior            = "Forever"/>
+
+              <DoubleAnimation Storyboard.TargetName     = "RearzRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "{Binding ElementName=sliderZ, Path=Value}"
+                               By                        = "360" 
+                               Duration                  = "0:0:37"
+                               RepeatBehavior            = "Forever"/>
+
+              <DoubleAnimation Storyboard.TargetName     = "LeftzRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "{Binding ElementName=sliderZ, Path=Value}"
+                               By                        = "360" 
+                               Duration                  = "0:0:37"
+                               RepeatBehavior            = "Forever"/>
+
+              <DoubleAnimation Storyboard.TargetName     = "RightzRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "{Binding ElementName=sliderZ, Path=Value}"
+                               By                        = "360" 
+                               Duration                  = "0:0:37"
+                               RepeatBehavior            = "Forever"/>
+
+              <DoubleAnimation Storyboard.TargetName     = "TopzRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "{Binding ElementName=sliderZ, Path=Value}"
+                               By                        = "360" 
+                               Duration                  = "0:0:37"
+                               RepeatBehavior            = "Forever"/>
+
+              <DoubleAnimation Storyboard.TargetName     = "BottomzRotate" 
+                               Storyboard.TargetProperty = "Angle"
+                               From                      = "{Binding ElementName=sliderZ, Path=Value}"
+                               By                        = "360" 
+                               Duration                  = "0:0:37"
+                               RepeatBehavior            = "Forever"/>
+            </Storyboard>
+          </BeginStoryboard>
+        </EventTrigger>
+        <EventTrigger SourceName="stopButton" RoutedEvent="Button.Click">
+          <BeginStoryboard>
+            <Storyboard>
+
+              <!-- This toggles the animation buttons so that only one is clickable at a time-->
+              <BooleanAnimationUsingKeyFrames 
+                  Storyboard.TargetName="startButton"
+                  Storyboard.TargetProperty="(Button.IsEnabled)"
+                  Duration="0:0:0">
+                <DiscreteBooleanKeyFrame Value="True" KeyTime="0:0:0" />
+              </BooleanAnimationUsingKeyFrames>
+              <BooleanAnimationUsingKeyFrames 
+                  Storyboard.TargetName="stopButton"
+                  Storyboard.TargetProperty="(Button.IsEnabled)"
+                  Duration="0:0:0">
+                <DiscreteBooleanKeyFrame Value="False" KeyTime="0:0:0" />
+              </BooleanAnimationUsingKeyFrames>
+            </Storyboard>
+          </BeginStoryboard>
+          <StopStoryboard BeginStoryboardName="xRotateStoryboard"/>
+          <StopStoryboard BeginStoryboardName="yRotateStoryboard"/>
+          <StopStoryboard BeginStoryboardName="zRotateStoryboard"/>
+        </EventTrigger>
+      </Grid.Triggers>
+    </Grid>
+  </Viewbox>
+</Window>

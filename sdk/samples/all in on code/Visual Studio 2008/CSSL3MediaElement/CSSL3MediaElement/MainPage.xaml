@@ -1,0 +1,139 @@
+﻿<UserControl x:Class="CSSL3MediaElement.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600">
+	<UserControl.Resources>
+        <!--We define a style for the Slider control so that we can hook up the DragStarted/DragCompleted event of
+        the Thumb control in it. -->
+		<Style x:Key="SliderStyle1" TargetType="Slider">
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="Maximum" Value="10"/>
+			<Setter Property="Minimum" Value="0"/>
+			<Setter Property="Value" Value="0"/>
+			<Setter Property="BorderBrush">
+				<Setter.Value>
+					<LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+						<GradientStop Color="#FFA3AEB9" Offset="0"/>
+						<GradientStop Color="#FF8399A9" Offset="0.375"/>
+						<GradientStop Color="#FF718597" Offset="0.375"/>
+						<GradientStop Color="#FF617584" Offset="1"/>
+					</LinearGradientBrush>
+				</Setter.Value>
+			</Setter>
+			<Setter Property="IsTabStop" Value="False"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="Slider">
+						<Grid x:Name="Root">
+							<Grid.Resources>
+								<ControlTemplate x:Key="RepeatButtonTemplate">
+									<Grid x:Name="Root" Opacity="0" Background="Transparent"/>
+								</ControlTemplate>
+							</Grid.Resources>
+							<VisualStateManager.VisualStateGroups>
+								<VisualStateGroup x:Name="CommonStates">
+									<VisualState x:Name="Normal"/>
+									<VisualState x:Name="MouseOver"/>
+									<VisualState x:Name="Disabled">
+										<Storyboard>
+											<ObjectAnimationUsingKeyFrames Duration="0" Storyboard.TargetName="HorizontalTrackRectangleDisabledOverlay" Storyboard.TargetProperty="Visibility">
+												<DiscreteObjectKeyFrame KeyTime="0">
+													<DiscreteObjectKeyFrame.Value>
+														<Visibility>Visible</Visibility>
+													</DiscreteObjectKeyFrame.Value>
+												</DiscreteObjectKeyFrame>
+											</ObjectAnimationUsingKeyFrames>
+											<ObjectAnimationUsingKeyFrames Duration="0" Storyboard.TargetName="ThumbDisabledOverlay" Storyboard.TargetProperty="Visibility">
+												<DiscreteObjectKeyFrame KeyTime="0">
+													<DiscreteObjectKeyFrame.Value>
+														<Visibility>Visible</Visibility>
+													</DiscreteObjectKeyFrame.Value>
+												</DiscreteObjectKeyFrame>
+											</ObjectAnimationUsingKeyFrames>
+											<ObjectAnimationUsingKeyFrames Duration="0" Storyboard.TargetName="VerticalTrackRectangleDisabledOverlay" Storyboard.TargetProperty="Visibility">
+												<DiscreteObjectKeyFrame KeyTime="0">
+													<DiscreteObjectKeyFrame.Value>
+														<Visibility>Visible</Visibility>
+													</DiscreteObjectKeyFrame.Value>
+												</DiscreteObjectKeyFrame>
+											</ObjectAnimationUsingKeyFrames>
+										</Storyboard>
+									</VisualState>
+								</VisualStateGroup>
+							</VisualStateManager.VisualStateGroups>
+							<Grid x:Name="HorizontalTemplate" Background="{TemplateBinding Background}">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="Auto"/>
+									<ColumnDefinition Width="Auto"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Rectangle x:Name="TrackRectangle" Fill="#FFE6EFF7" Stroke="#FFA3AEB9" StrokeThickness="{TemplateBinding BorderThickness}" RadiusX="1" RadiusY="1" Height="3" Margin="5,0,5,0" Grid.Column="0" Grid.ColumnSpan="3"/>
+								<Rectangle x:Name="HorizontalTrackRectangleDisabledOverlay" Fill="White" RadiusX="1" RadiusY="1" Height="3" Margin="5,0,5,0" Opacity=".55" Visibility="Collapsed" Grid.Column="0" Grid.ColumnSpan="3"/>
+								<RepeatButton x:Name="HorizontalTrackLargeChangeDecreaseRepeatButton" Height="18" IsTabStop="False" Template="{StaticResource RepeatButtonTemplate}" Grid.Column="0"/>
+								<!--We're using HorizontalThumb to show the progress, so only need to add event handler for the Thumb below-->
+                                <Thumb DragStarted="HorizontalThumb_DragStarted" DragCompleted="HorizontalThumb_DragCompleted" x:Name="HorizontalThumb" Height="18" Width="11" IsTabStop="True" Grid.Column="1"/>
+								<Rectangle x:Name="ThumbDisabledOverlay" Fill="White" RadiusX="2" RadiusY="2" Width="11" Opacity=".55" Visibility="Collapsed" Grid.Column="1"/>
+								<RepeatButton x:Name="HorizontalTrackLargeChangeIncreaseRepeatButton" Height="18" IsTabStop="False" Template="{StaticResource RepeatButtonTemplate}" Grid.Column="2"/>
+							</Grid>
+							<Grid x:Name="VerticalTemplate" Visibility="Collapsed" Background="{TemplateBinding Background}">
+								<Grid.RowDefinitions>
+									<RowDefinition Height="*"/>
+									<RowDefinition Height="Auto"/>
+									<RowDefinition Height="Auto"/>
+								</Grid.RowDefinitions>
+								<Rectangle Fill="#FFE6EFF7" Stroke="#FFA3AEB9" StrokeThickness="{TemplateBinding BorderThickness}" RadiusX="1" RadiusY="1" Margin="0,5,0,5" Width="3" Grid.Row="0" Grid.RowSpan="3"/>
+								<Rectangle x:Name="VerticalTrackRectangleDisabledOverlay" Fill="White" RadiusX="1" RadiusY="1" Margin="0,5,0,5" Width="3" Opacity=".55" Visibility="Collapsed" Grid.Row="0" Grid.RowSpan="3"/>
+								<RepeatButton x:Name="VerticalTrackLargeChangeDecreaseRepeatButton" Width="18" IsTabStop="False" Template="{StaticResource RepeatButtonTemplate}" Grid.Row="2"/>
+								<Thumb x:Name="VerticalThumb" Height="11" Width="18" IsTabStop="True" Grid.Row="1"/>
+								<RepeatButton x:Name="VerticalTrackLargeChangeIncreaseRepeatButton" Width="18" IsTabStop="False" Template="{StaticResource RepeatButtonTemplate}" Grid.Row="0"/>
+							</Grid>
+						</Grid>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+	</UserControl.Resources>
+
+  <Grid x:Name="LayoutRoot">
+        <ScrollViewer HorizontalScrollBarVisibility="Auto">
+            <StackPanel VerticalAlignment="Top">
+                <TextBlock HorizontalAlignment="Center" Text="MediaElement Sample" FontSize="24"></TextBlock>
+                <StackPanel x:Name="FullScreenPanel" Background="Gray" Visibility="Collapsed">
+                    <TextBlock FontSize="20" Text="This is FullScreenPanel. For the simplicity only a TextBlock is added here. Please click ESC to exit full screen mode"></TextBlock>
+                </StackPanel>
+                <MediaElement MediaFailed="MyMediaElement_MediaFailed" MarkerReached="MyMediaElement_MarkerReached" MediaEnded="MyMediaElement_MediaEnded" MediaOpened="MyMediaElement_MediaOpened" CurrentStateChanged="MyMediaElement_CurrentStateChanged" x:Name="MyMediaElement" AutoPlay="False" HorizontalAlignment="Center" VerticalAlignment="Center" Source="http://silverlight.services.live.com/104657/Industrial/video.wmv"/>
+                <StackPanel x:Name="MenuPanel" Margin="0,100">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Width="80" Height="30" Content="Play" x:Name="PlayButton" Click="PlayButton_Click"></Button>
+                        <Button Width="80" Height="30" Content="Pause" x:Name="PauseButton" Click="PauseButton_Click"></Button>
+                        <Button Width="80" Height="30" Content="Stop" x:Name="StopButton" Click="StopButton_Click"></Button>
+                        <Button Width="80" Height="30" Content="FullScreen" x:Name="FullScreenButton" Click="FullScreenButton_Click"></Button>
+                        <TextBlock Text="Progress: " Margin="10,0,0,0" VerticalAlignment="Center">
+                        </TextBlock>
+                        <Slider IsEnabled="False" x:Name="CurrentPositionSlider" Width="200" Height="30" Style="{StaticResource SliderStyle1}"></Slider>
+                        <TextBlock Text="Volume: " Margin="10,0,0,0" VerticalAlignment="Center">
+                        </TextBlock>
+                        <Slider x:Name="VolumeSlider" Width="100" Height="30" ValueChanged="VolumeSlider_ValueChanged" Maximum="1" Minimum="0"></Slider>
+                    </StackPanel>
+                    <Grid d:LayoutOverrides="Width">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="4*"></ColumnDefinition>
+                            <ColumnDefinition Width="6*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Left" Margin="0" d:LayoutOverrides="HorizontalAlignment">
+                            <TextBlock x:Name="StatusTextBlock"></TextBlock>
+                            <TextBlock Margin="30,0,0,0" x:Name="CurrentPositionTextBlock" Text="0:0:0/"></TextBlock>
+                            <TextBlock x:Name="DurationTextBlock"></TextBlock>
+                        </StackPanel>
+                        <TextBlock FontSize="12" Grid.Column="1" x:Name="CaptionTextBlock" Margin="0"/>
+                    </Grid>
+                </StackPanel>
+             
+
+            </StackPanel>
+        </ScrollViewer>
+           
+           
+    </Grid>
+</UserControl>

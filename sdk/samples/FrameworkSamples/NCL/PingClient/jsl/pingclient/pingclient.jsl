@@ -1,0 +1,250 @@
+//-----------------------------------------------------------------------
+//  This file is part of the Microsoft .NET SDK Code Samples.
+// 
+//  Copyright (C) Microsoft Corporation.  All rights reserved.
+// 
+//This source code is intended only as a supplement to Microsoft
+//Development Tools and/or on-line documentation.  See these other
+//materials for detailed information regarding Microsoft code samples.
+// 
+//THIS CODE AND INFORMATION ARE PROVIDED AS IS WITHOUT WARRANTY OF ANY
+//KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+//IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+//PARTICULAR PURPOSE.
+//-----------------------------------------------------------------------
+package PingClient;
+
+import System.*;
+import System.Drawing.*;
+import System.Collections.*;
+import System.ComponentModel.*;
+import System.Windows.Forms.*;
+import System.Net.NetworkInformation.*;
+import System.Globalization.*;
+
+/// <summary>
+/// Ping client demonstrates a client application that can be used to 
+/// ping a remote host.  It displays the IP address used and the
+/// ping time in milliseconds.
+/// </summary>
+public class PingClientForm extends System.Windows.Forms.Form
+{
+    private TextBox addressTextBox;
+    private Label pingLabel;
+    private Button sendButton;
+    private TextBox pingDetailsTextBox;
+    private Ping pingClient = null;
+    private Button cancelButton;
+
+    /// <summary>
+    /// Required designer variable.
+    /// </summary>
+    private System.ComponentModel.Container components = null;
+
+    public PingClientForm()
+    {
+        //
+        // Required for Windows Form Designer support
+        //
+        InitializeComponent();
+
+        pingClient = new Ping();
+        pingClient.add_PingCompleted(new PingCompletedEventHandler(
+            pingClient_PingCompleted));
+    } //Form1
+
+    /// <summary>
+    /// Clean up any resources being used.
+    /// </summary>
+    protected void Dispose(boolean disposing)
+    {
+        if (disposing)
+        {
+            if (components != null)
+            {
+                components.Dispose();
+            }
+        }
+        super.Dispose(disposing);
+    } //Dispose
+
+    /// <summary>
+    /// Required method for Designer support - do not modify
+    /// the contents of this method with the code editor.
+    /// </summary>
+    private void InitializeComponent()
+    {
+        this.addressTextBox = new System.Windows.Forms.TextBox();
+        this.pingLabel = new System.Windows.Forms.Label();
+        this.sendButton = new System.Windows.Forms.Button();
+        this.pingDetailsTextBox = new System.Windows.Forms.TextBox();
+        this.cancelButton = new System.Windows.Forms.Button();
+        this.SuspendLayout();
+        // 
+        // addressTextBox
+        // 
+        this.addressTextBox.set_Location(new System.Drawing.Point(69, 14));
+        this.addressTextBox.set_Name("addressTextBox");
+        this.addressTextBox.set_Size(new System.Drawing.Size(211, 20));
+        this.addressTextBox.set_TabIndex(0);
+        // 
+        // pingLabel
+        // 
+        this.pingLabel.set_AutoSize(true);
+        this.pingLabel.set_Location(new System.Drawing.Point(12, 17));
+        this.pingLabel.set_Name("pingLabel");
+        this.pingLabel.set_Size(new System.Drawing.Size(57, 14));
+        this.pingLabel.set_TabIndex(1);
+        this.pingLabel.set_Text("Name / IP:");
+        // 
+        // sendButton
+        // 
+        this.sendButton.set_Location(new System.Drawing.Point(124, 231));
+        this.sendButton.set_Name("sendButton");
+        this.sendButton.set_TabIndex(1);
+        this.sendButton.set_Text("Send");
+        this.sendButton.add_Click(new System.EventHandler(this.sendButton_Click));
+        // 
+        // pingDetailsTextBox
+        // 
+        this.pingDetailsTextBox.set_AutoSize(false);
+        this.pingDetailsTextBox.set_Location(new System.Drawing.Point(12, 41));
+        this.pingDetailsTextBox.set_Multiline(true);
+        this.pingDetailsTextBox.set_Name("pingDetailsTextBox");
+        this.pingDetailsTextBox.set_ScrollBars(System.Windows.Forms.ScrollBars.Vertical);
+        this.pingDetailsTextBox.set_Size(new System.Drawing.Size(268, 184));
+        this.pingDetailsTextBox.set_TabIndex(2);
+        // 
+        // cancelButton
+        // 
+        this.cancelButton.set_DialogResult(System.Windows.Forms.DialogResult.Cancel);
+        this.cancelButton.set_Location(new System.Drawing.Point(205, 231));
+        this.cancelButton.set_Name("cancelButton");
+        this.cancelButton.set_TabIndex(3);
+        this.cancelButton.set_Text("Cancel");
+        this.cancelButton.add_Click(new System.EventHandler(this.cancelButton_Click));
+        // 
+        // PingClientForm
+        // 
+        this.set_AcceptButton(this.sendButton);
+        this.set_AutoScaleBaseSize(new System.Drawing.Size(5, 13));
+        this.set_CancelButton(this.cancelButton);
+        this.set_ClientSize(new System.Drawing.Size(292, 266));
+        this.get_Controls().Add(this.cancelButton);
+        this.get_Controls().Add(this.sendButton);
+        this.get_Controls().Add(this.pingDetailsTextBox);
+        this.get_Controls().Add(this.addressTextBox);
+        this.get_Controls().Add(this.pingLabel);
+        this.set_FormBorderStyle(System.Windows.Forms.FormBorderStyle.FixedDialog);
+        this.set_MaximizeBox(false);
+        this.set_Name("PingClientForm");
+        this.set_Text("Ping Client");
+        this.ResumeLayout(false);
+        this.PerformLayout();
+
+    } //InitializeComponent
+
+    /// <summary>
+    /// The main entry point for the application.
+    /// </summary>
+    /** @attribute STAThread()
+*/
+    public static void main(String[] args)
+    {
+        Application.Run(new PingClientForm());
+    } //main
+
+    void pingClient_PingCompleted(Object sender, PingCompletedEventArgs e)
+    {
+        // Check to see if an error occurred.  If no error, then display 
+        // the address used and the ping time in milliseconds.
+        if (e.get_Error() == null)
+        {
+            if (e.get_Cancelled())
+            {
+                pingDetailsTextBox.AppendText("  Ping cancelled. \r\n");
+            }
+            else
+            {
+                PingReply reply = e.get_Reply();
+                if (reply.get_Status() == IPStatus.Success)
+                {
+                    pingDetailsTextBox.AppendText(
+                        "  " + reply.get_Address().ToString() + " " +
+                        reply.get_RoundtripTime() + "ms" + "\r\n");
+                }
+                else
+                {
+                    pingDetailsTextBox.AppendText(
+                        "  " + GetStatusString(reply.get_Status()) + "\r\n");
+                }
+            }
+        }
+        else
+        {
+            // Otherwise display the error.
+            pingDetailsTextBox.AppendText("  Ping error.\r\n");
+            MessageBox.Show(
+                "An error occurred while sending this ping. " +
+                e.get_Error().get_InnerException().get_Message());
+        }
+        sendButton.set_Enabled(true);
+    }
+
+    private String GetStatusString(IPStatus status)
+    {
+        switch (status)
+        {
+            case IPStatus.Success:
+                return "Success.";
+            case IPStatus.DestinationHostUnreachable:
+                return "Destination host unreachable.";
+            case IPStatus.DestinationNetworkUnreachable:
+                return "Destination network unreachable.";
+            case IPStatus.DestinationPortUnreachable:
+                return "Destination port unreachable.";
+            case IPStatus.DestinationProtocolUnreachable:
+                return "Destination protocol unreachable.";
+            case IPStatus.PacketTooBig:
+                return "Packet too big.";
+            case IPStatus.TtlExpired:
+                return "TTL expired.";
+            case IPStatus.ParameterProblem:
+                return "Parameter problem.";
+            case IPStatus.SourceQuench:
+                return "Source quench.";
+            case IPStatus.TimedOut:
+                return "Timed out.";
+            default:
+                return "Ping failed.";
+        }
+    }
+
+    private void sendButton_Click(Object sender, EventArgs e)
+    {
+        // Select all the text in the address box.
+        addressTextBox.SelectAll();
+
+        if (addressTextBox.get_Text().get_Length() != 0)
+        {
+            // Disable the Send button.
+            sendButton.set_Enabled(false);
+
+            pingDetailsTextBox.AppendText(
+                "Pinging " + addressTextBox.get_Text() + " . . .\r\n");
+
+            // Send ping request.
+            pingClient.SendAsync(addressTextBox.get_Text(), null);
+        }
+        else
+        {
+            MessageBox.Show("Please enter an IP address or host name.");
+        }
+
+    } //sendButton_Click
+
+    private void cancelButton_Click(Object sender, EventArgs e)
+    {
+        pingClient.SendAsyncCancel();
+    } //pingClient_PingCompleted
+} //Form1

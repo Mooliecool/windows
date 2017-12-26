@@ -1,0 +1,201 @@
+//-----------------------------------------------------------------------
+//  This file is part of the Microsoft .NET SDK Code Samples.
+// 
+//  Copyright (C) Microsoft Corporation.  All rights reserved.
+// 
+//This source code is intended only as a supplement to Microsoft
+//Development Tools and/or on-line documentation.  See these other
+//materials for detailed information regarding Microsoft code samples.
+// 
+//THIS CODE AND INFORMATION ARE PROVIDED AS IS WITHOUT WARRANTY OF ANY
+//KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+//IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+//PARTICULAR PURPOSE.
+//-----------------------------------------------------------------------
+package WebClientProgress;
+
+import System.*;
+import System.Drawing.*;
+import System.Collections.*;
+import System.ComponentModel.*;
+import System.Windows.Forms.*;
+import System.Net.*;
+
+/// <summary>
+/// WebClientProgress demonstrates how to download a file with a progress
+/// indicator without blocking any of the user interface.
+/// </summary>
+final class WebClientProgressForm extends System.Windows.Forms.Form
+{
+    private System.ComponentModel.IContainer components;
+    private boolean isBusy;
+    private WebClient client;
+
+    private System.Windows.Forms.Button downloadButton;
+    private System.Windows.Forms.ProgressBar downloadProgressBar;
+    private System.Windows.Forms.Panel progressBarPanel;
+    private System.Windows.Forms.TextBox urlTextBox;
+    private System.Windows.Forms.Label downloadUrlLabel;
+
+    public WebClientProgressForm()
+    {
+        InitializeComponent();
+        client = new WebClient();
+        // Wire up the event handler that is called when the download 
+        // operation completes.  The operation will either complete 
+        // successfully or with an error code.
+        client.add_DownloadFileCompleted(
+            new AsyncCompletedEventHandler(client_DownloadFileCompleted));
+        // Wire up the event handler that is called as the download progresses
+        client.add_DownloadProgressChanged(
+            new DownloadProgressChangedEventHandler(
+                client_DownloadProgressChanged));
+    } //WebClientProgressForm
+
+    /// <summary>
+    /// Required method for Designer support - do not modify
+    /// the contents of this method with the code editor.
+    /// </summary>
+    private void InitializeComponent()
+    {
+        this.downloadProgressBar = new System.Windows.Forms.ProgressBar();
+        this.downloadButton = new System.Windows.Forms.Button();
+        this.progressBarPanel = new System.Windows.Forms.Panel();
+        this.urlTextBox = new System.Windows.Forms.TextBox();
+        this.downloadUrlLabel = new System.Windows.Forms.Label();
+        this.progressBarPanel.SuspendLayout();
+        this.SuspendLayout();
+        // 
+        // downloadProgressBar
+        // 
+        this.downloadProgressBar.set_Location(new System.Drawing.Point(13, 23));
+        this.downloadProgressBar.set_Name("DownloadProgress");
+        this.downloadProgressBar.set_Size(new System.Drawing.Size(432, 19));
+        this.downloadProgressBar.set_TabIndex(0);
+        // 
+        // downloadButton
+        // 
+        this.downloadButton.set_Location(new System.Drawing.Point(367, 23));
+        this.downloadButton.set_Name("downloadButton");
+        this.downloadButton.set_Size(new System.Drawing.Size(105, 27));
+        this.downloadButton.set_TabIndex(1);
+        this.downloadButton.set_Text("Download");
+        this.downloadButton.add_Click(new System.EventHandler(
+            this.downloadButton_Click));
+        // 
+        // progressBarPanel
+        // 
+        this.progressBarPanel.set_BorderStyle(System.Windows.Forms.BorderStyle.Fixed3D);
+        this.progressBarPanel.get_Controls().Add(this.downloadProgressBar);
+        this.progressBarPanel.set_Location(new System.Drawing.Point(18, 56));
+        this.progressBarPanel.set_Name("progressBarPanel");
+        this.progressBarPanel.set_Size(new System.Drawing.Size(456, 63));
+        this.progressBarPanel.set_TabIndex(2);
+        // 
+        // urlTextBox
+        // 
+        this.urlTextBox.set_Location(new System.Drawing.Point(104, 26));
+        this.urlTextBox.set_Name("urlTextBox");
+        this.urlTextBox.set_Size(new System.Drawing.Size(247, 21));
+        this.urlTextBox.set_TabIndex(3);
+        // 
+        // downloadUrlLabel
+        // 
+        this.downloadUrlLabel.set_Location(new System.Drawing.Point(18, 26));
+        this.downloadUrlLabel.set_Name("downloadUrlLabel");
+        this.downloadUrlLabel.set_Size(new System.Drawing.Size(86, 19));
+        this.downloadUrlLabel.set_TabIndex(4);
+        this.downloadUrlLabel.set_Text("Download Url");
+        // 
+        // WebClientProgressForm
+        // 
+        this.set_AcceptButton(this.downloadButton);
+        this.set_AutoScaleBaseSize(new System.Drawing.Size(5, 14));
+        this.set_AutoSize(true);
+        this.set_ClientSize(new System.Drawing.Size(497, 143));
+        this.get_Controls().Add(this.progressBarPanel);
+        this.get_Controls().Add(this.downloadUrlLabel);
+        this.get_Controls().Add(this.urlTextBox);
+        this.get_Controls().Add(this.downloadButton);
+        this.set_FormBorderStyle(System.Windows.Forms.FormBorderStyle.FixedDialog);
+        this.set_MaximizeBox(false);
+        this.set_Name("WebClientProgressForm");
+        this.set_Padding(new System.Windows.Forms.Padding(9));
+        this.set_Text("WebClient Download Sample");
+        this.progressBarPanel.ResumeLayout(false);
+        this.ResumeLayout(false);
+        this.PerformLayout();
+    } //InitializeComponent
+
+    /// <summary>
+    /// Clean up any resources being used.
+    /// </summary>
+    protected void Dispose(boolean disposing)
+    {
+        if (disposing) {
+            if (components != null) {
+                components.Dispose();
+            }
+        }
+        super.Dispose(disposing);
+    } //Dispose
+
+    private void downloadButton_Click(Object sender, System.EventArgs e)
+    {
+        // If busy then the user has clicked cancel.
+        if (isBusy) {
+            client.CancelAsync();
+            isBusy = false;
+            this.downloadButton.set_Text("Download");
+        }
+        // Otherwise go ahead and start the download.
+        else {
+            try {
+                this.downloadProgressBar.set_Value(0);
+                Uri uri = new Uri(urlTextBox.get_Text());
+                client.DownloadFileAsync(uri, "localfile.htm");
+                this.downloadButton.set_Text("Cancel");
+                isBusy = true;
+            }
+            catch (UriFormatException exp) {
+                MessageBox.Show(exp.get_Message());
+            }
+        }
+    } //downloadButton_Click
+
+    // Displays a message indicating that the download completed successfully,
+    // or if there was an error it will be displayed instead.
+    private void client_DownloadFileCompleted(
+        Object sender, AsyncCompletedEventArgs e)
+    {
+        isBusy = false;
+        this.downloadButton.set_Text("Download");
+        if (e.get_Error() == null) {
+            MessageBox.Show("Download Complete");
+        }
+        else {
+            MessageBox.Show("Download Not Complete: "
+                + e.get_Error().ToString());
+        }
+    } //client_DownloadFileCompleted
+
+    // Updates the progress indicator with the latest progress
+    private void client_DownloadProgressChanged(
+        Object sender, DownloadProgressChangedEventArgs e)
+    {
+        this.downloadProgressBar.set_Value(e.get_ProgressPercentage());
+    } //client_DownloadProgressChanged
+} //WebClientProgressForm
+
+final class EntryPoint
+{
+    /// <summary>
+    /// The main entry point for the application.
+    /// </summary>
+    /** @attribute STAThread()
+     */
+    public static void main(String[] args)
+    {
+        Application.Run(new WebClientProgressForm());
+    } //main
+} //EntryPoint

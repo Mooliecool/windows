@@ -1,0 +1,326 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<title>Working with Direct2D</title>
+<style type="text/css">
+h1 {
+	color: #FF0000;
+}
+h2 {
+	color: #6699FF;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>Working with Direct2D</h1>
+<h2>Introduction</h2>
+<p>Windows 7 and Windows 2008 R2 come with a lot of cool new features. One of 
+the most exciting new features is a new graphic API powered by DirectX. It 
+allows you to take advantage of graphic cards to render complex scenarios. It 
+includes 3 components:</p>
+<ul>
+	<li>Direct2D: API for drawing vector graphics.</li>
+	<li>DirectWrite: API for text rendering.</li>
+	<li>WIC (Windows Imaging Component): API for bitmaps encoding and decoding. 
+	This API has been around since Windows Vista.</li>
+</ul>
+<p>Direct2D and DirectWrite will be ported to Vista in the future. But in 
+the meanwhile, you need Windows 7 in order to experience the power brought by 
+the new graphic engine.</p>
+<p>Among all the three components, Direct2D is the most important. You need to 
+use Direct2D to render text and bitmap. DirectWrite and WIC do not touch 
+rendering on themselves. Also, only WIC relies on COM runtime. Direct2D and 
+DirectWrite can work without COM runtime. This sample focuses on Direct2D. We 
+will demonstrate other components in the future.</p>
+<p>The main target audiences of the new graphic API are native application 
+developers. This sample (written in managed code) is just for demonstrating 
+purpose. Most managed applications should still use WPF, because WPF provides 
+you with a nice application framework and a nice UI framework. WPF uses Dirct3D 
+9 as its underlying rendering engine, while Direct2D uses Direct3D 10. In most 
+cases, you will not notice too much performance difference between WPF and 
+managed Direct2D. You will gain performance when hardware rendering is not an 
+option (such as server side batch operation), because Direct2D has an optimized 
+software rendering engine, as well as a hardware rendering engine. You may also 
+need Direct2D when working with Direct3D interop scenarios, to take advantages 
+of advanced GPU pipelines such as geometry shader.</p>
+<p>This sample provides an overview of the new vector graphic API. It renders a 
+simple scene with a star (or sun) and a planet (or earth). When you click the 
+planet, it will move around the star.</p>
+<p><img src="Screenshot.png" /></p>
+<p>The sample demostrates the 
+following features:</p>
+<ul>
+	<li>Draw simple vector graphics (such as ellipse).</li>
+	<li>Draw complex paths.</li>
+	<li>Create a PowerShell script to translate XAML path data to C# Direct2D 
+	code.</li>
+	<li>Create solid color and radial gradient brushes.</li>
+	<li>Simple render transform.</li>
+	<li>Perform hit test.</li>
+	<li>Control z-index.</li>
+	<li>Clip path.</li>
+</ul>
+<p>For more information, please refer to the 
+<a href="http://msdn.microsoft.com/en-us/library/dd370990(VS.85).aspx">MSDN documents</a> and the Windows SDK 
+samples.</p>
+<h2>Prepare the project</h2>
+<p>To work with Direct2D, you can either manually write a managed wrapper, or 
+take advantage of the
+<a href="http://code.msdn.microsoft.com/WindowsAPICodePack/Release/ProjectReleases.aspx?ReleaseId=3077">
+Windows API Code Pack</a> (recommended). The Windows API Code Pack exposes most 
+(while not all) of the new Windows 7 and Direct 3D 10/11 features to managed 
+code. It should be sufficient in most scenarios.</p>
+<p>Note since the DirectX part in the code pack is written in managed C++, 
+targeting x86, your managed application will have to target x86 as well (rather 
+than Any CPU) if you&#39;re running on a 64 bit OS. Alternatively, you can recompile 
+the code pack targeting x64. This is required if you want to use the code pack 
+in a 64 bit only environment, such as Windows Azure. This sample will target x86 
+only.</p>
+<p>If you encounter a limitation, you can easily expose the missing feature by 
+modifying the source code. For example, the D3DX10CreateEffectFromFile function 
+in Direct3D, which allows you to load an HLSL file dynimacally without compiling 
+it using the fxc command line tool (and thus very useful during debugging), is 
+missing from the managed code pack. To expose it, you can modify the 
+D3D10Device.h file under DirectX/Header Files/D3D10/Core. In the D3DDevice 
+class, add a new method:</p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-spacerun:yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>Effect^ CreateEffectFromFile(String^ path);<o:p></o:p></span></p>
+<p>Then find the corresponding source file, and implement this method:</p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">Effect^ D3DDevice::CreateEffectFromFile( 
+String^ path)<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">{<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-spacerun:yes">&nbsp;&nbsp;&nbsp;
+</span>ID3D10Effect* pEffect = NULL;<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;
+</span>IntPtr ptr = Marshal::StringToHGlobalUni(path);<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-spacerun:yes">&nbsp;&nbsp;&nbsp;
+</span>CommonUtils::VerifyResult(<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-spacerun:yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>D3DX10CreateEffectFromFile( <o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(LPCTSTR)ptr.ToPointer(),<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>NULL,<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>NULL,<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><span style="color:#A31515">&quot;fx_4_0&quot;</span>,<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>D3D10_SHADER_ENABLE_STRICTNESS,<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>0,<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><span style="color:blue">this</span>-&gt;GetInterface&lt;ID3D10Device&gt;(),<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>NULL,<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>NULL,<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>&amp;pEffect,<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>NULL,<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>NULL));<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><o:p>&nbsp;</o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-spacerun:yes">&nbsp;&nbsp;&nbsp;
+</span><span style="color:blue">return</span> pEffect ?
+<span style="color:
+blue">gcnew</span> Effect( pEffect ) : <span style="color:blue">nullptr</span>;<o:p></o:p></span></p>
+<p class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:新宋体;
+mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">}</span></p>
+<p>The wrapper for the new Graphic API is written in managed C++, so you also 
+need to use managed C++ to expose more features. On the other hand, if you&#39;re 
+working with other new features of Windows 7, such as the new task bar, and you need 
+to expose additional features of the underlying platform, you can simply use C#.</p>
+<p>All features used in this sample are already exposed via the code pack.</p>
+<h2>Essential steps to work with Direct2D</h2>
+<p>To work with Direct 2D, the following steps are required:</p>
+<ul>
+	<li>Create a factory.</li>
+	<li>Create a render target. The render target represents the actual divide. 
+	It can be a simple hwnd (as demonstrate in this sample), a Direct3D device 
+	(DXGI), or anything else.</li>
+	<li>Create other resources, such as brushes.</li>
+	<li>Handle the WM_PAINT message, and render the scene. In managed code, you 
+	perform this step by writing a method that implements the Render delegate of 
+	the Render/DirectHost.</li>
+</ul>
+<p>To render the scene, the following steps are required:</p>
+<ul>
+	<li>Call BeginDraw to initializing the scene.</li>
+	<li>Set the transform matrix for the next graph.</li>
+	<li>Prepare the graph, if necessary. For example, create a bounding 
+	rectangle for text.</li>
+	<li>Call various drawing functions to draw vector/bitmap graphics and texts.</li>
+	<li>Call EndDraw to flush the drawing instructions.</li>
+</ul>
+<p>A note about gradient brushes. Unlike WPF, in Direct2D, gradient brushes 
+always use global coordinate system. So you have to do additional work to 
+calculate the position of each gradient stop.</p>
+<h2>Draw complex paths</h2>
+<p>It is almost impossible to draw complex paths without first creating them in 
+a graphic authoring tool. WPF allows you to draw paths in Expression Design (or 
+Expression Blend directly if the path is not too complex), and then export to 
+XAML. WPF can directly render XAML content as vector graphics. With Direct2D, 
+you do not have the luxuriate to utilize XAML. Traditionally, programmers tend 
+to use bitmaps extensively, and avoid vector graphics as much as possible. 
+However, bitmaps have a lot of disadvantages, such as difficult to animate and 
+losing quality during scaling. Nowadays with WPF, a lot of managed applications 
+have begun to use more and more vector graphics. Our native applications must 
+catch up with them. Also Direct2D is a vector graphic API. So it will be great 
+if we can use Expression Studio, but output Direct2D code instead of XAML.</p>
+<p>You can try to create a tool to perform the translation. This sample provides 
+you with a general idea. XAML is xml, and there&#39;s a powerful tool in Windows 7 
+(and can be downloaded separately in Vista) named PowerShell. PowerShell is 
+capable of a lot of tasks, including parsing xml files. You can use the WPF 
+powered GUI PowerShell ISE to authorize PowerShell scripts. Assume your path 
+contains bezier segments only, you can use the following script to generate C# 
+code from XAML snip.</p>
+<p>$invocation = (Get-Variable MyInvocation -Scope 0).Value<br />
+$currentDir = Split-Path $invocation.InvocationName<br />
+cd $currentDir<br />
+$xmlData = [xml](Get-Content $args[0])<br />
+$segments = $xmlData.PathFigure.SelectNodes(&quot;BezierSegment&quot;)<br />
+$segments | ForEach-Object { &quot;sink.AddBezier(new BezierSegment(<br />
+new Point2F({0}f, {1}f),<br />
+new Point2F({2}f, {3}f),<br />
+new Point2F({4}f, {5}f)));<br />
+&quot; -f $_.GetAttribute(&quot;Point1&quot;).split(&#39;,&#39;)[0],<br />
+$_.GetAttribute(&quot;Point1&quot;).split(&#39;,&#39;)[1],<br />
+$_.GetAttribute(&quot;Point2&quot;).split(&#39;,&#39;)[0],<br />
+$_.GetAttribute(&quot;Point2&quot;).split(&#39;,&#39;)[1],<br />
+$_.GetAttribute(&quot;Point3&quot;).split(&#39;,&#39;)[0],<br />
+$_.GetAttribute(&quot;Point3&quot;).split(&#39;,&#39;)[1]<br />
+} &gt; $args[1]</p>
+<p>For more information about PowerShell, please refer to
+<a href="http://www.microsoft.com/technet/scriptcenter/topics/winpsh/manual/default.mspx">
+http://www.microsoft.com/technet/scriptcenter/topics/winpsh/manual/default.mspx</a>.</p>
+<h2>Render transforms</h2>
+<p>Unlike WPF, in Direct2D, there&#39;s no object tree. A 
+transform is applied to the whole render target, which affects all pending 
+drawing instructions, not to a particular object. So after you want to transform 
+the planet using matrix a, and then want to transform the star with matrix b, 
+you need to follow these steps:</p>
+<ul>
+	<li>Call SetTransform, passing matrix a as the parameter.</li>
+	<li>Draw all elements containing in the planet. They will all use matrix a.</li>
+	<li>Call SetTransform, passing matrix b as the parameter.</li>
+	<li>Draw all elements containing in the star. They will all use matrix b.</li>
+</ul>
+<p>If you want to draw an untransformed element, please set the transform back 
+to an identity matrix before drawing it.</p>
+<p>Note currently the managed code pack does not support Direct2D matrix 
+multiplication. As a workaround, you can either implement your own, or simply 
+create WPF matrixes to perform the multiplications.</p>
+<h2>Hit test</h2>
+<p>To handle mouse input, you handle the standard Win32 message loop. 
+Input system is independent from rendering engines such as Direct2D. However, 
+there is a limitation in WPF and Direct2D interop scenario. You can&#39;t handle the 
+mouse/keyboard events by specifying the event handlers in XAML, because a 
+seperate hwnd is created to render the Direct2D content. You have to handle 
+ComponentDispatcher.ThreadPreprocessMessage to get the Win32 message loop, as 
+you do in a normal WPF/Win32 interop scenario.</p>
+<p>To perform hit test, you call the FillContainsPoint function on the geometry 
+(or StrokeContainsPoint if you only want to hit test the stroke). Note when 
+drawing known geometries (such as ellipse), normally you do not need to create a 
+geometry. However, if you want to perform hit test on the known gemetry, you 
+have to explicitly create it.</p>
+<p>Unlike WPF, with Direct2D&#39;s immediate rendering model, it does not retain a 
+tree about each geometry&#39;s transform, so you must explicitly pass the transform 
+matrix as a parameter in FillContainsPoint.</p>
+<h2>Z-index</h2>
+<p>Once again, in an immediate rendering envionment, you lose the track of 
+previous rendered elements. It will be impossible to say, hey, the planet is 
+rendered later than the star, but I hope the star will cover the planet. There&#39;s 
+no concept of z-index in Direct2D. To simulate z-index, you will have to plan 
+carefully on the order of the elements being rendered. For exmaple, if you hope 
+the star to cover the planet, draw the planet first and then the star. On the 
+othe hand, if you hope the planet to cover the star, draw the star first and 
+then the planet.</p>
+<h2>Clip path</h2>
+<p>Direct2D doesn&#39;t support clipping path directly. However, a similar effect 
+can be achieved by intersecting the geometry with the clipping path. To perform 
+common geometry operations (such as intersect and union), you need to prepare 
+the two source geometries first, and then call CombineWithGeometry on the first 
+geometry, passing the second geometry as the parameter, and finally save the 
+result to a third geometry. Please remember to delete the source geometries if 
+you no longer need them.</p>
+<h2>Conclusion</h2>
+<p>Windows 7 ships with a new vector graphic API: Direct2D. It primarily targets 
+native developers, but you can also use it in managed applications, if you want. 
+However, for most managed applications, you should still use WPF. You can embed 
+Direct2D scenes inside a WPF application.</p>
+
+</body>
+
+</html>

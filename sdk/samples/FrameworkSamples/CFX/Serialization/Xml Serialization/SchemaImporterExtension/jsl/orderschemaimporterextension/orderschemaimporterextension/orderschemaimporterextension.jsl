@@ -1,0 +1,66 @@
+package Microsoft.Samples;
+
+#region Import directives
+import System.*;
+import System.Collections.*;
+import System.Collections.Generic.*;
+import System.Collections.Specialized.*;
+import System.Text.*;
+import System.Xml.Serialization.*;
+import System.Xml.Serialization.Advanced.*;
+import System.Xml.Schema.*;
+import System.Xml.*;
+import System.CodeDom.*;
+import System.CodeDom.Compiler.*;
+import Microsoft.Samples.*;
+#endregion
+   
+public class OrderSchemaImporterExtension extends SchemaImporterExtension
+{
+    static
+    {
+    } //OrderSchemaImporterExtension
+
+    public String ImportSchemaType(XmlSchemaType type, XmlSchemaObject context,
+        XmlSchemas schemas, XmlSchemaImporter importer,
+        CodeNamespace codeNamespace, StringCollection references,
+        CodeGenerationOptions options, ICodeGenerator codeGenerator)
+    {
+        ConsoleColor defaultColor = Console.get_BackgroundColor();
+        Console.set_BackgroundColor(ConsoleColor.Blue);
+        Console.WriteLine("\tOrderExtension called for type: " + type.ToString());
+        Console.set_BackgroundColor(defaultColor);
+        return null;
+    } //ImportSchemaType
+
+    public String ImportSchemaType(String name, String ns,
+        XmlSchemaObject context, XmlSchemas schemas,
+        XmlSchemaImporter importer, CodeNamespace codeNamespace,
+        StringCollection references, CodeGenerationOptions options,
+        ICodeGenerator codeGenerator)
+    {
+        ConsoleColor defaultColor = Console.get_BackgroundColor();
+        Console.set_BackgroundColor(ConsoleColor.Blue);
+        Console.WriteLine("\tOrderExtension called for name = " + name
+            + " and namespace = " + ns);
+        Console.set_BackgroundColor(defaultColor);
+
+        if (name.Equals("Order") && ns.Equals("http://orders/")) {
+            Console.set_BackgroundColor(ConsoleColor.Blue);
+            Console.WriteLine();
+            Console.WriteLine("\t\tOrderExtension matched for Order!");
+            Console.WriteLine();
+            Console.set_BackgroundColor(defaultColor);
+            references.Add("Order.dll");
+            codeNamespace.get_Imports().Add(
+                new CodeNamespaceImport("Microsoft.Samples"));
+            return "Microsoft.Samples.Order";
+        }
+        return null;
+    } //ImportSchemaType
+
+    public CodeExpression ImportDefaultValue(String value, String type)
+    {
+        return new CodePrimitiveExpression(new Order());
+    } //ImportDefaultValue
+} //OrderSchemaImporterExtension

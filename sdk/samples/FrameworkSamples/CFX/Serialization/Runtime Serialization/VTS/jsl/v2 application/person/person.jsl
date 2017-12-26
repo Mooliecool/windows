@@ -1,0 +1,132 @@
+package Microsoft.Samples.Test;
+
+import System.*;
+import System.Runtime.Serialization.*;
+
+/// <summary>
+/// Version 2 of the Person class.
+/// </summary>
+/// 
+/** @attribute Serializable()
+ */
+public class Person
+{
+    #region Constructors
+    public Person()
+    {
+    } //Person
+    #endregion
+
+    #region Fields
+    private String _name;
+    private String _address;
+    private DateTime _birthDate;
+
+    /** @attribute OptionalField(VersionAdded = 2)
+     */
+    private int _age;
+    #endregion
+
+    #region Properties
+    /** @property 
+     */
+    public String get_Name()
+    {
+        return _name;
+    } //get_Name
+
+    /** @property 
+     */
+    public void set_Name(String value)
+    {
+        _name = value;
+    } //set_Name
+
+    /** @property 
+     */
+    public String get_Address()
+    {
+        return _address;
+    } //get_Address
+
+    /** @property 
+     */
+    public void set_Address(String value)
+    {
+        _address = value;
+    } //set_Address
+
+    /** @property 
+     */
+    public DateTime get_BirthDate()
+    {
+        return _birthDate;
+    } //get_BirthDate
+
+    /** @property 
+     */
+    public void set_BirthDate(DateTime value)
+    {
+        _birthDate = value;
+    } //set_BirthDate
+
+    /** @property 
+     */
+    public int get_Age()
+    {
+        return _age;
+    } //get_Age
+
+    /** @property 
+     */
+    public void set_Age(int value)
+    {
+        _age = value;
+    } //set_Age
+    #endregion
+
+    #region Serialization Processing
+    /** @attribute OnDeserializing()
+     */
+    private void OnDeserializing(StreamingContext context)
+    {
+        Console.WriteLine("\nDeserializing into a v2 type of Person.");
+        _age = 0;
+        Console.WriteLine("\n\tDefaults set:");
+        Console.WriteLine("\t\tAge: " + _age);
+    } //OnDeserializing
+
+    /** @attribute OnDeserialized()
+     */
+    private void OnDeserialized(StreamingContext context)
+    {
+        Console.WriteLine("\nDeserialization completed.");
+        if (_age == 0) {
+            _age = DateTime.get_Now().get_Year() - _birthDate.get_Year();
+            if (DateTime.get_Now().get_DayOfYear() < _birthDate.get_DayOfYear()) {
+                _age--;
+            }
+        }
+        Console.WriteLine("\n\tFixups completed.");
+        Console.WriteLine("\tMy Person v2 values are: ");
+        Console.WriteLine("\t\tName: " + _name);
+        Console.WriteLine("\t\tAddress: " + _address);
+        Console.WriteLine("\t\tBirthDate: " + _birthDate.ToShortDateString());
+        Console.WriteLine("\t\tAge: " + _age);
+    } //OnDeserialized
+
+    /** @attribute OnSerializing()
+     */
+    private void OnSerializing(StreamingContext context)
+    {
+        Console.WriteLine("\nOnSerializing called.");
+    } //OnSerializing
+
+    /** @attribute OnSerialized()
+     */
+    private void OnSerialized(StreamingContext context)
+    {
+        Console.WriteLine("\nOnSerialized called.");
+    } //OnSerialized
+    #endregion
+} //Person 

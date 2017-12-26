@@ -1,0 +1,1 @@
+netsh http add urlacl url=http://+:81/ReverseString user=everyone listen=yes delegate=yes

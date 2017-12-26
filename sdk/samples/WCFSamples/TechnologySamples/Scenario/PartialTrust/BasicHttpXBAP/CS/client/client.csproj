@@ -1,0 +1,114 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{AF464349-D24D-4497-BDFE-9406A15C2F50}</ProjectGuid>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <RootNamespace>Microsoft.PartialTrust.Samples</RootNamespace>
+    <AssemblyName>client</AssemblyName>
+    <WarningLevel>4</WarningLevel>
+    <OutputType>winexe</OutputType>
+    <EnableSecurityDebugging>false</EnableSecurityDebugging>
+    <!-- Most people will use Publish dialog in Visual Studio to increment this -->
+    <HostInBrowser>True</HostInBrowser>
+    <TargetZone>Internet</TargetZone>
+    <StartAction>Program</StartAction>
+    <StartProgram>$(WINDIR)\System32\PresentationHost.exe</StartProgram>
+    <StartArguments>-debug "$(MSBuildProjectDirectory)\bin\$(Configuration)\$(AssemblyName)$(ApplicationExtension)"</StartArguments>
+    <SignManifests>True</SignManifests>
+    <ManifestKeyFile>PartialTrustWpfCallingWcf_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestCertificateThumbprint>B2DD54DD4EA00589E20D5A9B95BFF2530A6E4742</ManifestCertificateThumbprint>
+    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <PublishUrl>http://localhost/publish/</PublishUrl>
+    <Install>false</Install>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>false</MapFileExtensions>
+    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
+    <WebPage>publish.htm</WebPage>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <ApplicationExtension>.xbap</ApplicationExtension>
+    <BootstrapperEnabled>false</BootstrapperEnabled>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>.\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>false</DebugSymbols>
+    <Optimize>true</Optimize>
+    <OutputPath>.\bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Runtime.Serialization">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.ServiceModel">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System.Printing" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="MyApp.xaml" />
+    <Page Include="Page1.xaml" />
+    <Compile Include="CalcPlusService.cs" />
+    <Compile Include="Page1.xaml.cs">
+      <DependentUpon>Page1.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PartialTrustWpfCallingWcf_TemporaryKey.pfx" />
+    <None Include="Properties\app.manifest" />
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup Condition="'$(Do_MSBUILD_FromWinBuild)' !='true'">
+    <PostBuildEvent>copy "$(TargetDir)client.exe" %25SystemDrive%25\inetpub\wwwroot\servicemodelsamples
+copy "$(TargetDir)client.pdb" %25SystemDrive%25\inetpub\wwwroot\servicemodelsamples
+copy "$(TargetDir)client.xbap" %25SystemDrive%25\inetpub\wwwroot\servicemodelsamples
+copy "$(TargetDir)client.manifest" %25SystemDrive%25\inetpub\wwwroot\servicemodelsamples
+</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Do_MSBUILD_FromWinBuild)' != 'true'">
+    <PostBuildEvent>copy "$(TargetDir)client.exe" %25SystemDrive%25\inetpub\wwwroot\servicemodelsamples\
+copy "$(TargetDir)client.xbap" %25SystemDrive%25\inetpub\wwwroot\servicemodelsamples\
+copy "$(TargetDir)client.exe.manifest" %25SystemDrive%25\inetpub\wwwroot\servicemodelsamples\
+copy "$(TargetDir)client.pdb" %25SystemDrive%25\inetpub\wwwroot\servicemodelsamples\
+
+</PostBuildEvent>
+  </PropertyGroup>
+</Project>

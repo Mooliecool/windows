@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="ComplexTypeModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityContainer Name="ComplexTypeModelStoreContainer">
+          <EntitySet Name="Person" EntityType="ComplexTypeModel.Store.Person" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="PersonAddress" EntityType="ComplexTypeModel.Store.PersonAddress" store:Type="Tables" Schema="dbo" />
+          <AssociationSet Name="FK_PersonAddress_Person" Association="ComplexTypeModel.Store.FK_PersonAddress_Person">
+            <End Role="Person" EntitySet="Person" />
+            <End Role="PersonAddress" EntitySet="PersonAddress" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Person">
+          <Key>
+            <PropertyRef Name="PersonID" />
+          </Key>
+          <Property Name="PersonID" Type="int" Nullable="false" />
+          <Property Name="LastName" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="FirstName" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="PersonCategory" Type="smallint" Nullable="false" />
+          <Property Name="HireDate" Type="datetime" />
+          <Property Name="EnrollmentDate" Type="datetime" />
+          <Property Name="Picture" Type="image" />
+          <Property Name="BusinessCredits" Type="varchar" MaxLength="50" />
+          <Property Name="AdminDate" Type="datetime" />
+        </EntityType>
+        <EntityType Name="PersonAddress">
+          <Key>
+            <PropertyRef Name="PersonID" />
+          </Key>
+          <Property Name="PersonID" Type="int" Nullable="false" />
+          <Property Name="Address" Type="varchar" MaxLength="50" />
+          <Property Name="Postcode" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <Association Name="FK_PersonAddress_Person">
+          <End Role="Person" Type="ComplexTypeModel.Store.Person" Multiplicity="1" />
+          <End Role="PersonAddress" Type="ComplexTypeModel.Store.PersonAddress" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Person">
+              <PropertyRef Name="PersonID" />
+            </Principal>
+            <Dependent Role="PersonAddress">
+              <PropertyRef Name="PersonID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="GetPersonNameByPersonID" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="PersonID" Type="int" Mode="In" />
+        </Function>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="ComplexTypeModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityContainer Name="ComplexTypeEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="People" EntityType="ComplexTypeModel.Person" />
+          <FunctionImport Name="GetPersonNameByPersonID" ReturnType="Collection(ComplexTypeModel.PersonName)">
+            <Parameter Name="PersonID" Mode="In" Type="Int32" /></FunctionImport>
+        </EntityContainer>
+        <EntityType Name="Person">
+          <Key>
+            <PropertyRef Name="PersonID" />
+          </Key>
+          <Property Name="PersonID" Type="Int32" Nullable="false" />
+          <Property Name="LastName" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="FirstName" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="PersonCategory" Type="Int16" Nullable="false" />
+          <Property Name="Picture" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="BusinessCredits" Type="String" MaxLength="50" Unicode="false" FixedLength="false" />
+          <Property Name="PersonDate" Type="ComplexTypeModel.PersonDate" Nullable="false" />
+          <Property Name="PersonAddress" Type="ComplexTypeModel.PersonAddress" Nullable="false" />
+        </EntityType>
+        <ComplexType Name="PersonDate" >
+          <Property Type="DateTime" Name="HireDate" Nullable="true" />
+          <Property Type="DateTime" Name="EnrollmentDate" Nullable="true" />
+          <Property Type="DateTime" Name="AdminDate" Nullable="true" /></ComplexType>
+        <ComplexType Name="PersonAddress" >
+          <Property Type="String" Name="Address" Nullable="true" />
+          <Property Type="String" Name="Postcode" Nullable="true" /></ComplexType>
+        <ComplexType Name="PersonName">
+          <Property Type="String" Name="FirstName" Nullable="false" MaxLength="50" />
+          <Property Type="String" Name="LastName" Nullable="false" MaxLength="50" /></ComplexType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ComplexTypeModelStoreContainer" CdmEntityContainer="ComplexTypeEntities">
+          <EntitySetMapping Name="People"><EntityTypeMapping TypeName="ComplexTypeModel.Person"><MappingFragment StoreEntitySet="Person">
+            <ScalarProperty Name="PersonID" ColumnName="PersonID" />
+            <ScalarProperty Name="LastName" ColumnName="LastName" />
+            <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+            <ScalarProperty Name="PersonCategory" ColumnName="PersonCategory" />
+            <ScalarProperty Name="Picture" ColumnName="Picture" />
+            <ScalarProperty Name="BusinessCredits" ColumnName="BusinessCredits" />
+                <ComplexProperty Name="PersonDate">
+                  <ScalarProperty Name="HireDate" ColumnName="HireDate" />
+                  <ScalarProperty Name="EnrollmentDate" ColumnName="EnrollmentDate" />
+                  <ScalarProperty Name="AdminDate" ColumnName="AdminDate" /></ComplexProperty>
+          </MappingFragment></EntityTypeMapping>
+            <EntityTypeMapping TypeName="IsTypeOf(ComplexTypeModel.Person)">
+              <MappingFragment StoreEntitySet="PersonAddress">
+                <ScalarProperty Name="PersonID" ColumnName="PersonID" />
+                <ComplexProperty Name="PersonAddress">
+                  <ScalarProperty Name="Postcode" ColumnName="Postcode" />
+                  <ScalarProperty Name="Address" ColumnName="Address" /></ComplexProperty></MappingFragment></EntityTypeMapping></EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetPersonNameByPersonID" FunctionName="ComplexTypeModel.Store.GetPersonNameByPersonID" />
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams>
+      <Diagram Name="ComplexType">
+        <EntityTypeShape EntityType="ComplexTypeModel.Person" Width="1.5" PointX="0.75" PointY="1" Height="2.5571907552083331" IsExpanded="true" />
+        </Diagram></Diagrams>
+  </Designer>
+</edmx:Edmx>

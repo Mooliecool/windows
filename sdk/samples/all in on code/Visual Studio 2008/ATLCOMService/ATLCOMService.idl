@@ -1,0 +1,51 @@
+// ATLCOMService.idl : IDL source for ATLCOMService
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (ATLCOMService.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(1B877090-76CD-4EDE-8115-EC4CCD9676F3),
+	dual,
+	nonextensible,
+	helpstring("ISimpleObject Interface"),
+	pointer_default(unique)
+]
+interface ISimpleObject : IDispatch{
+	[propget, id(1), helpstring("property FloatProperty")] HRESULT FloatProperty([out, retval] FLOAT* pVal);
+	[propput, id(1), helpstring("property FloatProperty")] HRESULT FloatProperty([in] FLOAT newVal);
+	[id(2), helpstring("method HelloWorld")] HRESULT HelloWorld([out,retval] BSTR* pRet);
+	[id(3), helpstring("method GetProcessThreadID")] HRESULT GetProcessThreadID([out] LONG* pdwProcessId, [out] LONG* pdwThreadId);
+};
+[
+	uuid(CC2CA6F0-2220-4D77-BA46-4BCB62156A28),
+	version(1.0),
+	helpstring("ATLCOMService 1.0 Type Library")
+]
+library ATLCOMServiceLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(7DACF5E9-2885-4E4E-83DD-CA6CC3A88B6D),
+		helpstring("_ISimpleObjectEvents Interface")
+	]
+	dispinterface _ISimpleObjectEvents
+	{
+		properties:
+		methods:
+			[id(1), helpstring("method FloatPropertyChanging")] void FloatPropertyChanging([in] FLOAT NewValue, [in,out] VARIANT_BOOL* Cancel);
+	};
+	[
+		uuid(388F1C82-ED00-4966-9590-02F6B9CCA41B),
+		helpstring("SimpleObject Class")
+	]
+	coclass SimpleObject
+	{
+		[default] interface ISimpleObject;
+		[default, source] dispinterface _ISimpleObjectEvents;
+	};
+};

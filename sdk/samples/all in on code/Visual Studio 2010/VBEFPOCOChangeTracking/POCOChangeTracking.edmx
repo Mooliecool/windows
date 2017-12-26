@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="POCOChangeTrackingModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityContainer Name="POCOChangeTrackingModelStoreContainer">
+          <EntitySet Name="Course" EntityType="POCOChangeTrackingModel.Store.Course" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Department" EntityType="POCOChangeTrackingModel.Store.Department" store:Type="Tables" Schema="dbo" />
+          <AssociationSet Name="FK_Course_Department" Association="POCOChangeTrackingModel.Store.FK_Course_Department">
+            <End Role="Department" EntitySet="Department" />
+            <End Role="Course" EntitySet="Course" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Course">
+          <Key>
+            <PropertyRef Name="CourseID" />
+          </Key>
+          <Property Name="CourseID" Type="int" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" MaxLength="100" />
+          <Property Name="Credits" Type="int" />
+          <Property Name="DepartmentID" Type="int" />
+          <Property Name="StatusID" Type="bit" />
+        </EntityType>
+        <EntityType Name="Department">
+          <Key>
+            <PropertyRef Name="DepartmentID" />
+          </Key>
+          <Property Name="DepartmentID" Type="int" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" />
+          <Property Name="Budget" Type="money" />
+          <Property Name="StartDate" Type="datetime" />
+          <Property Name="Administrator" Type="int" />
+        </EntityType>
+        <Association Name="FK_Course_Department">
+          <End Role="Department" Type="POCOChangeTrackingModel.Store.Department" Multiplicity="0..1" />
+          <End Role="Course" Type="POCOChangeTrackingModel.Store.Course" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Department">
+              <PropertyRef Name="DepartmentID" />
+            </Principal>
+            <Dependent Role="Course">
+              <PropertyRef Name="DepartmentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="POCOChangeTrackingModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityContainer Name="POCOChangeTrackingEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Courses" EntityType="POCOChangeTrackingModel.Course" />
+          <EntitySet Name="Departments" EntityType="POCOChangeTrackingModel.Department" />
+          <AssociationSet Name="FK_Course_Department" Association="POCOChangeTrackingModel.FK_Course_Department">
+            <End Role="Department" EntitySet="Departments" />
+            <End Role="Course" EntitySet="Courses" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Course">
+          <Key>
+            <PropertyRef Name="CourseID" />
+          </Key>
+          <Property Name="CourseID" Type="Int32" Nullable="false" />
+          <Property Name="Title" Type="String" MaxLength="100" Unicode="true" FixedLength="false" />
+          <Property Name="Credits" Type="Int32" />
+          <Property Name="DepartmentID" Type="Int32" />
+          <Property Name="StatusID" Type="Boolean" />
+          <NavigationProperty Name="Department" Relationship="POCOChangeTrackingModel.FK_Course_Department" FromRole="Course" ToRole="Department" />
+        </EntityType>
+        <EntityType Name="Department">
+          <Key>
+            <PropertyRef Name="DepartmentID" />
+          </Key>
+          <Property Name="DepartmentID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Budget" Type="Decimal" Precision="19" Scale="4" />
+          <Property Name="StartDate" Type="DateTime" />
+          <Property Name="Administrator" Type="Int32" />
+          <NavigationProperty Name="Courses" Relationship="POCOChangeTrackingModel.FK_Course_Department" FromRole="Department" ToRole="Course" />
+        </EntityType>
+        <Association Name="FK_Course_Department">
+          <End Role="Department" Type="POCOChangeTrackingModel.Department" Multiplicity="0..1" />
+          <End Role="Course" Type="POCOChangeTrackingModel.Course" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Department">
+              <PropertyRef Name="DepartmentID" />
+            </Principal>
+            <Dependent Role="Course">
+              <PropertyRef Name="DepartmentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="POCOChangeTrackingModelStoreContainer" CdmEntityContainer="POCOChangeTrackingEntities">
+          <EntitySetMapping Name="Courses"><EntityTypeMapping TypeName="POCOChangeTrackingModel.Course"><MappingFragment StoreEntitySet="Course">
+            <ScalarProperty Name="CourseID" ColumnName="CourseID" />
+            <ScalarProperty Name="Title" ColumnName="Title" />
+            <ScalarProperty Name="Credits" ColumnName="Credits" />
+            <ScalarProperty Name="DepartmentID" ColumnName="DepartmentID" />
+            <ScalarProperty Name="StatusID" ColumnName="StatusID" />
+          </MappingFragment></EntityTypeMapping></EntitySetMapping>
+          <EntitySetMapping Name="Departments"><EntityTypeMapping TypeName="POCOChangeTrackingModel.Department"><MappingFragment StoreEntitySet="Department">
+            <ScalarProperty Name="DepartmentID" ColumnName="DepartmentID" />
+            <ScalarProperty Name="Name" ColumnName="Name" />
+            <ScalarProperty Name="Budget" ColumnName="Budget" />
+            <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+            <ScalarProperty Name="Administrator" ColumnName="Administrator" />
+          </MappingFragment></EntityTypeMapping></EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams>
+      <Diagram Name="POCOChangeTracking">
+        <EntityTypeShape EntityType="POCOChangeTrackingModel.Course" Width="1.5" PointX="3" PointY="0.875" Height="1.9210009765625" IsExpanded="true" />
+        <EntityTypeShape EntityType="POCOChangeTrackingModel.Department" Width="1.5" PointX="0.75" PointY="0.875" Height="1.9210009765625" IsExpanded="true" />
+        <AssociationConnector Association="POCOChangeTrackingModel.FK_Course_Department" ManuallyRouted="false">
+          <ConnectorPoint PointX="2.25" PointY="1.83550048828125" />
+          <ConnectorPoint PointX="3" PointY="1.83550048828125" />
+        </AssociationConnector>
+      </Diagram>
+    </Diagrams>
+  </Designer>
+</edmx:Edmx>

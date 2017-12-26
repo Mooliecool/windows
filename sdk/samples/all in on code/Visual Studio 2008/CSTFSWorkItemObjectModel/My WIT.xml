@@ -1,0 +1,280 @@
+<WITD application="Work item type editor" version="1.0" xmlns:witd="http://schemas.microsoft.com/VisualStudio/2005/workitemtracking/typedef">
+  <WORKITEMTYPE name="My WIT">
+    <DESCRIPTION>This WIT is used to demo TFS work item object models. It is created based on the Task WIT from MSF Agile process template.</DESCRIPTION>
+    <FIELDS>
+      <FIELD name="Title" refname="System.Title" type="String" reportable="dimension">
+        <HELPTEXT>Short description of the task used to differentiate it in a list or report</HELPTEXT>
+        <REQUIRED />
+      </FIELD>
+      <FIELD name="State" refname="System.State" type="String" reportable="dimension">
+        <HELPTEXT>The workflow state of the task</HELPTEXT>
+      </FIELD>
+      <FIELD name="Rev" refname="System.Rev" type="Integer" reportable="dimension" />
+      <FIELD name="Changed By" refname="System.ChangedBy" type="String" reportable="dimension">
+        <VALIDUSER />
+      </FIELD>
+      <FIELD name="Issue" refname="Microsoft.VSTS.Common.Issue" type="String" reportable="dimension">
+        <HELPTEXT>Used to highlight a task, e.g., to mark it as an issue</HELPTEXT>
+        <REQUIRED />
+        <ALLOWEDVALUES expanditems="true">
+          <LISTITEM value="Yes" />
+          <LISTITEM value="No" />
+        </ALLOWEDVALUES>
+        <DEFAULT from="value" value="No" />
+      </FIELD>
+      <FIELD name="State Change Date" refname="Microsoft.VSTS.Common.StateChangeDate" type="DateTime">
+        <WHENCHANGED field="System.State">
+          <SERVERDEFAULT from="clock" />
+        </WHENCHANGED>
+        <WHENNOTCHANGED field="System.State">
+          <READONLY />
+        </WHENNOTCHANGED>
+      </FIELD>
+      <FIELD name="Activated Date" refname="Microsoft.VSTS.Common.ActivatedDate" type="DateTime" reportable="dimension">
+        <WHENNOTCHANGED field="System.State">
+          <READONLY />
+        </WHENNOTCHANGED>
+      </FIELD>
+      <FIELD name="Activated By" refname="Microsoft.VSTS.Common.ActivatedBy" type="String" reportable="dimension">
+        <WHENNOTCHANGED field="System.State">
+          <READONLY />
+        </WHENNOTCHANGED>
+      </FIELD>
+      <FIELD name="Reason" refname="System.Reason" type="String" reportable="dimension">
+        <HELPTEXT>The reason why the task is in the current state</HELPTEXT>
+      </FIELD>
+      <FIELD name="Assigned To" refname="System.AssignedTo" type="String" reportable="dimension">
+        <ALLOWEXISTINGVALUE />
+        <VALIDUSER />
+      </FIELD>
+      <FIELD name="Work Item Type" refname="System.WorkItemType" type="String" reportable="dimension" />
+      <FIELD name="Closed By" refname="Microsoft.VSTS.Common.ClosedBy" type="String" reportable="dimension">
+        <WHENNOTCHANGED field="System.State">
+          <READONLY />
+        </WHENNOTCHANGED>
+      </FIELD>
+      <FIELD name="Closed Date" refname="Microsoft.VSTS.Common.ClosedDate" type="DateTime" reportable="dimension">
+        <WHENNOTCHANGED field="System.State">
+          <READONLY />
+        </WHENNOTCHANGED>
+      </FIELD>
+      <FIELD name="Rank" refname="Microsoft.VSTS.Common.Rank" type="String" reportable="dimension">
+        <HELPTEXT>Stack rank to prioritize work</HELPTEXT>
+      </FIELD>
+      <FIELD name="Created Date" refname="System.CreatedDate" type="DateTime" reportable="dimension" />
+      <FIELD name="Created By" refname="System.CreatedBy" type="String" reportable="dimension" />
+      <FIELD name="Integration Build" refname="Microsoft.VSTS.Build.IntegrationBuild" type="String" reportable="dimension">
+        <HELPTEXT>The build in which the task was completed</HELPTEXT>
+        <SUGGESTEDVALUES expanditems="true">
+          <LISTITEM value="&lt;None&gt;" />
+        </SUGGESTEDVALUES>
+      </FIELD>
+      <FIELD name="Discipline" refname="Microsoft.VSTS.Common.Discipline" type="String" reportable="dimension">
+        <HELPTEXT>The discipline to which the task belongs</HELPTEXT>
+        <ALLOWEDVALUES expanditems="true">
+          <LISTITEM value="Development" />
+          <LISTITEM value="Test" />
+          <LISTITEM value="Project Management" />
+          <LISTITEM value="Requirements" />
+          <LISTITEM value="Architecture" />
+          <LISTITEM value="Release Management" />
+        </ALLOWEDVALUES>
+      </FIELD>
+      <FIELD name="Remaining Work" refname="Microsoft.VSTS.Scheduling.RemainingWork" type="Double" reportable="measure" formula="sum">
+        <HELPTEXT>An estimate of the number of hours remaining to complete the task</HELPTEXT>
+      </FIELD>
+      <FIELD name="Completed Work" refname="Microsoft.VSTS.Scheduling.CompletedWork" type="Double" reportable="measure" formula="sum">
+        <HELPTEXT>The number of hours that have been completed for this task</HELPTEXT>
+      </FIELD>
+      <FIELD name="Baseline Work" refname="Microsoft.VSTS.Scheduling.BaselineWork" type="Double" reportable="measure" formula="sum">
+        <HELPTEXT>The number of hours of work from the baseline plan</HELPTEXT>
+      </FIELD>
+      <FIELD name="Finish Date" refname="Microsoft.VSTS.Scheduling.FinishDate" type="DateTime" reportable="dimension">
+        <HELPTEXT>The date to finish the task</HELPTEXT>
+      </FIELD>
+      <FIELD name="Task Hierarchy" refname="Microsoft.VSTS.Scheduling.TaskHierarchy" type="String" reportable="dimension">
+        <HELPTEXT>A string representing MS-Project context for the given task</HELPTEXT>
+      </FIELD>
+      <FIELD name="Start Date" refname="Microsoft.VSTS.Scheduling.StartDate" type="DateTime" reportable="dimension">
+        <HELPTEXT>The date to start the task</HELPTEXT>
+      </FIELD>
+      <FIELD name="Exit Criteria" refname="Microsoft.VSTS.Common.ExitCriteria" type="String" reportable="dimension">
+        <HELPTEXT>Flag to determine if this scenario should be tracked as an exit criteria for the iteration</HELPTEXT>
+        <REQUIRED />
+        <ALLOWEDVALUES expanditems="true">
+          <LISTITEM value="Yes" />
+          <LISTITEM value="No" />
+        </ALLOWEDVALUES>
+        <DEFAULT from="value" value="No" />
+      </FIELD>
+      <FIELD name="Description" refname="System.Description" type="PlainText" />
+      <FIELD name="History" refname="System.History" type="History">
+        <HELPTEXT>Discussion thread and other historical information</HELPTEXT>
+      </FIELD>
+      <FIELD name="RelatedLinkCount" refname="System.RelatedLinkCount" type="Integer" />
+      <FIELD name="Iteration Path" refname="System.IterationPath" type="TreePath" reportable="dimension">
+        <HELPTEXT>The iteration of the product with which this task is associated</HELPTEXT>
+      </FIELD>
+      <FIELD name="IterationID" refname="System.IterationId" type="Integer" />
+      <FIELD name="ExternalLinkCount" refname="System.ExternalLinkCount" type="Integer" />
+      <FIELD name="Team Project" refname="System.TeamProject" type="String" reportable="dimension" />
+      <FIELD name="HyperLinkCount" refname="System.HyperLinkCount" type="Integer" />
+      <FIELD name="AttachedFileCount" refname="System.AttachedFileCount" type="Integer" />
+      <FIELD name="Node Name" refname="System.NodeName" type="String" />
+      <FIELD name="Area Path" refname="System.AreaPath" type="TreePath" reportable="dimension">
+        <HELPTEXT>The area of the product with which this task is associated</HELPTEXT>
+      </FIELD>
+      <FIELD name="Revised Date" refname="System.RevisedDate" type="DateTime" />
+      <FIELD name="Changed Date" refname="System.ChangedDate" type="DateTime" reportable="dimension" />
+      <FIELD name="ID" refname="System.Id" type="Integer" reportable="dimension" />
+      <FIELD name="AreaID" refname="System.AreaId" type="Integer" />
+      <FIELD name="Authorized As" refname="System.AuthorizedAs" type="String" />
+    </FIELDS>
+    <WORKFLOW>
+      <STATES>
+        <STATE value="Active">
+          <FIELDS>
+            <FIELD refname="Microsoft.VSTS.Common.ClosedDate">
+              <EMPTY />
+            </FIELD>
+            <FIELD refname="Microsoft.VSTS.Common.ClosedBy">
+              <EMPTY />
+            </FIELD>
+          </FIELDS>
+        </STATE>
+        <STATE value="Closed" />
+      </STATES>
+      <TRANSITIONS>
+        <TRANSITION from="" to="Active">
+          <REASONS>
+            <DEFAULTREASON value="New" />
+          </REASONS>
+          <FIELDS>
+            <FIELD refname="Microsoft.VSTS.Common.ActivatedBy">
+              <COPY from="currentuser" />
+              <VALIDUSER />
+              <REQUIRED />
+            </FIELD>
+            <FIELD refname="Microsoft.VSTS.Common.ActivatedDate">
+              <SERVERDEFAULT from="clock" />
+            </FIELD>
+            <FIELD refname="System.AssignedTo">
+              <DEFAULT from="currentuser" />
+            </FIELD>
+          </FIELDS>
+        </TRANSITION>
+        <TRANSITION from="Active" to="Closed">
+          <REASONS>
+            <DEFAULTREASON value="Completed" />
+            <REASON value="Deferred" />
+            <REASON value="Obsolete" />
+            <REASON value="Cut" />
+          </REASONS>
+          <FIELDS>
+            <FIELD refname="Microsoft.VSTS.Common.ClosedDate">
+              <SERVERDEFAULT from="clock" />
+            </FIELD>
+            <FIELD refname="Microsoft.VSTS.Common.ClosedBy">
+              <COPY from="currentuser" />
+              <VALIDUSER />
+              <REQUIRED />
+            </FIELD>
+            <FIELD refname="Microsoft.VSTS.Common.ActivatedBy">
+              <READONLY />
+            </FIELD>
+            <FIELD refname="Microsoft.VSTS.Common.ActivatedDate">
+              <READONLY />
+            </FIELD>
+          </FIELDS>
+          <ACTIONS>
+            <ACTION value="Microsoft.VSTS.Actions.Checkin" />
+          </ACTIONS>
+        </TRANSITION>
+        <TRANSITION from="Closed" to="Active">
+          <REASONS>
+            <DEFAULTREASON value="Reactivated" />
+          </REASONS>
+          <FIELDS>
+            <FIELD refname="Microsoft.VSTS.Common.ActivatedBy">
+              <COPY from="currentuser" />
+              <VALIDUSER />
+              <REQUIRED />
+            </FIELD>
+            <FIELD refname="Microsoft.VSTS.Common.ActivatedDate">
+              <SERVERDEFAULT from="clock" />
+            </FIELD>
+            <FIELD refname="System.AssignedTo">
+              <COPY from="field" field="Microsoft.VSTS.Common.ClosedBy" />
+            </FIELD>
+          </FIELDS>
+        </TRANSITION>
+      </TRANSITIONS>
+    </WORKFLOW>
+    <FORM>
+      <Layout>
+        <Group>
+          <Column PercentWidth="70">
+            <Control FieldName="System.Title" Type="FieldControl" Label="&amp;Title:" LabelPosition="Left" />
+          </Column>
+          <Column PercentWidth="30">
+            <Control FieldName="Microsoft.VSTS.Common.Discipline" Type="FieldControl" Label="&amp;Discipline:" LabelPosition="Left" />
+          </Column>
+        </Group>
+        <Group Label="Classification">
+          <Column PercentWidth="100">
+            <Control FieldName="System.AreaPath" Type="WorkItemClassificationControl" Label="&amp;Area:" LabelPosition="Left" />
+            <Control FieldName="System.IterationPath" Type="WorkItemClassificationControl" Label="&amp;Iteration:" LabelPosition="Left" />
+          </Column>
+        </Group>
+        <Group Label="Status">
+          <Column PercentWidth="50">
+            <Control FieldName="System.AssignedTo" Type="FieldControl" Label="Assi&amp;gned to:" LabelPosition="Left" />
+            <Control FieldName="Microsoft.VSTS.Common.Rank" Type="FieldControl" Label="Ran&amp;k:" LabelPosition="Left" NumberFormat="WholeNumbers" MaxLength="10" />
+          </Column>
+          <Column PercentWidth="50">
+            <Control FieldName="System.State" Type="FieldControl" Label="&amp;State:" LabelPosition="Left" />
+            <Control FieldName="System.Reason" Type="FieldControl" Label="&amp;Reason:" LabelPosition="Left" />
+          </Column>
+        </Group>
+        <TabGroup>
+          <Tab Label="Description">
+            <Control FieldName="System.Description" Type="HtmlFieldControl" Label="Des&amp;cription:" LabelPosition="Top" Dock="Fill" />
+          </Tab>
+          <Tab Label="History">
+            <Control FieldName="System.History" Type="WorkItemLogControl" Label="&amp;History:" LabelPosition="Top" Dock="Fill" />
+          </Tab>
+          <Tab Label="Links">
+            <Control Type="LinksControl" LabelPosition="Top" />
+          </Tab>
+          <Tab Label="File Attachments">
+            <Control Type="AttachmentsControl" LabelPosition="Top" />
+          </Tab>
+          <Tab Label="Details">
+            <Group>
+              <Column PercentWidth="50">
+                <Group Label="General">
+                  <Column PercentWidth="100">
+                    <Control FieldName="Microsoft.VSTS.Common.Issue" Type="FieldControl" Label="Iss&amp;ue:" LabelPosition="Left" />
+                    <Control FieldName="Microsoft.VSTS.Common.ExitCriteria" Type="FieldControl" Label="E&amp;xit criteria:" LabelPosition="Left" />
+                    <Control FieldName="Microsoft.VSTS.Build.IntegrationBuild" Type="FieldControl" Label="Integration &amp;build:" LabelPosition="Left" />
+                    <Control FieldName="Microsoft.VSTS.Scheduling.TaskHierarchy" Type="FieldControl" Label="Task C&amp;ontext:" LabelPosition="Left" ReadOnly="True" />
+                  </Column>
+                </Group>
+              </Column>
+              <Column PercentWidth="50">
+                <Group Label="Schedule">
+                  <Column PercentWidth="100">
+                    <Control FieldName="Microsoft.VSTS.Scheduling.RemainingWork" Type="FieldControl" Label="Remaining &amp;work (hours):" LabelPosition="Left" NumberFormat="DecimalNumbers" MaxLength="10" />
+                    <Control FieldName="Microsoft.VSTS.Scheduling.CompletedWork" Type="FieldControl" Label="Com&amp;pleted work (hours):" LabelPosition="Left" NumberFormat="DecimalNumbers" MaxLength="10" />
+                    <Control FieldName="Microsoft.VSTS.Scheduling.StartDate" Type="FieldControl" Label="Start Dat&amp;e:" LabelPosition="Left" ReadOnly="True" />
+                    <Control FieldName="Microsoft.VSTS.Scheduling.FinishDate" Type="FieldControl" Label="&amp;Finish Date:" LabelPosition="Left" ReadOnly="True" />
+                  </Column>
+                </Group>
+              </Column>
+            </Group>
+          </Tab>
+        </TabGroup>
+      </Layout>
+    </FORM>
+  </WORKITEMTYPE>
+</WITD>

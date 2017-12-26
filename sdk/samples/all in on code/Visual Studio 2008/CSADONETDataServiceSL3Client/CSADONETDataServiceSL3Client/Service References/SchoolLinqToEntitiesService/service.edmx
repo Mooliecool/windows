@@ -1,0 +1,75 @@
+﻿<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx">
+  <edmx:DataServices>
+    <Schema Namespace="SQLServer2005DBModel" xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns="http://schemas.microsoft.com/ado/2006/04/edm">
+      <EntityType Name="Course">
+        <Key>
+          <PropertyRef Name="CourseID" />
+        </Key>
+        <Property Name="CourseID" Type="Edm.Int32" Nullable="false" />
+        <Property Name="Title" Type="Edm.String" Nullable="false" MaxLength="100" Unicode="true" FixedLength="false" />
+        <Property Name="Credits" Type="Edm.Int32" Nullable="false" />
+        <Property Name="DepartmentID" Type="Edm.Int32" Nullable="false" />
+        <NavigationProperty Name="CourseGrade" Relationship="SQLServer2005DBModel.FK_CourseGrade_Course" FromRole="Course" ToRole="CourseGrade" />
+        <NavigationProperty Name="Person" Relationship="SQLServer2005DBModel.CourseInstructor" FromRole="Course" ToRole="Person" />
+      </EntityType>
+      <EntityType Name="CourseGrade">
+        <Key>
+          <PropertyRef Name="EnrollmentID" />
+        </Key>
+        <Property Name="EnrollmentID" Type="Edm.Int32" Nullable="false" />
+        <Property Name="Grade" Type="Edm.Decimal" Nullable="true" Precision="3" Scale="2" />
+        <NavigationProperty Name="Course" Relationship="SQLServer2005DBModel.FK_CourseGrade_Course" FromRole="CourseGrade" ToRole="Course" />
+        <NavigationProperty Name="Person" Relationship="SQLServer2005DBModel.FK_CourseGrade_Student" FromRole="CourseGrade" ToRole="Person" />
+      </EntityType>
+      <EntityType Name="Person">
+        <Key>
+          <PropertyRef Name="PersonID" />
+        </Key>
+        <Property Name="PersonID" Type="Edm.Int32" Nullable="false" />
+        <Property Name="LastName" Type="Edm.String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+        <Property Name="FirstName" Type="Edm.String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+        <Property Name="PersonCategory" Type="Edm.Int16" Nullable="false" />
+        <Property Name="HireDate" Type="Edm.DateTime" Nullable="true" />
+        <Property Name="EnrollmentDate" Type="Edm.DateTime" Nullable="true" />
+        <Property Name="Picture" Type="Edm.Binary" Nullable="true" MaxLength="Max" FixedLength="false" />
+        <NavigationProperty Name="CourseGrade" Relationship="SQLServer2005DBModel.FK_CourseGrade_Student" FromRole="Person" ToRole="CourseGrade" />
+        <NavigationProperty Name="Course" Relationship="SQLServer2005DBModel.CourseInstructor" FromRole="Person" ToRole="Course" />
+      </EntityType>
+      <Association Name="FK_CourseGrade_Course">
+        <End Role="Course" Type="SQLServer2005DBModel.Course" Multiplicity="1" />
+        <End Role="CourseGrade" Type="SQLServer2005DBModel.CourseGrade" Multiplicity="*" />
+      </Association>
+      <Association Name="FK_CourseGrade_Student">
+        <End Role="Person" Type="SQLServer2005DBModel.Person" Multiplicity="1" />
+        <End Role="CourseGrade" Type="SQLServer2005DBModel.CourseGrade" Multiplicity="*" />
+      </Association>
+      <Association Name="CourseInstructor">
+        <End Role="Course" Type="SQLServer2005DBModel.Course" Multiplicity="*" />
+        <End Role="Person" Type="SQLServer2005DBModel.Person" Multiplicity="*" />
+      </Association>
+    </Schema>
+    <Schema Namespace="CSADONETDataService.LinqToEntities" xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns="http://schemas.microsoft.com/ado/2006/04/edm">
+      <EntityContainer Name="SQLServer2005DBEntities" m:IsDefaultEntityContainer="true">
+        <FunctionImport Name="GetPersonUpdateException" EntitySet="Person" ReturnType="Collection(SQLServer2005DBModel.Person)" m:HttpMethod="GET" />
+        <FunctionImport Name="CoursesByPersonID" EntitySet="Course" ReturnType="Collection(SQLServer2005DBModel.Course)" m:HttpMethod="GET">
+          <Parameter Name="ID" Type="Edm.Int32" Mode="In" />
+        </FunctionImport>
+        <EntitySet Name="Course" EntityType="SQLServer2005DBModel.Course" />
+        <EntitySet Name="CourseGrade" EntityType="SQLServer2005DBModel.CourseGrade" />
+        <EntitySet Name="Person" EntityType="SQLServer2005DBModel.Person" />
+        <AssociationSet Name="FK_CourseGrade_Course" Association="SQLServer2005DBModel.FK_CourseGrade_Course">
+          <End Role="Course" EntitySet="Course" />
+          <End Role="CourseGrade" EntitySet="CourseGrade" />
+        </AssociationSet>
+        <AssociationSet Name="FK_CourseGrade_Student" Association="SQLServer2005DBModel.FK_CourseGrade_Student">
+          <End Role="Person" EntitySet="Person" />
+          <End Role="CourseGrade" EntitySet="CourseGrade" />
+        </AssociationSet>
+        <AssociationSet Name="CourseInstructor" Association="SQLServer2005DBModel.CourseInstructor">
+          <End Role="Course" EntitySet="Course" />
+          <End Role="Person" EntitySet="Person" />
+        </AssociationSet>
+      </EntityContainer>
+    </Schema>
+  </edmx:DataServices>
+</edmx:Edmx>

@@ -1,0 +1,551 @@
+﻿//-----------------------------------------------------------------------
+//  This file is part of the Microsoft .NET SDK Code Samples.
+// 
+//  Copyright (C) Microsoft Corporation.  All rights reserved.
+// 
+//This source code is intended only as a supplement to Microsoft
+//Development Tools and/or on-line documentation.  See these other
+//materials for detailed information regarding Microsoft code samples.
+// 
+//THIS CODE AND INFORMATION ARE PROVIDED AS IS WITHOUT WARRANTY OF ANY
+//KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+//IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+//PARTICULAR PURPOSE.
+//-----------------------------------------------------------------------
+package Microsoft.Samples.NetworkInformation;
+
+import System.*;
+import System.Net.*;
+import System.Drawing.*;
+import System.Collections.*;
+import System.Collections.Generic.*;
+import System.Globalization.*;
+import System.Windows.Forms.*;
+import System.ComponentModel.*;
+import System.Net.NetworkInformation.*;
+
+/// <summary>
+/// This form provides information pertaining to the network elements
+/// on the current machine such as network networkInterfaces, IP addresses,
+/// and transmission statistics
+/// </summary>
+class NetworkInformationForm extends System.Windows.Forms.Form
+{
+    /// <summary>
+    /// Required designer variable.
+    /// </summary>
+    private System.ComponentModel.IContainer components;
+    private NetworkInterface networkInterfaces[];
+    private NetworkInterface currentInterface;
+
+    /// <summary>
+    /// Required method for Designer support - do not modify
+    /// the contents of this method with the code editor.
+    /// </summary>
+    private void InitializeComponent()
+    {
+		this.components = new System.ComponentModel.Container();
+		this.networkInterfacesComboBox = new System.Windows.Forms.ComboBox();
+		this.interfacesLabel = new System.Windows.Forms.Label();
+		this.updateInfoTimer = new System.Windows.Forms.Timer(this.components);
+		this.addressListView = new System.Windows.Forms.ListView();
+		this.clmnAddress = new System.Windows.Forms.ColumnHeader("");
+		this.clmnAddressType = new System.Windows.Forms.ColumnHeader("");
+		this.networkAvailabilityLabel = new System.Windows.Forms.Label();
+		this.networkAvailabilityTextLabel = new System.Windows.Forms.Label();
+		this.operationalStatusLabel = new System.Windows.Forms.Label();
+		this.operationalStatusTextLabel = new System.Windows.Forms.Label();
+		this.supportsMulticastLabel = new System.Windows.Forms.Label();
+		this.supportsMulticastTextLabel = new System.Windows.Forms.Label();
+		this.bytesSentLabel = new System.Windows.Forms.Label();
+		this.bytesSentTextLabel = new System.Windows.Forms.Label();
+		this.bytesReceivedLabel = new System.Windows.Forms.Label();
+		this.bytesReceivedTextLabel = new System.Windows.Forms.Label();
+		this.speedLabel = new System.Windows.Forms.Label();
+		this.speedTextLabel = new System.Windows.Forms.Label();
+		this.dnsSuffixLabel = new System.Windows.Forms.Label();
+		this.dnsSuffixTextLabel = new System.Windows.Forms.Label();
+		this.SuspendLayout();
+		// 
+		// networkInterfacesComboBox
+		// 
+		this.networkInterfacesComboBox.set_DropDownStyle(System.Windows.Forms.ComboBoxStyle.DropDownList);
+		this.networkInterfacesComboBox.set_FormattingEnabled(true);
+		this.networkInterfacesComboBox.set_Location(new System.Drawing.Point(85, 36));
+		this.networkInterfacesComboBox.set_Margin(new System.Windows.Forms.Padding(1, 3, 3, 3));
+		this.networkInterfacesComboBox.set_Name("networkInterfacesComboBox");
+		this.networkInterfacesComboBox.set_Size(new System.Drawing.Size(431, 21));
+		this.networkInterfacesComboBox.set_TabIndex(0);
+		this.networkInterfacesComboBox.add_SelectedIndexChanged(new System.EventHandler(this.OnSelectionChanged));
+		// 
+		// interfacesLabel
+		// 
+		this.interfacesLabel.set_Location(new System.Drawing.Point(11, 37));
+		this.interfacesLabel.set_Margin(new System.Windows.Forms.Padding(3, 3, 0, 3));
+		this.interfacesLabel.set_Name("interfacesLabel");
+		this.interfacesLabel.set_Size(new System.Drawing.Size(72, 20));
+		this.interfacesLabel.set_TabIndex(1);
+		this.interfacesLabel.set_Text("Interfaces:");
+		// 
+		// updateInfoTimer
+		// 
+		this.updateInfoTimer.set_Enabled(true);
+		this.updateInfoTimer.add_Tick(new System.EventHandler(this.updateInfoTimer_Tick));
+		// 
+		// addressListView
+		// 
+		this.addressListView.get_Columns().AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.clmnAddress,
+            this.clmnAddressType}
+		);
+		this.addressListView.set_FullRowSelect(true);
+		this.addressListView.set_GridLines(true);
+		this.addressListView.set_Location(new System.Drawing.Point(24, 147));
+		this.addressListView.set_Name("addressListView");
+		this.addressListView.set_Size(new System.Drawing.Size(492, 272));
+		this.addressListView.set_TabIndex(2);
+		this.addressListView.set_View(System.Windows.Forms.View.Details);
+		// 
+		// clmnAddress
+		// 
+		this.clmnAddress.set_Text("Address");
+		this.clmnAddress.set_Width(236);
+		// 
+		// clmnAddressType
+		// 
+		this.clmnAddressType.set_Text("Type");
+		this.clmnAddressType.set_Width(248);
+		// 
+		// networkAvailabilityLabel
+		// 
+		this.networkAvailabilityLabel.set_Location(new System.Drawing.Point(11, 12));
+		this.networkAvailabilityLabel.set_Margin(new System.Windows.Forms.Padding(3, 3, 3, 1));
+		this.networkAvailabilityLabel.set_Name("networkAvailabilityLabel");
+		this.networkAvailabilityLabel.set_Size(new System.Drawing.Size(106, 19));
+		this.networkAvailabilityLabel.set_TabIndex(3);
+		this.networkAvailabilityLabel.set_Text("Network Availability:");
+		// 
+		// networkAvailabilityTextLabel
+		// 
+		this.networkAvailabilityTextLabel.set_Location(new System.Drawing.Point(122, 12));
+		this.networkAvailabilityTextLabel.set_Name("networkAvailabilityTextLabel");
+		this.networkAvailabilityTextLabel.set_Size(new System.Drawing.Size(380, 20));
+		this.networkAvailabilityTextLabel.set_TabIndex(4);
+		this.networkAvailabilityTextLabel.set_Text("At least one network interface is up");
+		// 
+		// operationalStatusLabel
+		// 
+		this.operationalStatusLabel.set_Location(new System.Drawing.Point(286, 88));
+		this.operationalStatusLabel.set_Margin(new System.Windows.Forms.Padding(3, 0, 3, 3));
+		this.operationalStatusLabel.set_Name("operationalStatusLabel");
+		this.operationalStatusLabel.set_Size(new System.Drawing.Size(104, 15));
+		this.operationalStatusLabel.set_TabIndex(5);
+		this.operationalStatusLabel.set_Text("Operational Status:");
+		// 
+		// operationalStatusTextLabel
+		// 
+		this.operationalStatusTextLabel.set_Location(new System.Drawing.Point(418, 86));
+		this.operationalStatusTextLabel.set_Margin(new System.Windows.Forms.Padding(3, 2, 3, 3));
+		this.operationalStatusTextLabel.set_Name("operationalStatusTextLabel");
+		this.operationalStatusTextLabel.set_Size(new System.Drawing.Size(113, 16));
+		this.operationalStatusTextLabel.set_TabIndex(6);
+		this.operationalStatusTextLabel.set_Text("Up");
+		// 
+		// supportsMulticastLabel
+		// 
+		this.supportsMulticastLabel.set_Location(new System.Drawing.Point(286, 63));
+		this.supportsMulticastLabel.set_Name("supportsMulticastLabel");
+		this.supportsMulticastLabel.set_Size(new System.Drawing.Size(104, 21));
+		this.supportsMulticastLabel.set_TabIndex(7);
+		this.supportsMulticastLabel.set_Text("Supports Multicast:");
+		// 
+		// supportsMulticastTextLabel
+		// 
+		this.supportsMulticastTextLabel.set_Location(new System.Drawing.Point(418, 63));
+		this.supportsMulticastTextLabel.set_Margin(new System.Windows.Forms.Padding(3, 3, 3, 1));
+		this.supportsMulticastTextLabel.set_Name("supportsMulticastTextLabel");
+		this.supportsMulticastTextLabel.set_Size(new System.Drawing.Size(73, 20));
+		this.supportsMulticastTextLabel.set_TabIndex(8);
+		this.supportsMulticastTextLabel.set_Text("Yes");
+		// 
+		// bytesSentLabel
+		// 
+		this.bytesSentLabel.set_Location(new System.Drawing.Point(11, 90));
+		this.bytesSentLabel.set_Name("bytesSentLabel");
+		this.bytesSentLabel.set_Size(new System.Drawing.Size(89, 18));
+		this.bytesSentLabel.set_TabIndex(9);
+		this.bytesSentLabel.set_Text("Bytes Sent:");
+		// 
+		// bytesSentTextLabel
+		// 
+		this.bytesSentTextLabel.set_Location(new System.Drawing.Point(122, 91));
+		this.bytesSentTextLabel.set_Name("bytesSentTextLabel");
+		this.bytesSentTextLabel.set_Size(new System.Drawing.Size(144, 17));
+		this.bytesSentTextLabel.set_TabIndex(10);
+		this.bytesSentTextLabel.set_Text("0");
+		// 
+		// bytesReceivedLabel
+		// 
+		this.bytesReceivedLabel.set_Location(new System.Drawing.Point(11, 115));
+		this.bytesReceivedLabel.set_Name("bytesReceivedLabel");
+		this.bytesReceivedLabel.set_Size(new System.Drawing.Size(88, 17));
+		this.bytesReceivedLabel.set_TabIndex(11);
+		this.bytesReceivedLabel.set_Text("Bytes Received:");
+		// 
+		// bytesReceivedTextLabel
+		// 
+		this.bytesReceivedTextLabel.set_Location(new System.Drawing.Point(122, 116));
+		this.bytesReceivedTextLabel.set_Name("bytesReceivedTextLabel");
+		this.bytesReceivedTextLabel.set_Size(new System.Drawing.Size(158, 16));
+		this.bytesReceivedTextLabel.set_TabIndex(12);
+		this.bytesReceivedTextLabel.set_Text("0");
+		// 
+		// speedLabel
+		// 
+		this.speedLabel.set_Location(new System.Drawing.Point(286, 114));
+		this.speedLabel.set_Name("speedLabel");
+		this.speedLabel.set_Size(new System.Drawing.Size(88, 18));
+		this.speedLabel.set_TabIndex(13);
+		this.speedLabel.set_Text("Speed:");
+		// 
+		// speedTextLabel
+		// 
+		this.speedTextLabel.set_Location(new System.Drawing.Point(418, 114));
+		this.speedTextLabel.set_Margin(new System.Windows.Forms.Padding(3, 1, 3, 3));
+		this.speedTextLabel.set_Name("speedTextLabel");
+		this.speedTextLabel.set_Size(new System.Drawing.Size(119, 22));
+		this.speedTextLabel.set_TabIndex(14);
+		this.speedTextLabel.set_Text("100");
+		// 
+		// dnsSuffixLabel
+		// 
+		this.dnsSuffixLabel.set_Location(new System.Drawing.Point(11, 63));
+		this.dnsSuffixLabel.set_Name("dnsSuffixLabel");
+		this.dnsSuffixLabel.set_Size(new System.Drawing.Size(68, 18));
+		this.dnsSuffixLabel.set_TabIndex(15);
+		this.dnsSuffixLabel.set_Text("DNS Suffix:");
+		// 
+		// dnsSuffixTextLabel
+		// 
+		this.dnsSuffixTextLabel.set_Location(new System.Drawing.Point(121, 63));
+		this.dnsSuffixTextLabel.set_Margin(new System.Windows.Forms.Padding(3, 3, 3, 1));
+		this.dnsSuffixTextLabel.set_Name("dnsSuffixTextLabel");
+		this.dnsSuffixTextLabel.set_Size(new System.Drawing.Size(159, 23));
+		this.dnsSuffixTextLabel.set_TabIndex(16);
+		this.dnsSuffixTextLabel.set_Text("n/a");
+		// 
+		// NetworkInformationForm
+		// 
+		this.set_AutoSize(true);
+		this.set_ClientSize(new System.Drawing.Size(558, 440));
+		this.get_Controls().Add(this.dnsSuffixTextLabel);
+		this.get_Controls().Add(this.dnsSuffixLabel);
+		this.get_Controls().Add(this.speedTextLabel);
+		this.get_Controls().Add(this.speedLabel);
+		this.get_Controls().Add(this.bytesReceivedTextLabel);
+		this.get_Controls().Add(this.bytesReceivedLabel);
+		this.get_Controls().Add(this.bytesSentTextLabel);
+		this.get_Controls().Add(this.bytesSentLabel);
+		this.get_Controls().Add(this.supportsMulticastTextLabel);
+		this.get_Controls().Add(this.supportsMulticastLabel);
+		this.get_Controls().Add(this.operationalStatusTextLabel);
+		this.get_Controls().Add(this.operationalStatusLabel);
+		this.get_Controls().Add(this.networkAvailabilityTextLabel);
+		this.get_Controls().Add(this.networkAvailabilityLabel);
+		this.get_Controls().Add(this.addressListView);
+		this.get_Controls().Add(this.interfacesLabel);
+		this.get_Controls().Add(this.networkInterfacesComboBox);
+		this.set_FormBorderStyle(System.Windows.Forms.FormBorderStyle.Fixed3D);
+		this.set_MaximizeBox(false);
+		this.set_Name("NetworkInformationForm");
+		this.set_Padding(new System.Windows.Forms.Padding(9));
+		this.set_Text("Network Information");
+		this.add_Load(new System.EventHandler(this.NetworkInformationForm_Load));
+		this.ResumeLayout(false);
+
+	} //InitializeComponent
+
+	/// <summary>
+    /// Clean up any resources being used.
+    /// </summary>
+    protected void Dispose(boolean disposing)
+    {
+        if (disposing) {
+            if (components != null) {
+                components.Dispose();
+            }
+        }
+        super.Dispose(disposing);
+    } //Dispose
+
+    private System.Windows.Forms.ComboBox networkInterfacesComboBox;
+    private System.Windows.Forms.Label interfacesLabel;
+    private System.Windows.Forms.Timer updateInfoTimer;
+    private System.Windows.Forms.ColumnHeader clmnAddress;
+    private System.Windows.Forms.ColumnHeader clmnAddressType;
+    private System.Windows.Forms.ListView addressListView;
+    private System.Windows.Forms.Label networkAvailabilityLabel;
+    private System.Windows.Forms.Label networkAvailabilityTextLabel;
+    private System.Windows.Forms.Label operationalStatusLabel;
+    private System.Windows.Forms.Label operationalStatusTextLabel;
+    private System.Windows.Forms.Label supportsMulticastLabel;
+    private System.Windows.Forms.Label supportsMulticastTextLabel;
+    private System.Windows.Forms.Label bytesSentLabel;
+    private System.Windows.Forms.Label bytesSentTextLabel;
+    private System.Windows.Forms.Label bytesReceivedLabel;
+    private System.Windows.Forms.Label bytesReceivedTextLabel;
+    private System.Windows.Forms.Label speedLabel;
+    private System.Windows.Forms.Label speedTextLabel;
+    private System.Windows.Forms.Label dnsSuffixLabel;
+    private System.Windows.Forms.Label dnsSuffixTextLabel;
+
+    public NetworkInformationForm()
+    {
+        InitializeComponent();
+    } //NetworkInformationForm
+
+    private void NetworkInformationForm_Load(Object sender, EventArgs e)
+    {
+		// Wire up the NetworkAddressChanged events so we can get notified
+		// anytime an address change occurs on any of the network networkInterfaces.
+		// These changes occur when the interface changes operational
+		// status (up/down) or a new interface is added. 
+		NetworkChange.add_NetworkAddressChanged(
+			new NetworkAddressChangedEventHandler(
+			this.NetworkChange_NetworkAddressChanged));
+		NetworkChange.add_NetworkAvailabilityChanged(
+            new NetworkAvailabilityChangedEventHandler(
+			NetworkChange_NetworkAvailabilityChanged));
+
+		// Populate the global networkInterfaces container with the list of all 
+		// network networkInterfaces
+		networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+
+		// Determine if the network is available at startup.
+		UpdateNetworkAvailability(NetworkInterface.GetIsNetworkAvailable());
+		
+		// Update the information for the network networkInterfaces.
+		UpdateNetworkInformation();
+    } //NetworkInformationForm_Load
+
+    private void UpdateNicStats()
+    {
+        // Get the IPv4 statistics for the currently selected interface.
+		IPv4InterfaceStatistics ipStats =
+			currentInterface.GetIPv4Statistics();
+
+		NumberFormatInfo numberFormat = NumberFormatInfo.get_CurrentInfo();
+		
+        long bytesReceivedInKB = ipStats.get_BytesReceived() / 1024;
+        long bytesSentInKB = ipStats.get_BytesSent() / 1024;
+
+        this.speedTextLabel.set_Text(
+			GetSpeedString(currentInterface.get_Speed()));
+        this.bytesReceivedTextLabel.set_Text(
+			((Int64)bytesReceivedInKB).ToString("N0", numberFormat) + " KB");
+        this.bytesSentTextLabel.set_Text(
+            ((Int64)bytesSentInKB).ToString("N0", numberFormat) + " KB");
+
+        this.operationalStatusTextLabel.set_Text(
+            currentInterface.get_OperationalStatus().ToString());
+        this.supportsMulticastTextLabel.set_Text(
+            Convert.ToString(currentInterface.get_SupportsMulticast()));
+    } //UpdateNicStats
+
+    // Provide better formatting for some common speeds
+    private static String GetSpeedString(long speed)
+    {
+        if (speed == 10000000)
+            return "10 MB";
+        else if (speed == 11000000)
+            return "11 MB";
+        else if (speed == 54000000)
+            return "54 MB";
+        else if (speed == 100000000)
+            return "100 MB";
+        else if (speed == 1000000000)
+            return "1 GB";
+        else
+            return Convert.ToString(speed);
+    } //GetSpeedString
+
+    // Display the interface information that doesn't update so often that it
+    // should be on the timer that fires every 100 ms.  
+    private void UpdateCurrentNicInformation()
+    {
+        // Set the DNS suffix if any exists
+        IPInterfaceProperties ipProperties =
+            currentInterface.GetIPProperties();
+        this.dnsSuffixTextLabel.set_Text(
+            ipProperties.get_DnsSuffix().ToString());
+        
+        // Display the IP address information associated with this interface 
+        // including anycast, unicast, multicast, DNS servers, WINS servers, 
+        // DHCP servers, and the gateway.
+        this.addressListView.get_Items().Clear();
+        IPAddressInformationCollection anycastInfo = 
+            ipProperties.get_AnycastAddresses();
+        IEnumerator<IPAddressInformation> anycastInfoEnumerator = 
+            anycastInfo.GetEnumerator();
+        for (; anycastInfoEnumerator.MoveNext(); )
+        {
+            IPAddressInformation info =
+                anycastInfoEnumerator.get_Current();
+            InsertAddress(info.get_Address(), "Anycast");
+        }
+        UnicastIPAddressInformationCollection unicastInfo =
+            ipProperties.get_UnicastAddresses();
+        IEnumerator<UnicastIPAddressInformation> unicastInfoEnumerator =
+            unicastInfo.GetEnumerator();
+        for (; unicastInfoEnumerator.MoveNext(); )
+        {
+            UnicastIPAddressInformation info =
+                unicastInfoEnumerator.get_Current();
+            InsertAddress(info.get_Address(), "Unicast");
+        }
+        MulticastIPAddressInformationCollection multicastInfo = 
+            ipProperties.get_MulticastAddresses();
+        IEnumerator<MulticastIPAddressInformation> multicastInfoEnumerator =
+            multicastInfo.GetEnumerator();
+        for (; multicastInfoEnumerator.MoveNext(); )
+        {
+            MulticastIPAddressInformation info =
+                multicastInfoEnumerator.get_Current();
+            InsertAddress(info.get_Address(), "Multicast");
+        }
+        GatewayIPAddressInformationCollection gatewayInfo =
+            ipProperties.get_GatewayAddresses();
+        IEnumerator<GatewayIPAddressInformation> gatewayInfoEnumerator =
+            gatewayInfo.GetEnumerator();
+        for (; gatewayInfoEnumerator.MoveNext(); )
+        {
+            GatewayIPAddressInformation info =
+                gatewayInfoEnumerator.get_Current();
+            InsertAddress(info.get_Address(), "Gateway");
+        }
+
+        IPAddressCollection ipAddresses = 
+            ipProperties.get_WinsServersAddresses();
+        InsertAddresses(ipAddresses, "WINS Server");
+        ipAddresses = ipProperties.get_DhcpServerAddresses();
+        InsertAddresses(ipAddresses, "DHCP Server");
+        ipAddresses = ipProperties.get_DnsAddresses();
+        InsertAddresses(ipAddresses, "DNS Server");
+    } //UpdateCurrentNicInformation
+
+    // Used for inserting the IPAddress information into the listbox
+    private void InsertAddresses(
+        IPAddressCollection ipAddresses, String addressType)
+    {
+        IEnumerator<IPAddress> ipAddressesEnumerator = 
+            ipAddresses.GetEnumerator();
+        for (; ipAddressesEnumerator.MoveNext(); )
+        {
+            InsertAddress(
+                ipAddressesEnumerator.get_Current(),
+                addressType);
+        }
+    }
+
+    private void InsertAddress(IPAddress ipAddress, String addressType)
+    {
+        String listViewInformation[] = new String[2];
+        listViewInformation[0] = ipAddress.ToString();
+        listViewInformation[1] = addressType;
+
+        ListViewItem item = new ListViewItem(listViewInformation);
+        this.addressListView.get_Items().Add(item);
+    } //InsertAddresses
+
+    // Called on startup and whenever there is a network change event, this method
+    // reloads the list of networkInterfaces and sets the selection to the first one in 
+    // the list. The list is reloaded because this event could have been fired 
+    // as a result of an interface being removed from the machine.
+    private void UpdateNetworkInformation()
+    {
+        networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+        this.networkInterfacesComboBox.get_Items().Clear();
+        for (int iCtr = 0; iCtr < networkInterfaces.get_Length(); iCtr++) {
+            this.networkInterfacesComboBox.get_Items().Add(
+                networkInterfaces[iCtr].get_Description());
+        }
+
+        if (networkInterfaces.length == 0)
+        {
+            this.networkInterfacesComboBox.get_Items().Add(
+                "No NICs found on the machine");
+        }
+        else
+        {
+            currentInterface = networkInterfaces[0];
+            UpdateCurrentNicInformation();
+        }
+
+        this.networkInterfacesComboBox.set_SelectedIndex(0);
+    } //UpdateNetworkInformation
+
+    private void UpdateNetworkAvailability(boolean isNetworkAvailable)
+    {
+        if (isNetworkAvailable)
+        {
+            networkAvailabilityTextLabel.set_Text(
+                "At least one network interface is up.");
+        }
+        else
+        {
+            networkAvailabilityTextLabel.set_Text(
+                "The network is not currently available.");
+        }
+    }
+
+    /**@delegate*/
+    private delegate void NetworkAddressChangedCallback();
+    /**@delegate*/
+    private delegate void NetworkAvailabilityCallback(boolean isNetworkAvailable);
+
+    // Update network interface information whenever an address changes
+    private void NetworkChange_NetworkAddressChanged(Object sender, EventArgs e)
+    {
+        this.Invoke( (Delegate)
+            new NetworkAddressChangedCallback(UpdateNetworkInformation));
+    } //NetworkChange_NetworkAddressChanged
+
+    // Update network availability.
+    private void NetworkChange_NetworkAvailabilityChanged(
+        Object sender, NetworkAvailabilityEventArgs e)
+    {
+        this.Invoke( (Delegate)
+            new NetworkAvailabilityCallback(UpdateNetworkAvailability),
+            new Object[] { (System.Boolean) e.get_IsAvailable() });
+    }
+    
+    // Update current interface information whenever selection changes
+    private void OnSelectionChanged(Object sender, EventArgs e)
+    {
+        currentInterface = (NetworkInterface)networkInterfaces.get_Item(
+            this.networkInterfacesComboBox.get_SelectedIndex());
+        UpdateCurrentNicInformation();
+	}
+
+	// This timer call updates information associated with the currently 
+	// selected interface that is often changing such as operational 
+	// status, transfer statistics, and speed
+	private void updateInfoTimer_Tick(Object sender, EventArgs e)
+	{
+		UpdateNicStats();
+	}
+
+} //NetworkInformation
+
+class EntryPoint
+{
+    /// <summary>
+    /// The main entry point for the application.
+    /// </summary>
+    /** @attribute STAThread()
+     */
+    public static void main()
+    {
+        Application.Run(new NetworkInformationForm());
+    } //main
+} //EntryPoint

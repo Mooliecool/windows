@@ -1,0 +1,27 @@
+﻿<StateMachineWorkflowActivity x:Class="Microsoft.ServiceModel.Samples.Workflow1" InitialStateName="BuildingExpression" x:Name="Workflow1" DynamicUpdateCondition="{x:Null}" CompletedStateName="Completed" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/workflow">
+	<StateActivity x:Name="BuildingExpression">
+		<EventDrivenActivity x:Name="expressionExtended">
+			<HandleExternalEventActivity Invoked="handleExpressionExtended_Invoked" x:Name="handleExpressionExtended" EventName="ExpressionExtended" InterfaceType="{x:Type Microsoft.ServiceModel.Samples.IMathDataExchangeService,TypeName=Microsoft.ServiceModel.Samples.IMathDataExchangeService}" />
+			<SetStateActivity x:Name="setStateBuildingExpression" TargetStateName="BuildingExpression" />
+		</EventDrivenActivity>
+		<EventDrivenActivity x:Name="resultRequested">
+			<HandleExternalEventActivity x:Name="handleResultRequested" EventName="ResultRequested" InterfaceType="{x:Type Microsoft.ServiceModel.Samples.IMathDataExchangeService,TypeName=Microsoft.ServiceModel.Samples.IMathDataExchangeService}" />
+			<SetStateActivity x:Name="setStateSolved" TargetStateName="ExpressionSolved" />
+		</EventDrivenActivity>
+	</StateActivity>
+	<StateActivity x:Name="ExpressionSolved">
+		<StateInitializationActivity x:Name="sendResult">
+			<CallExternalMethodActivity x:Name="callResult" InterfaceType="{x:Type Microsoft.ServiceModel.Samples.IMathDataExchangeService,TypeName=Microsoft.ServiceModel.Samples.IMathDataExchangeService}" MethodName="Result">
+				<CallExternalMethodActivity.ParameterBindings>
+					<WorkflowParameterBinding ParameterName="result">
+						<WorkflowParameterBinding.Value>
+							<ActivityBind Name="Workflow1" Path="Result" />
+						</WorkflowParameterBinding.Value>
+					</WorkflowParameterBinding>
+				</CallExternalMethodActivity.ParameterBindings>
+			</CallExternalMethodActivity>
+			<SetStateActivity x:Name="setStateCompleted" TargetStateName="Completed" />
+		</StateInitializationActivity>
+	</StateActivity>
+	<StateActivity x:Name="Completed" />
+</StateMachineWorkflowActivity>

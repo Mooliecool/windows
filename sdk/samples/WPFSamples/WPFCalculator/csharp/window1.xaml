@@ -1,0 +1,131 @@
+﻿<Window x:Class="WPFCalculator.Window1"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="WPF Calculator"
+    Height="400"
+    Width="600" 
+    ResizeMode="CanMinimize"  
+    Icon="AppIcon.ico"
+    TextInput="OnWindowKeyDown"
+    >
+
+
+  <DockPanel Name="MyPanel">
+    <Menu  DockPanel.Dock="Top" Height="26">
+      <MenuItem Header="File">
+        <MenuItem Click="OnMenuExit" Header="Exit"/>
+      </MenuItem>
+      <MenuItem Header="View">
+           <MenuItem Name="StandardMenu" Click="OnMenuStandard" IsCheckable="true" IsChecked="True" Header="Standard"/>
+      </MenuItem>
+      <MenuItem Header="Help">
+        <MenuItem  Click="OnMenuAbout" Header="About"/>
+      </MenuItem>
+    </Menu>
+    <Grid Name="MyGrid" Background="Wheat"  ShowGridLines="False">
+      <Grid.Resources >
+        <Storyboard x:Key="playStoryboard">
+          <DoubleAnimation From="50"  To="40" Duration="0:0:0.25" RepeatBehavior="1x" AutoReverse="True" Storyboard.TargetName="TB" Storyboard.TargetProperty="(Ellipse.Height)"/>
+          <DoubleAnimation From="50"  To="44" Duration="0:0:0.25" RepeatBehavior="1x" AutoReverse="True" Storyboard.TargetName="TB" Storyboard.TargetProperty="(Ellipse.Width)"/>
+        </Storyboard>        
+       <Style x:Key="DigitBtn"  TargetType="{x:Type Button}">
+          <Setter Property="Focusable" Value="False"/>
+          <Setter Property="FontSize" Value="14pt"/>
+          <Setter Property="Margin" Value="0"/>
+          <Setter Property="Template">
+            <Setter.Value>
+              <ControlTemplate TargetType="{x:Type Button}">
+                <Grid Width="60" Height="50">
+			          <Ellipse Width="57" Height="49" x:Name="TB"  StrokeThickness="1"
+                           Stroke="{TemplateBinding Foreground}" Fill="{TemplateBinding Background}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" 
+                    VerticalAlignment="Center"/>
+                </Grid>
+
+				  <ControlTemplate.Triggers>
+					  <Trigger Property="IsMouseOver" Value="true">
+						  <Setter TargetName="TB" Property="Ellipse.Fill" Value="Lightblue" />
+					  </Trigger>
+					  <Trigger Property="IsPressed" Value="true">
+						  <Setter TargetName="TB" Property="Ellipse.Fill" Value="Blue" />
+					  </Trigger>
+
+
+					  <EventTrigger RoutedEvent="ButtonBase.Click">
+						  <EventTrigger.Actions>
+							  <BeginStoryboard Name="playStoryboard" Storyboard="{StaticResource playStoryboard}"/>
+						  </EventTrigger.Actions>
+					  </EventTrigger>
+
+				  </ControlTemplate.Triggers>
+              </ControlTemplate>
+            </Setter.Value>
+          </Setter>
+        </Style>
+
+      </Grid.Resources>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition/>
+        <ColumnDefinition/>
+        <ColumnDefinition/>
+        <ColumnDefinition/>
+        <ColumnDefinition/>
+        <ColumnDefinition/>
+        <ColumnDefinition/>
+        <ColumnDefinition/>
+        <ColumnDefinition/>
+      </Grid.ColumnDefinitions>
+      <Grid.RowDefinitions>
+        <RowDefinition/>
+        <RowDefinition/>
+        <RowDefinition/>
+        <RowDefinition/>
+        <RowDefinition/>
+        <RowDefinition/>
+      </Grid.RowDefinitions>
+
+      <Button Name="B7" Click="DigitBtn_Click" Style="{StaticResource DigitBtn}" Grid.Column="4" Grid.Row="2">7</Button>
+      <Button Name="B8" Click="DigitBtn_Click" Style="{StaticResource DigitBtn}" Grid.Column="5" Grid.Row="2">8</Button>
+      <Button Name="B9" Click="DigitBtn_Click" Style="{StaticResource DigitBtn}" Grid.Column="6" Grid.Row="2">9</Button>
+
+      <Button Name="B4" Click="DigitBtn_Click" Style="{StaticResource DigitBtn}" Grid.Column="4" Grid.Row="3" >4</Button>
+      <Button Name="B5" Click="DigitBtn_Click" Style="{StaticResource DigitBtn}" Grid.Column="5" Grid.Row="3" >5</Button>
+      <Button Name="B6" Click="DigitBtn_Click" Style="{StaticResource DigitBtn}" Grid.Column="6" Grid.Row="3" >6</Button>
+
+
+      <Button Name="B1" Click="DigitBtn_Click" Style="{StaticResource DigitBtn}" Grid.Column="4" Grid.Row="4" >1</Button>
+      <Button Name="B2" Click="DigitBtn_Click" Style="{StaticResource DigitBtn}" Grid.Column="5" Grid.Row="4" >2</Button>
+      <Button Name="B3" Click="DigitBtn_Click" Style="{StaticResource DigitBtn}" Grid.Column="6" Grid.Row="4" >3</Button>
+
+      <Button Name="B0" Click="DigitBtn_Click" Style="{StaticResource DigitBtn}" Grid.Column="4" Grid.Row="5" >0</Button>
+      <Button Name="BPeriod" Click="DigitBtn_Click" Style="{StaticResource DigitBtn}" Grid.Column="5" Grid.Row="5" >.</Button>
+
+      <Button Name="BPM"        Click="OperBtn_Click" Background="Darkgray" Style="{StaticResource DigitBtn}"  Grid.Column="6" Grid.Row="5" >+/-</Button>
+
+      <Button Name="BDevide"    Click="OperBtn_Click" Background="Darkgray" Style="{StaticResource DigitBtn}" Grid.Column="7" Grid.Row="2" >/</Button>
+      <Button Name="BMultiply"  Click="OperBtn_Click" Background="Darkgray" Style="{StaticResource DigitBtn}"  Grid.Column="7" Grid.Row="3" >*</Button>
+      <Button Name="BMinus" 	Click="OperBtn_Click" Background="Darkgray" Style="{StaticResource DigitBtn}"  Grid.Column="7" Grid.Row="4" >-</Button>
+      <Button Name="BPlus"      Click="OperBtn_Click" Background="Darkgray" Style="{StaticResource DigitBtn}"  Grid.Column="7" Grid.Row="5" >+</Button>
+
+
+
+      <Button Name="BSqrt" 		 Click="OperBtn_Click" Background="Darkgray" Style="{StaticResource DigitBtn}"  Grid.Column="8" Grid.Row="2"   ToolTip="Usage: 'A Sqrt'" >Sqrt</Button>
+      <Button Name="BPercent" 	 Click="OperBtn_Click" Background="Darkgray" Style="{StaticResource DigitBtn}"  Grid.Column="8" Grid.Row="3"   ToolTip="Usage: 'A % B ='" >%</Button>
+      <Button Name="BOneOver" 	 Click="OperBtn_Click" Background="Darkgray" Style="{StaticResource DigitBtn}"  Grid.Column="8" Grid.Row="4"   ToolTip="Usage: 'A 1/X'">1/X</Button>
+      <Button Name="BEqual" 	 Click="OperBtn_Click" Background="Darkgray" Style="{StaticResource DigitBtn}"  Grid.Column="8" Grid.Row="5" >=</Button>
+
+
+      <Button Name="BC"  Click="OperBtn_Click" Background="Darkgray" Style="{StaticResource DigitBtn}"  Grid.Column="8" Grid.Row="1" Grid.ColumnSpan="1" ToolTip="Clear All">C</Button>
+      <Button Name="BCE" Click="OperBtn_Click" Background="Darkgray" Style="{StaticResource DigitBtn}"  Grid.Column="7" Grid.Row="1" Grid.ColumnSpan="1"  ToolTip="Clear Current Entry">CE</Button>
+
+    
+      <Button Name="BMemClear" 	  Click="OperBtn_Click" Background="Darkgray" Style="{StaticResource DigitBtn}"  Grid.Column="3" Grid.Row="2"  ToolTip="Clear Memory" >MC</Button>
+      <Button Name="BMemRecall"   Click="OperBtn_Click" Background="Darkgray" Style="{StaticResource DigitBtn}"  Grid.Column="3" Grid.Row="3"  ToolTip="Recall Memory">MR</Button>
+      <Button Name="BMemSave" 	  Click="OperBtn_Click" Background="Darkgray" Style="{StaticResource DigitBtn}"  Grid.Column="3" Grid.Row="4"  ToolTip="Store in Memory">MS</Button>
+      <Button Name="BMemPlus" 	  Click="OperBtn_Click" Background="Darkgray" Style="{StaticResource DigitBtn}"  Grid.Column="3" Grid.Row="5"  ToolTip="Add To Memory">M+</Button>
+      <TextBlock  Name="BMemBox"	Grid.Column="3" Grid.Row="1" Margin="10,17,10,17" Grid.ColumnSpan="2">Memory: [empty]</TextBlock>
+
+    </Grid>
+  </DockPanel>
+</Window>

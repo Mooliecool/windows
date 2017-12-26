@@ -1,0 +1,79 @@
+﻿<Page x:Class="Microsoft.Samples.RecipeCatalog.RecipeViewer.RecipeRolodex"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Loaded="OnPageLoaded"
+	  Name="recipeCardFile"
+	  Title="Recipe Card"
+	  WindowHeight="650"
+	  WindowWidth="550"
+	  WindowTitle="Recipe Viewer">
+
+	<Page.Resources>
+		<Storyboard x:Key="recipeCardAnimationForward">
+			<DoubleAnimation From="-45.0" To="0.0" Duration="0:0:1" RepeatBehavior="1x"
+						DecelerationRatio="0.6" 
+						Storyboard.TargetName="RolodexTransform" Storyboard.TargetProperty="Angle"/>
+		</Storyboard>
+		<Storyboard x:Key="recipeCardAnimationBackward">
+			<DoubleAnimation From="45.0" To="0.0" Duration="0:0:1" RepeatBehavior="1x"
+						DecelerationRatio="0.6" 
+						Storyboard.TargetName="RolodexTransform" Storyboard.TargetProperty="Angle"/>
+		</Storyboard>
+	</Page.Resources>
+
+	<DockPanel Name="RecipeCards" Style="{StaticResource CorePageStyle}">
+
+		<Menu Style="{StaticResource MenuStyle}" >
+			<MenuItem Name="listMenu" Header="ListPage" Click="OnMenuListPage" />
+			<MenuItem Name="previousMenu" Header="Previous Recipe" Click="OnMenuPrevious" />
+			<MenuItem Name="nextMenu" Header="Next Recipe" Click="OnMenuNext" />
+		</Menu>
+
+		<DockPanel x:Name="currentRecipeCard"  Margin="20,20,20,20" 
+			VerticalAlignment="Stretch" HorizontalAlignment="Center" >
+
+			<DockPanel.RenderTransform>
+				<RotateTransform x:Name="RolodexTransform" CenterX="1500" CenterY="300" />
+			</DockPanel.RenderTransform>
+
+			<!-- Recipe title tab -->
+			<Border BorderBrush="DarkBlue" BorderThickness="4"
+					HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="5"
+					Background="Khaki" DockPanel.Dock="Top">
+				<TextBlock FontFamily="Arial" FontSize="24" Margin="15,15,15,15"
+							Foreground="Black" Text="{Binding XPath=Recipe/Title}" />
+			</Border>
+			
+			<!-- Recipe content-->
+			<Border BorderBrush="DarkBlue" BorderThickness="5"
+					HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Border.Background>
+          <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <LinearGradientBrush.GradientStops>
+              <GradientStop Offset="0" Color="White"/>
+              <GradientStop Offset="1" Color="Khaki"/>
+            </LinearGradientBrush.GradientStops>
+          </LinearGradientBrush>
+        </Border.Background>
+				<StackPanel Orientation="Vertical">
+					<DockPanel Margin="20,10,10,10">
+						<TextBlock DockPanel.Dock="Top" HorizontalAlignment="Left"
+								   FontFamily="Arial" FontSize="20" FontWeight="SemiBold" FontStyle="Italic" >
+							Ingredients
+						</TextBlock>
+						<ItemsControl ItemsSource="{Binding XPath=Recipe/Ingredients/Item}"
+									  ItemTemplate="{StaticResource IngredientStyle}" />
+					</DockPanel>
+					<DockPanel Margin="20,10,10,10">
+						<TextBlock DockPanel.Dock="Top" HorizontalAlignment="Left"
+								   FontFamily="Arial" FontSize="20" FontStyle="Italic" FontWeight="SemiBold">
+							Directions
+						</TextBlock>
+						<ItemsControl ItemsSource="{Binding XPath=Recipe/Directions/Step}"
+									  ItemTemplate="{StaticResource DirectionStepStyle}"   />
+					</DockPanel>
+				</StackPanel>
+			</Border>
+		</DockPanel>
+	</DockPanel>
+</Page>

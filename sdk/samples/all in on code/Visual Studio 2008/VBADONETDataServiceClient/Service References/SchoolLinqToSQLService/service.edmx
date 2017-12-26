@@ -1,0 +1,125 @@
+﻿<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx">
+  <edmx:DataServices>
+    <Schema Namespace="VBADONETDataService.LinqToSQL" xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns="http://schemas.microsoft.com/ado/2006/04/edm">
+      <EntityType Name="Course">
+        <Key>
+          <PropertyRef Name="CourseID" />
+        </Key>
+        <Property Name="CourseID" Type="Edm.Int32" Nullable="false" />
+        <Property Name="Title" Type="Edm.String" Nullable="true" />
+        <Property Name="Credits" Type="Edm.Int32" Nullable="false" />
+        <Property Name="DepartmentID" Type="Edm.Int32" Nullable="false" />
+        <NavigationProperty Name="CourseGrades" Relationship="VBADONETDataService.LinqToSQL.Course_CourseGrades" FromRole="Course" ToRole="CourseGrades" />
+        <NavigationProperty Name="CourseInstructors" Relationship="VBADONETDataService.LinqToSQL.Course_CourseInstructors" FromRole="Course" ToRole="CourseInstructors" />
+      </EntityType>
+      <EntityType Name="CourseGrade">
+        <Key>
+          <PropertyRef Name="EnrollmentID" />
+        </Key>
+        <Property Name="EnrollmentID" Type="Edm.Int32" Nullable="false" />
+        <Property Name="CourseID" Type="Edm.Int32" Nullable="false" />
+        <Property Name="StudentID" Type="Edm.Int32" Nullable="false" />
+        <Property Name="Grade" Type="Edm.Decimal" Nullable="true" />
+        <NavigationProperty Name="Course" Relationship="VBADONETDataService.LinqToSQL.CourseGrade_Course" FromRole="CourseGrade" ToRole="Course" />
+        <NavigationProperty Name="Person" Relationship="VBADONETDataService.LinqToSQL.CourseGrade_Person" FromRole="CourseGrade" ToRole="Person" />
+      </EntityType>
+      <EntityType Name="CourseInstructor">
+        <Key>
+          <PropertyRef Name="CourseID" />
+          <PropertyRef Name="PersonID" />
+        </Key>
+        <Property Name="CourseID" Type="Edm.Int32" Nullable="false" />
+        <Property Name="PersonID" Type="Edm.Int32" Nullable="false" />
+        <NavigationProperty Name="Course" Relationship="VBADONETDataService.LinqToSQL.CourseInstructor_Course" FromRole="CourseInstructor" ToRole="Course" />
+        <NavigationProperty Name="Person" Relationship="VBADONETDataService.LinqToSQL.CourseInstructor_Person" FromRole="CourseInstructor" ToRole="Person" />
+      </EntityType>
+      <EntityType Name="Person">
+        <Key>
+          <PropertyRef Name="PersonID" />
+        </Key>
+        <Property Name="PersonID" Type="Edm.Int32" Nullable="false" />
+        <Property Name="LastName" Type="Edm.String" Nullable="true" />
+        <Property Name="FirstName" Type="Edm.String" Nullable="true" />
+        <Property Name="PersonCategory" Type="Edm.Int16" Nullable="false" />
+        <Property Name="HireDate" Type="Edm.DateTime" Nullable="true" />
+        <Property Name="EnrollmentDate" Type="Edm.DateTime" Nullable="true" />
+        <Property Name="Picture" Type="Edm.Binary" Nullable="true" />
+        <NavigationProperty Name="CourseGrades" Relationship="VBADONETDataService.LinqToSQL.Person_CourseGrades" FromRole="Person" ToRole="CourseGrades" />
+        <NavigationProperty Name="CourseInstructors" Relationship="VBADONETDataService.LinqToSQL.Person_CourseInstructors" FromRole="Person" ToRole="CourseInstructors" />
+      </EntityType>
+      <Association Name="Course_CourseGrades">
+        <End Role="CourseGrades" Type="VBADONETDataService.LinqToSQL.CourseGrade" Multiplicity="*" />
+        <End Role="Course" Type="VBADONETDataService.LinqToSQL.Course" Multiplicity="*" />
+      </Association>
+      <Association Name="Course_CourseInstructors">
+        <End Role="CourseInstructors" Type="VBADONETDataService.LinqToSQL.CourseInstructor" Multiplicity="*" />
+        <End Role="Course" Type="VBADONETDataService.LinqToSQL.Course" Multiplicity="*" />
+      </Association>
+      <Association Name="CourseGrade_Course">
+        <End Role="Course" Type="VBADONETDataService.LinqToSQL.Course" Multiplicity="0..1" />
+        <End Role="CourseGrade" Type="VBADONETDataService.LinqToSQL.CourseGrade" Multiplicity="*" />
+      </Association>
+      <Association Name="CourseGrade_Person">
+        <End Role="Person" Type="VBADONETDataService.LinqToSQL.Person" Multiplicity="0..1" />
+        <End Role="CourseGrade" Type="VBADONETDataService.LinqToSQL.CourseGrade" Multiplicity="*" />
+      </Association>
+      <Association Name="CourseInstructor_Course">
+        <End Role="Course" Type="VBADONETDataService.LinqToSQL.Course" Multiplicity="0..1" />
+        <End Role="CourseInstructor" Type="VBADONETDataService.LinqToSQL.CourseInstructor" Multiplicity="*" />
+      </Association>
+      <Association Name="CourseInstructor_Person">
+        <End Role="Person" Type="VBADONETDataService.LinqToSQL.Person" Multiplicity="0..1" />
+        <End Role="CourseInstructor" Type="VBADONETDataService.LinqToSQL.CourseInstructor" Multiplicity="*" />
+      </Association>
+      <Association Name="Person_CourseGrades">
+        <End Role="CourseGrades" Type="VBADONETDataService.LinqToSQL.CourseGrade" Multiplicity="*" />
+        <End Role="Person" Type="VBADONETDataService.LinqToSQL.Person" Multiplicity="*" />
+      </Association>
+      <Association Name="Person_CourseInstructors">
+        <End Role="CourseInstructors" Type="VBADONETDataService.LinqToSQL.CourseInstructor" Multiplicity="*" />
+        <End Role="Person" Type="VBADONETDataService.LinqToSQL.Person" Multiplicity="*" />
+      </Association>
+      <EntityContainer Name="SchoolLinqToSQLDataContext" m:IsDefaultEntityContainer="true">
+        <EntitySet Name="Courses" EntityType="VBADONETDataService.LinqToSQL.Course" />
+        <EntitySet Name="CourseGrades" EntityType="VBADONETDataService.LinqToSQL.CourseGrade" />
+        <EntitySet Name="CourseInstructors" EntityType="VBADONETDataService.LinqToSQL.CourseInstructor" />
+        <EntitySet Name="Persons" EntityType="VBADONETDataService.LinqToSQL.Person" />
+        <AssociationSet Name="Course_CourseGrades" Association="VBADONETDataService.LinqToSQL.Course_CourseGrades">
+          <End Role="CourseGrades" EntitySet="CourseGrades" />
+          <End Role="Course" EntitySet="Courses" />
+        </AssociationSet>
+        <AssociationSet Name="Course_CourseInstructors" Association="VBADONETDataService.LinqToSQL.Course_CourseInstructors">
+          <End Role="CourseInstructors" EntitySet="CourseInstructors" />
+          <End Role="Course" EntitySet="Courses" />
+        </AssociationSet>
+        <AssociationSet Name="CourseGrade_Course" Association="VBADONETDataService.LinqToSQL.CourseGrade_Course">
+          <End Role="Course" EntitySet="Courses" />
+          <End Role="CourseGrade" EntitySet="CourseGrades" />
+        </AssociationSet>
+        <AssociationSet Name="CourseGrade_Person" Association="VBADONETDataService.LinqToSQL.CourseGrade_Person">
+          <End Role="Person" EntitySet="Persons" />
+          <End Role="CourseGrade" EntitySet="CourseGrades" />
+        </AssociationSet>
+        <AssociationSet Name="CourseInstructor_Course" Association="VBADONETDataService.LinqToSQL.CourseInstructor_Course">
+          <End Role="Course" EntitySet="Courses" />
+          <End Role="CourseInstructor" EntitySet="CourseInstructors" />
+        </AssociationSet>
+        <AssociationSet Name="CourseInstructor_Person" Association="VBADONETDataService.LinqToSQL.CourseInstructor_Person">
+          <End Role="Person" EntitySet="Persons" />
+          <End Role="CourseInstructor" EntitySet="CourseInstructors" />
+        </AssociationSet>
+        <AssociationSet Name="Person_CourseGrades" Association="VBADONETDataService.LinqToSQL.Person_CourseGrades">
+          <End Role="CourseGrades" EntitySet="CourseGrades" />
+          <End Role="Person" EntitySet="Persons" />
+        </AssociationSet>
+        <AssociationSet Name="Person_CourseInstructors" Association="VBADONETDataService.LinqToSQL.Person_CourseInstructors">
+          <End Role="CourseInstructors" EntitySet="CourseInstructors" />
+          <End Role="Person" EntitySet="Persons" />
+        </AssociationSet>
+        <FunctionImport Name="SearchCourses" EntitySet="Courses" ReturnType="Collection(VBADONETDataService.LinqToSQL.Course)" m:HttpMethod="GET">
+          <Parameter Name="searchText" Type="Edm.String" Mode="In" />
+        </FunctionImport>
+      </EntityContainer>
+    </Schema>
+  </edmx:DataServices>
+</edmx:Edmx>

@@ -1,0 +1,123 @@
+﻿<Window x:Class="InkCanvasDragAndDropSample.SampleWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:localAssembly="clr-namespace:InkCanvasDragAndDropSample;assembly="
+    Title="InkCanvas Drag and Drop Sample"
+    >
+  <Window.Resources>
+
+    <!-- A few LinearGradientBrushes for backgrounds -->
+    <LinearGradientBrush x:Key="inkCanvas1Brush" StartPoint="0,0" EndPoint="0,1">
+      <GradientStop Color="LightBlue" Offset="0.2"/>
+      <GradientStop Color="AliceBlue" Offset="0.8"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="inkCanvas2Brush" StartPoint="0,0" EndPoint="0,1">
+      <GradientStop Color="AliceBlue" Offset="0.2"/>
+      <GradientStop Color="LightBlue" Offset="0.8"/>
+    </LinearGradientBrush>
+
+    <Style x:Key="inkCanvasLabel" TargetType="TextBlock">
+      <Setter Property="HorizontalAlignment" Value="Center"/>
+      <Setter Property="VerticalAlignment" Value="Top"/>
+      <Setter Property="FontFamily" Value="Verdana"/>
+      <Setter Property="FontSize" Value="22"/>
+      <Setter Property="FontWeight" Value="Bold"/>
+      <Setter Property="Margin" Value="0,10,0,0"/>
+    </Style>
+    
+    <!-- a converter used by databinding to check or uncheck the editingmode menu items -->
+    <localAssembly:InkEditingModeConverter x:Key="InkEditingModeConverterKey" />
+    <localAssembly:SelectEditingModeConverter x:Key="SelectEditingModeConverterKey" />
+    
+  </Window.Resources>
+  <Grid >
+    <Grid.RowDefinitions>
+      <RowDefinition Height="20"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+    
+    <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.ColumnSpan="2" Background="Ivory">
+      <Menu Background="Ivory">
+          <MenuItem Header="File">
+          <Separator/>
+          <MenuItem Header="Clear Ink And Elements" Click="OnClearInkAndElements"/>
+				  <Separator/>
+				  <MenuItem Header="Exit" Click="OnExit"/>
+			  </MenuItem>
+        <MenuItem Header="InkCanvas1">
+          <MenuItem Name="miInkCanvas1EditingModeInk" Header="EditingMode: Ink" IsCheckable="True" Click="OnInkCanvasInkChecked" Tag="inkCanvas1">
+            <!-- we bind the IsChecked property to true when inkCanvas1.EditingMode == Ink.  To do this, we need to use a data converter-->
+            <MenuItem.IsChecked>
+              <Binding ElementName="inkCanvas1" Path="EditingMode" Converter="{StaticResource InkEditingModeConverterKey}"/>
+            </MenuItem.IsChecked>
+          </MenuItem>
+          <MenuItem Name="miInkCanvas1EditingModeSelect" Header="EditingMode: Select" IsCheckable="True" Click="OnInkCanvasSelectChecked" Tag="inkCanvas1">
+            <!-- we bind the IsChecked property to true when inkCanvas1.EditingMode == Select.  To do this, we need to use a data converter-->
+            <MenuItem.IsChecked>
+              <Binding ElementName="inkCanvas1" Path="EditingMode" Converter="{StaticResource SelectEditingModeConverterKey}"/>
+            </MenuItem.IsChecked>
+          </MenuItem>
+
+          <Separator/>
+
+          <!-- use commanding to bind this menu item to the InkCanvas for SelectAll support -->
+          <MenuItem IsCheckable="False" Command="SelectAll" CommandTarget="{Binding ElementName=inkCanvas1}" Header="Select All"/>
+
+          <Separator/>
+
+          <MenuItem Header="Insert">
+            <MenuItem Header="TextBox" Click="OnInsertTextBox" Tag="inkCanvas1"/>
+            <MenuItem Header="Label" Click="OnInsertLabel" Tag="inkCanvas1"/>
+            <MenuItem Header="Shape" Click="OnInsertShape" Tag="inkCanvas1"/>
+          </MenuItem>
+        </MenuItem>
+        <MenuItem Header="InkCanvas2">
+          <MenuItem Name="miInkCanvas2EditingModeInk" Header="EditingMode: Ink" IsCheckable="True" Click="OnInkCanvasInkChecked" Tag="inkCanvas2">
+            <!-- we bind the IsChecked property to true when inkCanvas2.EditingMode == Ink.  To do this, we need to use a data converter-->
+            <MenuItem.IsChecked>
+              <Binding ElementName="inkCanvas2" Path="EditingMode" Converter="{StaticResource InkEditingModeConverterKey}"/>
+            </MenuItem.IsChecked>
+          </MenuItem>
+          <MenuItem Name="miInkCanvas2EditingModeSelect" Header="EditingMode: Select" IsCheckable="True" Click="OnInkCanvasSelectChecked" Tag="inkCanvas2">
+            <!-- we bind the IsChecked property to true when inkCanvas2.EditingMode == Select.  To do this, we need to use a data converter-->
+            <MenuItem.IsChecked>
+              <Binding ElementName="inkCanvas2" Path="EditingMode" Converter="{StaticResource SelectEditingModeConverterKey}"/>
+            </MenuItem.IsChecked>
+          </MenuItem>
+
+          <Separator/>
+
+          <!-- use commanding to bind this menu item to the InkCanvas for SelectAll support -->
+          <MenuItem IsCheckable="False" Command="SelectAll" CommandTarget="{Binding ElementName=inkCanvas2}" Header="Select All"/>
+
+          <Separator/>
+
+          <MenuItem Header="Insert">
+            <MenuItem Header="TextBox" Click="OnInsertTextBox" Tag="inkCanvas2"/>
+            <MenuItem Header="Label" Click="OnInsertLabel" Tag="inkCanvas2"/>
+            <MenuItem Header="Shape" Click="OnInsertShape" Tag="inkCanvas2"/>
+          </MenuItem>
+        </MenuItem>
+        
+		  </Menu>
+      <CheckBox Margin="30,4,0,0" Checked="OnDragAndDropEnabled" Unchecked="OnDragAndDropDisabled">Drag and Drop Enabled</CheckBox>
+    </StackPanel>
+    
+    <!-- UI for inkCanvas1 -->
+    <Grid Grid.Column="0" Grid.Row="1" Background="{StaticResource inkCanvas1Brush}">
+      <TextBlock Foreground="AliceBlue" Style="{StaticResource inkCanvasLabel}">InkCanvas1</TextBlock>
+    </Grid>
+    <InkCanvas Grid.Column="0" Grid.Row="1" Name="inkCanvas1" Background="Transparent"/>
+
+    <!-- UI for inkCanvas2 -->
+    <Grid Grid.Column="1" Grid.Row="1" Background="{StaticResource inkCanvas2Brush}">
+      <TextBlock Foreground="LightBlue" Style="{StaticResource inkCanvasLabel}">InkCanvas2</TextBlock>
+    </Grid>
+    <InkCanvas Grid.Column="1" Grid.Row="1" Name="inkCanvas2" Background="Transparent"/>
+    
+	</Grid>
+</Window>

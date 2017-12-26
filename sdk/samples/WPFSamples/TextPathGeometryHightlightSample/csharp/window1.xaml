@@ -1,0 +1,72 @@
+﻿<Window
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  x:Class="SDKSample.Window1"
+  Title="Using a Path Geometry to Highlight Text"
+  Background="PowderBlue"
+  >
+
+  <StackPanel>
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="120"/>
+        <ColumnDefinition Width="160"/>
+        <ColumnDefinition Width="160"/>
+      </Grid.ColumnDefinitions>
+
+      <Label HorizontalAlignment="Right" Margin="10" Grid.Column="0" Grid.Row="0" FontSize="16">Enter string:</Label>
+      <TextBox Margin="10" Grid.Column="1" Grid.Row="0" FontSize="16" MaxLength="15" Name="TextToDisplay">Hello World!</TextBox>
+      <Button Margin="10" Grid.Column="2" Grid.Row="0" FontSize="16" Click="OnDisplayTextClick">Display Text</Button>
+    </Grid>
+
+    <Canvas
+      Margin="20" 
+      Height="150">
+
+      <!-- Top-left starting point should be half the width of the ellipse so the text strokes align to the center of circle. -->
+      <Path 
+        Canvas.Top="15" 
+        Canvas.Left="15" 
+        Stroke="SteelBlue"
+        StrokeThickness="3" 
+        Fill="LightSteelBlue" 
+        Name="path" />
+
+      <Ellipse
+        Canvas.Top="0" 
+        Canvas.Left="0"
+        Width="30"
+        Height="30">
+
+        <Ellipse.Fill>
+          <RadialGradientBrush GradientOrigin="0.5,0.5" Center="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
+            <RadialGradientBrush.GradientStops>
+              <GradientStop Color="Yellow" Offset="0.25" />
+              <GradientStop Color="Transparent" Offset="1" />
+            </RadialGradientBrush.GradientStops>
+          </RadialGradientBrush>
+        </Ellipse.Fill>
+
+        <Ellipse.RenderTransform>
+          <MatrixTransform />
+        </Ellipse.RenderTransform>
+        <Ellipse.Triggers>
+          <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+            <EventTrigger.Actions>
+            <BeginStoryboard>
+              <Storyboard x:Name="storyboard">
+                <MatrixAnimationUsingPath 
+                  x:Name="matrixAnimation"
+                  Duration="0:00:40"
+                  RepeatBehavior="Forever"
+                  Storyboard.TargetProperty="RenderTransform.Matrix" />
+              </Storyboard>
+            </BeginStoryboard>
+            </EventTrigger.Actions>
+          </EventTrigger>
+        </Ellipse.Triggers>
+      </Ellipse>
+
+    </Canvas>
+  </StackPanel>
+</Window>

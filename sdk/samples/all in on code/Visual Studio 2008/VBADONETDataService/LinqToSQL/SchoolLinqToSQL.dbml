@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Database Name="SQLServer2005DB" Class="SchoolLinqToSQLDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="WebSettings" ConnectionString="Data Source=MYPLAYSTATION\SQLEXPRESS;Initial Catalog=SQLServer2005DB;Integrated Security=True" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="SQLServer2005DBConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.Course" Member="Courses">
+    <Type Name="Course">
+      <Column Name="CourseID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Title" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="Credits" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="DepartmentID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Course_CourseGrade" Member="CourseGrades" ThisKey="CourseID" OtherKey="CourseID" Type="CourseGrade" />
+      <Association Name="Course_CourseInstructor" Member="CourseInstructors" ThisKey="CourseID" OtherKey="CourseID" Type="CourseInstructor" />
+    </Type>
+  </Table>
+  <Table Name="dbo.CourseGrade" Member="CourseGrades">
+    <Type Name="CourseGrade">
+      <Column Name="EnrollmentID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="CourseID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="StudentID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Grade" Type="System.Decimal" DbType="Decimal(3,2)" CanBeNull="true" />
+      <Association Name="Course_CourseGrade" Member="Course" ThisKey="CourseID" OtherKey="CourseID" Type="Course" IsForeignKey="true" />
+      <Association Name="Person_CourseGrade" Member="Person" ThisKey="StudentID" OtherKey="PersonID" Type="Person" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.CourseInstructor" Member="CourseInstructors">
+    <Type Name="CourseInstructor">
+      <Column Name="CourseID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="PersonID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Association Name="Course_CourseInstructor" Member="Course" ThisKey="CourseID" OtherKey="CourseID" Type="Course" IsForeignKey="true" />
+      <Association Name="Person_CourseInstructor" Member="Person" ThisKey="PersonID" OtherKey="PersonID" Type="Person" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Person" Member="Persons">
+    <Type Name="Person">
+      <Column Name="PersonID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="LastName" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="FirstName" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="PersonCategory" Type="System.Int16" DbType="SmallInt NOT NULL" CanBeNull="false" />
+      <Column Name="HireDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="EnrollmentDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Picture" Type="System.Data.Linq.Binary" DbType="Image" CanBeNull="true" UpdateCheck="Never" />
+      <Association Name="Person_CourseGrade" Member="CourseGrades" ThisKey="PersonID" OtherKey="StudentID" Type="CourseGrade" />
+      <Association Name="Person_CourseInstructor" Member="CourseInstructors" ThisKey="PersonID" OtherKey="PersonID" Type="CourseInstructor" />
+    </Type>
+  </Table>
+</Database>

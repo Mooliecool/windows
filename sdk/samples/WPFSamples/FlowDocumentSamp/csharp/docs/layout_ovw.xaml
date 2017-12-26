@@ -1,0 +1,2827 @@
+<FlowDocumentPageViewer xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <FlowDocument ColumnWidth="350" ColumnGap="15" ColumnRuleWidth="1" ColumnRuleBrush="LightGray">
+
+    <Paragraph Style="{StaticResource HeaderStyle}">Windows Presentation Foundation Layout "Cook Book"</Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}">Table of Contents:</Paragraph>
+    <Paragraph Style="{StaticResource tocStyle}" xml:space="preserve">
+1     <Hyperlink NavigateUri="#intro">Introduction</Hyperlink>
+2     <Hyperlink NavigateUri="#buttongrid">Building a Button with a Grid</Hyperlink> 
+3     <Hyperlink NavigateUri="#menugrid">Building a Menu with a Grid</Hyperlink>
+4     <Hyperlink NavigateUri="#dialoggrid">Building a Dialog with a Grid</Hyperlink>
+5     <Hyperlink NavigateUri="#showgridlines">Using "ShowGridLines" to Help Using Grid</Hyperlink>
+6     <Hyperlink NavigateUri="#marginsalign">Using Margins and Alignments</Hyperlink>
+7     <Hyperlink NavigateUri="#alignments">Using Alignments</Hyperlink>
+8     <Hyperlink NavigateUri="#spanningcolumns">Spanning Columns and Rows in a Grid</Hyperlink>
+9     <Hyperlink NavigateUri="#verticalstack">Vertical Stacking</Hyperlink>
+10    <Hyperlink NavigateUri="#alignverticalstack">Alignments in Vertical Stack</Hyperlink>
+11    <Hyperlink NavigateUri="#verticalstacknonuniform">Vertical Stacking with Non-Uniform Margins</Hyperlink>
+12    <Hyperlink NavigateUri="#overconstrainedvertical">Over constrained Vertical Stacking</Hyperlink>
+13    <Hyperlink NavigateUri="#horizontalstacking">Simple Horizontal Stacking</Hyperlink>
+14    <Hyperlink NavigateUri="#horizontalstackingalign">Alignments in Horizontal Stacking</Hyperlink>
+15    <Hyperlink NavigateUri="#horizontalstackingnonuiform">Horizontal Stacking with Non-Uniform Margins</Hyperlink>
+16    <Hyperlink NavigateUri="#horizontalstackingnconstrained">Overconstrained Horizontal Stacking</Hyperlink>
+17    <Hyperlink NavigateUri="#dockversusstack">The Difference Between DockPanel and StackPanel</Hyperlink>
+18    <Hyperlink NavigateUri="#defaultdocking">Default Docking</Hyperlink>
+19    <Hyperlink NavigateUri="#dockingfilltrue">Various Docking with LastChildFill=True</Hyperlink>
+20    <Hyperlink NavigateUri="#dockingfilltruealign">Various Docking with LastChildFill=True and Alignments</Hyperlink>
+21    <Hyperlink NavigateUri="#dockingfilltruealignwidth">Various Docking with LastChildFill=True, Alignments and Explicit Width</Hyperlink>
+22    <Hyperlink NavigateUri="#defaultcanvas">Default Canvas Layout</Hyperlink>
+23    <Hyperlink NavigateUri="#childcanvas">Positioning a Child in a Canvas</Hyperlink>
+24    <Hyperlink NavigateUri="#childcanvasmargin">Positioning a Child in a Canvas with Margin</Hyperlink>
+25    <Hyperlink NavigateUri="#sizingchildcanvas">Sizing a Child in a Canvas</Hyperlink>
+26    <Hyperlink NavigateUri="#canvascliptoboundstrue">Canvas and ClipToBounds=True</Hyperlink>
+27    <Hyperlink NavigateUri="#canvascliptoboundsfalse">Canvas and ClipToBounds=False</Hyperlink>
+28    <Hyperlink NavigateUri="#gridcanvassimilar">Grid and Canvas are Similar</Hyperlink>
+29    <Hyperlink NavigateUri="#bordertight">Border: Tight Fit</Hyperlink>
+30    <Hyperlink NavigateUri="#bordertightmargins">Border: Tight Fit with Margins</Hyperlink>
+31    <Hyperlink NavigateUri="#borderaligns">Border: Alignments and TextAlignment</Hyperlink>
+32    <Hyperlink NavigateUri="#borderoverconstrained">Border: Over constrained Child</Hyperlink>
+33    <Hyperlink NavigateUri="#borderrounded">Border: Rounded Corners</Hyperlink>
+34    <Hyperlink NavigateUri="#textblock">TextBlock: Displaying label text</Hyperlink>
+</Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="intro">1. Introduction</Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">This document has samples that can be copied and pasted as templates. Some of the examples may not render exactly as the images shown, but they will produce the same layout structure. To view the rendered output of an inline sample, click its associated "Rendered Output" button.</Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">A Grid control can be used to build the requisite layout structures to support a typical button layout.</Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="buttongrid">2. Building a Button with a Grid</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 1, Button - Zoomed</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure1.PNG" DecodePixelWidth="233" DecodePixelHeight="66"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 2, Button - Zoomed, Grid SuperImposed</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure2.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 3, Simplified Rendering (From Sample)</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure3.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Grid Background="LightGray" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" ShowGridLines="true">
+	&lt;Grid.ColumnDefinitions>
+  &lt;ColumnDefinition Width="20px"/>
+	&lt;ColumnDefinition Width="Auto"/>
+	&lt;ColumnDefinition Width="20px"/>
+  &lt;/Grid.ColumnDefinitions>
+  &lt;Grid.RowDefinitions>
+	&lt;RowDefinition Height="20px"/>
+	&lt;RowDefinition Height="Auto"/>
+	&lt;RowDefinition Height="20px"/>
+  &lt;/Grid.RowDefinitions>
+	&lt;Rectangle Width="20" Height="20" Fill="red"/>
+	&lt;Rectangle Width="20" Height="20" Fill="orange" Grid.Row="2"/>
+	&lt;Rectangle Width="20" Height="20" Fill="yellow" Grid.Column="2"/>
+	&lt;Rectangle Width="20" Height="20" Fill="purple" Grid.Row="2" Grid.Column="2"/>
+
+	&lt;Rectangle Width="20" Fill="blue" Grid.Row="1"/>
+	&lt;Rectangle Width="20" Fill="blue" Grid.Row="1" Grid.Column="2"/>
+	&lt;Rectangle Height="20" Fill="blue" Grid.Column="1"/>
+	&lt;Rectangle Height="20" Fill="blue" Grid.Column="1" Grid.Row="2"/>
+
+	&lt;TextBlock Margin="30,10,30,10" FontSize="40" Grid.Column="1" Grid.Row="1">Test&lt;/TextBlock>
+&lt;/Grid>
+</Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+
+        <Grid Background="LightGray" ShowGridLines="True">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20px"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="20px"/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="20px"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20px"/>
+          </Grid.RowDefinitions>
+
+          <Rectangle Width="20" Height="20" Fill="red"/>
+          <Rectangle Width="20" Height="20" Fill="orange" Grid.Row="2"/>
+          <Rectangle Width="20" Height="20" Fill="yellow" Grid.Column="2"/>
+          <Rectangle Width="20" Height="20" Fill="purple" Grid.Row="2" Grid.Column="2"/>
+
+          <Rectangle Width="20" Fill="blue" Grid.Row="1"/>
+          <Rectangle Width="20" Fill="blue" Grid.Row="1" Grid.Column="2"/>
+          <Rectangle Height="20" Fill="blue" Grid.Column="1"/>
+          <Rectangle Height="20" Fill="blue" Grid.Column="1" Grid.Row="2"/>
+
+          <TextBlock Margin="30,10,30,10" FontSize="40" Grid.Column="1" Grid.Row="1">Test</TextBlock>
+        </Grid>
+      </Expander>
+    </Paragraph>
+
+
+    <Paragraph Style="{StaticResource mainContentStyle}">An alternative method:</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure4.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Grid xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Background="lightgray">
+  &lt;Grid.ColumnDefinitions>
+	&lt;ColumnDefinition Width="Auto"/>
+  &lt;/Grid.ColumnDefinitions>
+  &lt;Grid.RowDefinitions>
+	&lt;RowDefinition Height="Auto"/>
+  &lt;/Grid.RowDefinitions>
+	&lt;Rectangle Width="20" HorizontalAlignment="Left" Fill="blue"/>
+	&lt;Rectangle Width="20" HorizontalAlignment="Right" Fill="blue"/>
+	&lt;Rectangle Height="20" VerticalAlignment="Top" Fill="blue"/>
+	&lt;Rectangle Height="20" VerticalAlignment="Bottom" Fill="blue"/>
+
+	&lt;Rectangle Height="20" Width="20" Fill="red" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+	&lt;Rectangle Height="20" Width="20" Fill="yellow" VerticalAlignment="Top" HorizontalAlignment="Right"/>
+	&lt;Rectangle Height="20" Width="20" Fill="orange" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
+	&lt;Rectangle Height="20" Width="20" Fill="purple" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
+
+	&lt;TextBlock HorizontalAlignment="center" VerticalAlignment="center" FontSize="40" Margin="50,30,50,30">Test&lt;/TextBlock>
+
+&lt;/Grid>
+            </Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Grid Background="LightGray">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
+
+          <Rectangle Width="20" HorizontalAlignment="Left" Fill="blue"/>
+          <Rectangle Width="20" HorizontalAlignment="Right" Fill="blue"/>
+          <Rectangle Height="20" VerticalAlignment="Top" Fill="blue"/>
+          <Rectangle Height="20" VerticalAlignment="Bottom" Fill="blue"/>
+
+          <Rectangle Height="20" Width="20" Fill="red" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+          <Rectangle Height="20" Width="20" Fill="yellow" VerticalAlignment="Top" HorizontalAlignment="Right"/>
+          <Rectangle Height="20" Width="20" Fill="orange" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
+          <Rectangle Height="20" Width="20" Fill="purple" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
+
+          <TextBlock HorizontalAlignment="center" VerticalAlignment="center" FontSize="40" Margin="50,30,50,30">Test</TextBlock>
+
+        </Grid>
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="menugrid">3. Building a Menu with a Grid</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">Similarly, a Grid control can be used to build the requisite layout structures to support a typical menu layout as well.</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 4, Edit Menu</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure5.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 5, Edit Menu – Zoomed, Grid Superimposed</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure6.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The <Bold>XAML</Bold> markup for the individual items for this might look like the following.
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;StackPanel xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	&lt;StackPanel.Resources>
+	       &lt;Style x:Key="menuStyle">
+            		&lt;Setter Property="TextBlock.Margin" Value="5"/>
+    		&lt;/Style>
+	&lt;/StackPanel.Resources>
+
+&lt;TextBlock>Edit&lt;/TextBlock>
+&lt;Grid ShowGridLines="True" Width="200" HorizontalAlignment="Left" Background="LightGray">
+    &lt;Grid.ColumnDefinitions>
+    &lt;ColumnDefinition Width="15" />
+    &lt;ColumnDefinition Width="Auto"/>
+    &lt;ColumnDefinition Width="Auto"/>
+    &lt;/Grid.RowDefinitions>
+    &lt;Grid.RowDefinitions>
+	  &lt;RowDefinition Height="Auto"/>
+	  &lt;RowDefinition Height="Auto"/>
+	  &lt;RowDefinition Height="Auto"/>
+	  &lt;RowDefinition Height="Auto"/>
+	  &lt;RowDefinition Height="Auto"/>
+	  &lt;RowDefinition Height="Auto"/>
+	  &lt;RowDefinition Height="Auto"/>
+	  &lt;RowDefinition Height="Auto"/>
+    &lt;/Grid.RowDefinitions>
+
+	&lt;StackPanel Background="LightGray" Grid.Column="0" Grid.RowSpan="7"/>
+
+	&lt;TextBlock Grid.Column="1" Grid.Row="0" Style="{StaticResource menuStyle}">Undo Move Objects&lt;/TextBlock>
+	&lt;TextBlock Grid.Column="1" Grid.Row="1" Style="{StaticResource menuStyle}">Cut&lt;/TextBlock>
+	&lt;TextBlock Grid.Column="1" Grid.Row="2" Style="{StaticResource menuStyle}">Copy Drawing&lt;/TextBlock>
+	&lt;TextBlock Grid.Column="1" Grid.Row="3" Style="{StaticResource menuStyle}">Paste&lt;/TextBlock>
+	&lt;TextBlock Grid.Column="1" Grid.Row="4" Style="{StaticResource menuStyle}">Clear&lt;/TextBlock>
+	&lt;TextBlock Grid.Column="1" Grid.Row="5" Style="{StaticResource menuStyle}">Select All&lt;/TextBlock>
+	&lt;TextBlock Grid.Column="1" Grid.Row="6" Style="{StaticResource menuStyle}">Find...&lt;/TextBlock>
+
+	&lt;TextBlock Grid.Column="2" Grid.Row="0" Style="{StaticResource menuStyle}">Ctrl+Z&lt;/TextBlock>
+	&lt;TextBlock Grid.Column="2" Grid.Row="1" Style="{StaticResource menuStyle}">Ctrl+X&lt;/TextBlock>
+	&lt;TextBlock Grid.Column="2" Grid.Row="2" Style="{StaticResource menuStyle}">Ctrl+C&lt;/TextBlock>
+	&lt;TextBlock Grid.Column="2" Grid.Row="3" Style="{StaticResource menuStyle}">Ctrl+V&lt;/TextBlock>
+	&lt;TextBlock Grid.Column="2" Grid.Row="4" Style="{StaticResource menuStyle}">Del&lt;/TextBlock>
+	&lt;TextBlock Grid.Column="2" Grid.Row="5" Style="{StaticResource menuStyle}">Ctrl+A&lt;/TextBlock>
+	&lt;TextBlock Grid.Column="2" Grid.Row="6" Style="{StaticResource menuStyle}">Ctrl+F&lt;/TextBlock>
+
+
+	&lt;Button Grid.Row="8" Grid.Column="1" Width="20">vv&lt;/Button>
+&lt;/Grid>
+
+&lt;/StackPanel>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <StackPanel xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+          <StackPanel.Resources>
+            <Style x:Key="menuStyle">
+              <Setter Property="TextBlock.Margin" Value="5"/>
+            </Style>
+          </StackPanel.Resources>
+
+          <TextBlock>Edit</TextBlock>
+          <Grid ShowGridLines="True" Width="200" HorizontalAlignment="Left" Background="LightGray">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="15" />
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto"/>
+              <RowDefinition Height="Auto"/>
+              <RowDefinition Height="Auto"/>
+              <RowDefinition Height="Auto"/>
+              <RowDefinition Height="Auto"/>
+              <RowDefinition Height="Auto"/>
+              <RowDefinition Height="Auto"/>
+              <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <StackPanel Background="LightGray" Grid.Column="0" Grid.RowSpan="7"/>
+
+            <TextBlock Grid.Column="1" Grid.Row="0" Style="{StaticResource menuStyle}">Undo Move Objects</TextBlock>
+            <TextBlock Grid.Column="1" Grid.Row="1" Style="{StaticResource menuStyle}">Cut</TextBlock>
+            <TextBlock Grid.Column="1" Grid.Row="2" Style="{StaticResource menuStyle}">Copy Drawing</TextBlock>
+            <TextBlock Grid.Column="1" Grid.Row="3" Style="{StaticResource menuStyle}">Paste</TextBlock>
+            <TextBlock Grid.Column="1" Grid.Row="4" Style="{StaticResource menuStyle}">Clear</TextBlock>
+            <TextBlock Grid.Column="1" Grid.Row="5" Style="{StaticResource menuStyle}">Select All</TextBlock>
+            <TextBlock Grid.Column="1" Grid.Row="6" Style="{StaticResource menuStyle}">Find...</TextBlock>
+
+            <TextBlock Grid.Column="2" Grid.Row="0" Style="{StaticResource menuStyle}">Ctrl+Z</TextBlock>
+            <TextBlock Grid.Column="2" Grid.Row="1" Style="{StaticResource menuStyle}">Ctrl+X</TextBlock>
+            <TextBlock Grid.Column="2" Grid.Row="2" Style="{StaticResource menuStyle}">Ctrl+C</TextBlock>
+            <TextBlock Grid.Column="2" Grid.Row="3" Style="{StaticResource menuStyle}">Ctrl+V</TextBlock>
+            <TextBlock Grid.Column="2" Grid.Row="4" Style="{StaticResource menuStyle}">Del</TextBlock>
+            <TextBlock Grid.Column="2" Grid.Row="5" Style="{StaticResource menuStyle}">Ctrl+A</TextBlock>
+            <TextBlock Grid.Column="2" Grid.Row="6" Style="{StaticResource menuStyle}">Ctrl+F</TextBlock>
+            <Button Grid.Row="8" Grid.Column="1" Width="20">vv</Button>
+          </Grid>
+
+        </StackPanel>
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="dialoggrid">4. Building a Dialog with a Grid</Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">Finally, a Grid control can also be used to build the requisite layout structures to support a dialog box.</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 6, Start/Run</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure7.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 7, Start/Run - Grid Super-imposed</Paragraph>
+
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure8.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The <Bold>XAML</Bold> markup for this example might look like the following.
+    </Paragraph>
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Grid xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" ShowGridLines="true" Width="400">
+	&lt;Grid.RowDefinitions>
+	&lt;RowDefinition Height="Auto"/>
+	&lt;RowDefinition Height="Auto"/>
+	&lt;RowDefinition Height="Auto"/>
+  &lt;/Grid.RowDefinitions>
+  &lt;Grid.ColumnDefinitions>
+	&lt;ColumnDefinition Width="Auto"/>
+	&lt;ColumnDefinition Width="20"/>
+	&lt;ColumnDefinition Width="Auto" SharedSizeGroup="buttons"/>
+	&lt;ColumnDefinition Width="Auto" SharedSizeGroup="buttons"/>
+	&lt;ColumnDefinition Width="Auto" SharedSizeGroup="buttons"/>
+  &lt;/Grid.ColumnDefinitions>
+	&lt;TextBlock Margin="0,10,0,10" Width="260" HorizontalAlignment="Left" Grid.ColumnSpan="4" Grid.Column="1" TextWrapping="Wrap">Type the name of a program, folder, document, or Internet resource, and Windows will open it for you.&lt;/TextBlock>
+
+	&lt;TextBlock Grid.Row="1" Margin="10,15,10,0">&lt;Underline>O&lt;/Underline>pen&lt;/TextBlock>
+	&lt;TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Margin="5,10,5,30"/>
+
+	&lt;Button Grid.Row="2" Grid.Column="2" Margin="3,10,3,15" MinWidth="90">OK&lt;/Button>
+	&lt;Button Grid.Row="2" Grid.Column="3" Margin="3,10,3,15">Cancel&lt;/Button>
+	&lt;Button Grid.Row="2" Grid.Column="4" Margin="3,10,3,15">Browse&lt;/Button>
+
+&lt;/Grid>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Grid Background="LightGray" ShowGridLines="True" Width="400">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="buttons"/>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="buttons"/>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="buttons"/>
+          </Grid.ColumnDefinitions>
+          <TextBlock Margin="0,10,0,10" Width="260" HorizontalAlignment="Left" Grid.ColumnSpan="4" Grid.Column="1" TextWrapping="Wrap">Type the name of a program, folder, document, or Internet resource, and Windows will open it for you.</TextBlock>
+
+          <TextBlock Grid.Row="1" Margin="10,15,10,0">
+            <Underline>O</Underline>pen
+          </TextBlock>
+          <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Margin="5,10,5,30"/>
+
+          <Button Grid.Row="2" Grid.Column="2" Margin="3,10,3,15" MinWidth="90">OK</Button>
+          <Button Grid.Row="2" Grid.Column="3" Margin="3,10,3,15">Cancel</Button>
+          <Button Grid.Row="2" Grid.Column="4" Margin="3,10,3,15">Browse</Button>
+        </Grid>
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="showgridlines">5. Using "ShowGridLines" to Help Using Grid</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">A convenient feature for visualizing layout partitions is "ShowGridLines."  This property causes dashed lines to render on the edges of the partitions defined by columns and rows.  The following markup demonstrates; the resulting visual is Figure 8.  This feature is designed to assist in layout construction; therefore, it is very limited.  The grid lines cannot be styled and should not be included in production code.</Paragraph>
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Grid xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Background="Wheat" Width="400" Height="200" ShowGridLines="true"> 
+	&lt;Grid.ColumnDefinitions>
+  &lt;ColumnDefinition/>
+	&lt;ColumnDefinition/>
+  &lt;/Grid.ColumnDefinitions>
+  &lt;Grid.RowDefinitions>
+	&lt;RowDefinition/>
+	&lt;RowDefinition/>
+  &lt;/Grid.RowDefinitions>
+&lt;/Grid>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Grid Background="Wheat" Width="400" Height="200" ShowGridLines="True">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+          </Grid.RowDefinitions>
+        </Grid>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 8, ShowGridLines</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure9.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="marginsalign">6. Using Margins and Alignments</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">Margins and alignments are processed by the layout system.  Margins can be used inside of a partition to offset a child.  Alignments can also be used within a partition.</Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">Because "stretch" is the default value for alignments, the following markup results in Figure 9.</Paragraph>
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Grid xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Background="Wheat" Width="400" Height="200" ShowGridLines="true"> 
+	&lt;Grid.ColumnDefinitions>
+  &lt;ColumnDefinition/>
+	&lt;ColumnDefinition/>
+  &lt;/Grid.ColumnDefinitions>
+  &lt;Grid.RowDefinitions>
+	&lt;RowDefinition/>
+	&lt;RowDefinition/>
+  &lt;/Grid.RowDefinitions>
+
+	&lt;Button Grid.Column="1" Grid.Row="1">Hello world!&lt;/Button>
+
+&lt;/Grid>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Grid Background="Wheat" Width="400" Height="200" ShowGridLines="True">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+          </Grid.RowDefinitions>
+          <Button Grid.Column="1" Grid.Row="1">Hello world!</Button>
+        </Grid>
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 9, Stretched Button</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure10.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">Margins can then be applied. See the markup below and its result, Figure 9.</Paragraph>
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Grid xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Background="Wheat" Width="400" Height="200" ShowGridLines="true"> 
+	&lt;Grid.ColumnDefinitions>
+  &lt;ColumnDefinition/>
+	&lt;ColumnDefinition/>
+  &lt;/Grid.ColumnDefinitions>
+  &lt;Grid.RowDefinitions>
+	&lt;RowDefinition/>
+	&lt;RowDefinition/>
+  &lt;/Grid.RowDefinitions>
+
+	&lt;Button Grid.Column="1" Grid.Row="1" Margin="30">Hello world!&lt;/Button>
+
+&lt;/Grid>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Grid Background="Wheat" Width="400" Height="200" ShowGridLines="True">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+          </Grid.RowDefinitions>
+          <Button Grid.Column="1" Grid.Row="1" Margin="30">Hello world!</Button>
+        </Grid>
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 10, Stretching with Margins</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure11.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="alignments">7. Using Alignments</Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">Now, applying non default alignments in the following markup (margin removed from last example), the result is Figure 11.</Paragraph>
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Grid xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Background="Wheat" Width="400" Height="200" ShowGridLines="true"> 
+	&lt;Grid.ColumnDefinitions>
+  &lt;ColumnDefinition/>
+	&lt;ColumnDefinition/>
+  &lt;/Grid.ColumnDefinitions>
+  &lt;Grid.RowDefinitions>
+	&lt;RowDefinition/>
+	&lt;RowDefinition/>
+  &lt;/Grid.RowDefinitions>
+	&lt;Button Grid.Column="1" Grid.Row="1" VerticalAlignment="top" HorizontalAlignment="right">Hello world!&lt;/Button>
+
+&lt;/Grid>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Grid Background="Wheat" Width="400" Height="200" ShowGridLines="True">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+          </Grid.RowDefinitions>
+          <Button Grid.Column="1" Grid.Row="1" VerticalAlignment="top" HorizontalAlignment="right">Hello world!</Button>
+        </Grid>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 11, With Alignments</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure12.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">The button can be offset by using the margin property. See markup below and resulting visual Figure 12.</Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Grid xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Background="Wheat" Width="400" Height="200" ShowGridLines="true"> 
+  &lt;Grid.ColumnDefinitions>	
+  &lt;ColumnDefinition/>
+	&lt;ColumnDefinition/>
+  &lt;/Grid.ColumnDefinitions>	
+  &lt;Grid.RowDefinitions>	
+	&lt;RowDefinition/>
+	&lt;RowDefinition/>
+  &lt;/Grid.RowDefinitions>	
+
+	&lt;Button Grid.Column="1" Grid.Row="1" VerticalAlignment="top" HorizontalAlignment="right" Margin="0,15,30,0">Hello world!&lt;/Button>
+
+&lt;/Grid>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Grid Background="Wheat" Width="400" Height="200" ShowGridLines="True">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+          </Grid.RowDefinitions>
+          <Button Grid.Column="1" Grid.Row="1" VerticalAlignment="top" HorizontalAlignment="right">Hello world!</Button>
+        </Grid>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 12, Alignments with Margin</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure13.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="spanningcolumns">8. Spanning Columns and Rows in a Grid</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      Children of a Grid can be spanned across multiple columns and rows. The <Bold>XAML</Bold> markup below shows a button which spans two columns; the default alignment of Stretch causes the button to be stretched across both. The resulting visual is shown in Figure 13.
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Grid xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Background="Wheat" Width="400" Height="200" ShowGridLines="true"> 
+	&lt;Grid.ColumnDefinitions>
+  &lt;ColumnDefinition Width="100"/>
+	&lt;ColumnDefinition Width="*"/>
+	&lt;/Grid.ColumnDefinitions>  
+	&lt;Grid.RowDefinitions>  
+	&lt;RowDefinition/>
+	&lt;RowDefinition/>
+  &lt;/Grid.RowDefinitions>
+
+	&lt;Button Grid.ColumnSpan="2">Hello world!&lt;/Button>
+&lt;/Grid>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Grid Background="Wheat" Width="350" Height="200" ShowGridLines="True">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+          </Grid.RowDefinitions>
+          <Button Grid.ColumnSpan="2">Hello world!</Button>
+        </Grid>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 13, Column Spanning</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure14.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">Alignments and margins can then be used against the partition defined by the span. See the following markup and resulting visual Figure 14.</Paragraph>
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Grid xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Background="Wheat" Width="400" Height="200" ShowGridLines="true"> 
+  &lt;Grid.ColumnDefinitions>	
+  &lt;ColumnDefinition Width="100"/>
+	&lt;ColumnDefinition Width="*"/>
+  &lt;/Grid.ColumnDefinitions>	  
+  &lt;Grid.RowDefinitions>	  
+	&lt;RowDefinition/>
+	&lt;RowDefinition/>
+  &lt;/Grid.RowDefinitions>	  
+
+	&lt;Button Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="20,20,0,0">Hello world!&lt;/Button>
+&lt;/Grid>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Grid Background="Wheat" Width="400" Height="200" ShowGridLines="True">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+          </Grid.RowDefinitions>
+          <Button Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="20,20,0,0">Hello world!</Button>
+        </Grid>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 14, Spanning with Alignments and Margins</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure15.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="verticalstack">9. Vertical Stacking</Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">A StackPanel can be used to easily stack objects vertically or horizontally. Vertical stacking is the default behavior.</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 15, Vertical Stacking</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure16.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;StackPanel Width="200" Height="300" Background="lightgray" ClipToBounds="true" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+
+	&lt;StackPanel.Resources>
+        &lt;Style x:Key="textblockStyle">
+            &lt;Setter Property="TextBlock.Margin" Value="10"/>
+        &lt;/Style>
+        &lt;Style x:Key="borderStyle">
+            &lt;Setter Property="Border.Background" Value="Lime"/>
+            &lt;Setter Property="Border.Margin" Value="3"/>
+            &lt;Setter Property="Border.BorderThickness" Value="1"/>
+            &lt;Setter Property="Border.BorderBrush" Value="Black"/>
+        &lt;/Style>
+	&lt;/StackPanel.Resources>
+
+
+	&lt;Border Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="20">Item 1&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="25" >Item 2&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="10">Item 3&lt;/TextBlock>
+	&lt;/Border>
+
+	&lt;Border Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="30">Item 4&lt;/TextBlock>
+	&lt;/Border>
+
+&lt;/StackPanel>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <StackPanel Width="200" Height="300" Background="LightGray" ClipToBounds="True">
+
+          <StackPanel.Resources>
+            <Style x:Key="textblockStyle">
+              <Setter Property="TextBlock.Margin" Value="10"/>
+            </Style>
+            <Style x:Key="borderStyle">
+              <Setter Property="Border.Background" Value="Lime"/>
+              <Setter Property="Border.Margin" Value="3"/>
+              <Setter Property="Border.BorderThickness" Value="1"/>
+              <Setter Property="Border.BorderBrush" Value="Black"/>
+            </Style>
+          </StackPanel.Resources>
+
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="20">Item 1</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="25" >Item 2</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="10">Item 3</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="30">Item 4</TextBlock>
+          </Border>
+        </StackPanel>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="alignverticalstack">10. Alignments in Vertical Stack</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">Figure 16 is the result of the markup shown below. Notice that the items whose HorizontalAlignment is set have items that do not stretch across the entire width of the StackPanel. Note that setting VerticalAlignment in a vertically stacking StackPanel has no effect due to the fact that in this dimension, the element is always arranged at its desired height.</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 16, Vertical Stacking and Horizontal Alignments</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure17.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;StackPanel Width="200" Height="300" Background="lightgray" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+
+	&lt;StackPanel.Resources>
+        &lt;Style x:Key="textblockStyle">
+            &lt;Setter Property="TextBlock.Margin" Value="10"/>
+        &lt;/Style>
+        &lt;Style x:Key="borderStyle">
+            &lt;Setter Property="Border.Background" Value="Lime"/>
+            &lt;Setter Property="Border.Margin" Value="3"/>
+            &lt;Setter Property="Border.BorderThickness" Value="1"/>
+            &lt;Setter Property="Border.BorderBrush" Value="Black"/>
+        &lt;/Style>
+
+	&lt;/StackPanel.Resources>
+
+
+	&lt;Border Style="{StaticResource borderStyle}" HorizontalAlignment="Left">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="20">Item 1&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}" HorizontalAlignment="Right">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="25" >Item 2&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}" HorizontalAlignment="Center">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="10">Item 3&lt;/TextBlock>
+	&lt;/Border>
+
+	&lt;Border Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="30">Item 4&lt;/TextBlock>
+	&lt;/Border>
+
+&lt;/StackPanel>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <StackPanel Width="200" Height="300" Background="LightGray" ClipToBounds="True">
+
+          <StackPanel.Resources>
+            <Style x:Key="textblockStyle">
+              <Setter Property="TextBlock.Margin" Value="10"/>
+            </Style>
+            <Style x:Key="borderStyle">
+              <Setter Property="Border.Background" Value="Lime"/>
+              <Setter Property="Border.Margin" Value="3"/>
+              <Setter Property="Border.BorderThickness" Value="1"/>
+              <Setter Property="Border.BorderBrush" Value="Black"/>
+            </Style>
+          </StackPanel.Resources>
+
+          <Border Style="{StaticResource borderStyle}" HorizontalAlignment="Left">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="20">Item 1</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}" HorizontalAlignment="Right">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="25" >Item 2</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}" HorizontalAlignment="Center">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="10">Item 3</TextBlock>
+          </Border>
+
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="30">Item 4</TextBlock>
+          </Border>
+
+        </StackPanel>
+
+
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 17, Vertical Stacking with Left Aligned Children</Paragraph>
+
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure18.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      A variation on the example above uses a Style to set the HorizontalAlignment to Left for all of the Border elements. This is shown in the <Bold>XAML</Bold> markup below. The resulting visual is Figure 17.
+    </Paragraph>
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;StackPanel Width="200" Height="300" Background="lightgray" ClipToBounds="true" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+
+	&lt;StackPanel.Resources>
+        &lt;Style x:Key="textblockStyle">
+            &lt;Setter Property="TextBlock.Margin" Value="10"/>
+        &lt;/Style>
+        &lt;Style x:Key="borderStyle">
+            &lt;Setter Property="Border.HorizontalAlignment" Value="Left"/>
+            &lt;Setter Property="Border.Background" Value="Lime"/>
+            &lt;Setter Property="Border.Margin" Value="3"/>
+            &lt;Setter Property="Border.BorderThickness" Value="1"/>
+            &lt;Setter Property="Border.BorderBrush" Value="Black"/>
+        &lt;/Style>
+	&lt;/StackPanel.Resources>
+
+	&lt;Border Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="20">Item 1&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="25" >Item 2&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="10">Item 3&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="30">Item 4&lt;/TextBlock>
+	&lt;/Border>
+
+&lt;/StackPanel>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <StackPanel Width="200" Height="300" Background="LightGray" ClipToBounds="True">
+
+          <StackPanel.Resources>
+            <Style x:Key="textblockStyle">
+              <Setter Property="TextBlock.Margin" Value="10"/>
+            </Style>
+            <Style x:Key="borderStyle">
+              <Setter Property="Border.HorizontalAlignment" Value="Left"/>
+              <Setter Property="Border.Background" Value="Lime"/>
+              <Setter Property="Border.Margin" Value="3"/>
+              <Setter Property="Border.BorderThickness" Value="1"/>
+              <Setter Property="Border.BorderBrush" Value="Black"/>
+            </Style>
+
+          </StackPanel.Resources>
+
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="20">Item 1</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="25" >Item 2</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="10">Item 3</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="30">Item 4</TextBlock>
+          </Border>
+        </StackPanel>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="verticalstacknonuniform">11. Vertical Stacking with Non-Uniform Margins</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 18, Vertical Stacking with Non-Uniform Margins</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure19.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+
+    <Paragraph Style="{StaticResource mainContentStyle}">Below is markup which varies the margins on the children of the StackPanel; the result is shown in Figure 18.</Paragraph>
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;StackPanel Width="200" Height="300" Background="lightgray" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+
+	&lt;StackPanel.Resources>
+        &lt;Style x:Key="textblockStyle">
+            &lt;Setter Property="TextBlock.Margin" Value="10"/>
+        &lt;/Style>
+        &lt;Style x:Key="borderStyle">
+            &lt;Setter Property="Border.Background" Value="Lime"/>
+            &lt;Setter Property="Border.BorderThickness" Value="1"/>
+            &lt;Setter Property="Border.BorderBrush" Value="Black"/>
+        &lt;/Style>
+	&lt;/StackPanel.Resources>
+
+	&lt;Border Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="20">Item 1&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}" Margin="2">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="25" >Item 2&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}" Margin="10,5,3,1">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="10">Item 3&lt;/TextBlock>
+	&lt;/Border>
+
+	&lt;Border Style="{StaticResource borderStyle}"Margin="0,0,20,0">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="30">Item 4&lt;/TextBlock>
+	&lt;/Border>
+
+&lt;/StackPanel>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <StackPanel Width="200" Height="300" Background="LightGray">
+
+          <StackPanel.Resources>
+            <Style x:Key="textblockStyle">
+              <Setter Property="TextBlock.Margin" Value="10"/>
+            </Style>
+            <Style x:Key="borderStyle">
+              <Setter Property="Border.Background" Value="Lime"/>
+              <Setter Property="Border.BorderThickness" Value="1"/>
+              <Setter Property="Border.BorderBrush" Value="Black"/>
+            </Style>
+          </StackPanel.Resources>
+
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="20">Item 1</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}" Margin="2">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="25" >Item 2</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}" Margin="10,5,3,1">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="10">Item 3</TextBlock>
+          </Border>
+
+          <Border Style="{StaticResource borderStyle}" Margin="0,0,20,0">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="30">Item 4</TextBlock>
+          </Border>
+
+        </StackPanel>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="overconstrainedvertical">12. Over constrained Vertical Stacking</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">If "parent wins" behavior is applied to StackPanel, layout happens on each "partition" or item of the stack just as it would elsewhere in layout.  For example, in the markup below, the items have various HorizontalAlignment values set while the entire StackPanel cannot accommodate the size of the children.  Therefore, for the value of Left, content is clipped on the right, the value of Right clips first on the left, the value of Center and Stretch clip equally on the left and right. See Figure 19 for the visualization.</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 19, Parent Wins in Vertical Stacking</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure20.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;StackPanel Width="200" Height="300" Background="lightgray" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+
+	&lt;StackPanel.Resources>
+        &lt;Style x:Key="textblockStyle">
+            &lt;Setter Property="TextBlock.Margin" Value="10,0,10,0"/>
+        &lt;/Style>
+	&lt;/StackPanel.Resources>
+
+	&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="20" HorizontalAlignment="Left">
+		HorizontalAlignment="Left"
+	&lt;/TextBlock>
+
+	&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="25" HorizontalAlignment="Right">
+		HorizontalAlignment="Right"
+	&lt;/TextBlock>
+
+	&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="10" HorizontalAlignment="Center">
+		HorizontalAlignment="Center"
+	&lt;/TextBlock>
+
+	&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="30" HorizontalAlignment="Stretch">
+		HorizontalAlignment="Stretch"
+	&lt;/TextBlock>
+
+
+&lt;/StackPanel>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <StackPanel Width="200" Height="300" Background="LightGray">
+
+          <StackPanel.Resources>
+            <Style x:Key="textblockStyle">
+              <Setter Property="TextBlock.Margin" Value="10,0,10,0"/>
+            </Style>
+          </StackPanel.Resources>
+
+          <TextBlock Style="{StaticResource textblockStyle}" FontSize="20" HorizontalAlignment="Left">
+            HorizontalAlignment="Left"
+          </TextBlock>
+
+          <TextBlock Style="{StaticResource textblockStyle}" FontSize="25" HorizontalAlignment="Right">
+            HorizontalAlignment="Right"
+          </TextBlock>
+
+          <TextBlock Style="{StaticResource textblockStyle}" FontSize="10" HorizontalAlignment="Center">
+            HorizontalAlignment="Center"
+          </TextBlock>
+
+          <TextBlock Style="{StaticResource textblockStyle}" FontSize="30" HorizontalAlignment="Stretch">
+            HorizontalAlignment="Stretch"
+          </TextBlock>
+
+
+        </StackPanel>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="horizontalstacking">13. Simple Horizontal Stacking</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">The example below shows horizontal stacking of Border elements with nested Text elements. In this example, there is enough room such that the items are not over constrained and clipped by the StackPanel. The markup below results in Figure 20.</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 20, Horizontal Stacking</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure21.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;StackPanel Width="500" Height="90" Background="lightgray" Orientation="Horizontal" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+
+	&lt;StackPanel.Resources>
+        &lt;Style x:Key="textblockStyle">
+            &lt;Setter Property="TextBlock.Margin" Value="10"/>
+        &lt;/Style>
+        &lt;Style x:Key="borderStyle">
+            &lt;Setter Property="Border.Background" Value="Lime"/>
+            &lt;Setter Property="Border.BorderThickness" Value="1"/>
+            &lt;Setter Property="Border.BorderBrush" Value="Black"/>
+        &lt;/Style>
+	&lt;/StackPanel.Resources>
+
+
+	&lt;Border Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="20">Item 1&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="25" >Item 2&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="10">Item 3&lt;/TextBlock>
+	&lt;/Border>
+
+	&lt;Border Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="30">Item 4&lt;/TextBlock>
+	&lt;/Border>
+
+&lt;/StackPanel>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <StackPanel Width="500" Height="90" Background="LightGray" Orientation="Horizontal" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+
+          <StackPanel.Resources>
+            <Style x:Key="textblockStyle">
+              <Setter Property="TextBlock.Margin" Value="10"/>
+            </Style>
+            <Style x:Key="borderStyle">
+              <Setter Property="Border.Background" Value="Lime"/>
+              <Setter Property="Border.BorderThickness" Value="1"/>
+              <Setter Property="Border.BorderBrush" Value="Black"/>
+            </Style>
+          </StackPanel.Resources>
+
+
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="20">Item 1</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="25" >Item 2</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="10">Item 3</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="30">Item 4</TextBlock>
+          </Border>
+
+        </StackPanel>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="horizontalstackingalign">14. Alignments in Horizontal Stacking</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">Figure 21 is the result of the markup shown below.  Notice that the items whose VerticalAlignment is set have items that do not stretch across the entire height of the StackPanel.  Note that setting HorizontalAlignment in a horizontally stacking StackPanel has no effect because, in this dimension, the element is always arranged at its desired width.</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 21, Horizontal Stacking and Vertical Alignments</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure22.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;StackPanel Width="500" Height="90" Background="lightgray" Orientation="Horizontal" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+
+	&lt;StackPanel.Resources>
+        &lt;Style x:Key="textblockStyle">
+            &lt;Setter Property="TextBlock.Margin" Value="10"/>
+        &lt;/Style>
+        &lt;Style x:Key="borderStyle">
+            &lt;Setter Property="Border.Background" Value="Lime"/>
+            &lt;Setter Property="Border.BorderThickness" Value="1"/>
+            &lt;Setter Property="Border.BorderBrush" Value="Black"/>
+        &lt;/Style>
+	&lt;/StackPanel.Resources>
+
+
+	&lt;Border Style="{StaticResource borderStyle}" VerticalAlignment="Top">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="20">Item 1&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}" VerticalAlignment="Bottom">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="25" >Item 2&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}" VerticalAlignment="Center">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="10">Item 3&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border>
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="30">Item 4&lt;/TextBlock>
+	&lt;/Border>
+
+&lt;/StackPanel>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <StackPanel Width="500" Height="90" Background="LightGray" Orientation="Horizontal" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+
+          <StackPanel.Resources>
+            <Style x:Key="textblockStyle">
+              <Setter Property="TextBlock.Margin" Value="10"/>
+            </Style>
+            <Style x:Key="borderStyle">
+              <Setter Property="Border.Background" Value="Lime"/>
+              <Setter Property="Border.BorderThickness" Value="1"/>
+              <Setter Property="Border.BorderBrush" Value="Black"/>
+            </Style>
+          </StackPanel.Resources>
+
+
+          <Border Style="{StaticResource borderStyle}" VerticalAlignment="Top">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="20">Item 1</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}" VerticalAlignment="Bottom">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="25" >Item 2</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}" VerticalAlignment="Center">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="10">Item 3</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="30">Item 4</TextBlock>
+          </Border>
+
+        </StackPanel>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">A variation on the example above, using a &lt;Style> to set the VerticalAlignment to Top for all of the Border elements, is shown in the markup below.  The resulting visual is Figure 22.</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 22, Horizontal Stacking with Left Aligned Children</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure23.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+	&lt;StackPanel.Resources>
+        &lt;Style x:Key="textblockStyle">
+            &lt;Setter Property="TextBlock.Margin" Value="10"/>
+        &lt;/Style>
+        &lt;Style x:Key="borderStyle">
+            &lt;Setter Property="Border.Background" Value="Lime"/>
+            &lt;Setter Property="Border.BorderThickness" Value="1"/>
+            &lt;Setter Property="Border.BorderBrush" Value="Black"/>
+            &lt;Setter Property="Border.VerticalAlignment" Value="Top"/>
+        &lt;/Style>
+	&lt;/StackPanel.Resources>
+
+	&lt;Border Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="20">Item 1&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="25" >Item 2&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="10">Item 3&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="30">Item 4&lt;/TextBlock>
+	&lt;/Border>
+&lt;/StackPanel>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <StackPanel Width="500" Height="90" Background="LightGray" Orientation="Horizontal">
+
+          <StackPanel.Resources>
+            <Style x:Key="textblockStyle">
+              <Setter Property="TextBlock.Margin" Value="10"/>
+            </Style>
+            <Style x:Key="borderStyle">
+              <Setter Property="Border.Background" Value="Lime"/>
+              <Setter Property="Border.BorderThickness" Value="1"/>
+              <Setter Property="Border.BorderBrush" Value="Black"/>
+              <Setter Property="Border.VerticalAlignment" Value="Top"/>
+            </Style>
+          </StackPanel.Resources>
+
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="20">Item 1</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="25" >Item 2</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="10">Item 3</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="30">Item 4</TextBlock>
+          </Border>
+        </StackPanel>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="horizontalstackingnonuiformhorizontalstackingnonuiform">15. Horizontal Stacking with Non-Uniform Margins</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">Below is markup which varies the margins on the children of the StackPanel; the result is shown in Figure 23.</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 23, Horizontal Stacking with Non-Uniform Margins</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure24.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;StackPanel Width="500" Height="90" Background="lightgray" Orientation="Horizontal" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+
+	&lt;StackPanel.Resources>
+        &lt;Style x:Key="textblockStyle">
+            &lt;Setter Property="TextBlock.Margin" Value="10"/>
+        &lt;/Style>
+        &lt;Style x:Key="borderStyle">
+            &lt;Setter Property="Border.Background" Value="Lime"/>
+            &lt;Setter Property="Border.BorderThickness" Value="1"/>
+            &lt;Setter Property="Border.BorderBrush" Value="Black"/>
+        &lt;/Style>
+	&lt;/StackPanel.Resources>
+
+	&lt;Border Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="20">Item 1&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Margin="2" Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="25" >Item 2&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Margin="10,5,3,1" Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="10">Item 3&lt;/TextBlock>
+	&lt;/Border>
+
+	&lt;Border Margin="0,0,20,0" Style="{StaticResource borderStyle}">
+		&lt;TextBlock Style="{StaticResource textblockStyle}" FontSize="30">Item 4&lt;/TextBlock>
+	&lt;/Border>
+
+&lt;/StackPanel>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <StackPanel Width="500" Height="90" Background="LightGray" Orientation="Horizontal">
+
+          <StackPanel.Resources>
+            <Style x:Key="textblockStyle">
+              <Setter Property="TextBlock.Margin" Value="10"/>
+            </Style>
+            <Style x:Key="borderStyle">
+              <Setter Property="Border.Background" Value="Lime"/>
+              <Setter Property="Border.BorderThickness" Value="1"/>
+              <Setter Property="Border.BorderBrush" Value="Black"/>
+            </Style>
+          </StackPanel.Resources>
+
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="20">Item 1</TextBlock>
+          </Border>
+          <Border Margin="2" Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="25" >Item 2</TextBlock>
+          </Border>
+          <Border Margin="10,5,3,1" Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="10">Item 3</TextBlock>
+          </Border>
+
+          <Border Margin="0,0,20,0" Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}" FontSize="30">Item 4</TextBlock>
+          </Border>
+
+        </StackPanel>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="horizontalstackingnconstrained">16. Overconstrained Horizontal Stacking </Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">If "parent wins" behavior is applied to StackPanel, layout happens on each "partition" or item of the stack just as it would elsewhere in layout.  For example, in the markup below, the items have various VerticalAlignment values set while the entire StackPanel cannot accommodate the size of the children.  Therefore, for the value of Top, content is clipped on the bottom, the value of Bottom clips first on the top, the value of Center and Stretch clip equally on the bottom and top.  See Figure 24 for the visualization.</Paragraph>
+
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 24, Parent Wins in Horizontal Stacking</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure25.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;StackPanel Width="500" Height="75" Background="lightgray" Orientation="Horizontal" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+
+	&lt;StackPanel.Resources>
+        &lt;Style x:Key="textblockStyle">
+            &lt;Setter Property="TextBlock.Margin" Value="10,0,10,0"/>
+            &lt;Setter Property="TextBlock.FontSize" Value="100"/>
+        &lt;/Style> 
+	&lt;/StackPanel.Resources>
+
+	
+	&lt;TextBlock Style="{StaticResource textblockStyle}" VerticalAlignment="Top">
+		A
+	&lt;/TextBlock>
+
+	&lt;TextBlock Style="{StaticResource textblockStyle}" VerticalAlignment="Bottom">
+		B
+	&lt;/TextBlock>
+
+	&lt;TextBlock Style="{StaticResource textblockStyle}" VerticalAlignment="Center">
+		C
+	&lt;/TextBlock>
+
+	&lt;TextBlock Style="{StaticResource textblockStyle}" VerticalAlignment="Stretch">
+		D
+	&lt;/TextBlock>
+
+&lt;/StackPanel>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <StackPanel Width="500" Height="75" Background="LightGray" Orientation="Horizontal">
+
+          <StackPanel.Resources>
+            <Style x:Key="textblockStyle">
+              <Setter Property="TextBlock.Margin" Value="10,0,10,0"/>
+              <Setter Property="TextBlock.FontSize" Value="100"/>
+            </Style>
+          </StackPanel.Resources>
+
+
+          <TextBlock Style="{StaticResource textblockStyle}" VerticalAlignment="Top">
+            A
+          </TextBlock>
+
+          <TextBlock Style="{StaticResource textblockStyle}" VerticalAlignment="Bottom">
+            B
+          </TextBlock>
+
+          <TextBlock Style="{StaticResource textblockStyle}" VerticalAlignment="Center">
+            C
+          </TextBlock>
+
+          <TextBlock Style="{StaticResource textblockStyle}" VerticalAlignment="Stretch">
+            D
+          </TextBlock>
+
+        </StackPanel>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="dockversusstack">17. The Difference Between DockPanel and StackPanel</Paragraph>
+    <Paragraph Style="{StaticResource noteParagraph}">Note:  Copy and paste the following image into a file named "smiley.bmp" and save it in the location relative to your application. The code below assumes a sub-directory called images.</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure26.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;DockPanel xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	&lt;Image Source="images\smiley.bmp" Stretch="Uniform"/>
+	&lt;Image Source="images\smiley.bmp" Stretch="Uniform"/>
+	&lt;Image Source="images\smiley.bmp" Stretch="Fill"/>
+&lt;/DockPanel>
+</Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">    
+&lt;StackPanel Orientation="Horizontal" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	&lt;Image Source="images\smiley.bmp" Stretch="Uniform"/>
+	&lt;Image Source="images\smiley.bmp" Stretch="Uniform"/>
+	&lt;Image Source="images\smiley.bmp" Stretch="Uniform"/>
+&lt;/StackPanel>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <DockPanel Height="100" Width="250">
+          <Image Stretch="Uniform">
+            <Image.Source>
+              <BitmapImage UriSource="\images\smiley.bmp"/>
+            </Image.Source>
+          </Image>
+          <Image Stretch="Uniform">
+            <Image.Source>
+              <BitmapImage UriSource="\images\smiley.bmp"/>
+            </Image.Source>
+          </Image>
+          <Image Stretch="Fill">
+            <Image.Source>
+              <BitmapImage UriSource="\images\smiley.bmp"/>
+            </Image.Source>
+          </Image>
+        </DockPanel>
+      </Expander>
+    </Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <StackPanel Orientation="Horizontal" Height="100" Width="250">
+          <Image Stretch="Uniform">
+            <Image.Source>
+              <BitmapImage UriSource="\images\smiley.bmp"/>
+            </Image.Source>
+          </Image>
+          <Image Stretch="Uniform">
+            <Image.Source>
+              <BitmapImage UriSource="\images\smiley.bmp"/>
+            </Image.Source>
+          </Image>
+          <Image Stretch="Uniform">
+            <Image.Source>
+              <BitmapImage UriSource="\images\smiley.bmp"/>
+            </Image.Source>
+          </Image>
+        </StackPanel>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 25, DockPanel Results</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure27.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 26, StackPanel Results</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure28.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="defaultdocking">18. Default Docking</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      This example demonstrates the default functionality of DockPanel.  It assumes that the DockPanel is not clipped.  The <Bold>XAML</Bold> markup for the resulting visual of Figure 27 is shown below.
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 27, Default Docking</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure29.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;DockPanel LastChildFill="false" HorizontalAlignment="Center" VerticalAlignment="Center" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	&lt;DockPanel.Resources>
+        &lt;Style x:Key="textblockStyle">
+            &lt;Setter Property="TextBlock.Margin" Value="10"/>
+        &lt;/Style> 
+        &lt;Style x:Key="borderStyle">
+            &lt;Setter Property="Border.BorderThickness" Value="3"/>
+            &lt;Setter Property="Border.BorderBrush" Value="Black"/>
+            &lt;Setter Property="Border.Background" Value="Wheat"/>
+        &lt;/Style>         
+	&lt;/DockPanel.Resources>
+
+	&lt;Border Style="{StaticResource borderStyle}">&lt;TextBlock Style="{StaticResource textblockStyle}">Item One&lt;/TextBlock>&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}">&lt;TextBlock Style="{StaticResource textblockStyle}">Item Two&lt;/TextBlock>&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}">&lt;TextBlock Style="{StaticResource textblockStyle}">Item Three&lt;/TextBlock>&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}">&lt;TextBlock Style="{StaticResource textblockStyle}">Item Four&lt;/TextBlock>&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}">&lt;TextBlock Style="{StaticResource textblockStyle}">Item Five&lt;/TextBlock>&lt;/Border>
+
+
+&lt;/DockPanel>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <DockPanel LastChildFill="False" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <DockPanel.Resources>
+            <Style x:Key="textblockStyle">
+              <Setter Property="TextBlock.Margin" Value="10"/>
+            </Style>
+            <Style x:Key="borderStyle">
+              <Setter Property="Border.BorderThickness" Value="3"/>
+              <Setter Property="Border.BorderBrush" Value="Black"/>
+              <Setter Property="Border.Background" Value="Wheat"/>
+            </Style>
+          </DockPanel.Resources>
+
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}">Item One</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Two</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Three</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Four</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Five</TextBlock>
+          </Border>
+
+
+        </DockPanel>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="dockingfilltrue">19. Various Docking with LastChildFill=True</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">This example demonstrates the basic docking functionality of DockPanel including filling the last child.  It assumes that DockPanel is not clipped.  The markup for the resulting visual of Figure 28 is shown below.</Paragraph>
+
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 28, Various Docking with LastChildFill=true</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure30.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+
+&lt;DockPanel LastChildFill="true" HorizontalAlignment="Center" VerticalAlignment="Center" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+
+	&lt;DockPanel.Resources>
+        &lt;Style x:Key="textblockStyle">
+            &lt;Setter Property="TextBlock.Margin" Value="10"/>
+        &lt;/Style> 
+        &lt;Style x:Key="borderStyle">
+            &lt;Setter Property="Border.BorderThickness" Value="3"/>
+            &lt;Setter Property="Border.BorderBrush" Value="Black"/>
+            &lt;Setter Property="Border.Background" Value="Wheat"/>
+        &lt;/Style>         
+	&lt;/DockPanel.Resources>
+
+	&lt;Border DockPanel.Dock="Top" Style="{StaticResource borderStyle}">&lt;TextBlock Style="{StaticResource textblockStyle}">Item One&lt;/TextBlock>&lt;/Border>
+	&lt;Border DockPanel.Dock="Left" Style="{StaticResource borderStyle}">&lt;TextBlock Style="{StaticResource textblockStyle}">Item Two&lt;/TextBlock>&lt;/Border>
+	&lt;Border DockPanel.Dock="Right" Style="{StaticResource borderStyle}">&lt;TextBlock Style="{StaticResource textblockStyle}">Item Three&lt;/TextBlock>&lt;/Border>
+	&lt;Border DockPanel.Dock="Bottom" Style="{StaticResource borderStyle}">&lt;TextBlock Style="{StaticResource textblockStyle}">Item Four&lt;/TextBlock>&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}">&lt;TextBlock Style="{StaticResource textblockStyle}">Item Five&lt;/TextBlock>&lt;/Border>
+&lt;/DockPanel>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <DockPanel LastChildFill="True" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+          <DockPanel.Resources>
+            <Style x:Key="textblockStyle">
+              <Setter Property="TextBlock.Margin" Value="10"/>
+            </Style>
+            <Style x:Key="borderStyle">
+              <Setter Property="Border.BorderThickness" Value="3"/>
+              <Setter Property="Border.BorderBrush" Value="Black"/>
+              <Setter Property="Border.Background" Value="Wheat"/>
+            </Style>
+          </DockPanel.Resources>
+
+          <Border DockPanel.Dock="Top" Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}">Item One</TextBlock>
+          </Border>
+          <Border DockPanel.Dock="Left" Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Two</TextBlock>
+          </Border>
+          <Border DockPanel.Dock="Right" Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Three</TextBlock>
+          </Border>
+          <Border DockPanel.Dock="Bottom" Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Four</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Five</TextBlock>
+          </Border>
+        </DockPanel>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource noteParagraph}">Note:  The text content in all of these Borders is stretched and, because they size to content, centered.  It may not appear as such in "Item One."  However, if you set the background on the respective TextBlock element, its easier to see what's happening (the markup for this is shown below.)</Paragraph>
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 29, Background Set on TextBlock</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure31.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;DockPanel LastChildFill="true" HorizontalAlignment="Center" VerticalAlignment="Center" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+
+	&lt;DockPanel.Resources>
+        &lt;Style x:Key="textblockStyle">
+            &lt;Setter Property="TextBlock.Margin" Value="10"/>
+        &lt;/Style> 
+        &lt;Style x:Key="borderStyle">
+            &lt;Setter Property="Border.BorderThickness" Value="3"/>
+            &lt;Setter Property="Border.BorderBrush" Value="Black"/>
+            &lt;Setter Property="Border.Background" Value="Wheat"/>
+        &lt;/Style>         
+	&lt;/DockPanel.Resources>
+
+	&lt;Border DockPanel.Dock="Top" Style="{StaticResource borderStyle}">&lt;TextBlock Background="white" Style="{StaticResource textblockStyle}">Item One&lt;/TextBlock>&lt;/Border>
+	&lt;Border DockPanel.Dock="Left" Style="{StaticResource borderStyle}">&lt;TextBlock Style="{StaticResource textblockStyle}">Item Two&lt;/TextBlock>&lt;/Border>
+	&lt;Border DockPanel.Dock="Right" Style="{StaticResource borderStyle}">&lt;TextBlock Style="{StaticResource textblockStyle}">Item Three&lt;/TextBlock>&lt;/Border>
+	&lt;Border DockPanel.Dock="Bottom" Style="{StaticResource borderStyle}">&lt;TextBlock Style="{StaticResource textblockStyle}">Item Four&lt;/TextBlock>&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}">&lt;TextBlock Style="{StaticResource textblockStyle}">Item Five&lt;/TextBlock>&lt;/Border>
+&lt;/DockPanel>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <DockPanel LastChildFill="True" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+          <DockPanel.Resources>
+            <Style x:Key="textblockStyle">
+              <Setter Property="TextBlock.Margin" Value="10"/>
+            </Style>
+            <Style x:Key="borderStyle">
+              <Setter Property="Border.BorderThickness" Value="3"/>
+              <Setter Property="Border.BorderBrush" Value="Black"/>
+              <Setter Property="Border.Background" Value="Wheat"/>
+            </Style>
+          </DockPanel.Resources>
+
+          <Border DockPanel.Dock="Top" Style="{StaticResource borderStyle}">
+            <TextBlock Background="White" Style="{StaticResource textblockStyle}">Item One</TextBlock>
+          </Border>
+          <Border DockPanel.Dock="Left" Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Two</TextBlock>
+          </Border>
+          <Border DockPanel.Dock="Right" Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Three</TextBlock>
+          </Border>
+          <Border DockPanel.Dock="Bottom" Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Four</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Five</TextBlock>
+          </Border>
+        </DockPanel>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">To center the Text in the "Item One" block, just set the TextAlignment on the respective TextBlock element (the markup for this is shown below.)</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 30, TextAlignment and Stretch</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure32.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;DockPanel LastChildFill="true" HorizontalAlignment="Center" VerticalAlignment="Center" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	&lt;DockPanel.Resources>
+        &lt;Style x:Key="textblockStyle">
+            &lt;Setter Property="TextBlock.Margin" Value="10"/>
+        &lt;/Style> 
+        &lt;Style x:Key="borderStyle">
+            &lt;Setter Property="Border.BorderThickness" Value="3"/>
+            &lt;Setter Property="Border.BorderBrush" Value="Black"/>
+            &lt;Setter Property="Border.Background" Value="Wheat"/>
+        &lt;/Style>         
+	&lt;/DockPanel.Resources>
+
+	&lt;Border Style="{StaticResource borderStyle}" DockPanel.Dock="Top">&lt;TextBlock Style="{StaticResource textblockStyle}" Background="white" TextAlignment="Center">Item One&lt;/TextBlock>&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}" DockPanel.Dock="Left">&lt;TextBlock Style="{StaticResource textblockStyle}">Item Two&lt;/TextBlock>&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}" DockPanel.Dock="Right">&lt;TextBlock Style="{StaticResource textblockStyle}">Item Three&lt;/TextBlock>&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}" DockPanel.Dock="Bottom">&lt;TextBlock Style="{StaticResource textblockStyle}">Item Four&lt;/TextBlock>&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}">&lt;TextBlock Style="{StaticResource textblockStyle}">Item Five&lt;/TextBlock>&lt;/Border>
+&lt;/DockPanel>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <DockPanel LastChildFill="True" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <DockPanel.Resources>
+            <Style x:Key="textblockStyle">
+              <Setter Property="TextBlock.Margin" Value="10"/>
+            </Style>
+            <Style x:Key="borderStyle">
+              <Setter Property="Border.BorderThickness" Value="3"/>
+              <Setter Property="Border.BorderBrush" Value="Black"/>
+              <Setter Property="Border.Background" Value="Wheat"/>
+            </Style>
+          </DockPanel.Resources>
+
+          <Border Style="{StaticResource borderStyle}" DockPanel.Dock="Top">
+            <TextBlock Style="{StaticResource textblockStyle}" Background="White" TextAlignment="Center">Item One</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}" DockPanel.Dock="Left">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Two</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}" DockPanel.Dock="Right">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Three</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}" DockPanel.Dock="Bottom">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Four</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Five</TextBlock>
+          </Border>
+        </DockPanel>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="dockingfilltruealign">20. Various Docking with LastChildFill=True and Alignments</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">This example demonstrates the basic docking functionality of DockPanel, including "LastChildFill" as well as how specifying alignment values affects layout.  It assumes that DockPanel is not clipped.  The markup for the resulting visual of Figure 31 is shown below.</Paragraph>
+
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 31, Various Docking with LastChildFill=True and Alignments</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure33.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;DockPanel LastChildFill="true" Background="red" HorizontalAlignment="Center" VerticalAlignment="Center" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+
+	&lt;DockPanel.Resources>
+        &lt;Style x:Key="textblockStyle">
+            &lt;Setter Property="TextBlock.Margin" Value="10"/>
+        &lt;/Style> 
+        &lt;Style x:Key="borderStyle">
+            &lt;Setter Property="Border.BorderThickness" Value="3"/>
+            &lt;Setter Property="Border.BorderBrush" Value="Black"/>
+            &lt;Setter Property="Border.Background" Value="Wheat"/>
+        &lt;/Style>         
+	&lt;/DockPanel.Resources>
+
+	&lt;Border Style="{StaticResource borderStyle}" DockPanel.Dock="Top" HorizontalAlignment="Right">
+		&lt;TextBlock Style="{StaticResource textblockStyle}">Item One&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}" DockPanel.Dock="Left" HorizontalAlignment="Right">
+		&lt;TextBlock Style="{StaticResource textblockStyle}">Item Two&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}" DockPanel.Dock="Right" VerticalAlignment="Bottom">
+		&lt;TextBlock Style="{StaticResource textblockStyle}">Item Three&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}" DockPanel.Dock="Bottom">
+		&lt;TextBlock Style="{StaticResource textblockStyle}">Item Four&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}" HorizontalAlignment="Center">
+		&lt;TextBlock Style="{StaticResource textblockStyle}">Item Five&lt;/TextBlock>
+	&lt;/Border>
+&lt;/DockPanel>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <DockPanel LastChildFill="True" Background="Red" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+          <DockPanel.Resources>
+            <Style x:Key="textblockStyle">
+              <Setter Property="TextBlock.Margin" Value="10"/>
+            </Style>
+            <Style x:Key="borderStyle">
+              <Setter Property="Border.BorderThickness" Value="3"/>
+              <Setter Property="Border.BorderBrush" Value="Black"/>
+              <Setter Property="Border.Background" Value="Wheat"/>
+            </Style>
+          </DockPanel.Resources>
+
+          <Border Style="{StaticResource borderStyle}" DockPanel.Dock="Top" HorizontalAlignment="Right">
+            <TextBlock Style="{StaticResource textblockStyle}">Item One</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}" DockPanel.Dock="Left" HorizontalAlignment="Right">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Two</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}" DockPanel.Dock="Right" VerticalAlignment="Bottom">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Three</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}" DockPanel.Dock="Bottom">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Four</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}" HorizontalAlignment="Center">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Five</TextBlock>
+          </Border>
+        </DockPanel>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="dockingfilltruealignwidth">21. Various Docking with LastChildFill=True, Alignments and Explicit Width</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">This example demonstrates the basic docking functionality of DockPanel including filling the last child, specifying alignments that affect the layout and setting an explicit width on one child.  The size set is approximately twice that of a size from content.  It assumes that DockPanel is not clipped.  The markup for the resulting visual of Figure 32 is shown below.</Paragraph>
+
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 32, Various Docking with LastChildFill=True, Alignments and Explicit Width</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure34.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;DockPanel LastChildFill="true" Background="red" HorizontalAlignment="Center" VerticalAlignment="Center" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	&lt;DockPanel.Resources>
+        &lt;Style x:Key="textblockStyle">
+            &lt;Setter Property="TextBlock.Margin" Value="10"/>
+        &lt;/Style> 
+        &lt;Style x:Key="borderStyle">
+            &lt;Setter Property="Border.BorderThickness" Value="3"/>
+            &lt;Setter Property="Border.BorderBrush" Value="Black"/>
+            &lt;Setter Property="Border.Background" Value="Wheat"/>
+        &lt;/Style>         
+	&lt;/DockPanel.Resources>
+
+	&lt;Border Style="{StaticResource borderStyle}" DockPanel.Dock="Top" HorizontalAlignment="Right">
+		&lt;TextBlock Style="{StaticResource textblockStyle}">Item One&lt;/TextBlock>
+	&lt;/Border>
+	&lt;Border Style="{StaticResource borderStyle}" DockPanel.Dock="Left" HorizontalAlignment="Right" Width="120px">
+		&lt;TextBlock Style="{StaticResource textblockStyle}">Item Two&lt;/TextBlock>
+	&lt;/Border>
+
+	&lt;Border Style="{StaticResource borderStyle}" DockPanel.Dock="Right" VerticalAlignment="Bottom">
+		&lt;TextBlock Style="{StaticResource textblockStyle}">Item Three&lt;/TextBlock>
+	&lt;/Border>
+
+	&lt;Border Style="{StaticResource borderStyle}" DockPanel.Dock="Bottom">
+		&lt;TextBlock Style="{StaticResource textblockStyle}">Item Four&lt;/TextBlock>
+	&lt;/Border>
+
+	&lt;Border Style="{StaticResource borderStyle}" HorizontalAlignment="Center">
+		&lt;TextBlock Style="{StaticResource textblockStyle}">Item Five&lt;/TextBlock>
+	&lt;/Border>
+&lt;/DockPanel>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <DockPanel LastChildFill="True" Background="Red" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <DockPanel.Resources>
+            <Style x:Key="textblockStyle">
+              <Setter Property="TextBlock.Margin" Value="10"/>
+            </Style>
+            <Style x:Key="borderStyle">
+              <Setter Property="Border.BorderThickness" Value="3"/>
+              <Setter Property="Border.BorderBrush" Value="Black"/>
+              <Setter Property="Border.Background" Value="Wheat"/>
+            </Style>
+          </DockPanel.Resources>
+
+          <Border Style="{StaticResource borderStyle}" DockPanel.Dock="Top" HorizontalAlignment="Right">
+            <TextBlock Style="{StaticResource textblockStyle}">Item One</TextBlock>
+          </Border>
+          <Border Style="{StaticResource borderStyle}" DockPanel.Dock="Left" HorizontalAlignment="Right" Width="120">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Two</TextBlock>
+          </Border>
+
+          <Border Style="{StaticResource borderStyle}" DockPanel.Dock="Right" VerticalAlignment="Bottom">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Three</TextBlock>
+          </Border>
+
+          <Border Style="{StaticResource borderStyle}" DockPanel.Dock="Bottom">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Four</TextBlock>
+          </Border>
+
+          <Border Style="{StaticResource borderStyle}" HorizontalAlignment="Center">
+            <TextBlock Style="{StaticResource textblockStyle}">Item Five</TextBlock>
+          </Border>
+        </DockPanel>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="defaultcanvas">22. Default Canvas Layout</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">Canvas applies no layout to its children.  It merely determines their desired size and position and arranges them as such.  In this example, a Button provides its desired size (based on its own content) and has no Top and Left properties set (e.g. default values for Top and Left are 0 and0, respectively.)</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 33</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure35.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Grid Width="150" Height="150" Background="silver" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+ 	&lt;Canvas Background="Yellow">
+		&lt;Button>Test&lt;/Button>
+	&lt;/Canvas>
+&lt;/Grid>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Grid Width="150" Height="150" Background="Silver">
+          <Canvas Background="Yellow">
+            <Button>Test</Button>
+          </Canvas>
+        </Grid>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="childcanvas">23. Positioning a Child in a Canvas</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">By setting the Top and Left properties, a child of the Canvas can be positioned. The Button below has Canvas.Top and Canvas.Left set providing a position for the Button.</Paragraph>
+
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 34</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure36.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Grid Width="150" Height="150" Background="silver" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+ 	&lt;Canvas Background="Yellow">
+		&lt;Button Canvas.Top="30" Canvas.Left="70">Test&lt;/Button>
+	&lt;/Canvas>
+&lt;/Grid>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Grid Width="150" Height="150" Background="Silver">
+          <Canvas Background="Yellow">
+            <Button Canvas.Top="30" Canvas.Left="70">Test</Button>
+          </Canvas>
+        </Grid>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="childcanvasmargin">24. Positioning a Child in a Canvas with Margin</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">Margins set on an element that are being positioned in a Canvas are included.  So, for example, the top-left most rendered point of an element is positioned Canvas.Left + Margin.Left and Canvas.Top + Margin.Top assuming that Canvas.Left and Canvas.Top are set.</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 35</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure37.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Grid Width="150" Height="150" Background="silver" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+ 	&lt;Canvas Background="Yellow">
+		&lt;Button Margin="0,30,0,0" Canvas.Top="30" Canvas.Left="70">Test&lt;/Button>
+	&lt;/Canvas>
+&lt;/Grid>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Grid Width="150" Height="150" Background="Silver">
+          <Canvas Background="Yellow">
+            <Button Margin="0,30,0,0" Canvas.Top="30" Canvas.Left="70">Test</Button>
+          </Canvas>
+        </Grid>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="sizingchildcanvas">25. Sizing a Child in a Canvas</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">A child of a Canvas can provide an explicit size and be sized to that size (consistent with layout system rules about desired size and set size.)  Below, a Border element has been added to a Canvas and given an explicit size along with Top and Left.</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 36</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure38.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Grid Width="150" Height="150" Background="silver" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+ 	&lt;Canvas Background="Yellow">
+		&lt;Button Canvas.Top="30" Canvas.Left="70">Test&lt;/Button>
+		&lt;Border Height="50" Width="50" CornerRadius="2,30,9,0" Canvas.Left="15" Canvas.Top="70">
+      &lt;Border.Background>
+        &lt;RadialGradientBrush GradientOrigin="0.5,0.5" Center="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
+          &lt;RadialGradientBrush.GradientStops>
+            &lt;GradientStop Color="Purple" Offset="0" />
+            &lt;GradientStop Color="Orange" Offset=".5" />
+          &lt;/RadialGradientBrush.GradientStops>
+        &lt;/RadialGradientBrush>
+      &lt;/Border.Background>
+    &lt;/Border>
+	&lt;/Canvas>
+&lt;/Grid>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Grid Width="150" Height="150" Background="Silver">
+          <Canvas Background="Yellow">
+            <Button Canvas.Top="30" Canvas.Left="70">Test</Button>
+            <Border Height="50" Width="50" CornerRadius="2,30,9,0" Canvas.Left="15" Canvas.Top="70">
+              <Border.Background>
+                <RadialGradientBrush GradientOrigin="0.5,0.5" Center="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
+                  <RadialGradientBrush.GradientStops>
+                    <GradientStop Color="Purple" Offset="0" />
+                    <GradientStop Color="Orange" Offset=".5" />
+                  </RadialGradientBrush.GradientStops>
+                </RadialGradientBrush>
+              </Border.Background>
+            </Border>
+          </Canvas>
+        </Grid>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="canvascliptoboundstrue">26. Canvas and ClipToBounds=True</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">If ClipToBounds is true for a Canvas and children are positioned beyond the boundary of the Canvas, those children are clipped. </Paragraph>
+
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 37</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure39.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Grid Background="silver" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+ 	&lt;Canvas Background="Yellow" ClipToBounds="true" Width="150" Height="150">
+		&lt;Button Canvas.Top="30" Canvas.Left="90">Test&lt;/Button>
+		&lt;Border Height="50" Width="50" CornerRadius="2,30,9,0" Canvas.Left="110" Canvas.Top="110">
+      &lt;Border.Background>
+        &lt;RadialGradientBrush GradientOrigin="0.5,0.5" Center="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
+          &lt;RadialGradientBrush.GradientStops>
+            &lt;GradientStop Color="Purple" Offset="0" />
+            &lt;GradientStop Color="Orange" Offset=".5" />
+          &lt;/RadialGradientBrush.GradientStops>
+        &lt;/RadialGradientBrush>
+      &lt;/Border.Background>
+    &lt;/Border>
+	&lt;/Canvas>
+&lt;/Grid>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Grid Background="Silver">
+          <Canvas Background="Yellow" ClipToBounds="True" Width="150" Height="150">
+            <Button Canvas.Top="30" Canvas.Left="90">Test</Button>
+            <Border Height="50" Width="50" CornerRadius="2,30,9,0" Canvas.Left="110" Canvas.Top="110">
+              <Border.Background>
+                <RadialGradientBrush GradientOrigin="0.5,0.5" Center="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
+                  <RadialGradientBrush.GradientStops>
+                    <GradientStop Color="Purple" Offset="0" />
+                    <GradientStop Color="Orange" Offset=".5" />
+                  </RadialGradientBrush.GradientStops>
+                </RadialGradientBrush>
+              </Border.Background>
+            </Border>
+          </Canvas>
+        </Grid>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}">27. Canvas and ClipToBounds=False</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">If ClipToBounds is false for a Canvas and children are positioned beyond the boundary of the Canvas, those children are not clipped by the Canvas.</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 38</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure40.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Grid Background="silver" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+ 	&lt;Canvas Background="Yellow" ClipToBounds="false" Width="150" Height="150">
+		&lt;Button Canvas.Top="30" Canvas.Left="90">Test&lt;/Button>
+		&lt;Border Height="50" Width="50" CornerRadius="2,30,9,0" Canvas.Left="110" Canvas.Top="110">
+       &lt;Border.Background>
+        &lt;RadialGradientBrush GradientOrigin="0.5,0.5" Center="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
+          &lt;RadialGradientBrush.GradientStops>
+            &lt;GradientStop Color="Purple" Offset="0" />
+            &lt;GradientStop Color="Orange" Offset=".5" />
+          &lt;/RadialGradientBrush.GradientStops>
+        &lt;/RadialGradientBrush>
+      &lt;/Border.Background>
+    &lt;/Border>
+	&lt;/Canvas>
+&lt;/Grid>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Grid Background="Silver">
+          <Canvas Background="Yellow" ClipToBounds="False" Width="150" Height="150">
+            <Button Canvas.Top="30" Canvas.Left="90">Test</Button>
+            <Border Height="50" Width="50" CornerRadius="2,30,9,0" Canvas.Left="110" Canvas.Top="110">
+              <Border.Background>
+                <RadialGradientBrush GradientOrigin="0.5,0.5" Center="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
+                  <RadialGradientBrush.GradientStops>
+                    <GradientStop Color="Purple" Offset="0" />
+                    <GradientStop Color="Orange" Offset=".5" />
+                  </RadialGradientBrush.GradientStops>
+                </RadialGradientBrush>
+              </Border.Background>
+            </Border>
+          </Canvas>
+        </Grid>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="gridcanvassimilar">28. Grid and Canvas are Similar</Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">Both Grid and Canvas can be used to position content relative to the upper left-hand corner of the containing element.</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 39, Centering with Grid</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure41.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Grid Width="150" Height="150" Background="silver" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+		&lt;Button VerticalAlignment="Center" HorizontalAlignment="Center">
+			Test
+		&lt;/Button>
+&lt;/Grid>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Grid Width="150" Height="150" Background="Silver">
+          <Button VerticalAlignment="Center" HorizontalAlignment="Center">
+            Test
+          </Button>
+        </Grid>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 40, Canvas Alternative: Grid with Alignments</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure42.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Grid Width="150" Height="150" Background="silver" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+		&lt;Button VerticalAlignment="Bottom" HorizontalAlignment="Right">
+			Test
+		&lt;/Button>
+&lt;/Grid>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Grid Width="150" Height="150" Background="Silver">
+          <Button VerticalAlignment="Bottom" HorizontalAlignment="Right">
+            Test
+          </Button>
+        </Grid>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="bordertight">29. Border: Tight Fit</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">Border is a tight fitting element—it, as much as possible, assumes the size of its child.  For the "stretch" values of the vertical and horizontal alignments it will be arranged at the entire available size and will not fit tightly.  The following markup produces the visual of Figure 41.</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 41, Border Around Text </Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure43.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Border BorderThickness="10" BorderBrush="navy" Background="khaki" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" VerticalAlignment="Center" HorizontalAlignment="Center">
+
+	&lt;TextBlock FontSize="20" Background="yellow">Decorators - Border Specification&lt;/TextBlock>
+
+&lt;/Border>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Border BorderThickness="10" BorderBrush="Navy" Background="Khaki" VerticalAlignment="Center" HorizontalAlignment="Center">
+
+          <TextBlock FontSize="20" Background="Yellow">Decorators - Border Specification</TextBlock>
+
+        </Border>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="bordertightmargins">30. Border: Tight Fit with Margins</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">The tight-wrapping behavior includes the margins.  See the markup below which results in Figure 42.</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 42, Border Around Text with a Margin</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure44.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Border BorderThickness="10" BorderBrush="navy" Background="khaki" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" VerticalAlignment="Center" HorizontalAlignment="Center">
+
+	&lt;TextBlock FontSize="20" Margin="15" Background="yellow">Decorators - Border Specification&lt;/TextBlock>
+
+&lt;/Border>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Border BorderThickness="10" BorderBrush="Navy" Background="Khaki" VerticalAlignment="Center" HorizontalAlignment="Center">
+
+          <TextBlock FontSize="20" Margin="15" Background="Yellow">Decorators - Border Specification</TextBlock>
+
+        </Border>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="borderaligns">31. Border: Alignments and TextAlignment</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">If the alignments are Stretch (see following markup) and the available size is larger than the desired size, the result could be Figure 43 (note that the text aligns itself within itself.)</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 43, Border Around Text - Stretched</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure45.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Border BorderThickness="10" BorderBrush="navy" Background="khaki" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" VerticalAlignment="Center" HorizontalAlignment="Center" Width="600" Height="150">
+
+	&lt;TextBlock FontSize="20" Background="yellow">Decorators - Border Specification&lt;/TextBlock>
+
+&lt;/Border>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Border BorderThickness="10" BorderBrush="Navy" Background="Khaki" VerticalAlignment="Center" HorizontalAlignment="Center" Width="600" Height="150">
+
+          <TextBlock FontSize="20" Background="Yellow">Decorators - Border Specification</TextBlock>
+
+        </Border>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">Note that the alignments VerticalAlignment and HorizontalAlignment are not the same as TextAlignment; see Figure 44, Alignments and TextAlignment and the markup that follows.</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 44, Alignments and TextAlignment</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure46.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Border BorderThickness="10" BorderBrush="navy" Background="khaki" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" VerticalAlignment="Center" HorizontalAlignment="Center" Width="600" Height="150">
+
+	&lt;TextBlock FontSize="20" Background="yellow" HorizontalAlignment="Left" VerticalAlignment="bottom" TextAlignment="center" Width="500">Decorators - Border Specification&lt;/TextBlock>
+
+&lt;/Border>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Border BorderThickness="10" BorderBrush="Navy" Background="Khaki" VerticalAlignment="Center" HorizontalAlignment="Center" Width="600" Height="150">
+
+          <TextBlock FontSize="20" Background="Yellow" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextAlignment="Center" Width="500">Decorators - Border Specification</TextBlock>
+
+        </Border>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="borderoverconstrained">32. Border: Over constrained Child</Paragraph>
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 45, Explicit Width on Border and Constrained Child</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure47.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">An explicit size can be set on a Border.  The following example shows a Border that has been sized to over constrain its child.  The child is clipped.</Paragraph>
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Border BorderThickness="10" BorderBrush="navy" Background="khaki" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" VerticalAlignment="Center" HorizontalAlignment="Center" Width="300" Height="150">
+
+	&lt;TextBlock FontSize="20" Background="yellow">Decorators - Border Specification&lt;/TextBlock>
+
+&lt;/Border>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Border BorderThickness="10" BorderBrush="Navy" Background="Khaki" VerticalAlignment="Center" HorizontalAlignment="Center" Width="300" Height="150">
+
+          <TextBlock FontSize="20" Background="Yellow">Decorators - Border Specification</TextBlock>
+
+        </Border>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">For a little more control over how the content is clipped, we can still apply the alignments.  The following allows the content to be centered while it is clipped.</Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 46, Content Overconstrained and Centered</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure48.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Border BorderThickness="10" BorderBrush="navy" Background="khaki" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" VerticalAlignment="Center" HorizontalAlignment="Center" Width="300" Height="150">
+
+	&lt;TextBlock FontSize="20" Background="yellow" HorizontalAlignment="center">Decorators - Border Specification&lt;/TextBlock>
+
+&lt;/Border>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Border BorderThickness="10" BorderBrush="Navy" Background="Khaki" VerticalAlignment="Center" HorizontalAlignment="Center" Width="300" Height="150">
+
+          <TextBlock FontSize="20" Background="Yellow" HorizontalAlignment="Center">Decorators - Border Specification</TextBlock>
+
+        </Border>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="borderrounded">33. Border: Rounded Corners</Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">Borders support independently rounded corners with the CornerRadius property.  A couple of simple examples are shown.</Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">The following markup produces the visuals of Figure 47 assuming an arrange size of 100, 100.</Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Border BorderThickness="5" BorderBrush="Orange" Background="Navy" CornerRadius="15" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Width="200" Height="200"/>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Border BorderThickness="5" BorderBrush="Purple" Background="Navy" CornerRadius="15" Width="200" Height="200"/>
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 47, Border with Uniform Corner Radii</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure49.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">The following markup produces the visuals of Figure 48 assuming an arrange size of 100, 100.</Paragraph>
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Border BorderThickness="10" BorderBrush="Red" Background="Navy"  CornerRadius="100,40,5,15" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Width="100" Height="100"/>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Border BorderThickness="10" BorderBrush="Red" Background="Navy" CornerRadius="100,40,5,15" Width="100" Height="100"/>
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 48, Border with Rounded Corners</Paragraph>
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure50.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="textblock">34. TextBlock: Displaying label text</Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">The TextBlock layout is optimized for displaying short amounts of text, usually as a label within UI. TextBlock formatting is basic: limited to changing the font properties (size, face, underline, etc).</Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">The following markup produces the visuals of Figure 45 assuming an arrange size of 100, 100.</Paragraph>
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Grid xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+  &lt;Grid.RowDefinitions>
+	&lt;RowDefinition Height="Auto" />
+  &lt;/Grid.RowDefinitions>
+  &lt;Grid.ColumnDefinitions>
+	&lt;ColumnDefinition Width="Auto"/>
+  &lt;/Grid.ColumnDefinitions>
+	&lt;Border BorderThickness="1" Padding="10" BorderBrush="Gray">
+		&lt;TextBlock FontFamily="Verdana" FontSize="30">
+			The New Workout Plan
+		&lt;/TextBlock>
+	&lt;/Border>
+&lt;/Grid>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <Border BorderThickness="1" Padding="10" BorderBrush="Gray">
+            <TextBlock FontFamily="Verdana" FontSize="30">
+              The New Workout Plan
+            </TextBlock>
+          </Border>
+        </Grid>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 49: TextBlock</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure51.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">Notice, however that text is clipped if the window is resized to smaller than the text width. We can prevent this by enabling ellipses on TextBlock with the TextTrimming property. </Paragraph>
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Grid xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+  &lt;Grid.RowDefinitions>
+	&lt;RowDefinition Height="Auto" />
+  &lt;/Grid.RowDefinitions>
+  &lt;Grid.ColumnDefinitions>
+	&lt;ColumnDefinition Width="Auto"/>
+  &lt;/Grid.ColumnDefinitions>
+	&lt;Border BorderThickness="1" Padding="10" BorderBrush="Gray" Width="240">
+		&lt;TextBlock FontFamily="Verdana" FontSize="30" TextTrimming="CharacterEllipsis">
+			The New Workout Plan
+		&lt;/TextBlock>
+	&lt;/Border>
+&lt;/Grid>
+</Paragraph>
+    <Paragraph Style="{StaticResource mainContentStyle}">
+      The following is the rendered output of the <Bold>XAML</Bold> markup above.
+    </Paragraph>
+    <Paragraph Style="{StaticResource expanderStyle}">
+      <Expander IsExpanded="True" Header="Rendered Output">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <Border BorderThickness="1" Padding="10" BorderBrush="Gray" Width="240">
+            <TextBlock FontFamily="Verdana" FontSize="30" TextTrimming="CharacterEllipsis">
+              The New Workout Plan
+            </TextBlock>
+          </Border>
+        </Grid>
+
+      </Expander>
+    </Paragraph>
+
+    <Paragraph Style="{StaticResource figureContentStyle}">Figure 50: TextBlock with Ellipses</Paragraph>
+
+    <Paragraph Style="{StaticResource imageStyler}">
+      <Image Stretch="Uniform">
+        <Image.Source>
+          <BitmapImage UriSource="\images\layout_figure52.PNG"/>
+        </Image.Source>
+      </Image>
+    </Paragraph>
+
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}">
+      Related Topics<LineBreak/>
+    </Paragraph>
+    <List>
+      <ListItem>
+        <Paragraph Style="{StaticResource mainContentStyle}">
+          <Hyperlink NavigateUri="canvas_ovw.xaml" TargetName="frame2">Canvas Overview</Hyperlink>
+        </Paragraph>
+      </ListItem>
+      <ListItem>
+        <Paragraph Style="{StaticResource mainContentStyle}">
+          <Hyperlink NavigateUri="dockpanel_ovw.xaml" TargetName="frame2">DockPanel Overview</Hyperlink>
+        </Paragraph>
+      </ListItem>
+      <ListItem>
+        <Paragraph Style="{StaticResource mainContentStyle}">
+          <Hyperlink NavigateUri="documents_ovw.xaml" TargetName="frame2">Documents Overview</Hyperlink>
+        </Paragraph>
+      </ListItem>
+      <ListItem>
+        <Paragraph Style="{StaticResource mainContentStyle}">
+          <Hyperlink NavigateUri="grid_ovw.xaml" TargetName="frame2">Grid Overview</Hyperlink>
+        </Paragraph>
+      </ListItem>
+      <ListItem>
+        <Paragraph Style="{StaticResource mainContentStyle}">
+          <Hyperlink NavigateUri="panels_ovw.xaml" TargetName="frame2">Panels Overview</Hyperlink>
+        </Paragraph>
+      </ListItem>
+      <ListItem>
+        <Paragraph Style="{StaticResource mainContentStyle}">
+          <Hyperlink NavigateUri="stackpanel_ovw.xaml" TargetName="frame2">StackPanel Overview</Hyperlink>
+        </Paragraph>
+      </ListItem>
+    </List>
+
+    <Paragraph Style="{StaticResource mainContentStyle}">© Microsoft Corporation. All rights reserved.</Paragraph>
+
+  </FlowDocument>
+</FlowDocumentPageViewer>

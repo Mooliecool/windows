@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="EFTPHModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2005" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2006/04/edm/ssdl">
+        <EntityContainer Name="EFTPHModelStoreContainer">
+          <EntitySet Name="Person" EntityType="EFTPHModel.Store.Person" store:Type="Tables" Schema="dbo" />
+        </EntityContainer>
+        <EntityType Name="Person">
+          <Key>
+            <PropertyRef Name="PersonID" />
+          </Key>
+          <Property Name="PersonID" Type="int" Nullable="false" />
+          <Property Name="LastName" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="FirstName" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="PersonCategory" Type="smallint" Nullable="false" />
+          <Property Name="HireDate" Type="datetime" />
+          <Property Name="EnrollmentDate" Type="datetime" />
+          <Property Name="Picture" Type="image" />
+          <Property Name="BusinessCredits" Type="varchar" MaxLength="50" />
+          <Property Name="AdminDate" Type="datetime" />
+        </EntityType>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="EFTPHModel" Alias="Self" xmlns="http://schemas.microsoft.com/ado/2006/04/edm">
+        <EntityContainer Name="EFTPHEntities">
+          <EntitySet Name="PersonSet" EntityType="EFTPHModel.Person" />
+        </EntityContainer>
+        <EntityType Name="Person">
+          <Key>
+            <PropertyRef Name="PersonID" />
+          </Key>
+          <Property Name="PersonID" Type="Int32" Nullable="false" />
+          <Property Name="LastName" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="FirstName" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="Picture" Type="Binary" MaxLength="Max" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="Student" BaseType="EFTPHModel.Person" >
+          <Property Name="EnrollmentDate" Type="DateTime" Nullable="true" /></EntityType>
+        <EntityType Name="Instructor" BaseType="EFTPHModel.Person" >
+          <Property Name="HireDate" Type="DateTime" Nullable="true" /></EntityType>
+        <EntityType Name="Admin" BaseType="EFTPHModel.Person" >
+          <Property Name="AdminDate" Type="DateTime" Nullable="true" /></EntityType>
+        <EntityType Name="BusinessStudent" BaseType="EFTPHModel.Student" >
+          <Property Name="BusinessCredits" Type="String" Nullable="true" /></EntityType></Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="urn:schemas-microsoft-com:windows:storage:mapping:CS">
+        <EntityContainerMapping StorageEntityContainer="EFTPHModelStoreContainer" CdmEntityContainer="EFTPHEntities">
+          <EntitySetMapping Name="PersonSet">
+            <EntityTypeMapping TypeName="IsTypeOf(EFTPHModel.Instructor)">
+              <MappingFragment StoreEntitySet="Person">
+                <ScalarProperty Name="Picture" ColumnName="Picture" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="PersonID" ColumnName="PersonID" />
+                <ScalarProperty Name="HireDate" ColumnName="HireDate" />
+                <Condition ColumnName="PersonCategory" Value="2" /></MappingFragment></EntityTypeMapping>
+            <EntityTypeMapping TypeName="IsTypeOf(EFTPHModel.Admin)">
+              <MappingFragment StoreEntitySet="Person">
+                <ScalarProperty Name="Picture" ColumnName="Picture" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="PersonID" ColumnName="PersonID" />
+                <ScalarProperty Name="AdminDate" ColumnName="AdminDate" />
+                <Condition ColumnName="PersonCategory" Value="3" /></MappingFragment></EntityTypeMapping>
+            <EntityTypeMapping TypeName="EFTPHModel.Person">
+              <MappingFragment StoreEntitySet="Person">
+                <ScalarProperty Name="PersonID" ColumnName="PersonID" />
+                <ScalarProperty Name="Picture" ColumnName="Picture" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <Condition ColumnName="PersonCategory" Value="0" /></MappingFragment></EntityTypeMapping>
+            <EntityTypeMapping TypeName="IsTypeOf(EFTPHModel.BusinessStudent)">
+              <MappingFragment StoreEntitySet="Person">
+                <ScalarProperty Name="Picture" ColumnName="Picture" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="EnrollmentDate" ColumnName="EnrollmentDate" />
+                <ScalarProperty Name="PersonID" ColumnName="PersonID" />
+                <ScalarProperty Name="BusinessCredits" ColumnName="BusinessCredits" />
+                <Condition ColumnName="PersonCategory" Value="4" /></MappingFragment></EntityTypeMapping>
+            <EntityTypeMapping TypeName="EFTPHModel.Student">
+              <MappingFragment StoreEntitySet="Person">
+                <ScalarProperty Name="PersonID" ColumnName="PersonID" />
+                <ScalarProperty Name="Picture" ColumnName="Picture" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="EnrollmentDate" ColumnName="EnrollmentDate" />
+                <Condition ColumnName="PersonCategory" Value="1" /></MappingFragment></EntityTypeMapping></EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2007/06/edmx">
+    <edmx:Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+      </DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram Name="TPH">
+        <EntityTypeShape EntityType="EFTPHModel.Person" Width="1.5" PointX="0.75" PointY="1.375" Height="1.622213541666667" IsExpanded="true" />
+        <EntityTypeShape EntityType="EFTPHModel.Student" Width="1.5" PointX="3.625" PointY="1.125" Height="0.947734375" />
+        <EntityTypeShape EntityType="EFTPHModel.Instructor" Width="1.5" PointX="3.625" PointY="2.625" Height="0.947734375" />
+        <InheritanceConnector EntityType="EFTPHModel.Student">
+          <ConnectorPoint PointX="2.25" PointY="1.8081770833333335" />
+          <ConnectorPoint PointX="3.625" PointY="1.8081770833333335" /></InheritanceConnector>
+        <InheritanceConnector EntityType="EFTPHModel.Instructor">
+          <ConnectorPoint PointX="2.25" PointY="2.8111067708333337" />
+          <ConnectorPoint PointX="3.625" PointY="2.8111067708333337" />
+          </InheritanceConnector>
+        <EntityTypeShape EntityType="EFTPHModel.Admin" Width="1.5" PointX="3.625" PointY="4.625" Height="0.947734375" />
+        <InheritanceConnector EntityType="EFTPHModel.Admin">
+          <ConnectorPoint PointX="1.5" PointY="2.997213541666667" />
+          <ConnectorPoint PointX="1.5" PointY="5.1831770833333337" />
+          <ConnectorPoint PointX="3.625" PointY="5.1831770833333337" /></InheritanceConnector>
+        <EntityTypeShape EntityType="EFTPHModel.BusinessStudent" Width="1.5" PointX="6.25" PointY="1.125" Height="0.947734375" />
+        <InheritanceConnector EntityType="EFTPHModel.BusinessStudent">
+          <ConnectorPoint PointX="5.125" PointY="1.5988671875" />
+          <ConnectorPoint PointX="6.25" PointY="1.5988671875" /></InheritanceConnector></Diagram></edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

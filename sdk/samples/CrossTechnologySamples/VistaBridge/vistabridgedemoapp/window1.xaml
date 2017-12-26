@@ -1,0 +1,103 @@
+﻿<Window x:Class="Microsoft.SDK.Samples.VistaBridge.Window1"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:v="clr-namespace:Microsoft.SDK.Samples.VistaBridge.Library;assembly=VistaBridgeLibrary" 
+    Title="VistaInteropDemoApp" Width="299" SizeToContent="Height" ResizeMode="CanMinimize" 
+    Loaded="WindowLoaded" Height="685">
+  <Window.Resources>
+    <v:TaskDialog x:Key="simpleWaitTD" Content="Please wait while we update your account." Instruction="Working ..."
+           Caption ="Updating Account" Cancelable="true" StandardButtons="Cancel">
+    </v:TaskDialog>
+    <v:TaskDialog x:Key="confirmationTD" Content="Are you sure you want to continue?"
+                  StandardButtons="YesNo" MainIcon="Warning" Caption="Confirm Format"
+                  Instruction="Confirm Drive Format"
+                  FooterText="NOTE: All data stored on the drive will be lost."
+                  FooterIcon="Information">
+    </v:TaskDialog>
+        <v:TaskDialogProgressBar x:Key="myProgressBar" Name="myProgressBar" Minimum="0" Maximum="100"/>
+        <v:TaskDialogMarquee x:Key="myMarquee" Name="myMarquee"/>
+      
+        <v:TaskDialog x:Key="complexTD" Content="Here is the core 'content' message for the dialog."
+                  Caption="Dialog Caption" Instruction="Main Instruction" Cancelable="true" HyperlinksEnabled="true"
+                  ExpandedText="This is some expanded text, only visible when expanded."             
+                  HyperlinkClick="OnHyperlinkClick" StandardButtons="OkCancel" MainIcon="Warning"
+                  FooterText="Here is some footer text." ExpansionMode="ExpandContent" FooterIcon="Information" 
+                  Tick="OnTick" CheckBoxText="This is a checkbox" Closing="OnDialogClosing"
+                  HelpInvoked="OnHelpInvoked" ProgressBar="{StaticResource myProgressBar}" >
+           
+            <v:TaskDialogCommandLink Name="cmdLink" Instruction="Instruction 1" ShowElevationIcon="false" Enabled="False">
+                Some descriptive text.
+            </v:TaskDialogCommandLink>
+        
+            <v:TaskDialogCommandLink Name="cmdLink2" Instruction="Instruction 2" ShowElevationIcon="false">
+                    Some more descriptive text.
+            </v:TaskDialogCommandLink>
+        </v:TaskDialog>
+        <v:TaskDialog x:Key="complexTD2" Content="Here is the core 'content' message for the dialog."
+                  Caption="Second Complex Dialog Caption" Instruction="Main Instruction" Cancelable="true"
+                  StandardButtons="OkCancel" MainIcon="Information"
+                  FooterText="Here is some footer text." ExpansionMode="ExpandContent"  
+                  Closing="OnDialogClosing" HelpInvoked="OnHelpInvoked" Marquee="{StaticResource myMarquee}">
+            <v:TaskDialogRadioButton Name="Radio1" Enabled="True" Text="Choice 1" Click="TaskDialogRadioButton_Click"/>
+            <v:TaskDialogRadioButton Name="Radio2" Enabled="True" Text="Choice 2" Click="TaskDialogRadioButton_Click"/>
+        </v:TaskDialog>
+    </Window.Resources>
+
+  <StackPanel Height="656" Width="283">
+        <!-- Task Dialog Demonstrations -->
+    <GroupBox Header="Message Box and Task Dialog" Margin="4,4,4,4" Height="375" Name="groupDialogs">
+      <StackPanel Height="398">
+        <TextBlock Margin="4,4,4,4" TextWrapping="Wrap">
+          The following buttons allow you to compare the XP-style message boxes (accessible from both the Windows Forms
+          and WPF MessageBox class) against various examples of the new Vista Task Dialogs.
+        </TextBlock>
+        <TextBlock Margin="4,4,4,4" TextWrapping="Wrap">
+          XP Style Dialogs:
+        </TextBlock>
+        <Button HorizontalAlignment="Stretch" Width="NaN" Height="23" 
+                Margin="4,4,4,4" Name="wfmsgboxButton" Click="WFMessageBoxClicked">Windows Forms Message Box</Button>
+        <Button HorizontalAlignment="Stretch" Width="NaN" Height="23" 
+                Margin="4,4,4,4" Name="wpfmsgboxButton" Click="WPFMessageBoxClicked">WPF Message Box</Button>
+        <TextBlock Margin="4,4,4,4" TextWrapping="Wrap">
+          New Vista Dialogs:
+        </TextBlock>
+        <Button HorizontalAlignment="Stretch" Width="NaN" Height="23" 
+                Margin="4,4,4,4" Name="helloWorldTDButton" Click="HelloWorldTDClicked">Hello World Task Dialog</Button>
+        <Button HorizontalAlignment="Stretch" Width="NaN" Height="23" 
+                Margin="4,4,4,4" Name="simpleWaitTDButton" Click="SimpleWaitTDClicked">Simple Wait Task Dialog</Button>
+        <Button HorizontalAlignment="Stretch" Width="NaN" Height="23" 
+                Margin="4,4,4,4" Name="confirmationTDButton" Click="ConfirmationTDClicked">Confirmation Task Dialog</Button>
+        <Button HorizontalAlignment="Stretch" Width="NaN" Height="23" 
+                Margin="4,4,4,4" Name="complexTDButton" Click="ComplexTDClicked">Complex Task Dialog</Button>
+        <Button HorizontalAlignment="Stretch" Width="NaN" Height="23" 
+                Margin="4,4,4,4" Name="complexTDButton2" Click="ComplexTD2Clicked">Complex Task Dialog 2</Button>
+            </StackPanel>
+    </GroupBox>
+
+    <!-- Common File Dialog Demonstrations -->
+    <GroupBox Header="Common File Dialogs" Margin="4,4,4,4" Height="257" Width="270" HorizontalAlignment="Left" VerticalAlignment="Bottom" Name="groupFileDialog">
+      <StackPanel Height="265">
+        <TextBlock Margin="4,4,4,4" TextWrapping="Wrap">
+          The following buttons allow you to compare the XP-style file dialogs (accessible from the 
+          various *FileDialog classes in WPF) against various examples of the 
+          new Vista Common File Dialogs.
+        </TextBlock>
+        <TextBlock Margin="4,4,4,4" TextWrapping="Wrap">
+          XP Style Dialogs:
+        </TextBlock>
+                <Button HorizontalAlignment="Stretch" Width="NaN" Height="23" 
+                Margin="4,4,4,4" Name="wpfDialogButton" Click="WPFDialogClicked">WPF File Dialog</Button>
+        <TextBlock Margin="4,4,4,4" TextWrapping="Wrap">
+          New Vista Dialogs:
+        </TextBlock>
+        <Button HorizontalAlignment="Stretch" Width="NaN" Height="23" 
+                Margin="4,4,4,4" Name="vistaOpenFileDialogButton" Click="OpenVistaFileDialogClicked">Common Open File Dialog</Button>
+        <Button HorizontalAlignment="Stretch" Width="NaN" Height="23" 
+                Margin="4,4,4,4" Name="vistaSaveFileDialogButton" Click="SaveVistaFileDialogClicked">Common Save File Dialog</Button>
+
+      </StackPanel>
+    </GroupBox>
+    
+  </StackPanel>
+
+</Window>

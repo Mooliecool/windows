@@ -1,0 +1,76 @@
+﻿<html><head><META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=utf-8" /><META NAME="save" CONTENT="history" /><title xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">Custom Proxies Technology Sample</title><META NAME="Description" CONTENT="&#xD;&#xA;                    This sample demonstrates the extensibility of the T:System.Runtime.Remoting.Proxies.RealProxy class. By extending T:System.Runtime.Remoting.Proxies.RealProxy, user code gains access to the messages that are transported to and fr ..."></META><META NAME="MS.LOCALE" CONTENT="en-us" /><style>
+body
+{font-family:Verdana;font-size:medium;}
+div#mainSection, div#header
+{font-size:70%;width: 100%;}
+div#mainBody
+{font-size:90%;}
+div#mainSection div table
+{font-size: 100%;text-align: left;}
+span#nsrTitle
+{color:#003399;font-size:90%;font-weight:600;}
+div#header
+{background-color:#D4DFFF;}
+.heading
+{font-size:120%;color:#003399;}
+.subHeading
+{font-size:100%;margin-bottom:4;}
+li
+{margin-top:-2;margin-bottom:3;}
+p
+{margin-top:10;margin-bottom:5;}
+div.tableSection p
+{margin-top:1;margin-bottom:4;}	
+div#mainSection table th
+{background-color:#EFEFF7;color:#000066;text-align:left;}
+div#mainSection table td
+{background-color:#F7F7FF;}
+div#mainSection table
+{margin-top:5px;margin-bottom: px;}
+			</style></head><body><div id="header"><table width="100%" id="topTable"></table></div><div id="mainSection"><div id="mainBody"><br /><font color="DarkGray">[This readme is a partial copy of the sample's topic in the SDK documentation.]</font><br /><font color="DarkGray" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt"></font><p xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt"></p><div class="introduction"><p xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+                    This sample demonstrates the extensibility of the <span sdata="cer" target="T:System.Runtime.Remoting.Proxies.RealProxy">RealProxy</span> class. By extending <span sdata="cer" target="T:System.Runtime.Remoting.Proxies.RealProxy">RealProxy</span>, user code gains access to the messages that are transported to and from any remote object. The sample creates three executable files. The ProxyWithReturnMessage.exe application overrides the <span sdata="cer" target="M:System.Runtime.Remoting.Proxies.RealProxy.Invoke(System.Runtime.Remoting.Messaging.IMessage)">Invoke</span> method to display message data. The ProxyWithCustomCasting.exe application uses two interfaces, named IFaq and IBaz, to demonstrate custom casting capabilities. The ProxyWiredToHttpChannel.exe application shows how to intercept and forward the call to the RemotingHello service using the Http Channel.
+                </p><div class="alert"><table width="100%" cellspacing="0" cellpadding="0" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt"><tr><th align="left"><b>Important Note:</b></th></tr><tr><td><p>
+					 This sample requires that Internet Information Services (IIS) be installed on your computer. You must register the RemotingHello service with IIS before running sample applications. 
+								
+								
+							</p></td></tr></table></div><p xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">
+                    For information about using the samples, see the following topics:
+                </p><ul xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt"><li><p><span sdata="link">How to: View and Download Samples</span></p></li><li><p><span sdata="link">How to: Set Sample Settings</span></p></li></ul></div><h3 class="procedureSubHeading" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">To build the sample using the Command Prompt</h3><div class="subSection"><ol xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt"><li><p>
+                    Open a Command Prompt window and navigate to the CS subdirectory. 
+                </p></li><li><p>
+                    Type <span class="input">msbuild CustomProxiesCS.sln</span> at the command line. 
+                </p><div class="alert"><table width="100%" cellspacing="0" cellpadding="0"><tr><th align="left"><b>Note:</b></th></tr><tr><td><p>
+					This sample builds three console applications. You must launch and run them using the command prompt in order to view their output.
+								
+								
+							</p></td></tr></table></div></li></ol></div><h3 class="procedureSubHeading" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">To build the sample using Visual Studio</h3><div class="subSection"><ol xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt"><li><p>
+                    Open Windows Explorer and navigate to the CS subdirectory.
+                </p></li><li><p>
+                    Double-click the icon for CustomProxiesCS.sln to open the file in Visual Studio.
+                </p></li><li><p>
+                    On the <span class="ui">Build</span> menu, choose <span class="ui">Build Solution</span>.
+                </p></li></ol></div><h3 class="procedureSubHeading" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">To register the service in IIS</h3><div class="subSection"><ol xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt"><li><p>
+                    Compile the service to a DLL and copy this DLL to a bin directory where the service will be loaded from. Building the sample using the Command Prompt or Visual Studio as described above compiles the service, creates the bin subdirectory under ProxyWiredToHttpChannel and copies Hello.dll there.
+                </p></li><li><p>
+                    Start Internet Services Manager and select <span class="ui">Default Web Site</span> under the server node. Select <span class="ui">Action, New, Virtual Directory</span> on the menu and click <span class="ui">Next</span> to continue.
+                </p></li><li><p>
+                    Enter <span class="input">RemotingHello</span> as the alias and press <span class="ui">Next</span>.
+                </p></li><li><p>
+                    Enter the directory where the service is located. Enter the full path up to but excluding the bin directory where the dll in step 1 was copied to.
+                </p></li><li><p>
+                    Press <span class="ui">Next</span>. Accept the defaults presented and press <span class="ui">Next</span> again. Press <span class="ui">Finish</span>. The service has now been registered and will appear under the list of Default Web Sites in the Internet Services Manager window.
+                </p></li><li><p>
+                    Ensure that there is a web.config file in the directory where the service was registered. This file describes your service and will automatically be loaded when a client attempts to access your service with a browser or client using the HTTP channel on port 80.
+                </p></li></ol></div><h3 class="procedureSubHeading" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">To run the sample</h3><div class="subSection"><ol xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt"><li><p>
+                    Navigate to the directory that contains one of the three executable files:
+                </p><ul><li><p>
+                    ProxyWiredToHttpChannel.exe 
+                </p></li><li><p>
+                    ProxyWithCustomCasting.exe 
+                </p></li><li><p>
+                    ProxyWithReturnMessage.exe. 
+                </p></li></ul><p>
+                    Each executable is located in the \bin\Debug subdirectory under the directory with the same name as the console application.
+                </p></li><li><p>
+                    Type the name of the executable file at the command line. Ensure that the RemotingHello service is registered with IIS as described above before running ProxyWiredToHttpChannel.exe.
+                </p></li></ol></div><h1 class="heading" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt"><span onclick="ExpandCollapse(seeAlsoToggle)" style="cursor:default;" onkeypress="ExpandCollapse_CheckKey(seeAlsoToggle, event)" tabindex="0">See Also</span></h1><div id="seeAlsoSection" class="section"><h4 class="subHeading" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">Reference</h4><div class="seeAlsoStyle"><span sdata="cer" target="T:System.Runtime.Remoting.Channels.IChannel" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">IChannel</span></div><div class="seeAlsoStyle"><span sdata="cer" target="T:System.Runtime.Remoting.Messaging.IMessage" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">IMessage</span></div><div class="seeAlsoStyle"><span sdata="cer" target="T:System.Runtime.Remoting.IRemotingTypeInfo" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">IRemotingTypeInfo</span></div><div class="seeAlsoStyle"><span sdata="cer" target="T:System.MarshalByRefObject" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">MarshalByRefObject</span></div><div class="seeAlsoStyle"><span sdata="cer" target="T:System.Runtime.Remoting.Messaging.OneWayAttribute" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">OneWayAttribute</span></div><div class="seeAlsoStyle"><span sdata="cer" target="T:System.Runtime.Remoting.Proxies.RealProxy" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">RealProxy</span></div><div class="seeAlsoStyle"><span sdata="cer" target="N:System.Collections" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">System.Collections</span></div><div class="seeAlsoStyle"><span sdata="cer" target="N:System.Runtime.Remoting" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">System.Runtime.Remoting</span></div><div class="seeAlsoStyle"><span sdata="cer" target="N:System.Runtime.Remoting.Proxies" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">System.Runtime.Remoting.Proxies</span></div><div class="seeAlsoStyle"><span sdata="cer" target="N:System.Runtime.Remoting.Messaging" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">System.Runtime.Remoting.Messaging</span></div><div class="seeAlsoStyle"><span sdata="cer" target="T:System.Runtime.InteropServices.UnmanagedType" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">UnmanagedType</span></div><h4 class="subHeading" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">Other Resources</h4><div class="seeAlsoStyle"><span sdata="link" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">Advanced Remoting</span></div><div class="seeAlsoStyle"><span sdata="link" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">Extending RealProxy</span></div><div class="seeAlsoStyle"><span sdata="link" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:msxsl="urn:schemas-microsoft-com:xslt">Object Activation and Lifetimes</span></div></div></div></div></body></html>

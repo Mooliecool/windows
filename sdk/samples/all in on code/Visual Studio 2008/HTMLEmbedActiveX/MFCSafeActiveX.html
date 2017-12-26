@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>MFCSafeActiveX</title>
+
+    <script language="javascript" type="text/javascript">
+        function SetFloatProperty() {
+            var fVal = parseFloat(floatPropInput.value);
+            if (!isNaN(fVal)) {
+                MFCSafeActiveX1.FloatProperty = fVal;
+            }
+        }
+        function GetFloatProperty() {
+            alert("MyActiveX1.FloatProperty = " +
+                MFCSafeActiveX1.FloatProperty.toString());
+        }
+        function HelloWorld() {
+            alert("HelloWorld");
+        }
+    </script>
+
+    <script language="vbscript" type="text/vbscript" for="MFCSafeActiveX1" event="FloatPropertyChanging(NewValue, byref Cancel)">
+'       http://support.microsoft.com/kb/253282
+'       we do not use jscript or javascript because they passes all variables
+'       by value (not by reference). The FloatPropertyChanging event requires 
+'       passing the cancel param by reference.
+        If confirm("FloatProperty is being changed to " & Cstr(NewValue)) Then
+            Cancel = false
+        Else
+            Cancel = true
+        End If
+'       'Cancel' does not seem to work [to be fixed in future, Jialiang]        
+    </script>
+
+    <!--<script language="javascript" type="text/javascript" 
+        for="MFCSafeActiveX1" event="FloatPropertyChanging(NewValue, Cancel)">        
+        alert("FloatProperty is being changed to " + NewValue.toString());
+    </script>-->
+    <style type="text/css">
+        body
+        {
+            font-family: Calibri;
+        }
+        #MFCSafeActiveX1
+        {
+            height: 120px;
+            width: 291px;
+        }
+    </style>
+</head>
+<body>
+    <object id="MFCSafeActiveX1" classid="CLSID:1EBAE592-7515-43C2-A6F1-CDEEDF3FD82B">
+    </object>
+    <p>
+    </p>
+    FloatProperty:
+    <input type="text" name="floatPropInput" value="" style="width: 120px" />
+    <input type="button" name="submit" value="Set" onclick="SetFloatProperty()" />
+    <input type="button" name="retrieve" value="Get" onclick="GetFloatProperty()" />
+</body>
+</html>

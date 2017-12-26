@@ -1,0 +1,364 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta content="zh-cn" http-equiv="Content-Language" />
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<title>Working with Silverlight Writeab</title>
+<style type="text/css">
+h1 {
+	color: #FF0000;
+}
+h2 {
+	color: #3399FF;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Working with Silverlight WriteableBitmap</h1>
+<h2>Introduction</h2>
+<p>WriteableBitmap is a new feature in Silverlight 3. It allows you to work with 
+raw pixel data of a bitmap image. This enables a lot of useful scenarios. 
+However, due to the limitation in the security sandbox (for example, unable to 
+write unsafe code that uses pointers), you may need to write more code compared 
+to a similar desktop application.</p>
+<p>This sample contains 3 sub samples which demonstrate some common tasks when 
+working with WriteableBitmap:</p>
+<ul>
+	<li>The gun shoot sample. It allows you to select two images of different 
+	size, scales them to the same resolution, and puts one on top of the other. 
+	When you click the top image to fire some bullets, a gun mark will be 
+	created, and you&#39;ll be able to see through the bottom image. This sample 
+	demonstrates how to scale a source image to a specific resolution (800 * 600 
+	in this case), as well as how to modify individual pixels.</li>
+	<li>The fill color sample. It implements a common feature in painting 
+	programmers: Fill an area with a solid color. It demonstrates how to apply 
+	common algorithms to Silverlight WriteableBitmap, as well as how to avoid 
+	stack overflow in very deep recursive methods by simulating the way CLR 
+	invokes methods.</li>
+	<li>The screenshot sample. It demonstrates another feature of 
+	WriteableBitmap: Create bitmap screenshots from either bitmap or non-bitmap 
+	elements. It allows you to save the result to a bmp file. It also 
+	demonstrates the limitation of the screenshot feature.</li>
+</ul>
+<p>To work with WriteableBitmap in any advanced scenarios, solid foundation of 
+computer graphics is required. You should at least understand how bitmap is 
+stored in memory, the essential concepts related to pixels and colors, and how 
+to work with bitwise shift operations to improve performance.</p>
+<h2>Important: When to use WriteableBitmap, and when not</h2>
+<p>Traditionally, it may be attempted to use some CPU based solutions similar to 
+WriteableBitmap whenever you need to modify a pixel on the screen. However, 
+these days we have much better GPU based solutions. For example: The mighty 
+shader effect. Keep in mind that when using WriteableBitmap, all jobs are 
+performed on the CPU, and if you need to do the job on each pixel, you will have 
+to do them pixel by pixel. Even if you create multiple threads, you can process 
+at least 4 pixels at one time on a quad-core CPU. GPU, on the other hand, can 
+process all pixels in parallel, no matter how many pixels the scenario contains. 
+Also, in most scenarios, it is much easier to write HLSL compared to a CPU based 
+algorithm, because you can think with a single pixel rather than find where the 
+pixel is, get its color in an integer value, extract the ARGB information using 
+bitwise shift operations, and so on. So it is recommended to use shader effect 
+whenever possible.</p>
+<p>However, shader effects do have limitations:</p>
+<ul>
+	<li>Silverlight 3 supports pixel shader only. No vertex shader and geometry 
+	shader. Without geometry shader, you cannot create GPU primitives 
+	dynamically in your HLSL program.</li>
+	<li>Silverlight 3 supports shader 2.0 only (while Direct 3D 11 supports 
+	shader 5.0). There&#39;re a lot of limitations in shader 2.0 due to the 
+	limitation of GPU at that time. For example, up to 64 arithmetic instructions may be given in a HLSL program, limited numbers of GPU 
+	registries can be used, and so on. Keep in mind GPU does not support loop. 
+	So when compiling HLSL, all loops will be expanded. That will introduce more 
+	arithmetic instructions than you may expect. Silverlight needs to support 
+	low end GPUs (in contrast to Direct 3D). That&#39;s why shader 2.0 is chosen.</li>
+	<li>Some features are just difficult to be written in shader effect. For 
+	example, one pixel&#39;s processing relies on another pixel&#39;s result. Shader 
+	effects are usually used to perform the same operation to all pixels. Of 
+	course, you can pass different parameters to achieve different results. 
+	Think of a swirl effect. All pixels are performed using the same algorithm, 
+	just the angle parameter is different. So shader effect can be used. 
+	However, if you want to fill an area with a solid color, or maybe even 
+	gradient, it can be very difficult to do with shader effect.</li>
+</ul>
+<p>So use WriteableBitmap when:</p>
+<ul>
+	<li>Your algorithm is too complex for a shader 2.0 program.</li>
+	<li>You have to support extremely low end computers where even shader 2.0 is 
+	not supported (in this case, CPU&#39;s SSE instructions set will be used if you 
+	choose shader effect, whose performance is not ideal).</li>
+	<li>In your algorithm, one pixel&#39;s processing relies on another pixel&#39;s 
+	result.</li>
+</ul>
+<h2>Difference between Silverlight and WPF&#39;s WriteableBitmap</h2>
+<p>While this sample targets Silverlight, you may want to port it to WPF. You 
+must be aware of some key differences between Silverlight and WPF&#39;s 
+WriteableBitmap:</p>
+<ul>
+	<li>Silverlight doesn&#39;t allow you to write unsafe code that uses pointers, 
+	while you will have to write unsafe code when working with WPF 
+	WriteableBitmap.</li>
+	<li>Silverlight exposes a Pixels property whose type is int[], while WPF 
+	exposes a BackBuffer property which is a pointer (convert it to a byte*) to 
+	the pixels&#39; data.</li>
+	<li>In Silverlight, since the pixel&#39;s color is of type int, you will have to 
+	use bitwise shift operations to extract ARGB information (you can use other 
+	solutions, but they&#39;re slow). In WPF, you can control the pointer to point 
+	to whatever position you like. For example, point to A, and then to R with 
+	pointer++.</li>
+	<li>Silverlight&#39;s WriteableBitmap supports Pbgra32 format only, so the back 
+	buffer stride is always pixel width * 4. WPF supports a lot of formats. So 
+	you need to get the back buffer stride from the BackBufferStride property.</li>
+	<li>In WPF, you need to wrap the write operation in a Lock and Unlock pair, 
+	while in Silverlight this is not required.</li>
+	<li>WPF allows you to use PLINQ to work with multi-core CPUs without 
+	worrying about threads, while in Silverlight you have to implement your own 
+	if you want to take advantage of multi-core CPUs.</li>
+</ul>
+<p>So, if you want to convert the following Silverlight code (extracted from the 
+fill color sample) to WPF,</p>
+<p class="MsoNormal">
+<span style="font-size:
+10.0pt;font-family:&quot;Courier New&quot;;mso-no-proof:yes">
+<span style="mso-tab-count:
+2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>
+<span style="color:green">&#39; Start from the clicked point.<o:p></o:p></span></span></p>
+<p class="MsoNormal">
+<span style="font-size:
+10.0pt;font-family:&quot;Courier New&quot;;mso-no-proof:yes">
+<span style="mso-tab-count:
+2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>
+<span style="color:blue">Dim</span> clickedPoint <span style="color:blue">As</span> 
+Point = e.GetPosition(<span style="color:blue">Me</span>.img)<o:p></o:p></span></p>
+<p class="MsoNormal">
+<span style="font-size:
+10.0pt;font-family:&quot;Courier New&quot;;mso-no-proof:yes">
+<span style="mso-tab-count:
+2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>
+<span style="color:green">&#39; The position of the clicked point in the pixel 
+array.<o:p></o:p></span></span></p>
+<p class="MsoNormal">
+<span style="font-size:
+10.0pt;font-family:&quot;Courier New&quot;;mso-no-proof:yes">
+<span style="mso-tab-count:
+2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>
+<span style="color:blue">Dim</span> clickedColorPosition
+<span style="color:blue">As</span> <span style="color:blue">Integer</span> = 
+((bmp.PixelWidth * <span style="color:blue">CInt</span>(clickedPoint.Y)) +
+<span style="color:blue">CInt</span>(clickedPoint.X))<o:p></o:p></span></p>
+<p class="MsoNormal">
+<span style="font-size:
+10.0pt;font-family:&quot;Courier New&quot;;mso-no-proof:yes">
+<span style="mso-tab-count:
+2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>
+<span style="color:green">&#39; The color of the clicked point.<o:p></o:p></span></span></p>
+<p class="MsoNormal">
+<span style="font-size:
+10.0pt;font-family:&quot;Courier New&quot;;mso-no-proof:yes">
+<span style="mso-tab-count:
+2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>
+<span style="color:blue">Dim</span> clickedColor <span style="color:blue">As</span>
+<span style="color:blue">Integer</span> = bmp.Pixels(clickedColorPosition)<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+you will need to write:</p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>bmp.Lock();<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><span style="color:green">//</span></span><span style="color:green"><span style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">The start position in the back buffer.</span></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><span style="color:blue">byte</span>* start = (<span style="color:blue">byte</span>*)bmp.BackBuffer.ToPointer();<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><span style="color:green">//<span lang="EN-US" style="font-size: 9.0pt; font-family: 新宋体; mso-hansi-font-family: &quot;Times New Roman&quot;; mso-bidi-font-family: &quot;Times New Roman&quot;; mso-font-kerning: 0pt; mso-no-proof: yes"><span style="color: green">Start 
+from the clicked point.<o:p></o:p></span></span></span></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><span style="color:#2B91AF">Point</span> c</span><span style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">licked</span><span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">Point = e.GetPosition(img);<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><span style="color:green">//</span></span><span style="color:green"><span style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">Get how many bytes a pixel occupies.</span></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><span style="color:blue">int</span> bytesPerPixel = bmp.BackBufferStride 
+/ bmp.PixelWidth;<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><span style="color:green">//</span></span><span lang="EN-US" style="font-size: 9.0pt; font-family: 新宋体; mso-hansi-font-family: &quot;Times New Roman&quot;; mso-bidi-font-family: &quot;Times New Roman&quot;; mso-font-kerning: 0pt; mso-no-proof: yes"><span style="color: green">The 
+position of the clicked point in the pixel array.<o:p></o:p></span></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><span style="color:blue">byte</span>* c</span><span style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">licked</span><span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">Color</span><span style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">Position</span><span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"> = start + (<span style="color:blue">int</span>)c</span><span style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">licked</span><span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">Point.X 
+* bytesPerPixel + bmp.BackBufferStride * (<span style="color:blue">int</span>)c</span><span style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">licked</span><span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">Point.Y;<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><span style="color:green">//<span lang="EN-US" style="font-size: 9.0pt; font-family: 新宋体; mso-hansi-font-family: &quot;Times New Roman&quot;; mso-bidi-font-family: &quot;Times New Roman&quot;; mso-font-kerning: 0pt; mso-no-proof: yes"><span style="color: green">The 
+color of the clicked point.<o:p></o:p></span></span></span></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><span style="color:blue">byte</span>[] c</span><span style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">licked</span><span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">Color =
+<span style="color:blue">new</span> <span style="color:blue">byte</span>[bytesPerPixel];<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><span style="color:blue">for</span> (<span style="color:blue">int</span> 
+i = 0; i &lt; bytesPerPixel; i++)<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>{<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>c</span><span style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">licked</span><span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">Color[i] = c</span><span style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">licked</span><span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">Color</span><span style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">Position</span><span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">[i];<o:p></o:p></span></p>
+<p align="left" class="MsoNormal">
+<span lang="EN-US" style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes"><span style="mso-tab-count:3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>}</span><o:p></o:p><br/><o:p>//Other operations.</o:p>
+<span style="font-size:9.0pt;font-family:
+新宋体;mso-hansi-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;
+mso-font-kerning:0pt;mso-no-proof:yes">
+<br/><o:p>bmp.Unlock();</o:p></span>
+<p>&nbsp;</p>
+<p><span lang="en-us">That means, if you want to use WriteableBitmap in WPF, you 
+cannot use VB since it doesn&#39;t support pointers...</span></p>
+<p>In the future, we may also write WPF WriteableBitmap samples.</p>
+<h2>Walkthrough of each sample</h2>
+<h3>Gun shoot</h3>
+<p>When you select 2 bitmap images, 2 WriteableBitmaps will be created and 
+stored in memory. Since the images&#39; size may be different, we need to convert 
+them to the same resolution. This is done by calculate a ratio and then 
+multiplies each pixel&#39;s position with the ratio. For example, if we need to 
+convert a 1600*1200 image to 800*600, we simply multiplies each pixel&#39;s position 
+with 0.5</p>
+<p>After the WriteableBitmaps are created, we set the source of the Image 
+Control to the top one, and the source images are no longer needed.</p>
+<p>When you click on the image, the program calculates a circle whose radius is 
+50. It also calculates the rectangle bound of the circle so we don&#39;t need to 
+walkthrough all pixels. Then for each pixel in the bound, if it is in the 
+radius, we paint the pixel with the color in the bottom image at the same 
+position. So you will be able to see through the bottom image at this pixel. We 
+also draw a gun mark at the edge of the circle. This demonstrates how to extract 
+the ARGB values, and how to modify them.</p>
+<p>Finally, do not forget you must once again set the Image Control&#39;s Source 
+property to the WriteableBitmap, or it won&#39;t be updated.</p>
+<h3>Fill color</h3>
+<p>This samples implements a very simple version of edge detection algorithm: 
+The growth method. It starts from the clicked point. If the clicked point&#39;s 
+color is the same as the filling color, then terminates the algorithm. Otherwise 
+extract the left, right, top, and bottom pixels (grow to the 4 pixels). If the 
+color is different from the clicked pixel, then we need to fill this pixel with 
+the filling color. And then we grow the graph to the left, right, top, and 
+bottom pixels of the new pixel.</p>
+<p>If you have a very large area to be filled, you may soon get into stack 
+overflow due to a very deep recursive. To avoid this, we can try to put the 
+recursive body inside a normal loop, and manually simulate the way CLR invokes a 
+method. To do so, first we need a stack. The number of elements inside the stack 
+represents the number of the method needs to be invoked. The data inside the 
+stack is the method&#39;s parameter. Now whenever we need to invoke the recursive 
+method, we instead populates a parameter data, and push it to the stack. When 
+the recursive body is executed, we pop the stack to get the parameter of this 
+recursion. Once there&#39;s no data in the stack, it means the recursive method has 
+finally completed, so we can exit the loop.</p>
+<p>If you want to provide your own image for this sample, please choose images 
+with large areas that can be filled. Also be aware of anti-aliased images. The 
+sample&#39;s implementation of the algorithm is simple, and do not take 
+anti-aliasing into account. For example, it may be difficult to see the 
+difference between 0xfffffffe and 0xffffffff, but the algorithm thinks the two 
+pixels have different color.</p>
+<h3>Screenshot</h3>
+<p>In this sample, you will see two rectangles. The above one is a vector 
+graphic that is wrapped in a Canvas, and the below one is a bitmap that is 
+captured from the above rectangle from time to time. It is very easy to use the 
+screenshot feature of WriteableBitmap. Just provide a UIElement and its 
+transform to the constructor. However, as demonstrated in this sample, there&#39;re 
+some limitations.</p>
+<p>Supported features:</p>
+<ul>
+	<li>The current value in the animation.</li>
+	<li>RenderTransform.</li>
+	<li>Shader Effects.</li>
+</ul>
+<p>Unsupported features:</p>
+<ul>
+	<li>Projection.</li>
+	<li>Non-UIElement, such as html elements.</li>
+</ul>
+<p>So be aware if you want to use WriteableBitmap to capture screenshots because 
+projection will be lost.</p>
+<p>This sample also implements a bmp encoder to allow you to save the result to 
+a bmp file. Silverlight doesn&#39;t ship the various bitmap encoders out of box. So 
+you will have to implement your own if you need.</p>
+
+</body>
+
+</html>

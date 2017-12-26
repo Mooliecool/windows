@@ -1,0 +1,128 @@
+﻿<StateMachineWorkflowActivity x:Class="Microsoft.WorkflowServices.Samples.ServiceWorkflow" InitialStateName="InitialState" x:Name="ServiceWorkflow" DynamicUpdateCondition="{x:Null}" CompletedStateName="FinalState" xmlns:ns0="clr-namespace:System.Workflow.Activities;Assembly=System.WorkflowServices, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/workflow">
+	<ns0:ReceiveActivity.WorkflowServiceAttributes>
+		<ns0:WorkflowServiceAttributes ConfigurationName="ServiceWorkflow" />
+	</ns0:ReceiveActivity.WorkflowServiceAttributes>
+	<StateActivity x:Name="InitialState">
+		<EventDrivenActivity x:Name="WaitForBeginWorkflow">
+			<ns0:ReceiveActivity x:Name="ReceiveBeginWorkflow" CanCreateInstance="True">
+				<ns0:ReceiveActivity.ServiceOperationInfo>
+					<ns0:TypedOperationInfo Name="BeginWorkflow" ContractType="{x:Type Microsoft.WorkflowServices.Samples.IForwardContract}" />
+				</ns0:ReceiveActivity.ServiceOperationInfo>
+				<ns0:ReceiveActivity.ParameterBindings>
+					<WorkflowParameterBinding ParameterName="returnAddress">
+						<WorkflowParameterBinding.Value>
+							<ActivityBind Name="ServiceWorkflow" Path="ReturnAddress" />
+						</WorkflowParameterBinding.Value>
+					</WorkflowParameterBinding>
+				</ns0:ReceiveActivity.ParameterBindings>
+				<CodeActivity x:Name="DoApplyReturnAddress" ExecuteCode="ApplyReturnAddress" />
+			</ns0:ReceiveActivity>
+			<SetStateActivity x:Name="Transition1" TargetStateName="BeginWorkItemState" />
+		</EventDrivenActivity>
+	</StateActivity>
+	<StateActivity x:Name="BeginWorkItemState">
+		<EventDrivenActivity x:Name="WaitForBeginWorkItem">
+			<ns0:ReceiveActivity x:Name="ReceiveBeginWorkItem">
+				<ns0:ReceiveActivity.ServiceOperationInfo>
+					<ns0:TypedOperationInfo Name="BeginWorkItem" ContractType="{x:Type Microsoft.WorkflowServices.Samples.IForwardContract}" />
+				</ns0:ReceiveActivity.ServiceOperationInfo>
+				<ns0:ReceiveActivity.ParameterBindings>
+					<WorkflowParameterBinding ParameterName="value">
+						<WorkflowParameterBinding.Value>
+							<ActivityBind Name="ServiceWorkflow" Path="BeginWorkItemInput" />
+						</WorkflowParameterBinding.Value>
+					</WorkflowParameterBinding>
+				</ns0:ReceiveActivity.ParameterBindings>
+			</ns0:ReceiveActivity>
+			<CodeActivity x:Name="DoCreateWorkItem" ExecuteCode="CreateWorkItem" />
+			<SetStateActivity x:Name="Transition2" TargetStateName="ProcessWorkItemState" />
+		</EventDrivenActivity>
+	</StateActivity>
+	<StateActivity x:Name="ProcessWorkItemState">
+		<EventDrivenActivity x:Name="WaitForContinueWorkItem">
+			<ns0:ReceiveActivity x:Name="ReceiveContinueWorkItem">
+				<ns0:ReceiveActivity.ServiceOperationInfo>
+					<ns0:TypedOperationInfo Name="ContinueWorkItem" ContractType="{x:Type Microsoft.WorkflowServices.Samples.IForwardContract}" />
+				</ns0:ReceiveActivity.ServiceOperationInfo>
+				<ns0:ReceiveActivity.ParameterBindings>
+					<WorkflowParameterBinding ParameterName="value">
+						<WorkflowParameterBinding.Value>
+							<ActivityBind Name="ServiceWorkflow" Path="ContinueWorkItemInput" />
+						</WorkflowParameterBinding.Value>
+					</WorkflowParameterBinding>
+				</ns0:ReceiveActivity.ParameterBindings>
+			</ns0:ReceiveActivity>
+			<CodeActivity x:Name="DoAddPartsToWorkItem" ExecuteCode="AddPartsToWorkItem" />
+		</EventDrivenActivity>
+		<EventDrivenActivity x:Name="WaitForCompleteWorkItem">
+			<ns0:ReceiveActivity x:Name="ReceiveCompleteWorkItem">
+				<ns0:ReceiveActivity.ServiceOperationInfo>
+					<ns0:TypedOperationInfo Name="CompleteWorkItem" ContractType="{x:Type Microsoft.WorkflowServices.Samples.IForwardContract}" />
+				</ns0:ReceiveActivity.ServiceOperationInfo>
+				<ns0:ReceiveActivity.ParameterBindings>
+					<WorkflowParameterBinding ParameterName="value">
+						<WorkflowParameterBinding.Value>
+							<ActivityBind Name="ServiceWorkflow" Path="CompleteWorkItemInput" />
+						</WorkflowParameterBinding.Value>
+					</WorkflowParameterBinding>
+				</ns0:ReceiveActivity.ParameterBindings>
+			</ns0:ReceiveActivity>
+			<CodeActivity x:Name="DoAddCompletedWorkItem" ExecuteCode="AddCompletedWorkItem" />
+			<SetStateActivity x:Name="Transition3" TargetStateName="CompleteWorkflowState" />
+		</EventDrivenActivity>
+	</StateActivity>
+	<StateActivity x:Name="CompleteWorkflowState">
+		<EventDrivenActivity x:Name="WaitForCompleteWorkflow">
+			<ns0:ReceiveActivity x:Name="ReceiveCompleteWorkflowComplete">
+				<ns0:ReceiveActivity.ServiceOperationInfo>
+					<ns0:TypedOperationInfo Name="CompleteWorkflow" ContractType="{x:Type Microsoft.WorkflowServices.Samples.IForwardContract}" />
+				</ns0:ReceiveActivity.ServiceOperationInfo>
+			</ns0:ReceiveActivity>
+			<SetStateActivity x:Name="Transition4" TargetStateName="FinalState" />
+		</EventDrivenActivity>
+		<EventDrivenActivity x:Name="WaitForBeginWorkItemAgain">
+			<ns0:ReceiveActivity x:Name="ReceiveBeginWorkItemAgain">
+				<ns0:ReceiveActivity.ServiceOperationInfo>
+					<ns0:TypedOperationInfo Name="BeginWorkItem" ContractType="{x:Type Microsoft.WorkflowServices.Samples.IForwardContract}" />
+				</ns0:ReceiveActivity.ServiceOperationInfo>
+				<ns0:ReceiveActivity.ParameterBindings>
+					<WorkflowParameterBinding ParameterName="value">
+						<WorkflowParameterBinding.Value>
+							<ActivityBind Name="ServiceWorkflow" Path="BeginWorkItemInput" />
+						</WorkflowParameterBinding.Value>
+					</WorkflowParameterBinding>
+				</ns0:ReceiveActivity.ParameterBindings>
+			</ns0:ReceiveActivity>
+			<CodeActivity x:Name="DoCreateWorkItemAgain" ExecuteCode="CreateWorkItem" />
+			<SetStateActivity x:Name="Transition5" TargetStateName="ProcessWorkItemState" />
+		</EventDrivenActivity>
+		<EventDrivenActivity x:Name="ReturnCompletedWorkItem">
+			<DelayActivity TimeoutDuration="00:00:05" x:Name="TimerEvent" />
+			<IfElseActivity x:Name="CheckForCompletedItem">
+				<IfElseBranchActivity x:Name="IfPendingItem">
+					<IfElseBranchActivity.Condition>
+						<RuleConditionReference ConditionName="PendingItem" />
+					</IfElseBranchActivity.Condition>
+					<ns0:SendActivity x:Name="SendWorkItemComplete">
+						<ns0:SendActivity.ServiceOperationInfo>
+							<ns0:TypedOperationInfo Name="WorkItemComplete" ContractType="{x:Type Microsoft.WorkflowServices.Samples.IReverseContract}" />
+						</ns0:SendActivity.ServiceOperationInfo>
+						<ns0:SendActivity.ParameterBindings>
+							<WorkflowParameterBinding ParameterName="item">
+								<WorkflowParameterBinding.Value>
+									<ActivityBind Name="ServiceWorkflow" Path="CompletedWorkItems.Item[0]" />
+								</WorkflowParameterBinding.Value>
+							</WorkflowParameterBinding>
+						</ns0:SendActivity.ParameterBindings>
+						<ns0:SendActivity.ChannelToken>
+							<ns0:ChannelToken Name="ReverseEndpoint" OwnerActivityName="ServiceWorkflow" EndpointName="ReverseEndpoint" />
+						</ns0:SendActivity.ChannelToken>
+					</ns0:SendActivity>
+					<CodeActivity x:Name="DoRemoveCompletedWorkItem" ExecuteCode="RemoveCompletedWorkItem" />
+				</IfElseBranchActivity>
+			</IfElseActivity>
+			<SetStateActivity x:Name="Transition6" TargetStateName="CompleteWorkflowState" />
+		</EventDrivenActivity>
+	</StateActivity>
+	<StateActivity x:Name="FinalState" />
+</StateMachineWorkflowActivity>

@@ -1,0 +1,68 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{378C01C5-A821-46AF-ADF4-C9CC6BB9911F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Microsoft.ServiceModel.Samples</RootNamespace>
+    <AssemblyName>Service</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.ServiceModel, Version=3.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Service.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="hello.aspx" />
+    <None Include="Service.svc" />
+    <None Include="web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UDPActivation\UDPActivation.csproj">
+      <Project>{FE5DA43A-9746-48EE-AB5C-9EE52A1EF2CA}</Project>
+      <Name>UDPActivation</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PostBuildEvent>
+if not exist %25SystemDrive%25\inetpub\wwwroot\servicemodelsamples\bin mkdir %25SystemDrive%25\inetpub\wwwroot\servicemodelsamples\bin
+copy /y $(ProjectDir)hello.aspx %25SystemDrive%25\inetpub\wwwroot\servicemodelsamples\.
+copy /y $(ProjectDir)Service.svc %25SystemDrive%25\inetpub\wwwroot\servicemodelsamples\.
+copy /y $(ProjectDir)Web.config %25SystemDrive%25\inetpub\wwwroot\servicemodelsamples\.
+copy "$(TargetDir)Service.dll" %25SystemDrive%25\inetpub\wwwroot\servicemodelsamples\bin
+copy "$(TargetDir)Service.pdb" %25SystemDrive%25\inetpub\wwwroot\servicemodelsamples\bin
+call $(ProjectDir)SetupApp.bat
+</PostBuildEvent>
+  </PropertyGroup>
+</Project>

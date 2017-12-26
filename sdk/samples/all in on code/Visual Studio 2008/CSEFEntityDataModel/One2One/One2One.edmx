@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="EFO2OModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2005" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2006/04/edm/ssdl">
+        <EntityContainer Name="EFO2OModelStoreContainer">
+          <EntitySet Name="Person" EntityType="EFO2OModel.Store.Person" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="PersonAddress" EntityType="EFO2OModel.Store.PersonAddress" store:Type="Tables" Schema="dbo" />
+          <AssociationSet Name="FK_PersonAddress_Person" Association="EFO2OModel.Store.FK_PersonAddress_Person">
+            <End Role="Person" EntitySet="Person" />
+            <End Role="PersonAddress" EntitySet="PersonAddress" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Person">
+          <Key>
+            <PropertyRef Name="PersonID" />
+          </Key>
+          <Property Name="PersonID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="LastName" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="FirstName" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="PersonCategory" Type="smallint" Nullable="false" />
+          <Property Name="HireDate" Type="datetime" />
+          <Property Name="EnrollmentDate" Type="datetime" />
+          <Property Name="Picture" Type="image" />
+          <Property Name="BusinessCredits" Type="varchar" MaxLength="50" />
+          <Property Name="AdminDate" Type="datetime" />
+        </EntityType>
+        <EntityType Name="PersonAddress">
+          <Key>
+            <PropertyRef Name="PersonID" />
+          </Key>
+          <Property Name="PersonID" Type="int" Nullable="false" />
+          <Property Name="Address" Type="varchar" MaxLength="50" />
+          <Property Name="Postcode" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <Association Name="FK_PersonAddress_Person">
+          <End Role="Person" Type="EFO2OModel.Store.Person" Multiplicity="1" />
+          <End Role="PersonAddress" Type="EFO2OModel.Store.PersonAddress" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Person">
+              <PropertyRef Name="PersonID" />
+            </Principal>
+            <Dependent Role="PersonAddress">
+              <PropertyRef Name="PersonID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="EFO2OModel" Alias="Self" xmlns="http://schemas.microsoft.com/ado/2006/04/edm">
+        <EntityContainer Name="EFO2OEntities">
+          <EntitySet Name="Person" EntityType="EFO2OModel.Person" />
+          <EntitySet Name="PersonAddress" EntityType="EFO2OModel.PersonAddress" />
+          <AssociationSet Name="FK_PersonAddress_Person" Association="EFO2OModel.FK_PersonAddress_Person">
+            <End Role="Person" EntitySet="Person" />
+            <End Role="PersonAddress" EntitySet="PersonAddress" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Person">
+          <Key>
+            <PropertyRef Name="PersonID" />
+          </Key>
+          <Property Name="PersonID" Type="Int32" Nullable="false" />
+          <Property Name="LastName" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="FirstName" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="PersonCategory" Type="Int16" Nullable="false" />
+          <Property Name="HireDate" Type="DateTime" />
+          <Property Name="EnrollmentDate" Type="DateTime" />
+          <Property Name="Picture" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <NavigationProperty Name="PersonAddress" Relationship="EFO2OModel.FK_PersonAddress_Person" FromRole="Person" ToRole="PersonAddress" />
+          <Property Name="BusinessCredits" Type="String" Nullable="true" />
+          <Property Name="AdminDate" Type="DateTime" Nullable="true" /></EntityType>
+        <EntityType Name="PersonAddress">
+          <Key>
+            <PropertyRef Name="PersonID" />
+          </Key>
+          <Property Name="PersonID" Type="Int32" Nullable="false" />
+          <Property Name="Address" Type="String" MaxLength="50" Unicode="false" FixedLength="false" />
+          <Property Name="Postcode" Type="String" MaxLength="50" Unicode="false" FixedLength="false" />
+          <NavigationProperty Name="Person" Relationship="EFO2OModel.FK_PersonAddress_Person" FromRole="PersonAddress" ToRole="Person" />
+        </EntityType>
+        <Association Name="FK_PersonAddress_Person">
+          <End Role="Person" Type="EFO2OModel.Person" Multiplicity="1" />
+          <End Role="PersonAddress" Type="EFO2OModel.PersonAddress" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Person">
+              <PropertyRef Name="PersonID" />
+            </Principal>
+            <Dependent Role="PersonAddress">
+              <PropertyRef Name="PersonID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="urn:schemas-microsoft-com:windows:storage:mapping:CS">
+        <EntityContainerMapping StorageEntityContainer="EFO2OModelStoreContainer" CdmEntityContainer="EFO2OEntities">
+          <EntitySetMapping Name="Person">
+            <EntityTypeMapping TypeName="IsTypeOf(EFO2OModel.Person)">
+              <MappingFragment StoreEntitySet="Person">
+                <ScalarProperty Name="AdminDate" ColumnName="AdminDate" />
+                <ScalarProperty Name="BusinessCredits" ColumnName="BusinessCredits" />
+                <ScalarProperty Name="PersonID" ColumnName="PersonID" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="PersonCategory" ColumnName="PersonCategory" />
+                <ScalarProperty Name="HireDate" ColumnName="HireDate" />
+                <ScalarProperty Name="EnrollmentDate" ColumnName="EnrollmentDate" />
+                <ScalarProperty Name="Picture" ColumnName="Picture" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PersonAddress">
+            <EntityTypeMapping TypeName="IsTypeOf(EFO2OModel.PersonAddress)">
+              <MappingFragment StoreEntitySet="PersonAddress">
+                <ScalarProperty Name="PersonID" ColumnName="PersonID" />
+                <ScalarProperty Name="Address" ColumnName="Address" />
+                <ScalarProperty Name="Postcode" ColumnName="Postcode" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="FK_PersonAddress_Person" TypeName="EFO2OModel.FK_PersonAddress_Person" StoreEntitySet="PersonAddress">
+            <EndProperty Name="Person">
+              <ScalarProperty Name="PersonID" ColumnName="PersonID" />
+            </EndProperty>
+            <EndProperty Name="PersonAddress">
+              <ScalarProperty Name="PersonID" ColumnName="PersonID" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2007/06/edmx">
+    <edmx:Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+      </DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram Name="One2One">
+        <EntityTypeShape EntityType="EFO2OModel.Person" Width="1.5" PointX="0.75" PointY="1" Height="2.5571907552083335" IsExpanded="true" />
+        <EntityTypeShape EntityType="EFO2OModel.PersonAddress" Width="1.5" PointX="3" PointY="1.375" Height="1.7879850260416672" IsExpanded="true" />
+        <AssociationConnector Association="EFO2OModel.FK_PersonAddress_Person" ManuallyRouted="false">
+          <ConnectorPoint PointX="2.25" PointY="2.2689925130208337" />
+          <ConnectorPoint PointX="3" PointY="2.2689925130208337" /></AssociationConnector></Diagram></edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

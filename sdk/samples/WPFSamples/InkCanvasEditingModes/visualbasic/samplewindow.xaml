@@ -1,0 +1,766 @@
+﻿<Window x:Class="SampleWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:InkCanvasEditingModes;assembly="
+    xmlns:sys="clr-namespace:System;assembly=Mscorlib"
+    Title="InkCanvas EditingModes Sample"
+    x:Name="MyWindow"
+    >
+  <Window.Resources>
+
+    <!-- The definition of the Pen DrawingAttributes Collection -->
+    <x:Array x:Key="MyPenDrawingAttributes" x:Type="DrawingAttributes">
+      <!-- Fine Chisel (Black) Pen -->
+      <DrawingAttributes Color="Black" StylusTip="Rectangle" Height="1.44" Width="0.768" IsHighlighter="false"/>
+      <!-- Fine Point (Indigo) Pen -->
+      <DrawingAttributes Color="Indigo" StylusTip="Ellipse" Height="1.44" Width="1.44" IsHighlighter="false"/>
+      <!-- Very Fine Point (Indigo) Pen -->
+      <DrawingAttributes Color="Indigo" StylusTip="Ellipse" Height="0.96" Width="0.96" IsHighlighter="false"/>
+      <!-- Medium Point (Red) Pen -->
+      <DrawingAttributes Color="Red" StylusTip="Ellipse" Height="2.88" Width="2.88" IsHighlighter="false"/>
+      <!-- Marker (2mm) (Black) Pen -->
+      <DrawingAttributes Color="Black" StylusTip="Ellipse" Height="8.64" Width="8.64" IsHighlighter="false"/>
+    </x:Array>
+
+    <!-- The definition of the Highlighter DrawingAttributes Collection -->
+    <x:Array x:Key="MyHighlighterDrawingAttributes" x:Type="DrawingAttributes">
+      <!-- Medium (Yellow) Highlighter -->
+      <DrawingAttributes Color="Yellow" StylusTip="Rectangle" Height="26.4" Width="7.68" IsHighlighter="true"/>
+      <!-- Medium (Bright Green) Highlighter -->
+      <DrawingAttributes Color="LightGreen" StylusTip="Rectangle" Height="26.4" Width="7.68" IsHighlighter="true"/>
+      <!-- Medium (Turquoise) (Indigo) Highlighter -->
+      <DrawingAttributes Color="Turquoise" StylusTip="Rectangle" Height="26.4" Width="7.68" IsHighlighter="true"/>
+      <!-- Thick (Pink) Highlighter -->
+      <DrawingAttributes Color="Pink" StylusTip="Rectangle" Height="39.648" Width="13.44" IsHighlighter="true"/>
+      <!-- Extra Thick (Light Orange) Highlighter -->
+      <DrawingAttributes Color="#FFFF9900" StylusTip="Rectangle" Height="47.232" Width="15.36" IsHighlighter="true"/>
+    </x:Array>
+
+    <!-- The converters used by the binding in the XAML code -->
+    <local:InkEditingModeOptionIsCheckedConverter x:Key="InkEditingModeOptionIsCheckedConverter"/>
+    <local:EditingModeIsCheckedConverter x:Key="EditingModeIsCheckedConverter"/>
+    <local:EditingModeIdToDrawingAttributesConverter x:Key="EditingModeIdToDrawingAttributesConverter"/>
+    <local:DrawingAttributesDropDownItemCaptionConverter x:Key="DrawingAttributesDropDownItemCaptionConverter"/>
+    <local:DrawingAttributesMenuCaptionConverter x:Key="DrawingAttributesMenuCaptionConverter"/>
+    <local:EraserNameConverter x:Key="EraserNameConverter"/>
+    <local:CurrentDrawingAttributesConverter x:Key="CurrentDrawingAttributesConverter"/>
+
+    <!-- The DrawingBrush which is used for drawing the background rule lines -->
+    <DrawingBrush x:Key="RuleLines" Viewbox="0,0,3000,32" ViewboxUnits="Absolute" Viewport="0,0,3000,32" ViewportUnits="Absolute" AlignmentX="Left" AlignmentY="Top" TileMode="Tile" Stretch="None">
+      <DrawingBrush.Drawing>
+        <GeometryDrawing Geometry="M 0, 31.5 L 3000, 31.5">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#40000000" Thickness="1" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+      </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <!-- The DataTemplate which is used by the menu items -->
+    <DataTemplate x:Key="DrawingAttributesMenuItemHeaderTemplate" DataType="{x:Type DrawingAttributes}">
+      <ContentPresenter Content="{Binding Converter={StaticResource DrawingAttributesMenuCaptionConverter}}" />
+    </DataTemplate>
+
+    <!-- The DataTemplate which is used by the dropdown items -->
+    <DataTemplate x:Key="DrawingAttributesDropDownItemTemplate" DataType="{x:Type DrawingAttributes}">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="25" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <!-- DrawingAttributes Icon -->
+        <Border x:Name="Icon" Grid.Column="0" />
+        <!-- DrawingAttributes string name -->
+        <TextBlock  Margin="3,0,0,0" Grid.Column="1" 
+            Text="{Binding Converter={StaticResource DrawingAttributesDropDownItemCaptionConverter}}"/>
+      </Grid>
+      <DataTemplate.Triggers>
+        <DataTrigger Binding="{Binding IsHighlighter}"
+                     Value="false">
+          <Setter Property="Background" TargetName="Icon">
+            <Setter.Value>
+              <DrawingBrush Viewbox="0,0,27,27" ViewboxUnits="Absolute" Viewport="0,0,1,1" AlignmentX="Center" AlignmentY="Center" Stretch="None">
+                <DrawingBrush.Drawing>
+                  <GeometryDrawing Geometry="M 0, 14 L 27, 14">
+                    <GeometryDrawing.Pen>
+                      <Pen Thickness="{Binding Path=Height}">
+                        <Pen.Brush>
+                          <SolidColorBrush Color="{Binding Path=Color}" />
+                        </Pen.Brush>
+                      </Pen>
+                    </GeometryDrawing.Pen>
+                  </GeometryDrawing>
+                </DrawingBrush.Drawing>
+              </DrawingBrush>
+            </Setter.Value>
+          </Setter>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding IsHighlighter}"
+                     Value="true">
+          <Setter Property="Background" TargetName="Icon">
+            <Setter.Value>
+              <DrawingBrush Viewbox="0,0,50,50" ViewboxUnits="Absolute" ViewportUnits="RelativeToBoundingBox" Viewport="0,0,1,1" AlignmentX="Center" AlignmentY="Center" TileMode="Tile">
+                <DrawingBrush.Drawing>
+                  <GeometryDrawing Geometry="M 0, 25 L 50, 25">
+                    <GeometryDrawing.Pen>
+                      <Pen Thickness="{Binding Path=Height}">
+                        <Pen.Brush>
+                          <SolidColorBrush Color="{Binding Path=Color}" />
+                        </Pen.Brush>
+                      </Pen>
+                    </GeometryDrawing.Pen>
+                  </GeometryDrawing>
+                </DrawingBrush.Drawing>
+              </DrawingBrush>
+            </Setter.Value>
+          </Setter>
+        </DataTrigger>
+      </DataTemplate.Triggers>
+    </DataTemplate>
+
+    <!-- The PointEraser Icon -->
+    <DrawingBrush x:Key="PointEraserIcon" ViewportUnits="RelativeToBoundingBox" Viewport="0,0,1,1" AlignmentX="Center" AlignmentY="Center" TileMode="Tile">
+      <DrawingBrush.Drawing>
+        <DrawingGroup>
+          <DrawingGroup.Children>
+            <GeometryDrawing 
+              Geometry="M 5, 5 L 16, 5 L 26, 15 L 15, 15 L 5, 5 z M 5, 10 L 15, 19 L 15, 15 L 5, 5 z M 15, 15 L 15, 19 L 26, 19 L 26, 15 L 15, 15 z">
+              <GeometryDrawing.Pen>
+                <Pen Brush="Gray" Thickness="0.7" />
+              </GeometryDrawing.Pen>
+              <GeometryDrawing.Brush>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                  <GradientBrush.GradientStops>
+                    <GradientStop Color="#FFF0F2FF" Offset="0" />
+                    <GradientStop Color="#FFB4CFF8" Offset="1" />
+                  </GradientBrush.GradientStops>
+                </LinearGradientBrush>
+              </GeometryDrawing.Brush>
+            </GeometryDrawing>
+          </DrawingGroup.Children>
+        </DrawingGroup>
+      </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <!-- The DataTemplate which is used by the eraser dropdown items -->
+    <DataTemplate x:Key="EraserDropDownItemTemplate" DataType="{x:Type local:EditingModeId}">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="25" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Border x:Name="Icon" Grid.Column="0" Background="{StaticResource PointEraserIcon}"/>
+        <TextBlock  Margin="3,0,0,0" Grid.Column="1" 
+            Text="{Binding Converter={StaticResource EraserNameConverter}}"/>
+      </Grid>
+      <DataTemplate.Triggers>
+        <DataTrigger Binding="{Binding }" Value="{x:Static local:EditingModeId.StrokeEraser}">
+          <Setter Property="Background" TargetName="Icon">
+            <Setter.Value>
+              <DrawingBrush ViewportUnits="RelativeToBoundingBox" Viewport="0,0,1,1" AlignmentX="Center" AlignmentY="Center" TileMode="Tile">
+                <DrawingBrush.Drawing>
+                  <DrawingGroup>
+                    <DrawingGroup.Children>
+                      <GeometryDrawing 
+                        Geometry="M 5, 5 L 16, 5 L 26, 15 L 15, 15 L 5, 5 z M 5, 10 L 15, 19 L 15, 15 L 5, 5 z M 15, 15 L 15, 19 L 26, 19 L 26, 15 L 15, 15 z M 10, 22 L 24, 22">
+                        <GeometryDrawing.Pen>
+                          <Pen Brush="Gray" Thickness="0.7" />
+                        </GeometryDrawing.Pen>
+                        <GeometryDrawing.Brush>
+                          <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientBrush.GradientStops>
+                              <GradientStop Color="#FFF0F2FF" Offset="0" />
+                              <GradientStop Color="#FFB4CFF8" Offset="1" />
+                            </GradientBrush.GradientStops>
+                          </LinearGradientBrush>
+                        </GeometryDrawing.Brush>
+                      </GeometryDrawing>
+                    </DrawingGroup.Children>
+                  </DrawingGroup>
+                </DrawingBrush.Drawing>
+              </DrawingBrush>
+            </Setter.Value>
+          </Setter>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding }" Value="{x:Static local:EditingModeId.PointEraser1}">
+          <Setter Property="RenderTransform" TargetName="Icon">
+            <Setter.Value>
+              <ScaleTransform ScaleX="0.6" ScaleY="0.6" CenterX="12.5" CenterY="8"/>
+            </Setter.Value>
+          </Setter>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding }" Value="{x:Static local:EditingModeId.PointEraser2}">
+          <Setter Property="RenderTransform" TargetName="Icon">
+            <Setter.Value>
+              <ScaleTransform ScaleX="0.8" ScaleY="0.8" CenterX="12.5" CenterY="8"/>
+            </Setter.Value>
+          </Setter>
+        </DataTrigger>
+      </DataTemplate.Triggers>
+    </DataTemplate>
+
+    <!-- The DataTemplate which is used by the eraser menu items -->
+    <DataTemplate x:Key="EraserMenuItemHeaderTemplate" DataType="{x:Type local:EditingModeId}">
+      <ContentPresenter Content="{Binding Converter={StaticResource EraserNameConverter}}"/>
+    </DataTemplate>
+
+    <!-- The DataTemplate which is used by the pen and highlighter toolbar button -->
+    <DataTemplate x:Key="PenToolBarButtonTemplate" DataType="{x:Type DrawingAttributes}">
+      <DockPanel LastChildFill="true">
+        <Line X1="0" X2="16" StrokeThickness="1.5" DockPanel.Dock="Bottom">
+          <Line.Stroke>
+            <SolidColorBrush Color="{Binding Path=Color}"/>
+          </Line.Stroke>
+        </Line>
+        <Border x:Name="Icon" Height="14.5" />
+      </DockPanel>
+      <DataTemplate.Triggers>
+        <DataTrigger Binding="{Binding IsHighlighter}"
+                     Value="false">
+          <Setter Property="Background" TargetName="Icon">
+            <Setter.Value>
+              <DrawingBrush Viewbox="0,0,23,23" ViewboxUnits="Absolute" Viewport="0,0,1,1" ViewportUnits="RelativeToBoundingBox" TileMode="Tile">
+                <DrawingBrush.Drawing>
+                  <DrawingGroup>
+                    <GeometryDrawing Geometry="M 17, 2 L 19, 2 L 19, 15 L 18, 20 L 17, 15 L 17,2 z">
+                      <GeometryDrawing.Pen>
+                        <Pen Thickness="0.5">
+                          <Pen.Brush>
+                            <SolidColorBrush Color="Black" />
+                          </Pen.Brush>
+                        </Pen>
+                      </GeometryDrawing.Pen>
+                      <GeometryDrawing.Brush>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                          <GradientBrush.GradientStops>
+                            <GradientStop Color="#FFF0F2FF" Offset="0" />
+                            <GradientStop Color="#FFB4CFF8" Offset="1" />
+                          </GradientBrush.GradientStops>
+                        </LinearGradientBrush>
+                      </GeometryDrawing.Brush>
+                    </GeometryDrawing>
+                  </DrawingGroup>
+                </DrawingBrush.Drawing>
+              </DrawingBrush>
+            </Setter.Value>
+          </Setter>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding IsHighlighter}"
+                     Value="true">
+          <Setter Property="Background" TargetName="Icon">
+            <Setter.Value>
+              <DrawingBrush Viewbox="0,0,23,23" ViewboxUnits="Absolute" Viewport="0,0,1,1" ViewportUnits="RelativeToBoundingBox" TileMode="Tile">
+                <DrawingBrush.Drawing>
+                  <DrawingGroup>
+                    <GeometryDrawing Geometry="M 15.5, 2 L 20.5, 2 L 20.5, 18 A 2,2 90 0 1 18.5,20 L 17.5, 20 A 2,2 90 0 1 15.5,18 L 15.5, 15 L 15.5,2 z">
+                      <GeometryDrawing.Pen>
+                        <Pen Thickness="0.5">
+                          <Pen.Brush>
+                            <SolidColorBrush Color="Black" />
+                          </Pen.Brush>
+                        </Pen>
+                      </GeometryDrawing.Pen>
+                      <GeometryDrawing.Brush>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                          <GradientBrush.GradientStops>
+                            <GradientStop Color="#FFF0F2FF" Offset="0" />
+                            <GradientStop Color="#FFB4CF00" Offset="1" />
+                          </GradientBrush.GradientStops>
+                        </LinearGradientBrush>
+                      </GeometryDrawing.Brush>
+                    </GeometryDrawing>
+                  </DrawingGroup>
+                </DrawingBrush.Drawing>
+              </DrawingBrush>
+            </Setter.Value>
+          </Setter>
+        </DataTrigger>
+      </DataTemplate.Triggers>
+    </DataTemplate>
+
+    <!-- The DataTemplate which is used by the eraser toolbar button -->
+    <DataTemplate x:Key="EraserToolBarButtonTemplate" DataType="{x:Type local:EditingModeId}">
+      <Border x:Name="Icon" Height="16" Width="16" Background="{StaticResource PointEraserIcon}"/>
+      <DataTemplate.Triggers>
+        <DataTrigger Binding="{Binding }" Value="{x:Static local:EditingModeId.StrokeEraser}">
+          <Setter Property="Background" TargetName="Icon">
+            <Setter.Value>
+              <DrawingBrush ViewportUnits="RelativeToBoundingBox" Viewport="0,0,1,1" AlignmentX="Center" AlignmentY="Center" TileMode="Tile">
+                <DrawingBrush.Drawing>
+                  <DrawingGroup>
+                    <DrawingGroup.Children>
+                      <GeometryDrawing 
+                        Geometry="M 5, 5 L 16, 5 L 26, 15 L 15, 15 L 5, 5 z M 5, 10 L 15, 19 L 15, 15 L 5, 5 z M 15, 15 L 15, 19 L 26, 19 L 26, 15 L 15, 15 z M 10, 22 L 24, 22">
+                        <GeometryDrawing.Pen>
+                          <Pen Brush="Gray" Thickness="0.7" />
+                        </GeometryDrawing.Pen>
+                        <GeometryDrawing.Brush>
+                          <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientBrush.GradientStops>
+                              <GradientStop Color="#FFF0F2FF" Offset="0" />
+                              <GradientStop Color="#FFB4CFF8" Offset="1" />
+                            </GradientBrush.GradientStops>
+                          </LinearGradientBrush>
+                        </GeometryDrawing.Brush>
+                      </GeometryDrawing>
+                    </DrawingGroup.Children>
+                  </DrawingGroup>
+                </DrawingBrush.Drawing>
+              </DrawingBrush>
+            </Setter.Value>
+          </Setter>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding }" Value="{x:Static local:EditingModeId.PointEraser1}">
+          <Setter Property="RenderTransform" TargetName="Icon">
+            <Setter.Value>
+              <ScaleTransform ScaleX="0.6" ScaleY="0.6" CenterX="8" CenterY="8"/>
+            </Setter.Value>
+          </Setter>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding }" Value="{x:Static local:EditingModeId.PointEraser2}">
+          <Setter Property="RenderTransform" TargetName="Icon">
+            <Setter.Value>
+              <ScaleTransform ScaleX="0.8" ScaleY="0.8" CenterX="8" CenterY="8"/>
+            </Setter.Value>
+          </Setter>
+        </DataTrigger>
+      </DataTemplate.Triggers>
+    </DataTemplate>
+
+    <!-- The dropdown menu style which is used by the split buttons -->
+    <Style x:Key="DropDownMenu" 
+           TargetType="{x:Type Menu}"
+           BasedOn="{StaticResource {x:Static ToolBar.MenuStyleKey}}">
+      <Setter Property="IsMainMenu" Value="false"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Margin" Value="0,-1,-1,-1"/>
+      <Setter Property="Padding" Value="0"/>
+    </Style>
+
+    <!-- The style of the pen toolbar button-->
+    <Style x:Key="PenSplitButtonKey"
+           TargetType="{x:Type ContentControl}">
+      <Setter Property="SnapsToDevicePixels" Value="true"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="{x:Type ContentControl}">
+            <RadioButton Style="{StaticResource {x:Static ToolBar.RadioButtonStyleKey}}"
+                     IsChecked="{Binding ElementName=MyWindow,Path=EditingMode,Mode=TwoWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.CurrentPen}}"
+                     Command="local:SampleWindow.EditingCommand" 
+                     CommandParameter="{x:Static local:EditingModeId.CurrentPen}"
+                     Padding="0">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Menu Grid.Column="1" Style="{StaticResource DropDownMenu}">
+                  <MenuItem Padding="1,2,2,2" Margin="0"
+                            Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type Menu}}, Path=ActualHeight}">
+                    <MenuItem.Header>
+                      <Path x:Name="ArrowDownPath"
+                            Data="M 2.5 0 L 8.5 0 L 5.5 3 Z"
+                            Fill="black"
+                            VerticalAlignment="Center"/>
+                    </MenuItem.Header>
+                    <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=CurrentPenMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.Pen1}}"
+                              Command="local:SampleWindow.EditingCommand" 
+                              CommandParameter="{x:Static local:EditingModeId.Pen1}"
+                              Header="{Binding ElementName=MyWindow,Path=DrawingAttributesCollection,Mode=OneWay,Converter={StaticResource EditingModeIdToDrawingAttributesConverter},ConverterParameter={x:Static local:EditingModeId.Pen1}}" 
+                              HeaderTemplate="{StaticResource DrawingAttributesDropDownItemTemplate}">
+                    </MenuItem>
+                    <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=CurrentPenMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.Pen2}}"
+                              Command="local:SampleWindow.EditingCommand" 
+                              CommandParameter="{x:Static local:EditingModeId.Pen2}"
+                              Header="{Binding ElementName=MyWindow,Path=DrawingAttributesCollection,Mode=OneWay,Converter={StaticResource EditingModeIdToDrawingAttributesConverter},ConverterParameter={x:Static local:EditingModeId.Pen2}}" 
+                              HeaderTemplate="{StaticResource DrawingAttributesDropDownItemTemplate}">
+                    </MenuItem>
+
+                    <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=CurrentPenMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.Pen3}}"
+                              Command="local:SampleWindow.EditingCommand" 
+                              CommandParameter="{x:Static local:EditingModeId.Pen3}"
+                              Header="{Binding ElementName=MyWindow,Path=DrawingAttributesCollection,Mode=OneWay,Converter={StaticResource EditingModeIdToDrawingAttributesConverter},ConverterParameter={x:Static local:EditingModeId.Pen3}}" 
+                              HeaderTemplate="{StaticResource DrawingAttributesDropDownItemTemplate}">
+                    </MenuItem>
+                    <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=CurrentPenMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.Pen4}}"
+                              Command="local:SampleWindow.EditingCommand" 
+                              CommandParameter="{x:Static local:EditingModeId.Pen4}"
+                              Header="{Binding ElementName=MyWindow,Path=DrawingAttributesCollection,Mode=OneWay,Converter={StaticResource EditingModeIdToDrawingAttributesConverter},ConverterParameter={x:Static local:EditingModeId.Pen4}}" 
+                              HeaderTemplate="{StaticResource DrawingAttributesDropDownItemTemplate}">
+                    </MenuItem>
+                    <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=CurrentPenMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.Pen5}}"
+                              Command="local:SampleWindow.EditingCommand" 
+                              CommandParameter="{x:Static local:EditingModeId.Pen5}"
+                              Header="{Binding ElementName=MyWindow,Path=DrawingAttributesCollection,Mode=OneWay,Converter={StaticResource EditingModeIdToDrawingAttributesConverter},ConverterParameter={x:Static local:EditingModeId.Pen5}}" 
+                              HeaderTemplate="{StaticResource DrawingAttributesDropDownItemTemplate}">
+                    </MenuItem>
+                  </MenuItem>
+                </Menu>
+                <ContentPresenter Margin="2" Grid.Column="0" 
+                             Content="{TemplateBinding Content}"
+                             ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                <Border Grid.Column="1" 
+                        Margin="0,-1,-1,-1" 
+                        BorderThickness="{Binding RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}, Mode=OneWay,Path=BorderThickness}" 
+                        BorderBrush="{Binding RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}, Mode=OneWay,Path=BorderBrush}"/>
+              </Grid>
+            </RadioButton>
+            </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- The style of the highlighter toolbar button-->
+    <Style x:Key="HighlighterSplitButtonKey"
+           TargetType="{x:Type ContentControl}">
+      <Setter Property="SnapsToDevicePixels" Value="true"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="{x:Type ContentControl}">
+            <RadioButton Style="{StaticResource {x:Static ToolBar.RadioButtonStyleKey}}"
+                     IsChecked="{Binding ElementName=MyWindow,Path=EditingMode,Mode=TwoWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.CurrentHighlighter}}"
+                     Command="local:SampleWindow.EditingCommand" 
+                     CommandParameter="{x:Static local:EditingModeId.CurrentHighlighter}"
+                     Padding="0">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Menu Grid.Column="1" Style="{StaticResource DropDownMenu}">
+                  <MenuItem Padding="1,2,2,2" Margin="0"
+                            Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type Menu}}, Path=ActualHeight}">
+                    <MenuItem.Header>
+                      <Path x:Name="ArrowDownPath"
+                            Data="M 2.5 0 L 8.5 0 L 5.5 3 Z"
+                            Fill="black"
+                            VerticalAlignment="Center"/>
+                    </MenuItem.Header>
+                    <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=CurrentHighlighterMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.Highlighter1}}"
+                              Command="local:SampleWindow.EditingCommand" 
+                              CommandParameter="{x:Static local:EditingModeId.Highlighter1}"
+                              Header="{Binding ElementName=MyWindow,Path=DrawingAttributesCollection,Mode=OneWay,Converter={StaticResource EditingModeIdToDrawingAttributesConverter},ConverterParameter={x:Static local:EditingModeId.Highlighter1}}" 
+                              HeaderTemplate="{StaticResource DrawingAttributesDropDownItemTemplate}">
+                    </MenuItem>
+                    <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=CurrentHighlighterMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.Highlighter2}}"
+                              Command="local:SampleWindow.EditingCommand" 
+                              CommandParameter="{x:Static local:EditingModeId.Highlighter2}"
+                              Header="{Binding ElementName=MyWindow,Path=DrawingAttributesCollection,Mode=OneWay,Converter={StaticResource EditingModeIdToDrawingAttributesConverter},ConverterParameter={x:Static local:EditingModeId.Highlighter2}}" 
+                              HeaderTemplate="{StaticResource DrawingAttributesDropDownItemTemplate}">
+                    </MenuItem>
+                    <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=CurrentHighlighterMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.Highlighter3}}"
+                              Command="local:SampleWindow.EditingCommand" 
+                              CommandParameter="{x:Static local:EditingModeId.Highlighter3}"
+                              Header="{Binding ElementName=MyWindow,Path=DrawingAttributesCollection,Mode=OneWay,Converter={StaticResource EditingModeIdToDrawingAttributesConverter},ConverterParameter={x:Static local:EditingModeId.Highlighter3}}" 
+                              HeaderTemplate="{StaticResource DrawingAttributesDropDownItemTemplate}">
+                    </MenuItem>
+                    <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=CurrentHighlighterMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.Highlighter4}}"
+                              Command="local:SampleWindow.EditingCommand" 
+                              CommandParameter="{x:Static local:EditingModeId.Highlighter4}"
+                              Header="{Binding ElementName=MyWindow,Path=DrawingAttributesCollection,Mode=OneWay,Converter={StaticResource EditingModeIdToDrawingAttributesConverter},ConverterParameter={x:Static local:EditingModeId.Highlighter4}}" 
+                              HeaderTemplate="{StaticResource DrawingAttributesDropDownItemTemplate}">
+                    </MenuItem>
+                    <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=CurrentHighlighterMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.Highlighter5}}"
+                              Command="local:SampleWindow.EditingCommand" 
+                              CommandParameter="{x:Static local:EditingModeId.Highlighter5}"
+                              Header="{Binding ElementName=MyWindow,Path=DrawingAttributesCollection,Mode=OneWay,Converter={StaticResource EditingModeIdToDrawingAttributesConverter},ConverterParameter={x:Static local:EditingModeId.Highlighter5}}" 
+                              HeaderTemplate="{StaticResource DrawingAttributesDropDownItemTemplate}">
+                    </MenuItem>
+                  </MenuItem>
+                </Menu>
+                <ContentPresenter Margin="2" Grid.Column="0" 
+                             Content="{TemplateBinding Content}"
+                             ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                <Border Grid.Column="1" 
+                        Margin="0,-1,-1,-1" 
+                        BorderThickness="{Binding RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}, Mode=OneWay,Path=BorderThickness}" 
+                        BorderBrush="{Binding RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}, Mode=OneWay,Path=BorderBrush}"/>
+              </Grid>
+            </RadioButton>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- The style of the eraser toolbar button-->
+    <Style x:Key="EraserSplitButtonKey"
+           TargetType="{x:Type ContentControl}">
+      <Setter Property="SnapsToDevicePixels" Value="true"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="{x:Type ContentControl}">
+            <RadioButton Style="{StaticResource {x:Static ToolBar.RadioButtonStyleKey}}"
+                     IsChecked="{Binding ElementName=MyWindow,Path=EditingMode,Mode=TwoWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.CurrentEraser}}"
+                     Command="local:SampleWindow.EditingCommand" 
+                     CommandParameter="{x:Static local:EditingModeId.CurrentEraser}"
+                     Padding="0">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Menu Grid.Column="1" Style="{StaticResource DropDownMenu}">
+                  <MenuItem Padding="1,2,2,2" Margin="0"
+                            Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type Menu}}, Path=ActualHeight}">
+                    <MenuItem.Header>
+                      <Path x:Name="ArrowDownPath"
+                            Data="M 2.5 0 L 8.5 0 L 5.5 3 Z"
+                            Fill="black"
+                            VerticalAlignment="Center"/>
+                    </MenuItem.Header>
+                    <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=CurrentEraserMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.PointEraser1}}"
+                              Command="local:SampleWindow.EditingCommand" 
+                              CommandParameter="{x:Static local:EditingModeId.PointEraser1}"
+                              Header="{x:Static local:EditingModeId.PointEraser1}"
+                              HeaderTemplate="{StaticResource EraserDropDownItemTemplate}"/>
+                    <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=CurrentEraserMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.PointEraser2}}"
+                              Command="local:SampleWindow.EditingCommand" 
+                              CommandParameter="{x:Static local:EditingModeId.PointEraser2}"
+                              Header="{x:Static local:EditingModeId.PointEraser2}"
+                              HeaderTemplate="{StaticResource EraserDropDownItemTemplate}"/>
+                    <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=CurrentEraserMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.PointEraser3}}"
+                              Command="local:SampleWindow.EditingCommand" 
+                              CommandParameter="{x:Static local:EditingModeId.PointEraser3}"
+                              Header="{x:Static local:EditingModeId.PointEraser3}"
+                              HeaderTemplate="{StaticResource EraserDropDownItemTemplate}"/>
+                    <Separator/>
+                    <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=CurrentEraserMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.StrokeEraser}}"
+                              Command="local:SampleWindow.EditingCommand"
+                              CommandParameter="{x:Static local:EditingModeId.StrokeEraser}"
+                              Header="{x:Static local:EditingModeId.StrokeEraser}"
+                              HeaderTemplate="{StaticResource EraserDropDownItemTemplate}"/>
+                  </MenuItem>
+                </Menu>
+                <ContentPresenter Margin="2" Grid.Column="0" 
+                             Content="{TemplateBinding Content}"
+                             ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                <Border Grid.Column="1" 
+                        Margin="0,-1,-1,-1" 
+                        BorderThickness="{Binding RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}, Mode=OneWay,Path=BorderThickness}" 
+                        BorderBrush="{Binding RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}, Mode=OneWay,Path=BorderBrush}"/>
+              </Grid>
+            </RadioButton>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="GestureInfoTextBlockKey"
+           TargetType="{x:Type TextBlock}">
+      <Setter Property="Visibility" Value="Collapsed"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding ElementName=MyInkCanvas,Path=ActiveEditingMode}" Value="GestureOnly">
+          <Setter Property="Visibility" Value="Visible"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+    
+  </Window.Resources>
+
+  <!-- The main UI tree -->
+  <DockPanel>
+    
+    <!-- The top level menu -->
+    <Menu DockPanel.Dock="Top">
+      <MenuItem Header="Action">
+        <MenuItem Header="Undo" Command="ApplicationCommands.Undo"/>
+        <MenuItem Header="Redo" Command="ApplicationCommands.Redo"/>
+        <Separator/>
+        <MenuItem Header="Clear" Command="local:SampleWindow.ClearCommand"/>
+        <Separator/>
+        <MenuItem Header="Exit" Command="ApplicationCommands.Close"/>
+      </MenuItem>
+      <MenuItem Header="Tools">
+        <MenuItem Header="Pen">
+          <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=EditingMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.Pen1}}"
+                    Command="local:SampleWindow.EditingCommand" 
+                    CommandParameter="{x:Static local:EditingModeId.Pen1}"
+                    Header="{Binding ElementName=MyWindow,Path=DrawingAttributesCollection,Mode=OneWay,Converter={StaticResource EditingModeIdToDrawingAttributesConverter},ConverterParameter={x:Static local:EditingModeId.Pen1}}" 
+                    HeaderTemplate="{StaticResource DrawingAttributesMenuItemHeaderTemplate}"/>
+          <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=EditingMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.Pen2}}"
+                    Command="local:SampleWindow.EditingCommand" 
+                    CommandParameter="{x:Static local:EditingModeId.Pen2}"
+                    Header="{Binding ElementName=MyWindow,Path=DrawingAttributesCollection,Mode=OneWay,Converter={StaticResource EditingModeIdToDrawingAttributesConverter},ConverterParameter={x:Static local:EditingModeId.Pen2}}" 
+                    HeaderTemplate="{StaticResource DrawingAttributesMenuItemHeaderTemplate}"/>
+          <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=EditingMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.Pen3}}"
+                    Command="local:SampleWindow.EditingCommand"
+                    CommandParameter="{x:Static local:EditingModeId.Pen3}"
+                    Header="{Binding ElementName=MyWindow,Path=DrawingAttributesCollection,Mode=OneWay,Converter={StaticResource EditingModeIdToDrawingAttributesConverter},ConverterParameter={x:Static local:EditingModeId.Pen3}}" 
+                    HeaderTemplate="{StaticResource DrawingAttributesMenuItemHeaderTemplate}"/>
+          <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=EditingMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.Pen4}}"
+                    Command="local:SampleWindow.EditingCommand" 
+                    CommandParameter="{x:Static local:EditingModeId.Pen4}"
+                    Header="{Binding ElementName=MyWindow,Path=DrawingAttributesCollection,Mode=OneWay,Converter={StaticResource EditingModeIdToDrawingAttributesConverter},ConverterParameter={x:Static local:EditingModeId.Pen4}}" 
+                    HeaderTemplate="{StaticResource DrawingAttributesMenuItemHeaderTemplate}"/>
+          <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=EditingMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.Pen5}}"
+                    Command="local:SampleWindow.EditingCommand" 
+                    CommandParameter="{x:Static local:EditingModeId.Pen5}"
+                    Header="{Binding ElementName=MyWindow,Path=DrawingAttributesCollection,Mode=OneWay,Converter={StaticResource EditingModeIdToDrawingAttributesConverter},ConverterParameter={x:Static local:EditingModeId.Pen5}}" 
+                    HeaderTemplate="{StaticResource DrawingAttributesMenuItemHeaderTemplate}"/>
+        </MenuItem>
+        <MenuItem Header="Highlighter">
+          <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=EditingMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.Highlighter1}}"
+                    Command="local:SampleWindow.EditingCommand" 
+                    CommandParameter="{x:Static local:EditingModeId.Highlighter1}"
+                    Header="{Binding ElementName=MyWindow,Path=DrawingAttributesCollection,Mode=OneWay,Converter={StaticResource EditingModeIdToDrawingAttributesConverter},ConverterParameter={x:Static local:EditingModeId.Highlighter1}}" 
+                    HeaderTemplate="{StaticResource DrawingAttributesMenuItemHeaderTemplate}"/>
+          <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=EditingMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.Highlighter2}}"
+                    Command="local:SampleWindow.EditingCommand" 
+                    CommandParameter="{x:Static local:EditingModeId.Highlighter2}"
+                    Header="{Binding ElementName=MyWindow,Path=DrawingAttributesCollection,Mode=OneWay,Converter={StaticResource EditingModeIdToDrawingAttributesConverter},ConverterParameter={x:Static local:EditingModeId.Highlighter2}}" 
+                    HeaderTemplate="{StaticResource DrawingAttributesMenuItemHeaderTemplate}"/>
+          <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=EditingMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.Highlighter3}}"
+                    Command="local:SampleWindow.EditingCommand" 
+                    CommandParameter="{x:Static local:EditingModeId.Highlighter3}"
+                    Header="{Binding ElementName=MyWindow,Path=DrawingAttributesCollection,Mode=OneWay,Converter={StaticResource EditingModeIdToDrawingAttributesConverter},ConverterParameter={x:Static local:EditingModeId.Highlighter3}}" 
+                    HeaderTemplate="{StaticResource DrawingAttributesMenuItemHeaderTemplate}"/>
+          <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=EditingMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.Highlighter4}}"
+                    Command="local:SampleWindow.EditingCommand" 
+                    CommandParameter="{x:Static local:EditingModeId.Highlighter4}"
+                    Header="{Binding ElementName=MyWindow,Path=DrawingAttributesCollection,Mode=OneWay,Converter={StaticResource EditingModeIdToDrawingAttributesConverter},ConverterParameter={x:Static local:EditingModeId.Highlighter4}}" 
+                    HeaderTemplate="{StaticResource DrawingAttributesMenuItemHeaderTemplate}"/>
+          <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=EditingMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.Highlighter5}}"
+                    Command="local:SampleWindow.EditingCommand" 
+                    CommandParameter="{x:Static local:EditingModeId.Highlighter5}"
+                    Header="{Binding ElementName=MyWindow,Path=DrawingAttributesCollection,Mode=OneWay,Converter={StaticResource EditingModeIdToDrawingAttributesConverter},ConverterParameter={x:Static local:EditingModeId.Highlighter5}}" 
+                    HeaderTemplate="{StaticResource DrawingAttributesMenuItemHeaderTemplate}"/>
+        </MenuItem>
+        <MenuItem Header="Selection Tool"
+                  IsChecked="{Binding ElementName=MyWindow,Path=EditingMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.SelectionTool}}"
+                  Command="local:SampleWindow.EditingCommand" 
+                  CommandParameter="{x:Static local:EditingModeId.SelectionTool}"/>
+        <MenuItem Header="Eraser">
+          <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=EditingMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.PointEraser1}}"
+                    Command="local:SampleWindow.EditingCommand" 
+                    CommandParameter="{x:Static local:EditingModeId.PointEraser1}"
+                    Header="{x:Static local:EditingModeId.PointEraser1}"
+                    HeaderTemplate="{StaticResource EraserMenuItemHeaderTemplate}"/>
+          <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=EditingMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.PointEraser2}}"
+                    Command="local:SampleWindow.EditingCommand" 
+                    CommandParameter="{x:Static local:EditingModeId.PointEraser2}"
+                    Header="{x:Static local:EditingModeId.PointEraser2}"
+                    HeaderTemplate="{StaticResource EraserMenuItemHeaderTemplate}"/>
+          <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=EditingMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.PointEraser3}}"
+                    Command="local:SampleWindow.EditingCommand" 
+                    CommandParameter="{x:Static local:EditingModeId.PointEraser3}"
+                    Header="{x:Static local:EditingModeId.PointEraser3}"
+                    HeaderTemplate="{StaticResource EraserMenuItemHeaderTemplate}"/>
+          <Separator/>
+          <MenuItem IsChecked="{Binding ElementName=MyWindow,Path=EditingMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.StrokeEraser}}"
+                    Command="local:SampleWindow.EditingCommand" 
+                    CommandParameter="{x:Static local:EditingModeId.StrokeEraser}"
+                    Header="{x:Static local:EditingModeId.StrokeEraser}"
+                    HeaderTemplate="{StaticResource EraserMenuItemHeaderTemplate}"/>
+        </MenuItem>
+        <MenuItem Header="None"
+                  IsChecked="{Binding ElementName=MyWindow,Path=EditingMode,Mode=OneWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.None}}"
+                  Command="local:SampleWindow.EditingCommand" 
+                  CommandParameter="{x:Static local:EditingModeId.None}"/>
+      </MenuItem>
+      <MenuItem Header="Options">
+        <MenuItem Header="Ink And Gesture"
+                  IsChecked="{Binding ElementName=MyWindow,Path=CurrentInkModeOption,Mode=OneWay,Converter={StaticResource InkEditingModeOptionIsCheckedConverter},ConverterParameter={x:Static local:OptionId.InkAndGesture}}"
+                  Command="local:SampleWindow.OptionCommand" 
+                  CommandParameter="{x:Static local:OptionId.InkAndGesture}"/>
+        <MenuItem Header="Ink"
+                  IsChecked="{Binding ElementName=MyWindow,Path=CurrentInkModeOption,Mode=OneWay,Converter={StaticResource InkEditingModeOptionIsCheckedConverter},ConverterParameter={x:Static local:OptionId.Ink}}"
+                  Command="local:SampleWindow.OptionCommand" 
+                  CommandParameter="{x:Static local:OptionId.Ink}"/>
+        <MenuItem Header="Gesture Only"
+                  IsChecked="{Binding ElementName=MyWindow,Path=CurrentInkModeOption,Mode=OneWay,Converter={StaticResource InkEditingModeOptionIsCheckedConverter},ConverterParameter={x:Static local:OptionId.GestureOnly}}"
+                  Command="local:SampleWindow.OptionCommand" 
+                  CommandParameter="{x:Static local:OptionId.GestureOnly}"/>
+      </MenuItem>
+    </Menu>
+
+    <!-- The toolbar -->
+    <ToolBar DockPanel.Dock="Top">
+      <ContentControl Style="{StaticResource PenSplitButtonKey}"
+                      ContentTemplate="{StaticResource PenToolBarButtonTemplate}" Margin="2,0,2,0">
+        <ContentControl.Content>
+          <MultiBinding Converter="{StaticResource CurrentDrawingAttributesConverter}">
+            <Binding Mode="OneWay"
+                ElementName="MyWindow"
+                Path="CurrentPenMode" />
+            <Binding Mode="OneWay"
+                ElementName="MyWindow"
+                Path="DrawingAttributesCollection" />
+          </MultiBinding>
+        </ContentControl.Content>
+      </ContentControl>
+      <ContentControl Style="{StaticResource HighlighterSplitButtonKey}"
+                      ContentTemplate="{StaticResource PenToolBarButtonTemplate}" Margin="2,0,2,0">
+        <ContentControl.Content>
+          <MultiBinding Converter="{StaticResource CurrentDrawingAttributesConverter}">
+            <Binding Mode="OneWay"
+                ElementName="MyWindow"
+                Path="CurrentHighlighterMode" />
+            <Binding Mode="OneWay"
+                ElementName="MyWindow"
+                Path="DrawingAttributesCollection" />
+          </MultiBinding>
+        </ContentControl.Content>
+      </ContentControl>
+      <RadioButton IsChecked="{Binding ElementName=MyWindow,Path=EditingMode,Mode=TwoWay,Converter={StaticResource EditingModeIsCheckedConverter},ConverterParameter={x:Static local:EditingModeId.SelectionTool}}"
+                   Command="local:SampleWindow.EditingCommand" 
+                   CommandParameter="{x:Static local:EditingModeId.SelectionTool}" Margin="2,0,2,0">
+        <RadioButton.Content>
+          <Border Width="16" Height="16">
+            <Border.Background>
+              <DrawingBrush Viewbox="0,0,23,23" ViewboxUnits="Absolute" Viewport="0,0,1,1" ViewportUnits="RelativeToBoundingBox" TileMode="Tile">
+                <DrawingBrush.Drawing>
+                  <DrawingGroup>
+                    <GeometryDrawing Geometry="M 5, 5 L 21, 5 L 21, 21 L 5, 21 L 5,5z">
+                      <GeometryDrawing.Pen>
+                        <Pen Thickness="0.5">
+                          <Pen.DashStyle>
+                            <DashStyle Dashes="2,4" />
+                          </Pen.DashStyle>
+                          <Pen.Brush>
+                            <SolidColorBrush Color="Black" />
+                          </Pen.Brush>
+                        </Pen>
+                      </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                    <GeometryDrawing Geometry="M 2, 5 L 8, 5 M 5, 2 L 5, 8">
+                      <GeometryDrawing.Pen>
+                        <Pen Thickness="0.7">
+                          <Pen.Brush>
+                            <SolidColorBrush Color="Black" />
+                          </Pen.Brush>
+                        </Pen>
+                      </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                  </DrawingGroup>
+                </DrawingBrush.Drawing>
+              </DrawingBrush>
+            </Border.Background>
+          </Border>
+        </RadioButton.Content>
+      </RadioButton>
+      <ContentControl Style="{StaticResource EraserSplitButtonKey}"
+                      Content="{Binding ElementName=MyWindow, Path=CurrentEraserMode}"
+                      ContentTemplate="{StaticResource EraserToolBarButtonTemplate}"/>
+    </ToolBar>
+
+    <!-- The status bar -->
+    <StatusBar DockPanel.Dock="Bottom">
+        <TextBlock Text="Strokes Count = "/>
+        <TextBlock Text="{Binding ElementName=MyInkCanvas,Path=Strokes.Count}"/>
+        <Separator Margin="3,0,3,0"/>
+        <TextBlock Text="Active Editing Mode = "/>
+        <TextBlock Text="{Binding ElementName=MyInkCanvas,Path=ActiveEditingMode}"/>
+        <TextBlock Style="{StaticResource GestureInfoTextBlockKey}">
+          <Hyperlink x:Name="MyHyperline">Gesture Information</Hyperlink>          
+        </TextBlock>
+    </StatusBar>
+
+    <!-- The main content area -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+      <InkCanvas x:Name="MyInkCanvas" 
+                 Background="{StaticResource RuleLines}" 
+                 MinWidth="0" MinHeight="0">
+      </InkCanvas>
+    </ScrollViewer>
+  </DockPanel>
+</Window>

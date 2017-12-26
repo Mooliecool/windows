@@ -1,0 +1,40 @@
+﻿<Page
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Page1"
+    >
+  <Page.Resources>
+    <!-- connect to RSS feed exposed by WCF service via Plain Old XML (POX) -->
+    <!-- TODO: bring in WCF RSS feed via POX -->
+    <XmlDataProvider x:Key="RssData" Source="http://localhost/ServiceModelSamples/service.svc" XPath="rss/channel" />
+  </Page.Resources>
+  
+  <!-- bind to each item in the RSS -->
+  <Grid DataContext="{Binding Source={StaticResource RssData}, XPath=item}">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+
+    <!-- show a list of items in the left-hand column -->
+    <ListBox Grid.Column="0" ItemsSource="{Binding}" IsSynchronizedWithCurrentItem="True">
+      <ListBox.ItemTemplate>
+
+        <!-- show each item's title and link -->
+        <DataTemplate>
+          <StackPanel Orientation="Vertical">
+            <TextBlock FontSize="12pt" Foreground="Blue" Text="{Binding XPath=title}" />
+            <TextBlock>
+              <Hyperlink NavigateUri="{Binding XPath=link}">
+                <TextBlock FontSize="8pt" Foreground="Gray" Text="{Binding XPath=link}" />
+              </Hyperlink>
+            </TextBlock>
+          </StackPanel>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+
+    <!-- show the description for the selected item in the right-hand column -->
+    <TextBlock Grid.Column="1" Text="{Binding XPath=description}" />
+  </Grid>
+</Page>

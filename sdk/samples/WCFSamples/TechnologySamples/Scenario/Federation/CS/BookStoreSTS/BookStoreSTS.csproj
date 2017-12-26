@@ -1,0 +1,73 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{3D879B25-E8E3-4ADF-9004-2F9B5C8FA960}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FederationSample</RootNamespace>
+    <AssemblyName>BookStoreSTS</AssemblyName>
+    <StartupObject>
+    </StartupObject>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.IdentityModel, Version=3.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+    </Reference>
+    <Reference Include="System.Security" />
+    <Reference Include="System.ServiceModel, Version=3.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BookStoreSTSHost.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="BookStoreSTS.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServiceConstants.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="STS.svc" />
+    <None Include="Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="BookDB.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{B22E58A4-A415-4D85-A7C2-9636E6413A3F}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy "$(TargetDir)BookStoreSTS.dll" %25SystemDrive%25\inetpub\wwwroot\FederationSample\BookStoreSTS\bin
+           copy "$(TargetDir)Common.dll" %25SystemDrive%25\inetpub\wwwroot\FederationSample\BookStoreSTS\bin
+           copy "$(ProjectDir)STS.svc" %25SystemDrive%25\inetpub\wwwroot\FederationSample\BookStoreSTS
+           copy "$(ProjectDir)web.config" %25SystemDrive%25\inetpub\wwwroot\FederationSample\BookStoreSTS
+           copy "$(ProjectDir)BookDB.txt" %25SystemDrive%25\inetpub\wwwroot\FederationSample\BookStoreSTS</PostBuildEvent>
+  </PropertyGroup>
+</Project>

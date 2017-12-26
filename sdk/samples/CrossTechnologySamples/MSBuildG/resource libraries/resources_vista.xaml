@@ -1,0 +1,866 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="Microsoft.Samples.MSBuildG.Resources_Vista"
+	xmlns:wpf="clr-namespace:Microsoft.Samples.MSBuildG"
+	xmlns:dw="clr-namespace:Microsoft.Samples.MSBuildG" >
+
+  <!--Dialog Window Style-->
+  <Style x:Key="DialogWindowStyle" TargetType ="{x:Type dw:DialogWindow}">
+    <Setter Property ="BorderThickness" Value ="0"/>
+    <Setter Property ="WindowStyle" Value ="None"/>
+    <Setter Property ="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType ="{x:Type dw:DialogWindow}">
+          <Border Style="{DynamicResource WindowBorder}">
+            <DockPanel>
+
+              <!-- Begin Window Formatting and Bar -->
+              <Grid Style="{DynamicResource DialogWindowBar}">
+
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <StackPanel Style="{DynamicResource WindowControlButtons}">
+                  <Button Name="CloseWindowButton" Click="CloseDialogWindow" Style ="{DynamicResource DialogCloseButton}">X</Button>
+                </StackPanel>
+
+                <TextBlock Name="WindowTitleBar" Style="{DynamicResource DialogWindowTitle}" Text="{TemplateBinding Title}" MouseLeftButtonDown="MouseDown" />
+              </Grid>
+
+
+              <DockPanel DockPanel.Dock="Bottom" Background ="#545A60">
+                <StackPanel Background ="#545A60" DockPanel.Dock ="Bottom" Orientation ="Vertical">
+                  <Rectangle Fill ="#aaaaaa" Height ="1"/>
+                  <Rectangle Fill ="#1F2227" Height ="1"/>
+                  <StackPanel x:Name="ButtonBarPanel"  Height ="36" Orientation ="Horizontal" Margin ="0,0,4,0" HorizontalAlignment ="Right" VerticalAlignment ="Center">
+                  </StackPanel>
+                </StackPanel>
+
+                <Grid Style="{DynamicResource DialogContentGrid}">
+                  <!--Begin Window Content-->
+                  <ContentPresenter Content ="{TemplateBinding Content}" Margin ="4,4,4,4"/>
+                </Grid>
+
+              </DockPanel>
+
+            </DockPanel>
+          </Border>
+
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!--Main Window Style-->
+  <Style x:Key="WindowStyle" TargetType ="{x:Type Window}">
+    <Setter Property ="BorderThickness" Value ="0"/>
+    <Setter Property ="WindowStyle" Value ="None"/>
+    <Setter Property ="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType ="{x:Type Window}">
+
+          <Border Style="{DynamicResource WindowBorder}">
+            <DockPanel>
+
+              <!-- Begin Window Formatting and Bar -->
+              <Grid Style="{DynamicResource WindowBar}">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <!--Pre breaking change:  IsEnabled="{Binding RelativeSource=/TemplatedParent, Path=ResizeMode, Converter={StaticResource MaxConverter}}">[]</Button> -->
+                <StackPanel Style="{DynamicResource WindowControlButtons}">
+                  <Button Name="MinimizeWindowButton" Click="MinimizeWindow"  Style ="{DynamicResource ControlButton}">_</Button>
+                  <Button Name="MaximizeWindowButton" Click="MaximizeWindow" Style ="{DynamicResource ControlButton}">[]</Button>
+                  <Button Name="CloseWindowButton" Click="CloseWindow" Style ="{DynamicResource CloseButton}">X</Button>
+                </StackPanel>
+
+                <TextBlock Name="WindowTitleBar" Style="{DynamicResource WindowTitle}" Text="{TemplateBinding Title}"  MouseLeftButtonDown="MouseDown"/>
+
+                <Image Style="{DynamicResource WindowIcon}" Source="pack://application:,,,/Icons/Warning.ico"/>
+
+              </Grid>
+
+              <!--Begin Window Content-->
+              <ContentPresenter Content ="{TemplateBinding Content}"/>
+
+            </DockPanel>
+          </Border>
+
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+
+  <!--Navigation Window (used for Wizard) Style-->
+  <Style x:Key="NavWindowStyle" TargetType ="{x:Type Window}">
+    <Setter Property ="BorderThickness" Value ="0"/>
+    <Setter Property ="WindowStyle" Value ="None"/>
+    <Setter Property ="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType ="{x:Type Window}">
+
+          <Border Style="{DynamicResource WindowBorder}">
+            <DockPanel>
+
+              <!-- Begin Window Formatting and Bar -->
+              <Grid Style="{DynamicResource WindowBar}">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <StackPanel Style="{DynamicResource WindowControlButtons}">
+                  <Button Name="MinimizeWindowButton" Click="MinimizeWindow"  Style ="{DynamicResource ControlButton}">_</Button>
+                  <Button Name="MaximizeWindowButton" Click="MaximizeWindow" Style ="{DynamicResource ControlButton}">[]</Button>
+                  <Button Name="CloseWindowButton" Click="CloseWindow" Style ="{DynamicResource CloseButton}">X</Button>
+                </StackPanel>
+
+                <TextBlock Name="WindowTitleBar" Style="{DynamicResource WindowTitle}" Text="{TemplateBinding Title}"  MouseLeftButtonDown="MouseDown"/>
+
+                <Image Style="{DynamicResource WindowIcon}" Source="pack://application:,,,/Icons/Warning.ico"/>
+
+              </Grid>
+
+              <!--Begin Window Content-->
+
+              <Grid  Style="{DynamicResource ContentGrid}">
+
+                <DockPanel Background ="#1F2227">
+                  <!--Nav Bar-->
+
+                  <StackPanel DockPanel.Dock="Top" Name="NavContainer" Orientation ="Vertical">
+                    <StackPanel x:Name="NavigationBar"  Orientation ="Horizontal" Height ="70" Background ="#5D5D5D">
+                      <Button Name="NavigateBackButton" Click="NavigateBack"  Style ="{DynamicResource NavButton}" Margin ="4,0,0,0" IsEnabled="false">
+                        <Image Source ="pack://application:,,,/Icons/Warning.ico"/>
+                      </Button>
+                      <Button Name="NavigateNextButton" Click="NavigateNext" Style ="{DynamicResource NavButton}">
+                        <Image Source ="pack://application:,,,/Icons/Warning.ico"/>
+                      </Button>
+                    </StackPanel>
+
+                    <Rectangle Height ="1" Fill ="#aaaaaa" />
+                  </StackPanel>
+
+                  <!--Frame-->
+
+                  <Frame Name ="WizardFrame" VerticalAlignment="Stretch" Background ="black"></Frame>
+                </DockPanel>
+
+              </Grid>
+
+            </DockPanel>
+          </Border>
+
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+
+  <!-- Navigation Window (used for Wizard) Styles-->
+
+  <Storyboard x:Key="HideNavBar" BeginTime="{x:Null}" TargetProperty="(StackPanel.Opacity)">
+    <DoubleAnimation From="1"  To="0" Duration="0:0:1" RepeatBehavior="1x"/>
+  </Storyboard>
+
+  <Style x:Key ="NavButton" TargetType ="{x:Type Button}">
+    <Setter Property ="Width" Value ="52"/>
+    <Setter Property ="Height" Value ="52"/>
+    <Setter Property ="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType ="{x:Type Button}">
+          <Canvas>
+            <Ellipse Width ="52" Height ="52" StrokeThickness="5" Stroke="{DynamicResource NavButtonBorder}"/>
+            <Ellipse Name="TBack" Canvas.Top="6" Canvas.Left="6" Width ="40" Height ="40" StrokeThickness="1" Fill ="{DynamicResource NavButtonGradient}" Stroke ="darkblue"/>
+            <ContentPresenter Canvas.Top="11" Canvas.Left="13" Content ="{TemplateBinding Content}" Width ="28"/>
+          </Canvas>
+
+          <ControlTemplate.Triggers>
+            <Trigger Property ="IsEnabled" Value ="False">
+              <Setter TargetName ="TBack" Property ="Ellipse.Fill" Value ="{DynamicResource NavButtonDisabled}"/>
+              <Setter TargetName ="TBack" Property ="Ellipse.Stroke" Value ="gray"/>
+            </Trigger>
+
+            <Trigger Property ="IsPressed" Value ="True">
+              <Setter TargetName ="TBack" Property ="Ellipse.Fill" Value ="{DynamicResource NavButtonGradientReversed}"/>
+            </Trigger>
+
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <LinearGradientBrush x:Key="NavButtonBorder" StartPoint="0,0" EndPoint ="0,1">
+    <LinearGradientBrush.GradientStops>
+      <GradientStop Color ="#454545" Offset ="0"/>
+      <GradientStop Color ="#747474" Offset ="0.5"/>
+      <GradientStop Color ="#dcdcdc" Offset ="0.7"/>
+    </LinearGradientBrush.GradientStops>
+  </LinearGradientBrush>
+
+  <LinearGradientBrush x:Key ="NavButtonGradient" StartPoint="1,0" EndPoint ="0,1">
+    <LinearGradientBrush.GradientStops>
+      <GradientStop Offset ="0" Color ="#A5D6FF"/>
+      <GradientStop Offset ="0.3" Color ="#73BDFF"/>
+      <GradientStop Offset ="0.5" Color ="#2C9DFF"/>
+    </LinearGradientBrush.GradientStops>
+  </LinearGradientBrush>
+
+  <LinearGradientBrush x:Key ="NavButtonGradientReversed" StartPoint="0,1" EndPoint ="1,0">
+    <LinearGradientBrush.GradientStops>
+      <GradientStop Offset ="0" Color ="#A5D6FF"/>
+      <GradientStop Offset ="0.3" Color ="#73BDFF"/>
+      <GradientStop Offset ="0.5" Color ="#2C9DFF"/>
+    </LinearGradientBrush.GradientStops>
+  </LinearGradientBrush>
+
+
+  <LinearGradientBrush x:Key ="NavButtonDisabled" StartPoint="1,0" EndPoint ="0,1">
+    <LinearGradientBrush.GradientStops>
+      <GradientStop Offset ="0" Color ="#E0E0E0"/>
+      <GradientStop Offset ="0.3" Color ="#CBCBCB"/>
+      <GradientStop Offset ="0.5" Color ="#A9A9A9"/>
+    </LinearGradientBrush.GradientStops>
+  </LinearGradientBrush>
+
+
+  <!-- Window Bar Styles -->
+
+  <LinearGradientBrush x:Key ="BorderBrush" StartPoint="0,0" EndPoint ="1,0">
+    <LinearGradientBrush.GradientStops>
+      <GradientStop Offset ="0.3" Color ="darkgray"/>
+      <GradientStop Offset ="0.6" Color ="gray"/>
+      <GradientStop Offset ="0.9" Color ="darkgray"/>
+    </LinearGradientBrush.GradientStops>
+  </LinearGradientBrush>
+
+  <LinearGradientBrush x:Key ="BarBrush" StartPoint="0,0" EndPoint ="0,1">
+    <LinearGradientBrush.GradientStops>
+      <GradientStop Offset ="0.1" Color ="#D9D9D9"/>
+      <GradientStop Offset ="0.3" Color ="#BFBFBF"/>
+      <GradientStop Offset ="0.6" Color ="#B5B5B5"/>
+    </LinearGradientBrush.GradientStops>
+  </LinearGradientBrush>
+
+  <LinearGradientBrush x:Key ="GrayGradient" StartPoint="0,0" EndPoint ="0,1">
+    <LinearGradientBrush.GradientStops>
+      <GradientStop Offset ="0" Color ="#E0E0E0"/>
+      <GradientStop Offset ="0.3" Color ="#CBCBCB"/>
+      <GradientStop Offset ="0.5" Color ="#A9A9A9"/>
+    </LinearGradientBrush.GradientStops>
+  </LinearGradientBrush>
+
+  <LinearGradientBrush x:Key ="BlueGradient" StartPoint="0,0" EndPoint ="0,1">
+    <LinearGradientBrush.GradientStops>
+      <GradientStop Offset ="0" Color ="#A5D6FF"/>
+      <GradientStop Offset ="0.3" Color ="#73BDFF"/>
+      <GradientStop Offset ="0.5" Color ="#2C9DFF"/>
+    </LinearGradientBrush.GradientStops>
+  </LinearGradientBrush>
+
+
+  <LinearGradientBrush x:Key ="RedGradient" StartPoint="0,0" EndPoint ="0,1">
+    <LinearGradientBrush.GradientStops>
+      <GradientStop Offset ="0" Color ="#FFC5C5"/>
+      <GradientStop Offset ="0.3" Color ="#FF9E9E"/>
+      <GradientStop Offset ="0.5" Color ="#FF6262"/>
+    </LinearGradientBrush.GradientStops>
+  </LinearGradientBrush>
+
+  <!-- The nice gray gradient behind all pages, including on non-wizards -->
+  <RadialGradientBrush x:Key="WizardPageBack"  RadiusX="0.8" RadiusY ="0.8">
+    <RadialGradientBrush.GradientStops>
+      <GradientStop Color ="#4F5460" Offset ="0"/>
+      <GradientStop Color ="#1F2227" Offset ="0.47"/>
+    </RadialGradientBrush.GradientStops>
+  </RadialGradientBrush>
+
+  <LinearGradientBrush x:Key ="DarkGrayGradient" StartPoint="0,0" EndPoint ="0,1">
+    <LinearGradientBrush.GradientStops>
+      <GradientStop Offset ="0" Color ="#8D9196"/>
+      <GradientStop Offset ="0.3" Color ="#545A60"/>
+      <GradientStop Offset ="1" Color ="#545A60"/>
+    </LinearGradientBrush.GradientStops>
+  </LinearGradientBrush>
+
+  <Style x:Key ="WindowBorder" TargetType ="{x:Type Border}">
+    <Setter Property ="BorderThickness" Value ="2"/>
+    <Setter Property ="BorderBrush" Value ="{StaticResource BorderBrush}"/>
+  </Style>
+
+
+  <Style x:Key ="WindowBar" TargetType ="{x:Type Grid}">
+    <Setter Property ="Background" Value ="{StaticResource BarBrush}"/>
+    <Setter Property ="DockPanel.Dock" Value ="Top"/>
+    <Setter Property ="Height" Value ="24"/>
+    <Setter Property ="VerticalAlignment" Value ="Center"/>
+  </Style>
+
+  <Style x:Key ="DialogWindowBar" TargetType ="{x:Type Grid}" BasedOn="{StaticResource WindowBar}">
+    <Setter Property ="Height" Value ="20"/>
+  </Style>
+
+
+  <Style x:Key ="WindowTitle" TargetType ="{x:Type TextBlock}">
+    <Setter Property ="Grid.Row" Value ="0"/>
+    <Setter Property ="Grid.Column" Value ="1"/>
+    <Setter Property ="FontFamily" Value ="Verdana"/>
+    <Setter Property ="FontSize" Value ="12"/>
+    <Setter Property ="Height" Value ="14"/>
+  </Style>
+
+  <Style x:Key ="DialogWindowTitle" TargetType ="{x:Type TextBlock}" BasedOn="{StaticResource WindowTitle}">
+    <Setter Property ="FontSize" Value ="11"/>
+    <Setter Property ="Height" Value ="14"/>
+    <Setter Property ="Margin" Value ="4,2,2,2"/>
+  </Style>
+
+  <Style x:Key ="WindowIcon" TargetType ="{x:Type Image}">
+    <Setter Property ="Grid.Row" Value ="0"/>
+    <Setter Property ="Grid.Column" Value ="0"/>
+    <Setter Property ="Width" Value ="16"/>
+    <Setter Property ="Height" Value ="16"/>
+    <Setter Property ="Margin" Value ="2,2,2,2"/>
+  </Style>
+
+  <Style x:Key ="WindowControlButtons" TargetType ="{x:Type StackPanel}">
+    <Setter Property ="Grid.Row" Value ="0"/>
+    <Setter Property ="Grid.Column" Value ="2"/>
+    <Setter Property ="Orientation" Value ="Horizontal"/>
+  </Style>
+
+  <!--Style for buttons which appear in dialogs-->
+  <Style x:Key ="DialogButton" TargetType ="{x:Type Button}">
+    <Setter Property ="Margin" Value ="2,2,2,2"/>
+    <Setter Property ="Foreground" Value ="white"/>
+    <Setter Property ="VerticalAlignment" Value ="Center"/>
+    <Setter Property ="Height" Value ="23"/>
+    <Setter Property ="Width" Value ="75"/>
+
+    <Setter Property ="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType ="{x:Type Button}">
+          <Grid VerticalAlignment ="Center">
+            <Rectangle Name="TBack" Width="{TemplateBinding Width}" Height ="{TemplateBinding Height}" Stroke ="white" Fill ="{StaticResource DarkGrayGradient}" RadiusX ="2" RadiusY ="2"/>
+            <Rectangle Name="BBack" Opacity="0" Width="{TemplateBinding Width}" Height ="{TemplateBinding Height}" Stroke ="white" Fill ="{StaticResource BlueGradient}" RadiusX ="2" RadiusY ="2"/>
+            <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" HorizontalAlignment ="Center"/>
+          </Grid>
+
+          <ControlTemplate.Triggers>
+            <EventTrigger RoutedEvent="ButtonBase.MouseEnter">
+              <BeginStoryboard>
+                <Storyboard>
+                  <DoubleAnimation Storyboard.TargetName="BBack" Storyboard.TargetProperty="(Rectangle.Opacity)" From="0"  To="1" Duration="0:0:0.6" RepeatBehavior="1x" AutoReverse="False"/>
+                </Storyboard>
+              </BeginStoryboard>
+            </EventTrigger>
+
+            <EventTrigger RoutedEvent="ButtonBase.MouseLeave">
+              <BeginStoryboard>
+                <Storyboard>
+                  <DoubleAnimation Storyboard.TargetName="BBack" Storyboard.TargetProperty="(Rectangle.Opacity)" From="1"  To="0" Duration="0:0:0.6" RepeatBehavior="1x" AutoReverse="False"/>
+                </Storyboard>
+              </BeginStoryboard>
+            </EventTrigger>
+
+            <Trigger Property ="IsEnabled" Value ="false">
+              <Setter TargetName ="TBack" Property ="Rectangle.Fill" Value ="#dddddd"/>
+              <Setter TargetName ="TBack" Property ="Rectangle.Stroke" Value ="#ffffff"/>
+            </Trigger>
+
+            <Trigger Property ="IsFocused" Value ="true">
+              <Setter TargetName ="TBack" Property ="Rectangle.Fill" Value ="{StaticResource GrayGradient}"/>
+            </Trigger>
+
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+
+  </Style>
+
+  <!--Style for "control buttons", the minimize and maximize buttons-->
+
+  <Style x:Key ="ControlButton" TargetType ="{x:Type Button}">
+    <Setter Property ="Width" Value ="18"/>
+    <Setter Property ="Height" Value ="16"/>
+    <Setter Property ="Margin" Value ="2,2,2,2"/>
+    <Setter Property ="Foreground" Value ="white"/>
+    <Setter Property ="IsTabStop" Value ="false"/>
+
+    <Setter Property ="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType ="{x:Type Button}">
+          <Grid>
+            <Rectangle Name="TBack" Width="18" Height ="16" Stroke ="white" Fill ="{StaticResource GrayGradient}" RadiusX ="2" RadiusY ="2"/>
+            <Rectangle Name="BBack" Opacity="0" Width="18" Height ="16" Stroke ="#001997" Fill ="{StaticResource BlueGradient}" RadiusX ="2" RadiusY ="2"/>
+            <ContentPresenter Content="{TemplateBinding Content}" Width ="8" HorizontalAlignment ="Center"/>
+          </Grid>
+
+          <ControlTemplate.Triggers>
+            <EventTrigger RoutedEvent="ButtonBase.MouseEnter">
+              <BeginStoryboard>
+                <Storyboard>
+                  <DoubleAnimation Storyboard.TargetName="BBack" Storyboard.TargetProperty="(Rectangle.Opacity)" From="0"  To="1" Duration="0:0:0.6" RepeatBehavior="1x" AutoReverse="False"/>
+                </Storyboard>
+              </BeginStoryboard>
+            </EventTrigger>
+
+            <EventTrigger RoutedEvent="ButtonBase.MouseLeave">
+              <EventTrigger.Actions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="BBack" Storyboard.TargetProperty="(Rectangle.Opacity)" From="1"  To="0" Duration="0:0:0.6" RepeatBehavior="1x" AutoReverse="False"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </EventTrigger.Actions>
+            </EventTrigger>
+
+            <Trigger Property ="IsEnabled" Value ="false">
+              <Setter TargetName ="TBack" Property ="Rectangle.Fill" Value ="#dddddd"/>
+              <Setter TargetName ="TBack" Property ="Rectangle.Stroke" Value ="#ffffff"/>
+            </Trigger>
+
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+
+  </Style>
+
+  <Style x:Key ="CloseButton" TargetType ="{x:Type Button}">
+    <Setter Property ="Width" Value ="18"/>
+    <Setter Property ="Height" Value ="16"/>
+    <Setter Property ="Margin" Value ="2,2,4,2"/>
+    <Setter Property ="Foreground" Value ="white"/>
+    <Setter Property ="IsTabStop" Value ="false"/>
+
+    <Setter Property ="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType ="{x:Type Button}">
+          <Grid HorizontalAlignment ="Center">
+            <Rectangle Name="TBack" Width="18" Height ="{TemplateBinding Height}" Stroke ="white" Fill ="{StaticResource GrayGradient}" RadiusX ="2" RadiusY ="2"/>
+            <Rectangle Name="RBack" Width="18" Height ="{TemplateBinding Height}" Stroke ="#AF5C5C" Opacity="0" Fill ="{StaticResource RedGradient}" RadiusX ="2" RadiusY ="2"/>
+            <ContentPresenter Content="{TemplateBinding Content}" Width ="8" HorizontalAlignment ="Center"/>
+          </Grid>
+
+          <ControlTemplate.Triggers>
+            <EventTrigger RoutedEvent="ButtonBase.MouseEnter">
+              <EventTrigger.Actions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="RBack" Storyboard.TargetProperty="(Rectangle.Opacity)" From="0"  To="1" Duration="0:0:0.6" RepeatBehavior="1x" AutoReverse="False"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </EventTrigger.Actions>
+            </EventTrigger>
+
+            <EventTrigger RoutedEvent="ButtonBase.MouseLeave">
+              <EventTrigger.Actions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="RBack" Storyboard.TargetProperty="(Rectangle.Opacity)" From="1"  To="0" Duration="0:0:0.6" RepeatBehavior="1x" AutoReverse="False"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </EventTrigger.Actions>
+            </EventTrigger>
+
+            <Trigger Property ="IsEnabled" Value ="false">
+              <Setter TargetName ="TBack" Property ="Rectangle.Fill" Value ="#dddddd"/>
+              <Setter TargetName ="TBack" Property ="Rectangle.Stroke" Value ="#ffffff"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+
+  </Style>
+
+  <!--Dialog-->
+
+  <Style x:Key ="DialogCloseButton" TargetType ="{x:Type Button}" BasedOn="{StaticResource CloseButton}">
+    <Setter Property ="Width" Value ="18"/>
+    <Setter Property ="Height" Value ="14"/>
+  </Style>
+
+
+  <Style x:Key ="DialogIcon" TargetType ="{x:Type Image}">
+    <Setter Property ="Width" Value ="48"/>
+    <Setter Property ="Margin" Value ="2,2,2,2"/>
+  </Style>
+
+  <Style x:Key ="DialogMessage" TargetType ="{x:Type TextBlock}">
+    <Setter Property ="FontSize" Value ="14"/>
+    <Setter Property="Foreground" Value="white"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+    <Setter Property ="Margin" Value ="8,2,8,2"/>
+  </Style>
+
+
+  <!--Menu Bar-->
+
+  <Style TargetType="{x:Type Menu}">
+    <Setter Property="Background" Value="#545A60"/>
+  </Style>
+
+  <Style x:Key="SubMenuItem"  TargetType="{x:Type TextBlock}">
+    <Setter Property="Foreground" Value="black"/>
+  </Style>
+
+  <!--Toolbar-->
+
+  <Style TargetType="{x:Type ToolBar}">
+    <Setter Property="Background" Value="#545A60"/>
+  </Style>
+
+  <Style x:Key="ToolBarCombo"  TargetType="{x:Type ComboBox}">
+    <Setter Property="Background" Value="#545A60"/>
+    <Setter Property="Margin" Value="2,2,2,2"/>
+    <Setter Property="BorderBrush" Value="#cccccc"/>
+    <Setter Property ="Foreground" Value="#ffffff"/>
+  </Style>
+
+
+  <!--Content Grid-->
+
+  <Style TargetType ="{x:Type TextBlock}">
+    <Setter Property ="Foreground" Value ="white"/>
+  </Style>
+
+  <Style TargetType ="{x:Type CheckBox}">
+    <Setter Property ="Foreground" Value ="white"/>
+  </Style>
+
+  <Style x:Key ="DialogContentGrid" TargetType ="{x:Type Grid}">
+    <Setter Property ="Background" Value ="#1F2227"/>
+    <Setter Property ="VerticalAlignment" Value ="Stretch"/>
+  </Style>
+
+
+  <Style x:Key ="ContentGrid" TargetType ="{x:Type Grid}">
+    <Setter Property ="Background" Value ="#545A60"/>
+    <Setter Property ="VerticalAlignment" Value ="Stretch"/>
+  </Style>
+
+  <!-- Designer -->
+
+  <Style x:Key="NormalProperty" TargetType ="{x:Type TextBlock}">
+    <Setter Property ="Background" Value ="Transparent"/>
+  </Style>
+
+  <Style x:Key="HighlightedProperty" TargetType ="{x:Type TextBlock}">
+    <Setter Property ="Background" Value ="Gray"/>
+  </Style>
+
+
+  <!--Style for toolbar buttons -->
+
+  <Style x:Key="ToolbarButtonStyle" TargetType="{x:Type Button}">
+    <Setter Property ="Foreground" Value ="White"/>
+    <Setter Property ="VerticalAlignment" Value ="Center"/>
+    <Setter Property ="StackPanel.Margin" Value ="2,0,2,0"/>
+    <Setter Property ="Height" Value ="24"/>
+    <Setter Property ="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType ="{x:Type Button}">
+          <Grid VerticalAlignment ="Stretch" HorizontalAlignment="Stretch" Width ="{TemplateBinding Width}">
+            <Rectangle Name="TBack" Height="24" Width ="{TemplateBinding Width}"/>
+            <ContentPresenter Name="TContent"  Content="{TemplateBinding Content}" Margin ="0,0,2,0"/>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property ="IsMouseOver" Value="True">
+              <Setter TargetName ="TBack" Property ="Rectangle.Stroke" Value ="#ffffff"/>
+              <Setter TargetName ="TBack" Property ="Rectangle.Fill" Value ="{DynamicResource GrayGradient}"/>
+            </Trigger>
+            <Trigger Property ="IsPressed" Value="True">
+              <Setter TargetName ="TBack" Property ="Rectangle.Stroke" Value ="#ffffff"/>
+              <Setter TargetName ="TBack" Property ="Rectangle.Fill" Value ="{DynamicResource BlueGradient}"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+    <!-- Toggle button style -->
+
+  <Style x:Key="ToggleButtonStyle" TargetType="{x:Type ToggleButton}">
+    <Setter Property ="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType ="{x:Type ToggleButton}">
+          <Grid VerticalAlignment ="Stretch" HorizontalAlignment="Stretch" Width ="{TemplateBinding Width}">
+            <Rectangle Name="TBack" Height="24" Width ="{TemplateBinding Width}"/>
+            <ContentPresenter Name="TContent"  Content="{TemplateBinding Content}"/>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property ="IsMouseOver" Value="True">
+              <Setter TargetName ="TBack" Property ="Rectangle.Stroke" Value ="#ffffff"/>
+              <Setter TargetName ="TBack" Property ="Rectangle.Fill" Value ="{DynamicResource GrayGradient}"/>
+            </Trigger>
+            <Trigger Property ="IsChecked" Value="True">
+              <Setter TargetName ="TBack" Property ="Rectangle.Stroke" Value ="#ffffff"/>
+              <Setter TargetName ="TBack" Property ="Rectangle.Fill" Value ="{DynamicResource BlueGradient}"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+    <Style x:Key="ConditionButtonStyle" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource ToggleButtonStyle}">
+        <Setter Property ="Width" Value ="24"/>
+    </Style>
+
+  <!--Wizard Pages-->
+
+  <Style x:Key="WizardPageStyle" TargetType ="{x:Type wpf:WizardPageFunction}">
+    <Setter Property ="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType ="{x:Type wpf:WizardPageFunction}">
+
+          <Grid VerticalAlignment ="Stretch" HorizontalAlignment="Stretch">
+            <Grid VerticalAlignment ="Stretch"  Background ="{StaticResource WizardPageBack}">
+              <StackPanel Orientation ="Vertical" VerticalAlignment ="Center" HorizontalAlignment="Center" Margin ="4,4,4,4">
+                <Grid HorizontalAlignment ="Left" VerticalAlignment ="Center">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="180" />
+                    <ColumnDefinition />
+                  </Grid.ColumnDefinitions>
+                  <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                  </Grid.RowDefinitions>
+
+
+
+                  <TextBlock Name="WizardTitle" Foreground="white" FontSize="18" Grid.Row ="0" Grid.Column ="0" Grid.ColumnSpan="2" Text="{TemplateBinding Title}" />
+                  <TextBlock Name="WizardText" Foreground="white" FontSize="14" Grid.Row ="1" Grid.Column ="0" Grid.ColumnSpan="2" Text="{TemplateBinding Instructions}"/>
+
+                  <Rectangle Grid.Row="2" Grid.Column ="0" Grid.ColumnSpan="2" Height="20"/>
+
+                  <ContentPresenter  Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3" Content="{TemplateBinding Content}"/>
+                </Grid>
+              </StackPanel>
+            </Grid>
+
+            <Grid x:Name="ErrorBubble" Width="250" Height ="Auto" Visibility="Collapsed">
+              <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal" Background="#dedede" VerticalAlignment ="Stretch" Margin="0,20,0,0">
+                  <Image Width="36" Height="36" Margin ="4,4,4,4" Source="pack://application:,,,/Icons/Warning.ico"/>
+                  <StackPanel Orientation ="Vertical" VerticalAlignment ="Center">
+                    <TextBlock x:Name="ErrorBubbleTitle" Margin="4,4,4,4" FontSize="14" Foreground="steelblue">Error Title goes here</TextBlock>
+                    <TextBlock x:Name="ErrorBubbleContent" Margin="4,4,4,4" FontSize="12" Foreground="#444444" Width="200" TextWrapping="Wrap">Error Title goes here</TextBlock>
+                  </StackPanel>
+                </StackPanel>
+                <Polygon Points="0,0 30,0 15,20" Fill="#dedede" HorizontalAlignment="Center"/>
+                <!--15,20 0,40 30,40-->
+              </StackPanel>
+            </Grid>
+
+          </Grid>
+
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Style for hover buttons that go from silver to blue -->
+
+  <Style x:Key ="WizardImageButton" TargetType ="{x:Type Button}">
+    <Setter Property ="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType ="{x:Type Button}">
+          <Grid>
+            <Rectangle Name ="TBack" Fill="{DynamicResource GrayGradient}" RadiusX="4" RadiusY="4" Stroke ="#cccccc" Width ="{TemplateBinding Width}" Height ="{TemplateBinding Height}"/>
+            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center"  VerticalAlignment="Center"/>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property ="IsMouseOver" Value="True">
+              <Setter TargetName ="TBack" Property ="Rectangle.Stroke" Value ="#ffffff"/>
+              <Setter TargetName ="TBack" Property ="Rectangle.Fill" Value ="{DynamicResource BlueGradient}"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  
+  <!-- The style of all comboboxes, including on non-wizards -->
+
+  <Style x:Key ="WizardComboBox" TargetType ="{x:Type ComboBox}">
+    <Setter Property ="Background" Value ="transparent"/>
+    <Setter Property ="ItemTemplate" Value ="{DynamicResource WizardComboItemTemplate}"/>
+    <Setter Property ="BorderBrush" Value ="#cccccc"/>
+    <Style.Triggers>
+      <Trigger Property ="IsMouseOver" Value="True">
+        <Setter Property="BorderBrush" Value ="white"/>
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+
+  <!-- The style of the "Open in designer" button at the end of the wizard-->
+
+  <Style x:Key="WizardLinkButton" TargetType="{x:Type Button}">
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property ="Foreground" Value ="steelblue"/>
+    <Setter Property ="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType ="{x:Type Button}">
+          <ContentPresenter Content="{TemplateBinding Content}"/>
+          <ControlTemplate.Triggers>
+            <Trigger Property ="IsMouseOver" Value ="true">
+              <Setter Property ="Foreground" Value ="White"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <DataTemplate x:Key ="WizardComboItemTemplate">
+    <DockPanel>
+      <ContentPresenter Content="{TemplateBinding Content}" />
+    </DockPanel >
+  </DataTemplate>
+
+  <!-- The style of all textboxes, including on non-wizards -->
+
+  <Style x:Key ="WizardEntryBox" TargetType ="{x:Type TextBox}">
+    <Setter Property ="Foreground" Value ="white"/>
+    <Setter Property ="Background" Value ="transparent"/>
+    <Setter Property ="BorderBrush" Value ="#cccccc"/>
+    <Setter Property ="Padding" Value ="2,2,2,2"/>
+    <Style.Triggers>
+      <Trigger Property ="IsMouseOver" Value="True">
+        <Setter Property="BorderBrush" Value ="white"/>
+      </Trigger>
+      <Trigger Property ="IsFocused" Value="True">
+        <Setter Property ="BorderBrush" Value ="white"/>
+        <Setter Property ="Background" Value ="#545A60"/>
+      </Trigger>
+
+    </Style.Triggers>
+  </Style>
+
+  <Style x:Key="TreeViewStyle" TargetType="{x:Type TreeView}">
+    <Setter Property="Border.BorderThickness" Value="1"/>
+    <Setter Property="Border.BorderBrush" Value="white"/>
+    <Setter Property="Foreground" Value="white"/>
+  </Style>
+
+  <!-- Others -->
+
+  
+  <Style TargetType ="{x:Type TreeView}">
+    <Setter Property="Background" Value="transparent"/>
+  </Style>
+
+  <Style x:Key ="ChooseButton" TargetType ="{x:Type Button}">
+    <Setter Property ="Width" Value ="100"/>
+    <Setter Property ="Height" Value ="100"/>
+    <Setter Property ="Margin" Value ="2,2,2,2"/>
+    <Setter Property ="Foreground" Value ="black"/>
+
+    <Setter Property ="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType ="{x:Type Button}">
+          <Grid  HorizontalAlignment ="Center" VerticalAlignment ="Center">
+            <Rectangle Name="TBack" Width="100" Height ="100" Stroke ="#C8C8C8" Fill ="{StaticResource DarkGrayGradient}" RadiusX ="1" RadiusY ="1"/>
+            <Rectangle Name="BBack" Opacity="0" Width="100" Height ="100" Stroke ="#C8C8C8" Fill ="{StaticResource BlueGradient}" RadiusX ="1" RadiusY ="1"/>
+            <ContentPresenter HorizontalAlignment ="Center" Width="100" Content="{TemplateBinding Content}" Margin="2,2,2,2"/>
+          </Grid>
+
+
+          <ControlTemplate.Triggers>
+
+            <EventTrigger RoutedEvent="ButtonBase.MouseEnter">
+              <EventTrigger.Actions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="BBack" Storyboard.TargetProperty="(Rectangle.Opacity)" From="0"  To="1" Duration="0:0:0.6" RepeatBehavior="1x" AutoReverse="False"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </EventTrigger.Actions>
+            </EventTrigger>
+
+            <EventTrigger RoutedEvent="ButtonBase.MouseLeave">
+              <EventTrigger.Actions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="BBack" Storyboard.TargetProperty="(Rectangle.Opacity)" From="1"  To="0" Duration="0:0:0.6" RepeatBehavior="1x" AutoReverse="False"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </EventTrigger.Actions>
+            </EventTrigger>
+
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+
+  </Style>
+
+  <!--Tab Buttons-->
+  <Style x:Key ="TabButton" TargetType ="{x:Type TabItem}">
+    <Setter Property ="Foreground" Value="white"/>
+    <Setter Property ="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type TabItem}">
+          <Grid Margin ="2,4,2,2">
+            <Rectangle Name="TBack" Fill="#000000" Stroke ="#aaaaaa" RadiusX ="4" RadiusY ="4" Width ="110" Height ="24" />
+            <ContentPresenter Name="TContent"  Content="{TemplateBinding Header}" HorizontalAlignment="Center"  VerticalAlignment="Center"/>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property ="IsSelected" Value ="True">
+              <Setter TargetName="TBack" Property ="Rectangle.Fill" Value ="{StaticResource GrayGradient}"/>
+              <Setter Property ="Foreground" Value="black"/>
+              <Setter TargetName ="TBack" Property ="Rectangle.Stroke" Value ="#444444"/>
+            </Trigger>
+            <Trigger Property ="IsMouseOver" Value ="True">
+              <Setter TargetName="TBack" Property ="Rectangle.Fill" Value ="{StaticResource BlueGradient}"/>
+              <Setter Property ="Foreground" Value="white"/>
+              <Setter TargetName ="TBack" Property ="Rectangle.Stroke" Value ="#001997"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <RadialGradientBrush x:Key ="TabGrayGradient" RadiusX="0.35" RadiusY ="3" Center="0.5,1.6">
+    <RadialGradientBrush.GradientStops>
+      <GradientStop Offset="0.5" Color ="gray"/>
+      <GradientStop Offset="1" Color ="black"/>
+    </RadialGradientBrush.GradientStops>
+  </RadialGradientBrush>
+
+  <RadialGradientBrush x:Key ="TabBlueGradient" RadiusX="0.35" RadiusY ="3" Center="0.5,1.6">
+    <RadialGradientBrush.GradientStops>
+      <GradientStop Offset="0.5" Color ="steelblue"/>
+      <GradientStop Offset="1" Color ="black"/>
+    </RadialGradientBrush.GradientStops>
+  </RadialGradientBrush>
+
+</ResourceDictionary>

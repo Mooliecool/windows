@@ -1,0 +1,417 @@
+<FlowDocumentPageViewer xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<FlowDocument ColumnWidth="350" ColumnGap="15" ColumnRuleWidth="1" ColumnRuleBrush="LightGray">
+    <Paragraph Style="{StaticResource HeaderStyle}">Grid Overview</Paragraph>
+    <Paragraph><Rectangle Fill="Black" Height="1" Width="500" HorizontalAlignment="Left" /><LineBreak/></Paragraph>
+    
+    <Paragraph Style="{StaticResource DisStyle}">[This topic is pre-release documentation and is subject to change in future releases. Blank topics are included as placeholders.]<LineBreak/></Paragraph>
+<Paragraph Style="{StaticResource mainContentStyle}">The <Bold>Grid</Bold> element merges the functionality of an absolute positioning and tabular data control. <Bold>Grid</Bold> is a good choice for scenarios like top-level dialog boxes or styling of a component's visuals.</Paragraph>
+
+<Paragraph Style="{StaticResource mainContentStyle}">This topic contains the following sections.</Paragraph>
+<List>
+
+<ListItem><Paragraph Style="{StaticResource mainContentStyle}"><Hyperlink NavigateUri="#gridwhat">What Can I Do with a Grid?</Hyperlink></Paragraph></ListItem>
+<ListItem><Paragraph Style="{StaticResource mainContentStyle}"><Hyperlink NavigateUri="#gridwhen">When to Use the Grid Element</Hyperlink></Paragraph></ListItem>
+<ListItem><Paragraph Style="{StaticResource mainContentStyle}"><Hyperlink NavigateUri="#gridxaml">Creating a Grid in "XAML"</Hyperlink></Paragraph></ListItem>
+<ListItem><Paragraph Style="{StaticResource mainContentStyle}"><Hyperlink NavigateUri="#gridcode">Creating a Grid in Code</Hyperlink></Paragraph></ListItem>
+<ListItem><Paragraph Style="{StaticResource mainContentStyle}"><Hyperlink NavigateUri="#dockrelated">Related Topics</Hyperlink></Paragraph></ListItem>
+
+</List>
+
+    <Paragraph Style="{StaticResource SubHeaderStyle}" Name="gridwhat">What Can I Do with a Grid?</Paragraph>
+<Paragraph Style="{StaticResource mainContentStyle}">A <Bold>Grid</Bold> allows you to easily position and style elements. It provides similar functionality to the Table element, but adds additional capabilities that allow more precise positioning and styling of child objects. The following image provides a typical example of a <Bold>Grid</Bold> element.</Paragraph>
+
+
+
+<Paragraph Style="{StaticResource SubHeaderStyle}">How is Grid Different from Table?</Paragraph>
+<Paragraph Style="{StaticResource mainContentStyle}">Table and <Bold>Grid</Bold> share some common functionality, but each can be applied in appropriate scenarios to better utilize the built-in feature set.</Paragraph>
+
+<Paragraph Style="{StaticResource mainContentStyle}"><Bold>Grid</Bold> adds elements based on a row and column index, Table does not. The <Bold>Grid</Bold> element allows layering of content, where more than one element can exist within a single "cell." Table does not support layering. Child elements of a <Bold>Grid</Bold> can be absolutely positioned relative to the upper left-hand corner of their "cell" boundaries. Table does not support this feature. <Bold>Grid</Bold> also offers more flexible resizing behavior than Table.</Paragraph>
+
+<Paragraph Style="{StaticResource SubHeaderStyle}" Name="gridwhen">When to Use the Grid Element</Paragraph>
+<Paragraph Style="{StaticResource mainContentStyle}">Windows Presentation Foundation offers two distinct elements for the display of tabular data. Each element is targeted to a different scenario. Understanding the appropriate use and application of each is an important step in choosing the correct element for your needs.</Paragraph>
+
+<Paragraph Style="{StaticResource mainContentStyle}">The <Bold>Grid</Bold> element is the best choice for creating lightweight, top-level layouts such as dialog boxes. It's also ideal for scenarios where data styling or styling of a component's visuals are required. The <Bold>Grid</Bold> element also simplifies localization of content, as it eases resizing of content. </Paragraph>
+
+<Paragraph Style="{StaticResource mainContentStyle}">Table introduces additional features for the creation of richer "document"-style tables. Unlike <Bold>Grid</Bold>, Table supports the grouping of TableRow elements with classes that derive from the TableRowGroup object—TableHeader, TableFooter, and TableBody. Each of these can also be used to apply styles to child content. Table content, which can consist of text, Images, or nearly any other user interface (UI) control, is contained within TableCells.  TableCells have properties such as Margin and ColumnSpan that can be used to further refine the display of data within the Table. TableFooter row groupings are declared at the bottom of the "Extensible Application Markup Language" ("XAML") markup. TableHeaders and TableFooters are optional elements.</Paragraph>
+
+<Paragraph Style="{StaticResource SubHeaderStyle}" Name="gridxaml">Creating a Grid in "XAML"</Paragraph>
+<Paragraph Style="{StaticResource mainContentStyle}"><Bold>Grid</Bold> can be instantiated using "XAML". The following markup demonstrates how to use <Bold>Grid</Bold> to create layout that looks like a monthly calendar. Eight rows and eight columns are defined, using the RowDefinition and ColumnDefinition classes, respectively. Using the ColumnSpan and RowSpan properties, Rectangle elements are used to fill the backgrounds of various columns and rows. This is possible since more than one element can exist in each cell in a <Bold>Grid</Bold>, a principle difference between <Bold>Grid</Bold> and Table.</Paragraph>
+
+<Paragraph Style="{StaticResource mainContentStyle}">Vertical gradients are used to Fill the columns and rows to improve the visual presentation and readability of the calendar. Styled TextBlock elements are used to represent the various dates and days of the week. TextBlock elements are absolutely positioned within their cells, relative to the upper-left corner, using the Margin properties defined within the Style for the application.</Paragraph>
+
+<Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+&lt;Page xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    &lt;Border BorderBrush="Black">
+
+        &lt;Grid ShowGridLines="false" Background="White">
+            &lt;Grid.Resources>
+                &lt;Style TargetType="{x:Type ColumnDefinition}">
+                    &lt;Setter Property="Width" Value="30"/>
+                &lt;/Style>
+                &lt;Style TargetType="{x:Type Rectangle}">
+                    &lt;Setter Property="RadiusX" Value="6"/>
+                    &lt;Setter Property="RadiusY" Value="6"/>
+                &lt;/Style>
+                &lt;Style x:Key="DayOfWeek">
+                    &lt;Setter Property="Grid.Row" Value="1">&lt;/Setter>
+                    &lt;Setter Property="TextBlock.Margin" Value="5">&lt;/Setter>
+                &lt;/Style>
+                &lt;Style x:Key="OneDate">
+                    &lt;Setter Property="TextBlock.Margin" Value="5">&lt;/Setter>
+                &lt;/Style>                
+            &lt;/Grid.Resources>
+            &lt;Grid.ColumnDefinitions>
+            &lt;ColumnDefinition/>
+            &lt;ColumnDefinition/>
+            &lt;ColumnDefinition/>
+            &lt;ColumnDefinition/>
+            &lt;ColumnDefinition/>
+            &lt;ColumnDefinition/>
+            &lt;ColumnDefinition/>
+            &lt;ColumnDefinition Width="*"/>
+            &lt;!-- This column will receive all remaining width -->
+            &lt;/Grid.ColumnDefinitions>
+            &lt;Grid.RowDefinitions>
+            &lt;RowDefinition Height="Auto"/>
+            &lt;RowDefinition Height="Auto"/>
+            &lt;RowDefinition Height="Auto"/>
+            &lt;RowDefinition Height="Auto"/>
+            &lt;RowDefinition Height="Auto"/>
+            &lt;RowDefinition Height="Auto"/>
+            &lt;RowDefinition Height="Auto"/>
+            &lt;RowDefinition/>
+            &lt;!-- This row will receive all remaining Height -->
+            &lt;/Grid.RowDefinitions>
+            &lt;!-- These Rectangles constitute the backgrounds of the various Rows and Columns -->
+
+            &lt;Rectangle Grid.ColumnSpan="7" Fill="#73B2F5"/>
+            &lt;Rectangle Grid.Row="1" Grid.RowSpan="6"  Fill="#73B2F5"/>
+            &lt;Rectangle Grid.Column="6" Grid.Row="1" Grid.RowSpan="6" Fill="#73B2F5"/>
+            &lt;Rectangle Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="5" Grid.RowSpan="6"
+  Fill="#efefef"/>
+
+            &lt;!-- Month row -->
+            &lt;TextBlock Grid.ColumnSpan="7" Margin="0,5,0,5" HorizontalAlignment="Center">
+                January 2004&lt;/TextBlock>
+            
+            &lt;!-- Draws a separator under the days-of-the-week row -->
+
+            &lt;Rectangle Grid.Row="1" Grid.ColumnSpan="7" 
+            Fill="Black" RadiusX="1" RadiusY="1" Height="2" Margin="0,20,0,0"/>
+
+            &lt;!-- Day-of-the-week row -->
+            &lt;TextBlock Grid.Column="0" Style="{StaticResource DayOfWeek}">Sun&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="1" Style="{StaticResource DayOfWeek}">Mon&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="2" Style="{StaticResource DayOfWeek}">Tue&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="3" Style="{StaticResource DayOfWeek}">Wed&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="4" Style="{StaticResource DayOfWeek}">Thu&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="5" Style="{StaticResource DayOfWeek}">Fri&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="6" Style="{StaticResource DayOfWeek}">Sat&lt;/TextBlock>
+
+            &lt;!-- Dates go here -->
+            &lt;TextBlock Grid.Column="4" Grid.Row="2" Style="{StaticResource OneDate}">1&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="5" Grid.Row="2" Style="{StaticResource OneDate}">2&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="6" Grid.Row="2" Style="{StaticResource OneDate}">3&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="0" Grid.Row="3" Style="{StaticResource OneDate}">4&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="1" Grid.Row="3" Style="{StaticResource OneDate}">5&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="2" Grid.Row="3" Style="{StaticResource OneDate}">6&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="3" Grid.Row="3" Style="{StaticResource OneDate}">7&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="4" Grid.Row="3" Style="{StaticResource OneDate}">8&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="5" Grid.Row="3" Style="{StaticResource OneDate}">9&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="6" Grid.Row="3" Style="{StaticResource OneDate}">10&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="0" Grid.Row="4" Style="{StaticResource OneDate}">11&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="1" Grid.Row="4" Style="{StaticResource OneDate}">12&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="2" Grid.Row="4" Style="{StaticResource OneDate}">13&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="3" Grid.Row="4" Style="{StaticResource OneDate}">14&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="4" Grid.Row="4" Style="{StaticResource OneDate}">15&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="5" Grid.Row="4" Style="{StaticResource OneDate}">16&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="6" Grid.Row="4" Style="{StaticResource OneDate}">17&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="0" Grid.Row="5" Style="{StaticResource OneDate}">18&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="1" Grid.Row="5" Style="{StaticResource OneDate}">19&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="2" Grid.Row="5" Style="{StaticResource OneDate}">20&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="3" Grid.Row="5" Style="{StaticResource OneDate}">21&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="4" Grid.Row="5" Style="{StaticResource OneDate}">22&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="5" Grid.Row="5" Style="{StaticResource OneDate}">23&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="6" Grid.Row="5" Style="{StaticResource OneDate}">24&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="0" Grid.Row="6" Style="{StaticResource OneDate}">25&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="1" Grid.Row="6" Style="{StaticResource OneDate}">26&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="2" Grid.Row="6" Style="{StaticResource OneDate}">27&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="3" Grid.Row="6" Style="{StaticResource OneDate}">28&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="4" Grid.Row="6" Style="{StaticResource OneDate}">29&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="5" Grid.Row="6" Style="{StaticResource OneDate}">30&lt;/TextBlock>
+            &lt;TextBlock Grid.Column="6" Grid.Row="6" Style="{StaticResource OneDate}">31&lt;/TextBlock>
+        &lt;/Grid>
+    &lt;/Border>
+&lt;/Page>
+</Paragraph>
+    
+<Paragraph Style="{StaticResource expanderStyle}">   
+    <Expander IsExpanded="true" Header="Rendered Output"> 
+    <Border BorderBrush="Black">
+
+        <Grid ShowGridLines="false" Background="White">
+            <Grid.Resources>
+                <Style TargetType="{x:Type ColumnDefinition}">
+                    <Setter Property="Width" Value="30"/>
+                </Style>
+                <Style TargetType="{x:Type Rectangle}">
+                    <Setter Property="RadiusX" Value="6"/>
+                    <Setter Property="RadiusY" Value="6"/>
+                </Style>
+                <Style x:Key="DayOfWeek">
+                    <Setter Property="Grid.Row" Value="1"></Setter>
+                    <Setter Property="TextBlock.Margin" Value="5"></Setter>
+                </Style>
+                <Style x:Key="OneDate">
+                    <Setter Property="TextBlock.Margin" Value="5"></Setter>
+                </Style>                
+            </Grid.Resources>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="*"/>
+            <!-- This column will receive all remaining width -->
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <!-- This row will receive all remaining Height -->
+          </Grid.RowDefinitions>
+            <!-- These Rectangles constitute the backgrounds of the various Rows and Columns -->
+
+          <Rectangle Grid.ColumnSpan="7" Fill="#73B2F5"/>
+          <Rectangle Grid.Row="1" Grid.RowSpan="6"  Fill="#73B2F5"/>
+          <Rectangle Grid.Column="6" Grid.Row="1" Grid.RowSpan="6" Fill="#73B2F5"/>
+          <Rectangle Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="5" Grid.RowSpan="6"
+          Fill="#efefef"/>
+
+          <!-- Month row -->
+            <TextBlock Grid.ColumnSpan="7" Margin="0,5,0,5" HorizontalAlignment="Center">
+                January 2004</TextBlock>
+            
+            <!-- Draws a separator under the days-of-the-week row -->
+
+            <Rectangle Grid.Row="1" Grid.ColumnSpan="7" 
+            Fill="Black" RadiusX="1" RadiusY="1" Height="2" Margin="0,20,0,0"/>
+
+            <!-- Day-of-the-week row -->
+            <TextBlock Grid.Column="0" Style="{StaticResource DayOfWeek}">Sun</TextBlock>
+            <TextBlock Grid.Column="1" Style="{StaticResource DayOfWeek}">Mon</TextBlock>
+            <TextBlock Grid.Column="2" Style="{StaticResource DayOfWeek}">Tue</TextBlock>
+            <TextBlock Grid.Column="3" Style="{StaticResource DayOfWeek}">Wed</TextBlock>
+            <TextBlock Grid.Column="4" Style="{StaticResource DayOfWeek}">Thu</TextBlock>
+            <TextBlock Grid.Column="5" Style="{StaticResource DayOfWeek}">Fri</TextBlock>
+            <TextBlock Grid.Column="6" Style="{StaticResource DayOfWeek}">Sat</TextBlock>
+
+            <!-- Dates go here -->
+            <TextBlock Grid.Column="4" Grid.Row="2" Style="{StaticResource OneDate}">1</TextBlock>
+            <TextBlock Grid.Column="5" Grid.Row="2" Style="{StaticResource OneDate}">2</TextBlock>
+            <TextBlock Grid.Column="6" Grid.Row="2" Style="{StaticResource OneDate}">3</TextBlock>
+            <TextBlock Grid.Column="0" Grid.Row="3" Style="{StaticResource OneDate}">4</TextBlock>
+            <TextBlock Grid.Column="1" Grid.Row="3" Style="{StaticResource OneDate}">5</TextBlock>
+            <TextBlock Grid.Column="2" Grid.Row="3" Style="{StaticResource OneDate}">6</TextBlock>
+            <TextBlock Grid.Column="3" Grid.Row="3" Style="{StaticResource OneDate}">7</TextBlock>
+            <TextBlock Grid.Column="4" Grid.Row="3" Style="{StaticResource OneDate}">8</TextBlock>
+            <TextBlock Grid.Column="5" Grid.Row="3" Style="{StaticResource OneDate}">9</TextBlock>
+            <TextBlock Grid.Column="6" Grid.Row="3" Style="{StaticResource OneDate}">10</TextBlock>
+            <TextBlock Grid.Column="0" Grid.Row="4" Style="{StaticResource OneDate}">11</TextBlock>
+            <TextBlock Grid.Column="1" Grid.Row="4" Style="{StaticResource OneDate}">12</TextBlock>
+            <TextBlock Grid.Column="2" Grid.Row="4" Style="{StaticResource OneDate}">13</TextBlock>
+            <TextBlock Grid.Column="3" Grid.Row="4" Style="{StaticResource OneDate}">14</TextBlock>
+            <TextBlock Grid.Column="4" Grid.Row="4" Style="{StaticResource OneDate}">15</TextBlock>
+            <TextBlock Grid.Column="5" Grid.Row="4" Style="{StaticResource OneDate}">16</TextBlock>
+            <TextBlock Grid.Column="6" Grid.Row="4" Style="{StaticResource OneDate}">17</TextBlock>
+            <TextBlock Grid.Column="0" Grid.Row="5" Style="{StaticResource OneDate}">18</TextBlock>
+            <TextBlock Grid.Column="1" Grid.Row="5" Style="{StaticResource OneDate}">19</TextBlock>
+            <TextBlock Grid.Column="2" Grid.Row="5" Style="{StaticResource OneDate}">20</TextBlock>
+            <TextBlock Grid.Column="3" Grid.Row="5" Style="{StaticResource OneDate}">21</TextBlock>
+            <TextBlock Grid.Column="4" Grid.Row="5" Style="{StaticResource OneDate}">22</TextBlock>
+            <TextBlock Grid.Column="5" Grid.Row="5" Style="{StaticResource OneDate}">23</TextBlock>
+            <TextBlock Grid.Column="6" Grid.Row="5" Style="{StaticResource OneDate}">24</TextBlock>
+            <TextBlock Grid.Column="0" Grid.Row="6" Style="{StaticResource OneDate}">25</TextBlock>
+            <TextBlock Grid.Column="1" Grid.Row="6" Style="{StaticResource OneDate}">26</TextBlock>
+            <TextBlock Grid.Column="2" Grid.Row="6" Style="{StaticResource OneDate}">27</TextBlock>
+            <TextBlock Grid.Column="3" Grid.Row="6" Style="{StaticResource OneDate}">28</TextBlock>
+            <TextBlock Grid.Column="4" Grid.Row="6" Style="{StaticResource OneDate}">29</TextBlock>
+            <TextBlock Grid.Column="5" Grid.Row="6" Style="{StaticResource OneDate}">30</TextBlock>
+            <TextBlock Grid.Column="6" Grid.Row="6" Style="{StaticResource OneDate}">31</TextBlock>
+        </Grid>
+    </Border>
+    </Expander>
+</Paragraph>    
+
+<Paragraph Style="{StaticResource SubHeaderStyle}" Name="gridcode">Creating a Grid in Code</Paragraph>
+<Paragraph Style="{StaticResource mainContentStyle}">The following code sample shows how to instantiate and use a <Bold>Grid</Bold> in C#. Three ColumnDefinitions and three RowDefinitions are created to produce a grid with nine cells, as in a worksheet. TextBlock elements representing data fill each cell, with the top row filled by TextBlock elements with the ColumnSpan property applied. The ShowGridLines property is enabled in order to show the boundaries of each cell.</Paragraph>
+
+    <Paragraph Style="{StaticResource CodeSnippetParagraph}" xml:space="preserve">
+[C#]using System;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Threading;
+
+namespace Grid_Demo
+{
+    public class app : System.Windows.Application
+    {
+        System.Windows.Controls.Grid grid1;
+        System.Windows.Controls.ColumnDefinition colDef1;
+        System.Windows.Controls.ColumnDefinition colDef2;
+        System.Windows.Controls.ColumnDefinition colDef3;
+        System.Windows.Controls.RowDefinition rowDef1;
+        System.Windows.Controls.RowDefinition rowDef2;
+        System.Windows.Controls.RowDefinition rowDef3;
+        System.Windows.Controls.TextBlock txt1;
+        System.Windows.Controls.TextBlock txt2;
+        System.Windows.Controls.TextBlock txt3;
+        System.Windows.Controls.TextBlock txt4;
+        System.Windows.Controls.TextBlock txt5;
+        System.Windows.Controls.TextBlock txt6;
+        System.Windows.Controls.TextBlock txt7;
+        System.Windows.Window mainWindow;
+
+        protected override void OnStartingUp(StartingUpCancelEventArgs e)
+        {
+            base.OnStartingUp(e);
+            CreateAndShowMainWindow();
+        }
+
+        private void CreateAndShowMainWindow()
+        {
+            // Create the application's main window
+            mainWindow = new System.Windows.Window();
+
+            // Create the Grid
+            grid1 = new Grid();
+            grid1.Width = 250;
+            grid1.Height = 100;
+            grid1.HorizontalAlignment = HorizontalAlignment.Left;
+            grid1.VerticalAlignment = VerticalAlignment.Top;
+            grid1.ShowGridLines = true;
+
+            // Define the Columns
+            colDef1 = new ColumnDefinition();
+            colDef2 = new ColumnDefinition();
+            colDef3 = new ColumnDefinition();
+            grid1.ColumnDefinitions.Add(colDef1);
+            grid1.ColumnDefinitions.Add(colDef2);
+            grid1.ColumnDefinitions.Add(colDef3);
+
+            // Define the Rows
+            rowDef1 = new RowDefinition();
+            rowDef2 = new RowDefinition();
+            rowDef3 = new RowDefinition();
+            grid1.RowDefinitions.Add(rowDef1);
+            grid1.RowDefinitions.Add(rowDef2);
+            grid1.RowDefinitions.Add(rowDef3);
+            
+            // Add the first text cell to the Grid
+            txt1 = new System.Windows.Controls.TextBlock();
+            txt1.TextContent = "2004 Products Shipped";
+            txt1.FontSize = 20; 
+            txt1.FontWeight = System.Windows.FontWeight.Bold;
+            Grid.SetColumnSpan(txt1, 3);
+            Grid.SetRow(txt1, 0);
+            Grid.SetColumn(txt1, 0);
+
+            // Add the second text cell to the Grid
+            txt2 = new System.Windows.Controls.TextBlock();
+            txt2.TextContent = "Quarter 1";
+            txt2.FontSize = 12;
+            txt2.FontWeight = System.Windows.FontWeight.Bold;
+            Grid.SetRow(txt2, 1);
+            Grid.SetColumn(txt2, 0);
+            
+            // Add the third text cell to the Grid
+            txt3 = new System.Windows.Controls.TextBlock();
+            txt3.TextContent = "Quarter 2";
+            txt3.FontSize = 12;
+            txt3.FontWeight = System.Windows.FontWeight.Bold;
+            Grid.SetRow(txt3, 1);
+            Grid.SetColumn(txt3, 1);
+            
+            // Add the fourth text cell to the Grid
+            txt4 = new System.Windows.Controls.TextBlock();
+            txt4.TextContent = "Quarter 3";
+            txt4.FontSize = 12;
+            txt4.FontWeight = System.Windows.FontWeight.Bold;
+            Grid.SetRow(txt4, 1);
+            Grid.SetColumn(txt4, 2);
+
+            // Add the sixth text cell to the Grid
+            txt5 = new System.Windows.Controls.TextBlock();
+            txt5.TextContent = "50,000";
+            txt5.FontSize = 12;
+            txt5.FontWeight = System.Windows.FontWeight.Normal;
+            Grid.SetRow(txt5, 2);
+            Grid.SetColumn(txt5, 0);
+
+            // Add the seventh text cell to the Grid
+            txt6 = new System.Windows.Controls.TextBlock();
+            txt6.TextContent = "100,000";
+            txt6.FontSize = 12;
+            txt6.FontWeight = System.Windows.FontWeight.Normal;
+            Grid.SetRow(txt6, 2);
+            Grid.SetColumn(txt6, 1);
+            
+            // Add the final text cell to the Grid
+            txt7 = new System.Windows.Controls.TextBlock();
+            txt7.TextContent = "150,000";
+            txt7.FontSize = 12;
+            txt7.FontWeight = System.Windows.FontWeight.Normal;
+            Grid.SetRow(txt7, 2);
+            Grid.SetColumn(txt7, 2);
+		
+            grid1.Children.Add(txt1);
+            grid1.Children.Add(txt2);
+            grid1.Children.Add(txt3);
+            grid1.Children.Add(txt4);
+            grid1.Children.Add(txt5);
+            grid1.Children.Add(txt6);
+            grid1.Children.Add(txt7);
+            mainWindow.Content = grid1;
+            mainWindow.Show();
+
+        }
+    }
+
+    internal sealed class EntryClass 
+    {
+        [System.STAThread()]
+        private static void Main()
+        {
+            app app = new app();
+            app.Run();
+        }
+    }
+}
+</Paragraph>
+<Paragraph Style="{StaticResource SubHeaderStyle}" Name="gridrelated">Related Topics<LineBreak/></Paragraph>
+<List>
+    <ListItem><Paragraph Style="{StaticResource mainContentStyle}"><Hyperlink NavigateUri="canvas_ovw.xaml" TargetName="frame2">Canvas Overview</Hyperlink></Paragraph></ListItem>
+    <ListItem><Paragraph Style="{StaticResource mainContentStyle}"><Hyperlink NavigateUri="dockpanel_ovw.xaml" TargetName="frame2">DockPanel Overview</Hyperlink></Paragraph></ListItem>
+    <ListItem><Paragraph Style="{StaticResource mainContentStyle}"><Hyperlink NavigateUri="documents_ovw.xaml" TargetName="frame2">Documents Overview</Hyperlink></Paragraph></ListItem>    
+    <ListItem><Paragraph Style="{StaticResource mainContentStyle}"><Hyperlink NavigateUri="layout_ovw.xaml" TargetName="frame2">Layout "Cook Book"</Hyperlink></Paragraph></ListItem>
+    <ListItem><Paragraph Style="{StaticResource mainContentStyle}"><Hyperlink NavigateUri="panels_ovw.xaml" TargetName="frame2">Panels Overview</Hyperlink></Paragraph></ListItem>
+    <ListItem><Paragraph Style="{StaticResource mainContentStyle}"><Hyperlink NavigateUri="stackpanel_ovw.xaml" TargetName="frame2">StackPanel Overview</Hyperlink></Paragraph></ListItem>
+</List>
+
+
+<Paragraph Style="{StaticResource mainContentStyle}">Send comments about this topic to Microsoft. © Microsoft Corporation. All rights reserved.</Paragraph>
+    
+    
+</FlowDocument>
+</FlowDocumentPageViewer>

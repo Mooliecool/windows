@@ -1,0 +1,45 @@
+package Microsoft.Samples;
+
+import System.*;
+import System.IO.*;
+import System.Runtime.Serialization.*;
+import System.Runtime.Serialization.Formatters.Binary.*;
+import Microsoft.Samples.Test.*;
+
+/// <summary>
+/// Summary description for Class1.
+/// </summary>
+class TestV1
+{
+    /// <summary>
+    /// The main entry point for the application.
+    /// </summary>
+    /** @attribute STAThread()
+     */
+    public static void main(String[] args)
+    {
+        //
+        // TODO: Add code to start application here
+        //
+        BinaryFormatter formatter = new BinaryFormatter();
+        FileStream v2File = null;
+        try {
+            v2File = new FileStream("..\\..\\..\\..\\Output\\v2Output.bin",
+                FileMode.Open);
+            Person aV2Person = (Person)(formatter.Deserialize(v2File));
+            Console.WriteLine("\nPerson values after deserialize from v2:");
+            Console.WriteLine("\tName: " + aV2Person.get_Name());
+            Console.WriteLine("\tAddress: " + aV2Person.get_Address());
+            Console.WriteLine("\tBirth Date: "
+                + aV2Person.get_BirthDate().ToShortDateString());
+        }
+        catch (FileNotFoundException e) {
+            Console.WriteLine("An error occurred:\n" + e.ToString());
+        }
+        finally {
+            if (v2File != null) {
+                v2File.Close();
+            }
+        }
+    } //main
+} //TestV1

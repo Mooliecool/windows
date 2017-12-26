@@ -1,0 +1,36 @@
+namespace FixedLinearTopologySample
+{
+    using System;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Navigation;
+
+    public partial class WizardPage3 : PageFunction<WizardResult>
+    {
+        public WizardPage3(WizardData WizardData)
+        {
+            InitializeComponent();
+
+            // Bind Wizard state to UI
+            this.DataContext = WizardData;
+        }
+
+        void backButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Go to previous Wizard page
+            this.NavigationService.GoBack();
+        }
+
+        void cancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Cancel the Wizard and don't return any data
+            OnReturn(new ReturnEventArgs<WizardResult>(WizardResult.Canceled));
+        }
+
+        void finishButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Finish the Wizard and return bound data to calling page
+            OnReturn(new ReturnEventArgs<WizardResult>(WizardResult.Finished));
+        }
+    }
+}

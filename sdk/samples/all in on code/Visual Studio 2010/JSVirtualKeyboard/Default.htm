@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<!--
+/*************************** Module Header *******************************\
+ Module Name:    Default.htm
+ Project:        JSVirtualKeyboard
+ Copyright (c) Microsoft Corporation
+
+ This project illustrates how to make a virtual keyboard on the page. For
+ example, if we need a password textbox somewhere and we need it can only
+ be inputted through a virtual keyboard on the page, this sample may give
+ a quick start to build a solution for this situation.
+ 
+ 
+ This source is subject to the Microsoft Public License.
+ See http://www.microsoft.com/opensource/licenses.mspx#Ms-PL.
+ All other rights reserved.
+\*************************************************************************/
+ -->
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+    <script type="text/javascript">
+        function load() {
+            // Create a array for the random number.
+            var array = new Array();
+
+            while (array.length < 10) {
+                // Get a random number from 0 to 9 via Math.random().
+                var temp = Math.round(Math.random() * 9);
+                // Check if the random number is contained in the array.               
+                if (!contain(array, temp)) {
+                    // insert it into the array.
+                    array.push(temp);
+                }
+            }
+
+            // After the while loop, we will get an array of 10 random number
+            // from 0 to 9 without repeat. For example: (3,0,5,4,8,6,1,2,9,7).
+
+            // Then, we will set the value of the number buttons to each item in this array.
+            // btn0.value = 3
+            // btn1.value = 0
+            // btn2.value = 5
+            // ...
+            // btn8.value = 9
+            // btn9.value = 7
+
+            // This will give us a disordered virtual number keyboard.
+
+            for (i = 0; i < 10; i++) {
+                // Get the button and set its value to the random number.
+                var btn = document.getElementById("btn" + i);
+                btn.value = array[i];
+            }
+        }
+
+        function contain(array, num) {
+            // Check if the random number is contained in the array.    
+            for (var i = 0; i < array.length; i++) {
+                if (array[i] == num) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function input(e) {
+            // Get the TextBox object.
+            var tbInput = document.getElementById("tbInput");
+
+            // As e is the button, its value is the text on it.
+            // Add the value to the TextBox.
+            tbInput.value = tbInput.value + e.value;
+        }
+
+        function del() {
+            // Get the TextBox object.
+            var tbInput = document.getElementById("tbInput");
+
+            // Remove the last char in the TextBox.
+            tbInput.value = tbInput.value.substr(0, tbInput.value.length - 1);
+        }
+    </script>
+</head>
+<body onload="load();">
+    <form id="form1" runat="server">
+    <div>
+        <input id="tbInput" type="text" />
+        <p />
+        <div id="VirtualKey">
+            <input id="btn1" type="button" onclick="input(this);" />
+            <input id="btn2" type="button" onclick="input(this);" />
+            <input id="btn3" type="button" onclick="input(this);" />
+            <br />
+            <input id="btn4" type="button" onclick="input(this);" />
+            <input id="btn5" type="button" onclick="input(this);" />
+            <input id="btn6" type="button" onclick="input(this);" />
+            <br />
+            <input id="btn7" type="button" onclick="input(this);" />
+            <input id="btn8" type="button" onclick="input(this);" />
+            <input id="btn9" type="button" onclick="input(this);" />
+            <br />
+            <input id="btn0" type="button" onclick="input(this)" />
+            <input id="btnDel" type="button" value="Backspace" onclick="del();" />
+        </div>
+    </div>
+    </form>
+</body>
+</html>

@@ -1,0 +1,239 @@
+﻿<Window x:Class="CSWPFDataBinding.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local ="clr-namespace:CSWPFDataBinding"
+    Title="MainWindow" Height="600" Width="600">
+    <Window.Resources>
+        
+        <!--Data Providers-->
+        <ObjectDataProvider x:Key="defaultPerson" ObjectType="{x:Type local:Person}"></ObjectDataProvider>
+        <ObjectDataProvider x:Key="persons" ObjectType="{x:Type local:Persons}"></ObjectDataProvider>
+        <CollectionViewSource x:Key="personSource" Source="{StaticResource persons}"></CollectionViewSource>
+        <!--Converters-->
+        <local:SalaryFormmatingConverter x:Key="con"></local:SalaryFormmatingConverter>
+        
+        <!--Board Style-->
+        <Style TargetType="{x:Type Border}" >
+            <Style.Setters>
+                <Setter Property="BorderBrush" Value="Blue"></Setter>
+                <Setter Property="BorderThickness" Value="1.0"></Setter>
+                <Setter Property="Background" Value="White"></Setter>
+                <Setter Property="CornerRadius" Value="10"></Setter>
+            </Style.Setters>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderThickness" Value="2.0"></Setter>
+                    <Setter Property="BorderBrush" Value="Yellow"></Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <!-- Error Template for TextBox-->
+        <ControlTemplate x:Key="errorTemplate">
+            <DockPanel>
+                <AdornedElementPlaceholder></AdornedElementPlaceholder>
+                <TextBlock Foreground="Red" FontSize="20" Text="!"></TextBlock>
+            </DockPanel>
+        </ControlTemplate>
+    </Window.Resources>
+    <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto">
+            </RowDefinition>
+            <RowDefinition Height="Auto">
+            </RowDefinition>
+            <RowDefinition Height="Auto">
+            </RowDefinition>
+            <RowDefinition Height="Auto">
+            </RowDefinition>
+            <RowDefinition Height="Auto">
+            </RowDefinition>
+            <RowDefinition Height="Auto">
+            </RowDefinition>
+            <RowDefinition Height="Auto">
+            </RowDefinition>
+            <RowDefinition Height="Auto">
+            </RowDefinition>
+        </Grid.RowDefinitions>
+        
+        <TextBlock Text="Binding using XAML code:" Grid.Row="0" Grid.ColumnSpan="2"></TextBlock>
+        <TextBlock Text="Binding using Procedure code:" Grid.Row="2" Grid.ColumnSpan="2"></TextBlock>
+        <TextBlock Text="CollectionBinding using Xaml" Grid.Row="4" Grid.ColumnSpan="2"></TextBlock>
+        <TextBlock Text="CollectionBinding using Procedure Code" Grid.Row="6" Grid.ColumnSpan="2"></TextBlock>
+        
+        <Border Grid.Column="0" Grid.Row="1">
+            <StackPanel Margin="10" >
+                <!--Twoway binding, and the change will be propagated to the source to target once propery is changed.-->
+                <StackPanel Orientation="Horizontal" >
+                    <Label>Name:</Label>
+                    <TextBox  Text="{Binding  Name, Source ={StaticResource defaultPerson}, Mode=Twoway,
+                                                                UpdateSourceTrigger=PropertyChanged }" Height="25" Width="222"></TextBox>
+                </StackPanel>
+                <!--The default UpdateSourceTrigger property for Text is LostFocus, you will find source will be updated when the Textbox losts focus.
+                    You will see Textbox will not load the defalut value when it is loaded due to it uses OneWayToSouce binding mode.
+                -->
+                <StackPanel Orientation="Horizontal"  >
+                    <Label Width="44" Height="25">Job:</Label>
+                    <TextBox   Text="{Binding Job, Source={StaticResource defaultPerson}, Mode = OneWayToSource}" Height="26" Width="222"></TextBox>
+                </StackPanel>
+                <!--If age is less than 0, or much bigger than 300. There will be "!" appearing next to TextBox indicating the input error-->
+                <StackPanel Orientation="Horizontal"  >
+                    <Label Height="26" Width="44">Age:</Label>
+                    <TextBox  Height="26" Width="222" Validation.ErrorTemplate="{StaticResource errorTemplate}">
+                        <TextBox.Text>
+                            <Binding Path="Age" Source="{StaticResource defaultPerson}">
+                                <Binding.ValidationRules>
+                                    <local:AgeValidationRule></local:AgeValidationRule>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+                </StackPanel>
+                
+                
+                 <StackPanel Orientation="Horizontal"  >
+                    <Label Height="26" Width="44">Salary:</Label>
+                    <TextBox  Text="{Binding Salary, Source={StaticResource defaultPerson}, Mode=Twoway, UpdateSourceTrigger =PropertyChanged}"
+                                                                    Height="26" Width="222"></TextBox>
+                </StackPanel>
+                
+                <!--The target will be updated only if we change the source if the binding mode is Oneway-->
+                 <StackPanel Orientation="Horizontal"  >
+                    <Label Height="23" Width="53">Interest:</Label>
+                    <TextBox  Text="{Binding Interest, Source={StaticResource defaultPerson}, Mode =Oneway}" Height="26" Width="222"></TextBox>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+        <Border Grid.Column="1" Grid.Row="1">
+            <StackPanel Margin="10" >
+                <StackPanel Orientation="Horizontal">
+                    <Label>Name:</Label>
+                    <Label  Content="{Binding Name, Source ={StaticResource defaultPerson}}" Height="25" Width="222"></Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="44" Height="25">Job:</Label>
+                    <Label    Content="{Binding Job, Source={StaticResource defaultPerson}}" Height="26" Width="222"></Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Height="26" Width="44">Age:</Label>
+                    <Label   Content="{Binding Age, Source={StaticResource defaultPerson}}" Height="26" Width="222"></Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal"  >
+                    <Label Height="26" Width="44">Salary:</Label>
+                    <!--Here We use the converter to format the salar so that user can see a more readable text-->
+                    <Label  Content="{Binding Salary, Source={StaticResource defaultPerson}, Converter={StaticResource con}}" Height="26" Width="222"></Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Height="25" Width="56">Interest:</Label>
+                    <Label  Content="{Binding Interest, Source={StaticResource defaultPerson}}" Height="26" Width="222"></Label>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+
+        <!--Binding using Procedure code-->
+        <Border Grid.Column="0" Grid.Row="3">
+            <StackPanel Margin="10" >
+                <!--Twoway binding, and the change will be propagated to the source to target once propery is changed.-->
+                <StackPanel Orientation="Horizontal" >
+                    <Label>Name:</Label>
+                    <TextBox Name="tbPersonName" Height="26" Width="222"></TextBox>
+                </StackPanel>
+                <!--The default UpdateSourceTrigger property for Text is LostFocus, you will find source will be updated when the Textbox losts focus.
+                    You will see Textbox will not load the defalut value when it is loaded due to it uses OneWayToSouce binding mode.
+                -->
+                <StackPanel Orientation="Horizontal"  >
+                    <Label Width="44" Height="25">Job:</Label>
+                    <TextBox Name="tbPersonJob"   Text="{Binding Job, Source={StaticResource defaultPerson}, Mode = OneWayToSource}" Height="26" Width="222"></TextBox>
+                </StackPanel>
+                <!---->
+                <StackPanel Orientation="Horizontal"  >
+                    <Label Height="26" Width="44">Age:</Label>
+                    <TextBox Name="tbPersonAge"  Height="26" Width="222" Validation.ErrorTemplate="{StaticResource errorTemplate}">
+                        <TextBox.Text>
+                            <Binding Path="Age" Source="{StaticResource defaultPerson}">
+                                <Binding.ValidationRules>
+                                    <local:AgeValidationRule></local:AgeValidationRule>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+                </StackPanel>
+                
+                 <StackPanel Orientation="Horizontal"  >
+                    <Label Height="26" Width="44">Salary:</Label>
+                    <TextBox Name="tbPersonSalary" Text="{Binding Salary, Source={StaticResource defaultPerson}, Mode=Twoway, UpdateSourceTrigger =PropertyChanged}"
+                                                                    Height="26" Width="222"></TextBox>
+                </StackPanel>
+                
+                <!--The target will be updated only if we change the source if the binding mode is Oneway-->
+                <StackPanel Orientation="Horizontal"  >
+                    <Label Height="23" Width="53">Interest:</Label>
+                    <TextBox Name="tbPersonInterest" Text="{Binding Interest, Source={StaticResource defaultPerson}, Mode =Oneway}" Height="26" Width="222"></TextBox>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+        <Border Grid.Column="1" Grid.Row="3">
+            <StackPanel Margin="10" >
+                <StackPanel Orientation="Horizontal">
+                    <Label>Name:</Label>
+                    <Label Name="lblPersonName"  Content="{Binding Name, Source ={StaticResource defaultPerson}}" Height="25" Width="222"></Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="44" Height="25">Job:</Label>
+                    <Label Name="lblPersonJob"   Content="{Binding Job, Source={StaticResource defaultPerson}}" Height="26" Width="222"></Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Height="26" Width="44">Age:</Label>
+                    <Label Name="lblPersonAge"  Content="{Binding Age, Source={StaticResource defaultPerson}}" Height="26" Width="222"></Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal"  >
+                    <Label Height="26" Width="44">Salary:</Label>
+                    <Label Name="lblPersonSalary" Content="{Binding Salary, Source={StaticResource defaultPerson}, Converter={StaticResource con}}" Height="26" Width="222"></Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Height="25" Width="56">Interest:</Label>
+                    <Label Name="lblPersonInterest" Content="{Binding Interest, Source={StaticResource defaultPerson}}" Height="26" Width="222"></Label>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+        <!--Collection Binding Using Xaml-->
+        <Border Grid.Row="5" Grid.ColumnSpan="2">
+        <ListBox DataContext="{StaticResource personSource}" ItemsSource="{Binding .}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Label>Name:</Label>
+                            <Label Content="{Binding Name}"></Label>
+                            <Label>Job:</Label>
+                            <Label Content="{Binding Job}"></Label>
+                            <Label>Interest:</Label>
+                            <Label Content="{Binding Interest}"></Label>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+         </Border>
+
+        <!--Collection Binding Using Procedure code-->
+        <Border Grid.Row="7" Grid.ColumnSpan="2">
+            <ListBox Name="lb">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Label>Name:</Label>
+                            <Label Content="{Binding Name}"></Label>
+                            <Label>Job:</Label>
+                            <Label Content="{Binding Job}"></Label>
+                            <Label>Interest:</Label>
+                            <Label Content="{Binding Interest}"></Label>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+    </Grid>
+</Window>

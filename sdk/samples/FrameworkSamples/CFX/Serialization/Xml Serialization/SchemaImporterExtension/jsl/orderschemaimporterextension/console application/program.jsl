@@ -1,0 +1,66 @@
+package Microsoft.Samples;
+
+#region Import Directives
+import System.*;
+import System.Collections.*;
+import System.IO.*;
+import System.Collections.Generic.*;
+import System.Text.*;
+import System.Xml.Serialization.*;
+import System.Xml.*;
+import System.Xml.Schema.*;
+import System.Web.Services.Description.*;
+import System.Web.Services.Discovery.*;
+import System.CodeDom.*;
+import System.CodeDom.Compiler.*;
+import Microsoft.VJSharp.*;
+#endregion
+   
+class Program
+{
+    public static void main(String[] args)
+    {
+        Uri wsdlLocation = new Uri(Directory.GetCurrentDirectory()
+            + "\\..\\..\\..\\OrderService.wsdl");
+        Console.WriteLine("Beginning schema import.");
+        Console.WriteLine();
+
+        DiscoveryClientProtocol client = new DiscoveryClientProtocol();
+        client.set_AllowAutoRedirect(true);
+        DiscoveryDocument doc = client.DiscoverAny(wsdlLocation.ToString());
+        client.ResolveAll();
+
+        WebReferenceCollection references = new WebReferenceCollection();
+        //add 1st web reference document
+        WebReference wr = new WebReference(client.get_Documents(),
+            new CodeNamespace("Microsoft.Samples"));
+        references.Add(wr);
+        //add other web reference documents if needed
+        CodeDomProvider codeProvider = new Microsoft.VJSharp.VJSharpCodeProvider();
+        CodeCompileUnit ccu = new CodeCompileUnit();
+        ccu.get_Namespaces().Add(wr.get_ProxyCode());
+        ICodeGenerator codegen = codeProvider.CreateGenerator();
+        try {
+            //This is the new API call
+            ServiceDescriptionImporter.GenerateWebReferences(references, 
+				codeProvider,
+				ccu,
+                 new WebReferenceOptions());
+        }
+        catch (System.Exception ex) {
+            //do exception handling
+        }        
+        StreamWriter writer = new StreamWriter("OrderProxy.jsl", false,
+            new System.Text.UTF8Encoding(true));
+        codegen.GenerateCodeFromCompileUnit(ccu, writer, null);
+        writer.Close();
+
+        //importer.Import(new CodeNamespace("Microsoft.Samples"), compileUnit);
+        Console.WriteLine();
+        Console.WriteLine("Schema import completed.");
+        //reader.Close();
+        Console.WriteLine("Finished. Press any key to continue...");
+        Console.ReadLine();
+        System.Diagnostics.Process.Start("notepad", "OrderProxy.jsl");
+    } //main 
+} //Program

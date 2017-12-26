@@ -1,0 +1,247 @@
+package Microsoft.Samples;
+
+import System.*;
+import System.IO.*;
+import System.Xml.Serialization.*;
+import System.Xml.Schema.*;
+import System.Xml.*;
+import System.Collections.*;
+import System.ComponentModel.*;
+import System.Web.*;
+
+/** @attribute XmlSchemaProvider("OrderSchema")
+ */
+/** @attribute XmlRoot("order", Namespace = "http://orders/", IsNullable = true)
+ */
+public class Order implements IXmlSerializable
+{
+    int orderNumber;
+    String orderName;
+    String shipTo;
+    String shipAddress1;
+    String shipAddress2;
+    static String ordersNamespace = "http://orders/";
+
+    public static Order Create(int id)
+    {
+        Order o = new Order();
+        o.Fill(id);
+        return o;
+    } //Create
+
+    public void Fill(int id)
+    {
+        orderNumber = id;
+        orderName = "Order#" + ((Int32)orderNumber).ToString();
+        shipTo = "Customer Name";
+        shipAddress1 = "One Main Street";
+        shipAddress2 = "Springfield, VA";
+    } //Fill
+
+    static Order ReadOrder(XmlReader r, Order o) throws InvalidOperationException
+    {
+        if (IsNull(r)) {
+            r.Skip();
+            return o;
+        }
+        XmlQualifiedName qName;
+        String type = r.GetAttribute("type", XmlSchema.InstanceNamespace);
+        if (type == null) {
+            qName = null;
+        }
+        qName = ToQname(r, type);
+        if (qName != null) {
+            if (!(qName.get_Namespace().Equals(ordersNamespace))
+                || !(qName.get_Name().Equals("Order"))) {
+                throw new InvalidOperationException("Unexpected xsi:type='"
+                    + qName + "'");
+            }
+        }
+        type = r.GetAttribute("nil", XmlSchema.InstanceNamespace);
+        if (IsNull(r)) {
+            r.Skip();
+            return o;
+        }
+        if (r.get_IsEmptyElement()) {
+            return o;
+        }
+        if (o == null) {
+            o = new Order();
+        }
+        r.ReadStartElement();
+        ReadOrderMembers(r, o);
+        r.ReadEndElement();
+        return o;
+    } //ReadOrder
+
+    static void ReadOrderMembers(XmlReader r, Order o)
+    {
+        r.MoveToContent();
+        o.orderNumber = XmlConvert.ToInt32(r.ReadElementString("OrderNumber",
+            ordersNamespace));
+        if (r.get_LocalName().Equals("OrderName")
+            && r.get_NamespaceURI().Equals(ordersNamespace)) {
+            if (r.get_IsEmptyElement()) {
+                o.orderName = IsNull(r) ? null : "";
+            }
+            else {
+                o.orderName = r.ReadElementString();
+            }
+        }
+        if (r.get_LocalName().Equals("ShipTo")
+            && r.get_NamespaceURI().Equals(ordersNamespace)) {
+            if (r.get_IsEmptyElement()) {
+                o.shipTo = IsNull(r) ? null : "";
+            }
+            else {
+                o.shipTo = r.ReadElementString();
+            }
+        }
+        if (r.get_LocalName().Equals("ShipAddress1")
+            && r.get_NamespaceURI().Equals(ordersNamespace)) {
+            if (r.get_IsEmptyElement()) {
+                o.shipAddress1 = IsNull(r) ? null : "";
+            }
+            else {
+                o.shipAddress1 = r.ReadElementString();
+            }
+        }
+        if (r.get_LocalName().Equals("ShipAddress2")
+            && r.get_NamespaceURI().Equals(ordersNamespace)) {
+            if (r.get_IsEmptyElement()) {
+                o.shipAddress2 = IsNull(r) ? null : "";
+            }
+            else {
+                o.shipAddress2 = r.ReadElementString();
+            }
+        }
+        r.MoveToContent();
+    } //ReadOrderMembers
+
+    static boolean IsNull(XmlReader r)
+    {
+        String isNull = r.GetAttribute("nil", XmlSchema.InstanceNamespace);
+        if (isNull == null || !(XmlConvert.ToBoolean(isNull))) {
+            return false;
+        }
+        return true;
+    } //IsNull
+
+    public void WriteXml(XmlWriter writer) throws System.Exception
+    {
+        Order.Write(this, true, writer);
+    } //WriteXml
+
+    static void Write(Order o, boolean isNilable, XmlWriter w) throws System.Exception
+    {
+        if (IsNullOrder(o, isNilable, w)) {
+            return;
+        }
+        String qName = GetQualifiedName(o.GetType(), ordersNamespace, w);
+        w.WriteAttributeString("xsi", "type", XmlSchema.InstanceNamespace, qName);
+        WriteOrderMembers(o, isNilable, w);
+    } //Write
+
+    static void WriteOrderMembers(Order o, boolean isNilable, XmlWriter w)
+    {
+        String prefix = w.LookupPrefix(ordersNamespace);
+        w.WriteElementString("OrderNumber", ordersNamespace,
+            XmlConvert.ToString(o.orderNumber));
+        if (o.orderName != null) {
+            w.WriteElementString("OrderName", ordersNamespace, o.orderName);
+        }
+        if (o.shipTo != null) {
+            w.WriteElementString("ShipTo", ordersNamespace, o.shipTo);
+        }
+        if (o.shipAddress1 != null) {
+            w.WriteElementString("ShipAddress1", ordersNamespace, o.shipAddress1);
+        }
+        if (o.shipAddress2 != null) {
+            w.WriteElementString("ShipAddress2", ordersNamespace, o.shipAddress2);
+        }
+    } //WriteOrderMembers
+
+    public XmlSchema GetSchema()
+    {
+        return null;
+    } // GetSchema
+
+    public void ReadXml(XmlReader r) throws InvalidOperationException
+    {
+        ReadOrder(r, this);
+    } //ReadXml
+
+    static boolean IsNullOrder(Order o, boolean isNilable, XmlWriter w)
+    {
+        if (o == null) {
+            if (isNilable) {
+                w.WriteAttributeString("xsi", "nil",
+                    XmlSchema.InstanceNamespace, "true");
+            }
+            return true;
+        }
+        return false;
+    } //IsNullOrder
+
+    public static XmlQualifiedName OrderSchema(XmlSchemaSet xs)
+    {
+        XmlSerializer schemaSerializer =
+            new XmlSerializer(XmlSchema.class.ToType());
+        XmlSchema s = (XmlSchema)(schemaSerializer.Deserialize(
+            new XmlTextReader(HttpContext.get_Current().get_Server().
+            MapPath("Order.xsd")), null));
+        xs.set_XmlResolver(new XmlUrlResolver());
+        xs.Add(s);
+        return new XmlQualifiedName("Order", ordersNamespace);
+    } //OrderSchema
+
+    static String GetQualifiedName(Type type, String ns, XmlWriter w)
+        throws System.Exception
+    {
+        String name;
+        if (type.Equals(Order.class.ToType())) {
+            name = "Order";
+        }
+        else {
+            throw new System.Exception("Unknown type " + type.get_FullName());
+        }
+        if (ns == null || ns.get_Length() == 0) {
+            return name;
+        }
+        String prefix = w.LookupPrefix(ns);
+        if (prefix == null) {
+            if (ns == "http://www.w3.org/XML/1998/namespace") {
+                prefix = "xml";
+            }
+            else {
+                prefix = "tns";
+                w.WriteAttributeString("xmlns", prefix, null, ns);
+            }
+        }
+        else {
+            if (prefix.get_Length() == 0) {
+                return name;
+            }
+        }
+        return prefix + ":" + name;
+    } //GetQualifiedName
+
+    static XmlQualifiedName ToQname(XmlReader r, String value)
+        throws InvalidOperationException
+    {
+        int colon = value.LastIndexOf(':');
+        value = XmlConvert.DecodeName(value);
+        if (colon < 0) {
+            return new XmlQualifiedName(value, r.LookupNamespace(""));
+        }
+        else {
+            String ns = r.LookupNamespace(value.Substring(0, colon));
+            if (ns == null) {
+                // Namespace prefix '{0}' is not defined.
+                throw new InvalidOperationException("Undefined alias: "
+                    + value.Substring(0, colon));
+            }
+            return new XmlQualifiedName(value.Substring(colon + 1), ns);
+        }
+    } //ToQname
+} //Order

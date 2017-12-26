@@ -1,0 +1,89 @@
+import System.*;
+import System.Net.*;
+import System.IO.*;
+import System.Text.*;
+import System.Globalization.*;
+
+// The HttpRequestListener example demonstrates how to add the ability to process
+// HTTP requests from within a client application.
+public class HttpRequestListener
+{
+    public static void main(String[] args)
+    {
+        String prefixes[] = new String[1];
+        prefixes.set_Item(0, "http://*:8080/HttpListener/");
+        ProcessRequests(prefixes);
+    } //main
+
+    public static void ProcessRequests(String prefixes[])
+    {
+        if (!(HttpListener.get_IsSupported())) {
+            Console.WriteLine("Windows XP SP2, Server 2003, or higher is " 
+                + "required to use the HttpListener class.");
+            return;
+        }
+        // URI prefixes are required,
+        if (prefixes == null || prefixes.get_Length() == 0) {
+            throw new ArgumentException("prefixes");
+        }
+        // Create a listener and add prefixes.
+        HttpListener listener = new HttpListener();
+        for (int iCtr = 0; iCtr < prefixes.get_Length(); iCtr++) {
+            String s = prefixes[iCtr];
+            listener.get_Prefixes().Add(s);
+        }
+
+        try
+        {
+            // Start the listener.
+            listener.Start();
+            Console.WriteLine("Listening...");
+
+            // Set the number of requests this application will handle.
+            int numRequestsToBeHandled = 10;
+
+            for (int i = 0; i < numRequestsToBeHandled; i++)
+            {
+                HttpListenerResponse response = null;
+                try
+                {
+                    // Note: GetContext blocks while waiting for a request. 
+                    HttpListenerContext context = listener.GetContext();
+
+                    // Construct a response.
+                    response = context.get_Response();
+                    String responseString = 
+                        "<HTML><BODY>The time is currently " + 
+                        DateTime.get_Now().ToString(
+                        DateTimeFormatInfo.get_CurrentInfo()) +
+                        "</BODY></HTML>";
+                    ubyte buffer[] = 
+                        Encoding.get_UTF8().GetBytes(responseString);
+                    // Get a response stream and write the response to it.
+                    response.set_ContentLength64(buffer.get_Length());
+                    System.IO.Stream output = response.get_OutputStream();
+                    output.Write(buffer, 0, buffer.get_Length());
+                }
+                catch (HttpListenerException ex)
+                {
+                    Console.WriteLine(ex.get_Message());
+                }
+                finally
+                {
+                    if (response != null)
+                        response.Close();
+                }
+            }
+        }
+        catch (HttpListenerException ex)
+        {
+            Console.WriteLine(ex.get_Message());
+        }
+        finally
+        {
+            // Stop listening for requests.
+            listener.Close();
+            Console.WriteLine("Done Listening...");
+        }
+    } //ProcessRequests
+} //HttpRequestListener

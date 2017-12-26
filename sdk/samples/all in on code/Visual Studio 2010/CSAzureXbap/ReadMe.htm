@@ -1,0 +1,204 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>Untitled Page</title>
+    <style type="text/css">
+
+
+		H2
+		{
+			color: #003399;
+			font-size: 125%;
+		}
+		
+		H3
+		{
+			color: #0033DD;
+			font-size: 110%;
+		}
+	</style>
+</head>
+<body>
+
+    <h2>
+        Overview</h2>
+    <p>
+        In a typical cloud development scenario, you host a web service in the cloud, 
+        distribute a client application from the cloud, and consume the service from the 
+        client application.</p>
+    <p>
+        This sample demonstrates the above typical scenario, where the client 
+        application is a XBAP application, and the cloud service is a WCF service hosted 
+        in a Windows Azure Web Role.</p>
+    <h2>
+        Choose Silverlight or XBAP</h2>
+    <p>
+        I create this sample because several customers ask how to distribute XBAP from 
+        Windows Azure. But before you go, please note in most cases, you should use 
+        Silverlight rather than XBAP. Silverlight has a bunch of advantages over XBAP, 
+        for example:</p>
+    <ul>
+        <li>Client only needs a Silverlight plug-in (about 5MB download), rather than .NET 
+            Client Profile (about 30MB download), or full .NET (about 50MB download).</li>
+        <li>Supported on Mac OS (and Linux via Moonlight).</li>
+        <li>Support more web browsers.</li>
+        <li>Easier to consume web services, both a service from the same Web Role, or a 
+            cross domain service.</li>
+        <li>Easier to deploy, and can be associated to a Web Role project automatically.</li>
+        <li>Supports OOB.</li>
+        <li>Easier to port to Windows Phone.</li>
+        <li>Deep Zoom integration.</li>
+    </ul>
+    <p>
+        However, XBAP also provides its unique features, which are either difficult, or 
+        impossible to achieve in Silverlight. This includes full 3D capabilities and full 
+        trust mode.</p>
+    <p>
+        This sample uses the CS/VBWPF3DMultiTouch sample we built a while ago, since 3D 
+        is a one of the use cases where XBAP makes more sense than Silverlight. For more 
+        information about the client application, please read the ReadMe.htm document in 
+        the CS/VBWPF3DMultiTouch sample.</p>
+    <p>
+        A few modifications have been made on the client sample:</p>
+    <ol>
+        <li>Use XBAP instead of a desktop WPF application.</li>
+        <li>Use the default partial trust model of XBAP. Fortunately, the 
+            CS/VBWPF3DMultiTouch sample doesn&#39;t require any features that are not supported 
+            in partial trust.</li>
+        <li>Invoke a WCF service to obtain the Windows Azure data center list. (The original 
+            sample embeds the list in the client application directly.)</li>
+    </ol>
+    <h2>
+        Prerequisites</h2>
+    <p>
+        For this sample to work, you must have Visual Studio 2010, .NET 4, and Windows 
+        Azure SDK 1.3 or later. You must use Windows 7. You also need to have a Windows 7 
+        compatible multi-touch screen. If you don&#39;t have a touch screen, you can still 
+        use mouse to manipulate the earth, but you won&#39;t be able to enjoy the fun 
+        provided by the touching experience.</p>
+    <h2>
+        Distribute XBAP from Windows Azure</h2>
+    <p>
+        To distribute a XBAP from Windows Azure, please use the following steps:</p>
+    <ol>
+        <li>Create a Windows Azure solution with at least one Web Role project.</li>
+        <li>Create a new (or include an existing) XBAP project in the same solution.</li>
+        <li>Build the solution.</li>
+        <li>Right click the Web Role project, choose Add existing item, navigate to the 
+            output directory of the XBAP application, and add the following files to the Web 
+            Role project:<ul>
+                <li>***.exe</li>
+                <li>***.exe.manifest</li>
+                <li>***.xbap</li>
+            </ul>
+        </li>
+        <li>Select the above files, and set their Build Action to Content.</li>
+		<li>In the XBAP project&#39;s properties page, click the Publish tab.</li>
+		<li>Click the Options button.</li>
+		<li>In the popup dialog, select the Deployment tab.</li>
+		<li>Uncheck &quot;Use .deploy file extension&quot;. If the check box is checked 
+		(default), the manifest will point to a ***.exe.deploy file instead of 
+		***.exe file.</li>
+		<li>Alternatively, if you don&#39;t perform step 6~9, you can rename the 
+		***.exe file to ***.exe.deploy.</li>
+        <li>If you want to display the XBAP application when the user navigates to the root 
+            URI of your Web Role, please modify web.config, and add the following under the 
+            system.webServer section (replace XbapClient.xbap with your XBAP&#39;s name):<ol>
+                    <pre style="font-family: consolas"><span style="color: blue">&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span 
+                        style="color: #a31515">defaultDocument</span><span style="color: blue">&gt;</span>
+<span style="color: blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color: #a31515">files</span><span 
+                        style="color: blue">&gt;</span>
+<span style="color: blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color: #a31515">clear</span><span 
+                        style="color: blue">/&gt;</span>
+<span style="color: blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;</span><span style="color: #a31515">add</span><span 
+                        style="color: blue">&nbsp;</span><span style="color: red">value</span><span 
+                        style="color: blue">=</span>&quot;<span style="color: blue">XbapClient.xbap</span>&quot;<span 
+                        style="color: blue">/&gt;</span>
+<span style="color: blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/</span><span style="color: #a31515">files</span><span 
+                        style="color: blue">&gt;</span>
+<span style="color: blue">&nbsp;&nbsp;&nbsp;&nbsp;&lt;/</span><span style="color: #a31515">defaultDocument</span><span 
+                        style="color: blue">&gt;</span>
+</pre>
+            </ol>
+        </li>
+    </ol>
+    <p>
+        Now run the solution in Development Fabric, and you should be able to see the 
+        XBAP application. It also works fine after deployed to the real cloud.</p>
+    <p>
+        If you want to modify the original XBAP project, you must take additional steps 
+        for the changes to be reflected in the Web Role:</p>
+    <ul>
+        <li>Open Visual Studio command prompt, and run this command to clear the XBAP cache: 
+            mage -cc</li>
+        <li>Delete the .exe, .manifest, and .xbap files from the Web Role.</li>
+        <li>Repeat step 3 to step 5 above.</li>
+    </ul>
+    <p>
+        As you can see, since a XBAP project cannot be associated to a Web Role project 
+        automatically, you have a lot of manual tasks to do whenever you want to update 
+        the XBAP project. You can try to create a Visual Studio script to automate the 
+        process, but if a Silverlight project meets your requirement, you should 
+        definitely use Silverlight.</p>
+    <h2>
+        Access web services from XBAP</h2>
+    <p>
+        In most cases, the client applications distributed from the cloud need to invoke 
+        web services hosted in the cloud, to provide a true connected experience. This 
+        sample demonstrates how to access a WCF SOAP service from XBAP.</p>
+    <p>
+        The process is similar to accessing a SOAP service from a normal client. If you 
+        need to allow clients to add a service reference to your Windows Azure WCF 
+        service, you need the hotfix and workaround described on
+        <a href="http://support.microsoft.com/kb/971842">
+        http://support.microsoft.com/kb/971842</a>. However, there&#39;re also a few unique 
+        tasks to perform in order to make WCF calls successful in XBAP:</p>
+    <p>
+        First of all, you must configure the service endpoint in code, rather than in 
+        app.config. By default, in Windows Azure (and normal IIS environment), *.config 
+        files, such as web.config and app.config, are not allowed to be downloaded to 
+        the client. You can configure system.webServer to allow the download, but that 
+        makes web.config to be downloadable as well, which may cause serious security 
+        concerns. So it is always recommended to take the code only approach for XBAP 
+        applications. Silverlight applications do not have this problem, because the 
+        configuration file name&#39;s extension is ClientConfig, rather than config.</p>
+    <p>
+        After adding the service reference, please remove the generated app.config file.</p>
+    <p>
+        To configure the service endpoint in code, you can use the following overload of 
+        the client proxy class:</p>
+    <pre style="font-family: consolas"><span style="color: blue">public</span>&nbsp;DataCenterServiceClient(System.ServiceModel.Channels.<span 
+        style="color: #2b91af">Binding</span>&nbsp;binding,&nbsp;System.ServiceModel.<span 
+        style="color: #2b91af">EndpointAddress</span>&nbsp;remoteAddress)
+</pre>
+    <p>
+        This overload requires the service address information. You can use an absolute 
+        address. But if the service is hosted in the same Web Role, it is recommended to 
+        use a relative URI, so that you don&#39;t need to modify the code before deploying 
+        the application to the cloud. The relative URI can be obtained with the help of 
+        BrowserInteropHelper.Source property:</p>
+    <pre style="font-family: consolas">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #2b91af">Uri</span>&nbsp;serviceUri&nbsp;=&nbsp;<span 
+        style="color: blue">new</span>&nbsp;<span style="color: #2b91af">Uri</span>(<span 
+        style="color: #2b91af">BrowserInteropHelper</span>.Source,&nbsp;<span 
+        style="color: #a31515">&quot;../DataCenterService.svc&quot;</span>);
+</pre>
+    <p>
+        In addition, by default, a partial trust XBAP can only consume services from the 
+        same domain. To invoke cross domain services, you must modify the application 
+        properties to use full trust, or grant yourself permission to access web 
+        resources. Silverlight cross domain access policy file does not affect XBAP. 
+        Note if your XBAP is not use the default partial trust configuration, you must 
+        make sure it does not perform any tasks that may harm the end user&#39;s machine, 
+        and you must sign the XBAP with a valid certificate, otherwise you won&#39;t be able 
+        to deploy a non-default partial trust XBAP to an internet environment, such as 
+        the cloud. This sample does not cover the non-default partial trust scenario.</p>
+    <h2>
+        Conclusion</h2>
+    <p>
+        The cloud allows you to host services, as well as distribute client 
+        applications. One type of those client applications is XBAP. As you can see in 
+        the sample, XBAP is fully supported in Windows Azure. However, whenever 
+        Silverlight can be used, you should choose Silverlight instead of XBAP.</p>
+
+</body>
+</html>

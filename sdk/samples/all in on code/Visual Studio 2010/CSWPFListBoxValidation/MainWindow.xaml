@@ -1,0 +1,38 @@
+﻿ <Window x:Class="CSWPFListBoxValidation.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:CSWPFListBoxValidation"
+        Title="CSWPFListBoxValidation" Height="267" Width="405">
+    <Grid>
+        <!-- Here we have provided a label, also bound to the validation rule, where we will display the validation error text if any exists.  -->
+        <Label Height="28" HorizontalAlignment="Stretch" Margin="12,12,12,0" Name="lbValidation" VerticalAlignment="Top">
+            <Label.Content>
+                <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType=Window}" Path="Validation">
+                    <Binding.ValidationRules>
+                        <local:ListBoxValidationRule ValidatesOnTargetUpdated="True"></local:ListBoxValidationRule>
+                    </Binding.ValidationRules>
+                </Binding>
+            </Label.Content>
+        </Label>
+        
+        <!-- Here is the validated list box override, a ValidatingListBox, defined in the C# code for this sample.  -->
+        <local:ValidatingListBox x:Name="validatingListBox1" SelectionMode="Multiple" SelectionChanged="ValidatingListBox_SelectionChanged" Margin="12,46,12,12" ItemsSource="{Binding}">
+           
+            <!-- Here we bind the ValidationListener property to the Validation property of the window, which we 
+                 chose to use for validation in the sample.  
+            -->
+            <local:ValidatingListBox.ValidationListener>
+                <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType=Window}" Path="Validation">
+                    <!-- The ValidationRule is where the magic happens, since it decides whether the ValidatingListBox
+                         is valid or not, based on the presence of error text in the Validation property of the window.  
+                         If it is not valid, the standard Validation UI will present the ValidatingListBox with a red 
+                         line around its border.
+                    -->
+                    <Binding.ValidationRules>
+                        <local:ListBoxValidationRule ValidatesOnTargetUpdated="True" ></local:ListBoxValidationRule>
+                    </Binding.ValidationRules>
+                </Binding>
+            </local:ValidatingListBox.ValidationListener>
+        </local:ValidatingListBox>
+    </Grid>
+</Window>

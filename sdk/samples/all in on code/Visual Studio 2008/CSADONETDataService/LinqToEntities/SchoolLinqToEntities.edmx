@@ -1,0 +1,280 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="SQLServer2005DBModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2005" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2006/04/edm/ssdl">
+        <EntityContainer Name="SQLServer2005DBModelStoreContainer">
+          <EntitySet Name="Course" EntityType="SQLServer2005DBModel.Store.Course" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="CourseGrade" EntityType="SQLServer2005DBModel.Store.CourseGrade" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="CourseInstructor" EntityType="SQLServer2005DBModel.Store.CourseInstructor" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Person" EntityType="SQLServer2005DBModel.Store.Person" store:Type="Tables" Schema="dbo" />
+          <AssociationSet Name="FK_CourseGrade_Course" Association="SQLServer2005DBModel.Store.FK_CourseGrade_Course">
+            <End Role="Course" EntitySet="Course" />
+            <End Role="CourseGrade" EntitySet="CourseGrade" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CourseGrade_Student" Association="SQLServer2005DBModel.Store.FK_CourseGrade_Student">
+            <End Role="Person" EntitySet="Person" />
+            <End Role="CourseGrade" EntitySet="CourseGrade" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CourseInstructor_Course" Association="SQLServer2005DBModel.Store.FK_CourseInstructor_Course">
+            <End Role="Course" EntitySet="Course" />
+            <End Role="CourseInstructor" EntitySet="CourseInstructor" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CourseInstructor_Person" Association="SQLServer2005DBModel.Store.FK_CourseInstructor_Person">
+            <End Role="Person" EntitySet="Person" />
+            <End Role="CourseInstructor" EntitySet="CourseInstructor" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Course">
+          <Key>
+            <PropertyRef Name="CourseID" />
+          </Key>
+          <Property Name="CourseID" Type="int" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" Nullable="false" MaxLength="100" />
+          <Property Name="Credits" Type="int" Nullable="false" />
+          <Property Name="DepartmentID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="CourseGrade">
+          <Key>
+            <PropertyRef Name="EnrollmentID" />
+          </Key>
+          <Property Name="EnrollmentID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="CourseID" Type="int" Nullable="false" />
+          <Property Name="StudentID" Type="int" Nullable="false" />
+          <Property Name="Grade" Type="decimal" Precision="3" Scale="2" />
+        </EntityType>
+        <EntityType Name="CourseInstructor">
+          <Key>
+            <PropertyRef Name="CourseID" />
+            <PropertyRef Name="PersonID" />
+          </Key>
+          <Property Name="CourseID" Type="int" Nullable="false" />
+          <Property Name="PersonID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Person">
+          <Key>
+            <PropertyRef Name="PersonID" />
+          </Key>
+          <Property Name="PersonID" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="LastName" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="FirstName" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="PersonCategory" Type="smallint" Nullable="false" />
+          <Property Name="HireDate" Type="datetime" />
+          <Property Name="EnrollmentDate" Type="datetime" />
+          <Property Name="Picture" Type="image" />
+        </EntityType>
+        <Association Name="FK_CourseGrade_Course">
+          <End Role="Course" Type="SQLServer2005DBModel.Store.Course" Multiplicity="1" />
+          <End Role="CourseGrade" Type="SQLServer2005DBModel.Store.CourseGrade" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Course">
+              <PropertyRef Name="CourseID" />
+            </Principal>
+            <Dependent Role="CourseGrade">
+              <PropertyRef Name="CourseID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CourseGrade_Student">
+          <End Role="Person" Type="SQLServer2005DBModel.Store.Person" Multiplicity="1" />
+          <End Role="CourseGrade" Type="SQLServer2005DBModel.Store.CourseGrade" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Person">
+              <PropertyRef Name="PersonID" />
+            </Principal>
+            <Dependent Role="CourseGrade">
+              <PropertyRef Name="StudentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CourseInstructor_Course">
+          <End Role="Course" Type="SQLServer2005DBModel.Store.Course" Multiplicity="1" />
+          <End Role="CourseInstructor" Type="SQLServer2005DBModel.Store.CourseInstructor" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Course">
+              <PropertyRef Name="CourseID" />
+            </Principal>
+            <Dependent Role="CourseInstructor">
+              <PropertyRef Name="CourseID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_CourseInstructor_Person">
+          <End Role="Person" Type="SQLServer2005DBModel.Store.Person" Multiplicity="1" />
+          <End Role="CourseInstructor" Type="SQLServer2005DBModel.Store.CourseInstructor" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Person">
+              <PropertyRef Name="PersonID" />
+            </Principal>
+            <Dependent Role="CourseInstructor">
+              <PropertyRef Name="PersonID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="SQLServer2005DBModel" Alias="Self" xmlns="http://schemas.microsoft.com/ado/2006/04/edm">
+        <EntityContainer Name="SQLServer2005DBEntities">
+          <EntitySet Name="Course" EntityType="SQLServer2005DBModel.Course" />
+          <EntitySet Name="CourseGrade" EntityType="SQLServer2005DBModel.CourseGrade" />
+          <EntitySet Name="Person" EntityType="SQLServer2005DBModel.Person" />
+          <AssociationSet Name="FK_CourseGrade_Course" Association="SQLServer2005DBModel.FK_CourseGrade_Course">
+            <End Role="Course" EntitySet="Course" />
+            <End Role="CourseGrade" EntitySet="CourseGrade" />
+          </AssociationSet>
+          <AssociationSet Name="FK_CourseGrade_Student" Association="SQLServer2005DBModel.FK_CourseGrade_Student">
+            <End Role="Person" EntitySet="Person" />
+            <End Role="CourseGrade" EntitySet="CourseGrade" />
+          </AssociationSet>
+          <AssociationSet Name="CourseInstructor" Association="SQLServer2005DBModel.CourseInstructor">
+            <End Role="Course" EntitySet="Course" />
+            <End Role="Person" EntitySet="Person" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Course">
+          <Key>
+            <PropertyRef Name="CourseID" />
+          </Key>
+          <Property Name="CourseID" Type="Int32" Nullable="false" />
+          <Property Name="Title" Type="String" Nullable="false" MaxLength="100" Unicode="true" FixedLength="false" />
+          <Property Name="Credits" Type="Int32" Nullable="false" />
+          <Property Name="DepartmentID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="CourseGrade" Relationship="SQLServer2005DBModel.FK_CourseGrade_Course" FromRole="Course" ToRole="CourseGrade" />
+          <NavigationProperty Name="Person" Relationship="SQLServer2005DBModel.CourseInstructor" FromRole="Course" ToRole="Person" />
+        </EntityType>
+        <EntityType Name="CourseGrade">
+          <Key>
+            <PropertyRef Name="EnrollmentID" />
+          </Key>
+          <Property Name="EnrollmentID" Type="Int32" Nullable="false" />
+          <Property Name="Grade" Type="Decimal" Precision="3" Scale="2" />
+          <NavigationProperty Name="Course" Relationship="SQLServer2005DBModel.FK_CourseGrade_Course" FromRole="CourseGrade" ToRole="Course" />
+          <NavigationProperty Name="Person" Relationship="SQLServer2005DBModel.FK_CourseGrade_Student" FromRole="CourseGrade" ToRole="Person" />
+        </EntityType>
+        <EntityType Name="Person">
+          <Key>
+            <PropertyRef Name="PersonID" />
+          </Key>
+          <Property Name="PersonID" Type="Int32" Nullable="false" />
+          <Property Name="LastName" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="FirstName" Type="String" Nullable="false" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="PersonCategory" Type="Int16" Nullable="false" />
+          <Property Name="HireDate" Type="DateTime" />
+          <Property Name="EnrollmentDate" Type="DateTime" />
+          <Property Name="Picture" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <NavigationProperty Name="CourseGrade" Relationship="SQLServer2005DBModel.FK_CourseGrade_Student" FromRole="Person" ToRole="CourseGrade" />
+          <NavigationProperty Name="Course" Relationship="SQLServer2005DBModel.CourseInstructor" FromRole="Person" ToRole="Course" />
+        </EntityType>
+        <Association Name="FK_CourseGrade_Course">
+          <End Role="Course" Type="SQLServer2005DBModel.Course" Multiplicity="1" />
+          <End Role="CourseGrade" Type="SQLServer2005DBModel.CourseGrade" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_CourseGrade_Student">
+          <End Role="Person" Type="SQLServer2005DBModel.Person" Multiplicity="1" />
+          <End Role="CourseGrade" Type="SQLServer2005DBModel.CourseGrade" Multiplicity="*" />
+        </Association>
+        <Association Name="CourseInstructor">
+          <End Role="Course" Type="SQLServer2005DBModel.Course" Multiplicity="*" />
+          <End Role="Person" Type="SQLServer2005DBModel.Person" Multiplicity="*" />
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="urn:schemas-microsoft-com:windows:storage:mapping:CS">
+        <EntityContainerMapping StorageEntityContainer="SQLServer2005DBModelStoreContainer" CdmEntityContainer="SQLServer2005DBEntities">
+          <EntitySetMapping Name="Course">
+            <EntityTypeMapping TypeName="IsTypeOf(SQLServer2005DBModel.Course)">
+              <MappingFragment StoreEntitySet="Course">
+                <ScalarProperty Name="CourseID" ColumnName="CourseID" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Credits" ColumnName="Credits" />
+                <ScalarProperty Name="DepartmentID" ColumnName="DepartmentID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CourseGrade">
+            <EntityTypeMapping TypeName="IsTypeOf(SQLServer2005DBModel.CourseGrade)">
+              <MappingFragment StoreEntitySet="CourseGrade">
+                <ScalarProperty Name="EnrollmentID" ColumnName="EnrollmentID" />
+                <ScalarProperty Name="Grade" ColumnName="Grade" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Person">
+            <EntityTypeMapping TypeName="IsTypeOf(SQLServer2005DBModel.Person)">
+              <MappingFragment StoreEntitySet="Person">
+                <ScalarProperty Name="PersonID" ColumnName="PersonID" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="PersonCategory" ColumnName="PersonCategory" />
+                <ScalarProperty Name="HireDate" ColumnName="HireDate" />
+                <ScalarProperty Name="EnrollmentDate" ColumnName="EnrollmentDate" />
+                <ScalarProperty Name="Picture" ColumnName="Picture" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="FK_CourseGrade_Course" TypeName="SQLServer2005DBModel.FK_CourseGrade_Course" StoreEntitySet="CourseGrade">
+            <EndProperty Name="Course">
+              <ScalarProperty Name="CourseID" ColumnName="CourseID" />
+            </EndProperty>
+            <EndProperty Name="CourseGrade">
+              <ScalarProperty Name="EnrollmentID" ColumnName="EnrollmentID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_CourseGrade_Student" TypeName="SQLServer2005DBModel.FK_CourseGrade_Student" StoreEntitySet="CourseGrade">
+            <EndProperty Name="Person">
+              <ScalarProperty Name="PersonID" ColumnName="StudentID" />
+            </EndProperty>
+            <EndProperty Name="CourseGrade">
+              <ScalarProperty Name="EnrollmentID" ColumnName="EnrollmentID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="CourseInstructor" TypeName="SQLServer2005DBModel.CourseInstructor" StoreEntitySet="CourseInstructor">
+            <EndProperty Name="Course">
+              <ScalarProperty Name="CourseID" ColumnName="CourseID" />
+            </EndProperty>
+            <EndProperty Name="Person">
+              <ScalarProperty Name="PersonID" ColumnName="PersonID" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2007/06/edmx">
+    <edmx:Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+      </DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram Name="SchoolLinqToEntities">
+        <EntityTypeShape EntityType="SQLServer2005DBModel.Course" Width="1.5" PointX="0.75" PointY="2.625" Height="2.1610522460937496" IsExpanded="true" />
+        <EntityTypeShape EntityType="SQLServer2005DBModel.CourseGrade" Width="1.5" PointX="5.25" PointY="4.25" Height="1.7790128580729174" IsExpanded="true" />
+        <EntityTypeShape EntityType="SQLServer2005DBModel.Person" Width="1.5" PointX="3" PointY="4.875" Height="2.7341113281249996" IsExpanded="true" />
+        <AssociationConnector Association="SQLServer2005DBModel.FK_CourseGrade_Course" ManuallyRouted="false">
+          <ConnectorPoint PointX="2.25" PointY="4.5180261230468748" />
+          <ConnectorPoint PointX="3.6666666666666665" PointY="4.5180261230468739" />
+          <ConnectorPoint PointX="3.8333333333333335" PointY="4.5180261230468748" />
+          <ConnectorPoint PointX="5.25" PointY="4.5180261230468748" /></AssociationConnector>
+        <AssociationConnector Association="SQLServer2005DBModel.FK_CourseGrade_Student" ManuallyRouted="false">
+          <ConnectorPoint PointX="4.5" PointY="5.4520064290364587" />
+          <ConnectorPoint PointX="5.25" PointY="5.4520064290364587" /></AssociationConnector>
+        <AssociationConnector Association="SQLServer2005DBModel.CourseInstructor" ManuallyRouted="false">
+          <ConnectorPoint PointX="2.25" PointY="3.5402605615234375" />
+          <ConnectorPoint PointX="3.75" PointY="3.5402605615234375" />
+          <ConnectorPoint PointX="3.75" PointY="4.875" /></AssociationConnector></Diagram></edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

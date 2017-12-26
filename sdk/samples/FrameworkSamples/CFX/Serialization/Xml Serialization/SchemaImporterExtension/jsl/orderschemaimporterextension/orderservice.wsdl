@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://demos" xmlns:s1="http://orders/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://demos" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://demos">
+      <s:import namespace="http://orders/" />
+      <s:element name="GetOrder">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetOrderResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetOrderResult" type="s1:Order" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+    <s:schema xmlns:mstns="http://orders/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://orders/" elementFormDefault="qualified" targetNamespace="http://orders/" id="Order">
+      <xs:complexType name="Order">
+        <xs:sequence>
+          <xs:element minOccurs="1" maxOccurs="1" name="OrderNumber" type="xs:int" />
+          <xs:element minOccurs="0" maxOccurs="1" name="OrderName" type="mstns:OrderNameType" />
+          <xs:element minOccurs="0" maxOccurs="1" name="ShipTo" type="xs:string" />
+          <xs:element minOccurs="0" maxOccurs="1" name="ShipAddress1" type="xs:string" />
+          <xs:element minOccurs="0" maxOccurs="1" name="ShipAddress2" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:simpleType name="OrderNameType">
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="50" />
+        </xs:restriction>
+      </xs:simpleType>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="GetOrderSoapIn">
+    <wsdl:part name="parameters" element="tns:GetOrder" />
+  </wsdl:message>
+  <wsdl:message name="GetOrderSoapOut">
+    <wsdl:part name="parameters" element="tns:GetOrderResponse" />
+  </wsdl:message>
+  <wsdl:portType name="Service_asmxSoap">
+    <wsdl:operation name="GetOrder">
+      <wsdl:input message="tns:GetOrderSoapIn" />
+      <wsdl:output message="tns:GetOrderSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="Service_asmxSoap" type="tns:Service_asmxSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+    <wsdl:operation name="GetOrder">
+      <soap:operation soapAction="http://demos/GetOrder" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="Service_asmxSoap12" type="tns:Service_asmxSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+    <wsdl:operation name="GetOrder">
+      <soap12:operation soapAction="http://demos/GetOrder" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Service_asmx">
+    <wsdl:port name="Service_asmxSoap" binding="tns:Service_asmxSoap">
+      <soap:address location="http://localhost/IXmlSerWebService/Service.asmx" />
+    </wsdl:port>
+    <wsdl:port name="Service_asmxSoap12" binding="tns:Service_asmxSoap12">
+      <soap12:address location="http://localhost/IXmlSerWebService/Service.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
