@@ -1,0 +1,144 @@
+﻿<ResourceDictionary 
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:thriple="http://thriple.codeplex.com/">
+
+    <!-- BRUSHES -->
+    <RadialGradientBrush x:Key="RedBubbleBrush" GradientOrigin="0.25, 0.25">
+        <GradientStop Color="#88FF0000" Offset="0" />
+        <GradientStop Color="#FFFF0000" Offset="0.5" />
+        <GradientStop Color="#AAFF0000" Offset="1" />
+    </RadialGradientBrush>
+    <RadialGradientBrush x:Key="GreenBubbleBrush" GradientOrigin="0.25, 0.25">
+        <GradientStop Color="#88008800" Offset="0" />
+        <GradientStop Color="#FF008800" Offset="0.5" />
+        <GradientStop Color="#AA008800" Offset="1" />
+    </RadialGradientBrush>
+    <RadialGradientBrush x:Key="BlueBubbleBrush" GradientOrigin="0.25, 0.25">
+        <GradientStop Color="#880000FF" Offset="0" />
+        <GradientStop Color="#FF0000FF" Offset="0.5" />
+        <GradientStop Color="#AA0000FF" Offset="1" />
+    </RadialGradientBrush>
+    <RadialGradientBrush x:Key="OrangeBubbleBrush" GradientOrigin="0.25, 0.25">
+        <GradientStop Color="#88FF6600" Offset="0" />
+        <GradientStop Color="#FFFF6600" Offset="0.5" />
+        <GradientStop Color="#AAFF6600" Offset="1" />
+    </RadialGradientBrush>
+    <RadialGradientBrush x:Key="PurpleBubbleBrush" GradientOrigin="0.25, 0.25">
+        <GradientStop Color="#88B23AEE" Offset="0" />
+        <GradientStop Color="#FFB23AEE" Offset="0.5" />
+        <GradientStop Color="#AAB23AEE" Offset="1" />
+    </RadialGradientBrush>
+
+
+    <!-- STYLES -->
+    <Style x:Key="BubbleEllipseStyle" TargetType="{x:Type Ellipse}">
+        <Setter Property="Margin" Value="3" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Path=BubbleType, Mode=OneTime}" Value="RedBubble">
+                <Setter Property="Fill" Value="{StaticResource RedBubbleBrush}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Path=BubbleType, Mode=OneTime}" Value="GreenBubble">
+                <Setter Property="Fill" Value="{StaticResource GreenBubbleBrush}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Path=BubbleType, Mode=OneTime}" Value="BlueBubble">
+                <Setter Property="Fill" Value="{StaticResource BlueBubbleBrush}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Path=BubbleType, Mode=OneTime}" Value="OrangeBubble">
+                <Setter Property="Fill" Value="{StaticResource OrangeBubbleBrush}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Path=BubbleType, Mode=OneTime}" Value="PurpleBubble">
+                <Setter Property="Fill" Value="{StaticResource PurpleBubbleBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    
+    <Style x:Key="BubbleGridStyle" TargetType="{x:Type Grid}">
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <ScaleTransform ScaleX="1" ScaleY="1" />
+            </Setter.Value>
+        </Setter>
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Path=IsActive}" Value="True">
+                <DataTrigger.EnterActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <thriple:EasingDoubleAnimation 
+                                Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)"
+                                Duration="0:0:0.1"
+                                Equation="CubicEaseInOut"
+                                To="1.1"
+                                />
+                            <thriple:EasingDoubleAnimation 
+                                Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)"
+                                Duration="0:0:0.1"
+                                Equation="CubicEaseInOut"
+                                To="1.1"
+                                />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </DataTrigger.EnterActions>
+                <DataTrigger.ExitActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <thriple:EasingDoubleAnimation 
+                                Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)"
+                                Duration="0:0:0.1"
+                                Equation="CubicEaseInOut"
+                                To="1"
+                                />
+                            <thriple:EasingDoubleAnimation 
+                                Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)"
+                                Duration="0:0:0.1"
+                                Equation="CubicEaseInOut"
+                                To="1"
+                                />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </DataTrigger.ExitActions>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    
+    <Style x:Key="BubbleBackgroundBorderStyle" TargetType="{x:Type Border}">
+        <Setter Property="BorderBrush" Value="Gray" />
+        <Setter Property="BorderThickness" Value="0,0,0.5,0.5" />
+        <Setter Property="CornerRadius" Value="45" />
+        <Setter Property="Margin" Value="4" />
+        <Setter Property="Visibility" Value="Collapsed" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Path=IsActive}" Value="True">
+                <Setter Property="Visibility" Value="Visible" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+
+    <!-- STORYBOARDS -->
+    <Storyboard x:Key="BubbleLoadedStoryboard">
+        <thriple:EasingDoubleAnimation 
+            Storyboard.TargetProperty="RenderTransform.(TransformGroup.Children)[0].(ScaleTransform.ScaleX)" 
+            Duration="0:0:0.2"
+            Equation="CubicEaseInOut"
+            FillBehavior="Stop"
+            From="0" 
+            To="1"   
+            />
+        <thriple:EasingDoubleAnimation 
+            Storyboard.TargetProperty="RenderTransform.(TransformGroup.Children)[0].(ScaleTransform.ScaleY)" 
+            Duration="0:0:0.2"
+            Equation="CubicEaseInOut"
+            FillBehavior="Stop" 
+            From="0" 
+            To="1"  
+            />
+    </Storyboard>
+
+    <!-- CONTROL TEMPLATES-->
+    <ControlTemplate x:Key="BubbleTemplate" TargetType="{x:Type Button}">
+        <ContentPresenter />
+    </ControlTemplate>
+
+</ResourceDictionary>

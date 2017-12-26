@@ -1,0 +1,63 @@
+﻿<!-- DATACONTEXT = BubbleBurstViewModel -->
+<UserControl 
+  x:Class="BubbleBurst.View.BubbleBurstView"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:view="clr-namespace:BubbleBurst.View"
+  xmlns:viewModel="clr-namespace:BubbleBurst.ViewModel">
+    <UserControl.DataContext>
+        <viewModel:BubbleBurstViewModel />
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <FontFamily x:Key="MiramonteFontFamily">/Fonts/#Miramonte</FontFamily>
+        <FontFamily x:Key="MiramonteBoldFontFamily">/Fonts/#Miramonte Bold</FontFamily>
+    </UserControl.Resources>
+
+    <Grid>
+        <view:BubbleMatrixView 
+            x:Name="_bubbleMatrixView"
+            x:FieldModifier="private"
+            DataContext="{Binding Path=BubbleMatrix, Mode=OneTime}" />
+
+        <view:GameOverView DataContext="{Binding Path=GameOver, Mode=OneWay}">
+            <view:GameOverView.Style>
+                <Style TargetType="{x:Type view:GameOverView}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path=.}" Value="{x:Null}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </view:GameOverView.Style>
+        </view:GameOverView>
+    </Grid>
+
+    <UserControl.ContextMenu>
+        <ContextMenu IsEnabled="{Binding Path=BubbleMatrix.IsIdle}">
+            <MenuItem 
+                Command="{Binding Path=UndoCommand, Mode=OneTime}"
+                FontFamily="{StaticResource MiramonteFontFamily}"
+                FontSize="14"
+                Header="Undo">
+
+                <MenuItem.Icon>
+                    <Image Source="Icons/Undo.png" Width="20" Height="20" />
+                </MenuItem.Icon>
+            </MenuItem>
+
+            <Separator />
+
+            <MenuItem 
+                Command="{Binding Path=RestartCommand, Mode=OneTime}"
+                FontFamily="{StaticResource MiramonteFontFamily}" 
+                FontSize="14"
+                Header="Restart">
+                
+                <MenuItem.Icon>
+                    <Image Source="Icons/Restart.png" Width="20" Height="20" />
+                </MenuItem.Icon>
+            </MenuItem>
+        </ContextMenu>
+    </UserControl.ContextMenu>
+</UserControl>

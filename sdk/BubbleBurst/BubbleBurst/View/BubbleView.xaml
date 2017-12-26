@@ -1,0 +1,53 @@
+﻿<!-- DATACONTEXT = BubbleViewModel
+
+  NOTE: The resources used by this view are declared in BubbleViewResources.xaml, 
+  which is loaded into Application.Current.Resources.MergedDictionaries to avoid 
+  resource duplication.  BubbleBurstView loads the resources in its constructor.
+-->
+<Button 
+    x:Class="BubbleBurst.View.BubbleView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Command="{Binding Path=BurstBubbleGroupCommand, Mode=OneTime}"
+    RenderTransformOrigin="0.5,0.5"
+    Template="{StaticResource BubbleTemplate}"
+    >
+    <Button.Triggers>
+        <!-- This causes the bubble to animate into view. -->
+        <EventTrigger RoutedEvent="Button.Loaded">
+            <BeginStoryboard Storyboard="{StaticResource BubbleLoadedStoryboard}" />
+        </EventTrigger>
+    </Button.Triggers>
+
+    <!-- These transforms are used during animations. -->
+    <Button.RenderTransform>
+        <TransformGroup>
+            <ScaleTransform />
+            <TranslateTransform />
+        </TransformGroup>
+    </Button.RenderTransform>
+
+    <!-- The Grid captures mouse clicks. -->
+    <Grid 
+    x:Name="HitTestArea" 
+    x:FieldModifier="private" 
+    Background="Transparent"
+    IsHitTestVisible="True"
+    Style="{StaticResource BubbleGridStyle}"
+    >
+        <!-- The Border provides a dark rim when in a bubble group. -->
+        <Border
+            x:Name="BubbleBackground"
+            x:FieldModifier="private"
+            IsHitTestVisible="False"
+            Style="{StaticResource BubbleBackgroundBorderStyle}"
+            />
+        <!-- The Ellipse draws a bubble. -->
+        <Ellipse 
+            x:Name="Bubble" 
+            x:FieldModifier="private" 
+            IsHitTestVisible="False"
+            Style="{StaticResource BubbleEllipseStyle}" 
+            />
+    </Grid>
+</Button>
