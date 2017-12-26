@@ -1,0 +1,71 @@
+# ==++==
+#
+#   
+#    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+#   
+#    The use and distribution terms for this software are contained in the file
+#    named license.txt, which can be found in the root of this distribution.
+#    By using this software in any fashion, you are agreeing to be bound by the
+#    terms of this license.
+#   
+#    You must not remove this notice, or any other, from this software.
+#   
+#
+# ==--==
+# ============================================================================
+# File: makefile
+# makefile for nmake
+# ============================================================================
+
+# Common part
+TOP_SRC_DIR = @top_srcdir@
+include $(TOP_SRC_DIR)/obj${BUILD_ALT_DIR}/${_BUILDARCH}/makefile.common
+
+# Local changes
+# Note that nmake does not build as Unicode.
+TARGET_NAME = $(_NTTREE)/nmake
+
+LOCAL_CFLAGS =
+
+SOURCES=action.cpp \
+        build.cpp \
+        charmap.cpp \
+        command.cpp \
+        error.cpp \
+        exec.cpp \
+        file.cpp \
+        getrcmsg.c \
+        globals.cpp \
+        ifexpr.cpp \
+        init.cpp \
+        inline.cpp \
+        lexer.cpp \
+        macro.cpp \
+        nmake.cpp \
+        parser.cpp \
+        print.cpp \
+        rpn.cpp \
+        rule.cpp \
+        util.cpp \
+        utilp.cpp \
+        win32.cpp
+
+# Objects
+CPP_OBJS = $(SOURCES:.cpp=.o)
+OBJS = $(CPP_OBJS:.c=.o)
+
+#################
+# Targets
+
+all: makefile $(TARGET_NAME)
+
+$(TARGET_NAME) : makefile $(OBJS)
+	$(LINK_CXX) -o $@ $(OBJS)
+
+makefile : ../../makefile.in
+	@echo $? is newer than $@. Please rerun $(TOP_SRC_DIR)/obj${BUILD_ALT_DIR}/${_BUILDARCH}/configure.
+	@exit 1
+
+clean:
+	rm -f *.o
+	rm -f $(TARGET_NAME)

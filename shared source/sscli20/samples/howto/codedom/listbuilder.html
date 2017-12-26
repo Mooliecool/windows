@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> 
+<head>
+<title>ListBuilder CodeDOM Sample</title>
+<link rel="stylesheet" type="text/css" href="../../../docs/rotor.css">
+</head>
+
+<body>		
+
+
+<h1>ListBuilder CodeDOM Sample</h1>
+
+
+<h2>Sample Overview</h2>
+
+
+<p>This sample demonstrates how to use the code document object model (DOM) to generate a strongly typed 
+collection.</p>
+
+
+<h3>Using the CodeDOM to Emit Source Code</h3>
+
+
+  <h4>What is the CodeDOM</h4>
+  <p>The CodeDOM is an API that gives you the ability to create a programming 
+  structure of namespaces, objects, and programming constructs by adding items 
+  to different collections. All CodeDOM programs start out with the creation of 
+  an <b>ICodeGenerator</b> for the target language. The following code shows the 
+  creation of the <b>ICodeGenerator</b> for C#. </p>
+
+
+  <blockquote>
+      <pre>ICodeGenerator cg =new CSharpCodeProvider().CreateGenerator();
+ ...
+CSharpCodeProvider cdp = new CSharpCodeProvider();
+cg = cdp.CreateGenerator();
+</pre>
+      </blockquote>
+  <p>The <b>ICodeGenerator</b> is used to generate the actual code after a 
+  CodeDOM tree is built. To begin building your tree, you need to start with a
+  <b>CodeNamespace</b> object. This object will contain any types and import 
+  directives.&nbsp;In 
+  the sample, several <b>CodeNamespaceImport</b> objects are used to 
+  generate import directives for commonly used namespaces. The sample also needs 
+  to generate a class construct  by using a <b>CodeTypeDeclaration</b> and 
+  setting the <b>IsClass</b> property to <b>true</b>. The following code demonstrates 
+  these concepts. </p>
+  <blockquote>
+      <pre>CodeNamespace cnamespace = new CodeNamespace(&quot;Microsoft.Samples&quot;);
+cnamespace.Imports.Add (new CodeNamespaceImport (&quot;System&quot;) );
+ ...
+CodeTypeDeclaration co = new CodeTypeDeclaration (typeName +&quot;List&quot;);
+co.IsClass = true;
+cnamespace.Types.Add (co);
+</pre>
+      </blockquote>
+  <p>At the end of the previous example, the class type definition is added to 
+  the <b>Types</b> collection of the <b>CodeNamespace</b> object. This is how a 
+  CodeDOM tree is built. Starting with a <b>CodeNamespace</b> object and working 
+  down through classes to class members. Class members in turn contain different 
+  types of code statements and expressions. Once the entire tree is built, the 
+  entire source tree can be written with a call to <b>GenerateCodeFromNamespace</b>, 
+  a method on <b>ICodeGenerator</b>. The method is being passed the <b>
+  CodeNamespace</b> object and a <b>TextWriter</b>. </p>
+  <blockquote>
+  <pre>baseCompiler.GenerateCodeFromNamespace (cnamespace, w, null);</pre>
+      </blockquote>
+  <p>The ListBuilder sample demonstrates the techniques described above by 
+  generating the code for a strongly typed List. It also contains additional 
+  information and code for generating code statements and expressions that were 
+  left out of the  documentation above for brevity.
+
+
+<h2>Sample Source and Build Output Locations</h2>
+
+
+<p>The sample source is found in sscli20\samples\howto\codedom.&nbsp; </p>
+
+
+<p>The source file is:</p>
+
+
+<ul class="none">
+  <li><a href="listbuilder.cs">listbuilder.cs</a></li>
+</ul>
+
+
+<p>The build output location is %_NTTREE%\samples\howto\codedom. The output file is an executable assembly named listbuilder.exe.</p>
+
+
+<h2>Building the Sample</h2>
+
+
+<p>All samples are built from the buildall script.&nbsp;  </p>
+
+
+<p>You can also build all the 
+samples by switching to the root of the sample directory, sscli20\samples, and typing 
+<code>build -c</code>.</p>
+
+
+<p>You can run this specific sample  by switching to the sample directory and typing 
+<code>build -c</code>.</p>
+
+
+<h2>Running the Sample</h2>
+
+
+<p>These steps require that the Shared Source CLI (SSCLI) be already built and 
+functional.</p>
+
+
+<ol>
+  <li>Run  env.bat. </li>
+  <li>Switch to the %_NTTREE%\samples\howto\codedom directory.</li>
+  <li>Type the following command:<blockquote>
+
+
+<p>clix listbuilder.exe</p>
+
+
+  </blockquote>
+
+
+  </li>
+</ol>
+
+
+
+<p><i>Copyright (c) 2006 Microsoft Corporation. All rights reserved.</i></p>
+</body> 
+</html>

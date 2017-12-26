@@ -1,0 +1,112 @@
+#
+# 
+#  Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+# 
+#  The use and distribution terms for this software are contained in the file
+#  named license.txt, which can be found in the root of this distribution.
+#  By using this software in any fashion, you are agreeing to be bound by the
+#  terms of this license.
+# 
+#  You must not remove this notice, or any other, from this software.
+# 
+#
+
+
+SYNCHRONIZE_PASS2_DRAIN=1
+
+TARGETNAME=System.Runtime.Remoting
+TARGETTYPE=NOTARGET
+TARGETPATH=obj
+
+CLR_TARGETTYPE=DLL
+CLR_ENABLE_ASMMETA=1
+
+INCLUDE_ASSEMBLY_REFS=1
+
+ASSEMBLY_KEY_TYPE=ECMA
+
+SOURCES=native.rc
+
+CLS_COMPLIANT=0
+
+# Turn all warnings into errors, except obsolete warnings.  Note that 
+# build lab machines have logic to turn this off - see VBL\Tools\devdiv2.def.
+# Also, make sure that obsolete methods aren't blocking errors.
+# During an integration, if treating warnings as errors ever becomes a serious
+# problem that can't be avoided, feel free to turn the problematic warnings
+# back into errors using CSC_FLAGS=$(CSC_FLAGS) /warnaserror-:<error num>
+# and file a bug to get the code cleaned up.
+CSC_TREAT_WARNINGS_AS_ERRORS=1
+CSC_OBSOLETE_WARNINGS_ARE_NOT_ERRORS=1
+
+METADATA_SOURCES=\
+    ..\metadata\metadata.cs \
+    ..\metadata\sdlchannelsink.cs \
+    ..\metadata\sudsparser.cs \
+    ..\metadata\sudswriter.cs \
+    ..\metadata\sudscommon.cs \
+    ..\metadata\wsdlparser.cs \
+    ..\metadata\wsdlwriter.cs
+
+CHANNELS_HTTP_SOURCES=\
+    ..\channels\http\combinedhttpchannel.cs \
+    ..\channels\http\httpchannelhelper.cs \
+    ..\channels\http\httpclientchannel.cs \
+    ..\channels\http\httpserverchannel.cs \
+    ..\channels\http\httpsocketmanager.cs \
+    ..\channels\http\httpstreams.cs \
+
+
+CHANNELS_CORE_SOURCES=\
+    ..\channels\core\basetransportheaders.cs \
+    ..\channels\core\basicasyncresult.cs \
+    ..\channels\core\bytebufferpool.cs \
+    ..\channels\core\chunkedmemorystream.cs \
+    ..\channels\core\commonchannelkeys.cs \
+    ..\channels\core\corechannel.cs \
+    ..\channels\core\exclusivetcplistener.cs \
+    ..\channels\core\requestqueue.cs \
+    ..\channels\core\socketcache.cs \
+    ..\channels\core\socketmanager.cs \
+    ..\channels\core\socketstream.cs \
+    ..\channels\core\streamhelper.cs \
+    ..\channels\core\stringhelper.cs \
+    ..\channels\core\remotingauthentication.cs
+
+
+SERVICES_SOURCES=\
+    ..\services\remotingclientproxy.cs \
+
+CHANNELS_TCP_SOURCES=\
+    ..\channels\tcp\combinedtcpchannel.cs \
+    ..\channels\tcp\tcpchannelhelper.cs \
+    ..\channels\tcp\tcpclientchannel.cs \
+    ..\channels\tcp\tcpclientsocketmanager.cs \
+    ..\channels\tcp\tcpserverchannel.cs \
+    ..\channels\tcp\tcpsocketmanager.cs \
+    ..\channels\tcp\tcpstreams.cs \
+    ..\channels\tcp\tcpwireprotocol.cs
+
+
+CHANNELS_SINKS_SOURCES=\
+    ..\channels\sinks\binaryformattersinks.cs \
+    ..\channels\sinks\soapformattersinks.cs
+
+
+CSHARP_SOURCES=\
+#   $(ACTIVATION_SOURCES) \
+    $(CHANNELS_CORE_SOURCES) \
+    $(CHANNELS_HTTP_SOURCES) \
+    $(CHANNELS_TCP_SOURCES) \
+    $(CHANNELS_SINKS_SOURCES) \
+    $(METADATA_SOURCES) \
+    $(SERVICES_SOURCES)
+
+CLR_REFERENCES=\
+    $(SDK_REF_PATH)\System.dll \
+    $(SDK_REF_PATH)\System.Xml.dll \
+    $(SDK_REF_PATH)\System.Runtime.Serialization.Formatters.Soap.dll \
+
+RESGEN_SOURCE=..\System.Runtime.Remoting.txt
+
+CSC_FLAGS=$(CSC_FLAGS) /unsafe

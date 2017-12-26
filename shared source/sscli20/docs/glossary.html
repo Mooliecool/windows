@@ -1,0 +1,560 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> 
+<head>
+<title>Glossary</title>
+<link rel="stylesheet" type="text/css" href="rotor.css">
+</head>
+<body>
+
+<h2 class="top">Glossary of Terms for the Microsoft&reg; Shared Source Common 
+Language Infrastructure (SSCLI)</h2>
+
+<p class="top">Many commonly used terms and acronyms are also defined in the 
+glossary for the &quot;Standard ECMA-335 Common Language Infrastructure (CLI)&quot; specification 
+(<a href="http://www.ecma.ch/ecma1/STAND/ecma-335.htm">www.ecma.ch/ecma1/STAND/ecma-335.htm</a>).</p>
+
+<table width="90%" align="center" border="1">
+<tr>
+ <th width="20%" valign="top"><b>Term</b></th>
+ <th>Definition</th></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>assembly</b></td>
+ <td>
+A collection of one or more portable executable (PE) files that are versioned 
+and deployed as a unit. An assembly is the primary building block of a CLI 
+application. All managed types and resources are contained within an assembly 
+and are marked either as accessible only within the assembly or as accessible 
+from code in other assemblies. Assemblies also play a key role in security. The 
+code access security system uses information about the assembly to determine the 
+set of permissions that code in the assembly is granted.
+</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>by-ref pointer</b></td>
+ <td>
+A pointer to a location inside  a garbage-collectible object, 
+created in order to pass a parameter by reference rather than by value.  
+A by-ref pointer refers to:
+    <ul>
+    <li>An address on the stack (when passing the address of a local variable).</li>
+    <li>An address in the static area (when passing the address of a static or class variable).</li>
+    <li>An array (when passing the address of an array element).</li>
+    </ul>
+ <p>
+<i>(See also </i><b>interior pointer</b><i>.)</i>
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>callee-saves</b></td>
+ <td>
+Registers that must be preserved by the called method so  the 
+calling method can assume that they are unchanged when control returns.  
+The callee-saves registers are EBP, ESI, EDI, and EBX. The values of 
+ediSaved, esiSaved, ebxSaved, and ebpSaved in the Method Header Information 
+indicate whether each of these registers should be saved in the method prolog.
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>caller-saves</b></td>
+ <td>
+Registers that are considered to be scratch registers at a call site.&nbsp; If the 
+caller wants the values in these registers to be saved, it has to arrange to 
+save them into the local frame. The caller-saves registers are EAX, ECX 
+and EDX. 
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>checked build</b></td>
+ <td valign="top">
+A build of the source tree with optimizations off, debug code enabled, 
+and&nbsp;debugging symbols generated.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>CIL</b></td>
+ <td valign="top">
+Common intermediate language, the platform-independent persistent, 
+representation of managed executable code used by the CLI runtime engine.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>CLI</b></td>
+ <td valign="top">
+Common Language Infrastructure.&nbsp; The formal specification for this is 
+Standard ECMA-335.&nbsp; For more information see
+<a href="http://www.ecma.ch/ecma1/STAND/ecma-335.htm">
+www.ecma.ch/ecma1/STAND/ecma-335.htm</a>.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>CLR</b></td>
+ <td valign="top">
+Common language runtime.&nbsp; The Microsoft .NET Framework implementation of 
+the CLI.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>code manager<br>or<br>CM</b></td>
+ <td valign="top">
+The source language-independent run-time service that supplies access to 
+information about a segment of running code.  The code manager is used to 
+support debugging, exception handling, garbage collection, and security 
+management. 
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>COR</b></td>
+ <td>
+An obsolete synonym for CLI or CLR.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>delay signed</b></td>
+ <td>
+A synonym for partially signed.&nbsp; See partially signed.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>EBP-frame<br>or<br>EBP-based method</b></td>
+ <td>
+Methods that have been compiled to use the EBP pointer to locate the current 
+stack frame. The value of the Method Header Information ebpFrame variable will 
+be set to zero. Since the 
+EBP is a callee-saves register, EBP-frames always contain a slot (pushed 
+immediately after the return address) where the parent's EBP is stored.  
+In EBP-based methods, arguments are referenced as positive offsets from the 
+EBP and local variables or compiler temporaries are typically referenced 
+as negative offsets from the EBP.  There is an exception, however, for 
+methods that require that some of their variables be  8-byte-aligned.  In this case, the arguments are referenced with respect to the 
+EBP, but the temporaries and locals are referenced using the ESP so that 
+a padding word can be inserted at runtime to provide the required alignment 
+of the locals, temporaries, and ESP without affecting the EBP. 
+<p><b>NOTE:</b> The Shared Source CLI uses EBP-based methods for most calls.
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>EBP-less method</b></td>
+ <td>
+Methods that use ESP (the stack pointer) rather than EBP (the frame pointer) 
+to reference arguments, local variables, and compiler temporary values. 
+The value of the Method Header Information ebpFrame variable is set to zero. In these frames, the 
+caller's EBP is saved only if the method's code uses the register for its 
+own purposes.  In this case, the old value is saved along with the other 
+callee-saves registers rather than in a special location in the frame.
+<p><b>NOTE:</b> The Shared Source CLI uses EBP-less methods only for
+stubs.
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>EBP register</b></td>
+ <td>
+One of the seven general-purpose 32-bit registers used in the x86 architecture. 
+It can either be used as a general-purpose register that might contain a garbage 
+collection reference, or as a special-purpose frame pointer register. 
+The value of the Method Header Information variable ebpFrame is equal to
+
+1 when it is used as a special-purpose frame pointer. 
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>ECMA standard</b></td>
+ <td>
+See <a href="http://www.ecma.ch/ecma1/STAND/ecma-334.htm">
+www.ecma.ch/ecma1/STAND/ecma-334.htm</a> for C# and
+<a href="http://www.ecma.ch/ecma1/STAND/ecma-335.htm">
+www.ecma.ch/ecma1/STAND/ecma-335.htm</a> for CLI.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>ESP register</b></td>
+ <td>
+The name given to the 32-bit register that is always used as the 
+stack pointer on the x86 architecture. 
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>epilog</b></td>
+ <td>
+Code generated to exit a method.  Because the stack pointer and frame 
+pointer are adjusted by this code, the just-in-time (JIT) code manager assumes that 
+a garbage collection is not allowed during this code, and that stack 
+unwinding has detailed knowledge of the precise code sequences 
+present in the epilog. 
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>executable file</b></td>
+ <td>
+A file in  PE format that can be loaded 
+into memory and executed by the operating system loader. This includes both .exe 
+and .dll files.&nbsp; (the PE/COFF specification is available on MSDN, but the 
+information needed to implement a CLI is also in the ECMA specification.)</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>fastchecked build</b></td>
+ <td>
+A build of the source tree with optimizations on,&nbsp;debug code enabled, and 
+debugging symbols generated.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>free build</b></td>
+ <td>
+A build of the source tree with optimizations on, debug tracing and assert code 
+disabled, and no debugging symbols generated.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>fully interruptible method</b></td>
+ <td>
+A method in which the information for garbage collection is available 
+at all points inside the main body of the method, excluding the 
+prolog and epilog portions of the method. The Method Header 
+Information has interruptible=1. Because of the size of the Method GC 
+Information required to supply this information, the JIT compiler avoids creating fully interruptible methods where possible. 
+However, if a method has a computation-bound loop with no method calls, 
+the method is required to be fully interruptible.
+<p>Although the Shared Source CLI JIT compiler produces code that 
+could be fully interruptible, the polling garbage collector causes this 
+functionality to remain unexercised.<p>(<i>See also</i> <b>non-fully 
+interruptible method</b>.)</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>fusion</b></td>
+ <td>
+A portion of the CLI assembly-loading code that finds and loads 
+the correct assembly file based on the versioned assembly references in the 
+calling assembly.&nbsp; This code also manages the global assembly cache.</td>
+</tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>fx or FX</b></td>
+ <td>
+A major part of the managed source code tree.&nbsp; SSCLI source code is factored 
+into several large source sub-trees: sscli\clr\src for 
+the core engine and base class libraries, sscli\managedlibraries for remoting 
+and soap serialization, and sscli\fx for other fundamental class libraries.&nbsp; 
+The term &quot;FX&quot; is occasionally used in the source code as an abbreviation for 
+&quot;Frameworks.&quot;</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>global assembly cache</b></td>
+ <td>
+A location where assemblies can be 
+installed so  they can be shared across applications.&nbsp; For the SSCLI, the 
+global assembly cache is private to a specific installation of the SSCLI code base.&nbsp; 
+The term &quot;GAC&quot; is commonly used in the source code to refer to the global 
+assembly cache.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>garbage collection</b></td>
+ <td>
+The process of transitively tracing through all pointers to actively used objects to locate all objects that might be potentially 
+referenced, and then arranging to reuse any heap memory that was 
+not found during this trace.  The garbage collector 
+also arranges to compact the memory that is in use to reduce the 
+working space needed for the heap. The term &quot;GC&quot; is commonly used in the source 
+code to refer to garbage collection.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>interior pointers </b></td>
+ <td>
+A pointer to a location inside of a garbage-collectible object. 
+An interior pointer or by-ref pointer is typically created by 
+a compiler for temporary use. Three examples of interior 
+pointers are:
+    <ul>
+    <li>A pointer to an element within a garbage-collectible array.</li>
+    <li>A pointer to a data member or field of a garbage-collectible object.</li>
+    <li>An argument that has been identified as a by-ref pointer.</li>
+    </ul>
+<p>The garbage collector must update all interior pointers when it compacts 
+the heap.  For the garbage collector to operate correctly, there must be a live pointer to the 
+whole object (somewhere visible to the garbage collector) whenever 
+there is an interior pointer to it. </p>
+<p>(<i>See also</i> <b>by-ref pointer</b>.)</td>
+</tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>intermediate language</b></td>
+ <td>
+A language designed to be used efficiently both as the output of a number of 
+compilers and as the input to a JIT compiler.&nbsp; The Microsoft implementation 
+of the ECMA common intermediate language (CIL) is Microsoft intermediate 
+language (MSIL).</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>JIT<br>&nbsp;</b></td>
+ <td valign="top">
+Just-in-time compiler which takes intermediate language as input and generates native code, 
+ready to run, in memory.   It also produces information used by the built-in 
+code manager. 
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>lifetime</b></td>
+ <td>
+The addresses in the body of a method during which a storage location is 
+actively in use, beginning when the location is initialized and ending 
+with the last reference to the location.  For example, an argument 
+location on the stack begins its life immediately after the method's 
+prolog because the caller provides it at the time the 
+method begins execution.  Other stack locations might be initialized later in the 
+execution of the method.  Some stack locations (or other storage locations) 
+are not referenced after a particular point in the method's body and they 
+are considered "dead" after that point.  There is no need for the garbage 
+collector to trace through locations that are not live, and it is critical 
+that the garbage collector not trace through locations that have not been 
+initialized or have out-of-date information.  The garbage collector assumes 
+that live locations are safe to trace. 
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>local variable area</b></td>
+ <td>
+Locations allocated on the stack by a method for its own storage purposes. This 
+includes, for example, local variables declared by the user as well as temporary 
+locations for storing intermediate values as well for when the 
+compiler runs out of registers.&nbsp; Typically in the SSCLI the local 
+variables area 
+does not include the linkage area or callee-saves area, nor does it include 
+the variable-sized region of the stack frame that is used to store parameters 
+for methods that are being called. 
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>managed code</b></td>
+ <td>
+Code that executes under the CLI execution environment.&nbsp; Managed code uses 
+the execution environment for memory management, object lifetime, and the basic 
+type-system, among other fundamental services.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>metadata</b></td>
+ <td>
+Metadata is binary information that describes and annotates the intermediate 
+language in an 
+assembly.&nbsp; 
+<p>See the ECMA-335 CLI standard for specific details.&nbsp; </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>metadata root</b></td>
+ <td>
+The root of the section of the PE file that contains metadata.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>method</b></td>
+ <td>
+This term has a specialized meaning for higher-level languages like C# and C++. 
+In this document, however, it refers to a sequence of computor instructions that 
+are accessed by a procedure call to a specific code address. The code managers 
+provided by the CLI assume that methods have 
+a single entry point and possibly multiple exit points.  Custom code 
+managers need not make these assumptions. 
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>method GC information</b></td>
+ <td>
+A term in the source code that refers to a data structure used to describe a method so that the runtime system 
+can perform garbage collection, handle exceptions, and so forth.
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>MSIL</b></td>
+ <td>
+The Microsoft implementation of the ECMA standard common intermediate language.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>nested call</b></td>
+ <td>
+A method invocation that occurs in the argument list to of another method 
+invocation.&nbsp; For example in:<blockquote>
+  <p><b>outerMethod</b>(a, b, <b>innerMethod</b>(), c, d)</p>
+</blockquote>
+<p><b>innerMethod</b> is a nested call.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>non-fully interruptible method</b></td>
+ <td>
+A method in which the information for garbage collection is  provided only at method call sites. The Method Header Information has 
+interruptible=0. The run-time system  replaces the actual return address on the stack with an 
+address within the run-time system  to accomplish  garbage collection. 
+The JIT-compiler preferentially makes methods 
+non-fully-interruptible in order to keep the size of the Method 
+GC data structure size to a minimum. 
+ </td>
+</tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>PAL</b></td>
+ <td>
+The SSCLI Platform Adaptation Layer.&nbsp; This layer allows calls from the 
+SSCLI implementation to be mapped to the underlying operating system.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>parameter area</b></td>
+ <td>
+The part of the method's stack frame that is used to store parameters being 
+passed to methods that it calls. This is the part of the stack frame that grows 
+and shrinks as the method executes. 
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>partially signed</b></td>
+ <td>
+An assembly that has the public key field filled in but is not signed with the 
+private key.&nbsp; <i>See also</i> <b>delay signed</b>, <b>strong name</b>, and
+<b>simple name</b>.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>pending arguments </b></td>
+ <td>
+The values already pushed onto the stack at the time of a nested call. For 
+example, in<blockquote>
+  <p><b>outerMethod</b>(<i>a</i>, <i>b</i>, <i>c</i>, <i>d</i>, <i>e</i>, <b>
+  innerMethod</b>(), <i>f</i>, <i>g</i>, <i>h</i>)</p>
+</blockquote>
+<p>when the call to the <b>innnerMethod</b>() is made, the JIT-compiled code for
+<b>outerMethod</b>() typically would have already pushed three arguments on the 
+stack; the values of <i>c</i>, <i>d</i> and <i>e</i>. The first two arguments 
+are normally passed in registers and are handled specially in the JIT compiler.&nbsp; 
+When <b>innerMethod</b>() returns, <b>outerMethod</b>() continues pushing its 
+remaining arguments, the return value of <b>innerMethod</b>(), and the values of
+<i>f</i>, <i>g</i>, and <i>h</i>. 
+ </td>
+</tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>pinned pointer</b></td>
+ <td>
+A pointer to a location that must be considered  pinned for the purposes 
+of a garbage collection. Only untracked local variables can be marked as 
+pinned pointers. Arguments and class variables cannot 
+be directly marked as pinned. Instead, a copy of the reference that they 
+refer to must be placed in a local variable and that local variable must be 
+marked as pinned. It is also possible to have a pinned by-ref or pinned 
+interior pointer. A pinned pointer is  considered to be pinned only during 
+the lifetime of the stack frame associated with the local variable that 
+contains the pinning mark. 
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>platform invoke</b></td>
+ <td>
+The implementation used to call from managed to platform-specific unmanaged code.&nbsp; 
+Sometimes referred to in source by the deprecated term &quot;P/Invoke&quot;.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>prolog</b></td>
+ <td>
+The part of a method's code that is executed when the method starts and 
+during which the fixed part of the stack frame is not yet completely 
+initialized.  The code manager does not permit a garbage collection to 
+occur during a method prolog and it must take extra care during stack 
+unwinding for methods that are executing their prolog. The prolog is 
+responsible for constructing the local stack frame, saving the callee-saved registers, and initializing the untracked local 
+variables.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>public key token</b></td>
+ <td>
+A reduced-size numeric token that represents a public key for an assembly.&nbsp; 
+Assembly references in metadata frequently store the public key token rather than the 
+entire public key.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right" style="height: 58px"><b>pushed args mask</b></td>
+ <td style="height: 58px">
+A bit mask used to indicate which locations in the outgoing parameter area (not 
+the incoming pushed argument area) contain live garbage collection pointers. It 
+sometimes also includes bits to indicate whether particular  registers 
+contain live garbage collection pointers. 
+ </td>
+</tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>pushed argument area</b></td>
+ <td>
+The portion of the current stack that holds the incoming arguments passed 
+onto the stack for&nbsp; any given method. The JIT-compiler assumes that this area occupies 
+the portion of the stack frame with the highest memory addresses (that is, that 
+part that is pushed first). It is created by the calling method (in its 
+outgoing parameter area) and, after the call occurs, becomes the base of the 
+current stack frame. Note that the first two arguments are passed in registers, 
+are not pushed onto the stack, and are thus not part of the pushed 
+argument area. 
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>rotor</b></td>
+ <td>
+Code name for the Shared Source CLI implementation (both 1.0 and 2.0 versions).</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>rotor whidbey</b></td>
+ <td>
+Code name for the Shared Source CLI implementation 2.0.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>RVA</b></td>
+ <td>
+Short for "relative virtual address."  An offset (in bytes) from the start 
+of the executable file.
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>security object</b></td>
+ <td>
+Some methods are compiled knowing that they are calling system services 
+that require security checks.  These methods allocate a location in their 
+stack frame (currently the last temporary variable) in which 
+the system will store a security token at runtime.  The compiler is responsible 
+only for initializing the location when the method begins execution and for 
+making sure that the method GC information indicates that the method has a 
+security object. 
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>SEH facility</b></td>
+ <td>
+The Structured Exception Handling facility supplied by the PAL (or by the Win32 
+API).
+The Code Manager is responsible for part of the interface between the 
+runtime system and the Win32 SEH facility.  The details of this interface are 
+subject to change. 
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>shim</b></td>
+ <td>
+Used  in the SSCLI source code to refer to the .NET Framework startup code used 
+to bootstrap some version of the .NET Framework by means of the system loader on Windows systems.  In the Shared
+Source CLI, the clix application launcher program is used to load PE images rather than the shim 
+technology.
+ </td>
+</tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>simple name</b></td>
+ <td>
+An assembly that has a blank public key field has only a simple name.&nbsp; <i>See 
+also</i><b> strong name</b>.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>source language processor<br>or<br>SLP</b></td>
+ <td>
+The compiler or JIT compiler that produced the executing code.  For a given programming 
+language there might be multiple implementations (for example, from different vendors) 
+and for each implementation there might be multiple source language processors (for 
+example, a compiler, an optimizing compiler, a JIT compiler, and an optimized JIT 
+compiler). 
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>strong name</b></td>
+ <td>
+An assembly that has the cryptographic public key field containing a public key 
+value has a strong name.&nbsp; A strong name 
+implies that the assembly is also signed with the private key.&nbsp; <i>See also</i>
+<b>simple name</b> and <b>partially signed</b>.</td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>this</b></td>
+ <td>
+A pointer to the object instance on whose behalf the current method is executing.
+Not all methods have a <b>this</b> pointer.&nbsp; <b>Static</b> methods in C#, for example, do 
+not have a <b>this</b> pointer. 
+ </td></tr>
+ <!--
+<tr>
+ <td width="20%" valign="top" align="right"><b>that</b></td>
+ <td>
+A demonstrative pronoun that usually points out, or refers to, a person or thing 
+previously mentioned, or supposed to be understood.
+</td></tr>
+-->
+<tr>
+ <td width="20%" valign="top" align="right"><b>unmanaged code</b></td>
+ <td>
+Code that runs outside the common language runtime.   
+ECMA Section III specifies the assumptions made by the runtime about the 
+behavior of such code. 
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>untracked</b></td>
+ <td>
+An argument, variable, or local variable that contains a garbage collection pointer but whose lifetime 
+information is not available at runtime.  Untracked locations are assumed by 
+the garbage collector to be live during the execution of the entire method body, 
+so they must be initialized by the prolog and must be either cleared at the end 
+of their lifetime (if known) or when their contents might become incorrect. 
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>variable-sized stack area</b></td>
+ <td>
+See parameter area.
+ </td></tr>
+
+<tr>
+ <td width="20%" valign="top" align="right"><b>Windows NDP</b></td>
+ <td>
+The .NET developer platform (.NET Framework) on Windows.&nbsp; &quot;Windows NDP v1&quot; refers to the first 
+released version of the .NET Framework on Windows.</td></tr>
+
+<tr>
+ <td width="20%" valign="top" align="right"><b>Win32 PCONTEXT</b></td>
+ <td>
+Pointer to a computation context sufficient to resume (or alter and resume) 
+a computation.  Part of the Win32 API specification. 
+ </td></tr>
+<tr>
+ <td width="20%" valign="top" align="right"><b>zaplogs<br>or<br>zapmonitor</b></td>
+ <td>
+Anything with the &quot;zap&quot; name in the source code refers to native image code generation (also 
+called &quot;ngen&quot;).&nbsp; 
+In native code image generation, JIT-compiled code is stored to the file system 
+for faster loading.&nbsp; The SSCLI implementation does not support generating 
+or using native 
+code images.
+ </td></tr>
+</table>
+
+ 
+<p><i>Copyright (c) 2006 Microsoft Corporation. All rights reserved.</i></p>
+</body>
+</html>

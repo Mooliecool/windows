@@ -1,0 +1,946 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> 
+<head>
+<TITLE>Runtime Debugger</TITLE>
+<link rel="stylesheet" type="text/css" href="../rotor.css">
+</head>
+<body>
+
+<H1>Runtime Debugger (cordbg.exe)</H1>
+
+<P>The Runtime Debugger helps tools vendors and application developers find and fix bugs in programs that target the 
+ 
+Shared Source CLI (SSCLI) 2.0.
+    This tool uses the runtime Debug API to provide debugging services. The source code for 
+cordbg is included as a sample application.&nbsp; This debugger is a good 
+example of how to use the debugging services and APIs. </P>
+
+<P>The application file for the Runtime Debugger is named cordbg.exe in  SSCLI builds on Microsoft Windows®.</P>
+
+<P>The following options supported by the Microsoft .NET Framework implementation of this 
+tool are not supported by the SSCLI implementation:</P>
+
+<ul>
+  <li><B>dis</B>[<B>assemble</B>] [<B>0x</B><I>address</I>][{<B>+</B>|<B>-</B>} <I>delta</I>] [<I>line</I> <I>count</I>]</li>
+</ul>
+
+<P>The following options are supported by the SSCLI implementation of the 
+Runtime Debugger.</P>
+
+<H4>Syntax (<A HREF="#cpgrfruntimedebuggercordbgexeanchor4">starting a cordbg session</A>)</H4>
+
+<blockquote>
+
+<PRE class="syntax"><B>cordbg</B> [<I>ProgramName</I>[<I>Program arguments</I>]][<I>optional arguments </I>]</PRE>
+
+</blockquote>
+
+<H4>Syntax (<A HREF="#cpgrfruntimedebuggercordbgexeanchor5">inside a cordbg session</A> at the <span class=cfe><CODE>(cordbg)</CODE></span> prompt)</H4>
+
+<blockquote>
+
+<PRE class="syntax"><B>command</B>[<I>command arguments</I>]</PRE>
+
+</blockquote>
+
+<p>To view the usage text at the console use cordbg <b>-?.</b></p>
+
+<table border=1>
+
+<TR VALIGN="top">
+<TH width=46%>Command</TH>
+<TH width=54%>Description</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>ap</B>[<B>pdomainenum</B>] [<I>option</I>]</DT>
+
+</DL>
+</TD>
+<TD width=54%>
+<DL>
+<DT>Enumerates all application domains, assemblies, and modules in the current process. If you do not specify the <I>option</I> argument, 
+the command lists all application domains, assemblies, and modules in the current process. 
+After detaching or attaching, you must specify the <B>go </B>command to resume execution.</DT>
+
+</DL>
+The <I>option</I> argument can be one of the following:<DL>
+
+<DT><B>attach</B></DT>
+
+<DD>Lists the application domains in the process and prompts the user to select the domain to attach to.</dd>
+
+<DT><B>detach</B></DT>
+
+<DD>Lists the application domains in the process and prompts the user to select the domain to detach from.</dd>
+
+<DT><B>0</B></DT>
+
+<DD>Lists the application domains in the process.</dd>
+
+<DT><B>1</B></DT>
+
+<DD>Lists the application domains and assemblies in the process.</dd>
+</DL>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>as</B>[<B>sociatesource</B>] {<B>s</B>|<B>b</B>  <I>breakpoint id</I>} <I>filename</I></DT>
+</DL>
+</TD>
+<TD width=54%>Associates the given file name with the current stack frame pointer (option <B>s</B>) or the specified breakpoint (option <B>b</B>).</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>a</B>[<B>ttach</B>] <I>pid</I></DT>
+</DL>
+</TD>
+<TD width=54%>
+<DL>
+<DT>Attaches the debugger to a running process. The Runtime Debugger terminates the program that it is currently debugging (if there is one), and attempts to attach to the process specified by the <I>pid </I>argument. The process identification number <I>pid</I> can be in decimal or hexadecimal format. </DT>
+</DL>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>b</B>[<B>reak</B>] [[<I>file</I><B>:</B>] <I>line number</I>] |</DT>
+
+<DT>[[ <I>class</I><B>::</B>] <I>function </I>[<B>:</B><I>offset</I>]]</DT>
+
+
+</DL>
+</TD>
+<TD width=54%>
+<DL>
+<DT>Sets or displays breakpoints. If you do not specify any arguments, the tool displays a list of current breakpoints; otherwise, it sets a breakpoint at the specified location. You can set a breakpoint at a line number in the current source file, a line number in a fully qualified source file, or in a method qualified by a class and optional offset. </DT>
+
+<DT>Breakpoints persist across runs in a session. You can use the <B>stop</B> command the same way you use <B>break</B>. </DT>
+
+<DT>The Runtime Debugger displays breakpoints as "unbound" if the specified breakpoint location cannot be bound to code. When a breakpoint is unbound, it means that the underlying code for the breakpoint location has not been loaded yet. This can happen for a number of valid reasons, such as a misspelled file or class name (they are case-sensitive). Also, breakpoints will be unbound if you set them before running an application. Breakpoints become bound when the real code is loaded. The debugger tries to automatically rebind every unbound breakpoint when it loads a module.</DT>
+</DL>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>ca</B>[<B>tch</B>] [<I>event</I>]</DT>
+</DL>
+</TD>
+<TD width=54%>
+<DL>
+<DT>Displays a list of event types, or causes the specified event type to stop the debugger. If you do not specify an argument, the tool displays a list of event types, where event types that stop the debugger are marked 
+<b>on</b>, and event types that are ignored are marked <b>off</b>. If you specify an argument, the debugger stops when events of the specified type occur. By default, the debugger only stops on unhandled exception events (that is, second chance exceptions). Event types that stop the debugger persist across runs in a session. To cause the debugger to ignore a particular type of event, use the <B>ignore</B> command. </DT>
+
+
+
+<DT>The event argument can be one of the following:</DT>
+
+<DT><B>e</B>[<B>xceptions</B>] [exception type]</DT>
+
+<DD>The tool adds the exception type to a list of first chance exceptions to catch. If you do not specify an exception type, the tool catches all first chance exceptions. The exception type is case-sensitive, for example, <B>System.ArgumentException</B>.</dd>
+
+<DT><B>u</B>[<B>nhandled</B>]</DT>
+
+<DD>Unhandled exceptions</dd>
+
+<DT><B>c</B>[<B>lass</B>]</DT>
+
+<DD>Class load events</dd>
+
+<DT><B>m</B>[<B>odule</B>]</DT>
+
+<DD>Module load events</dd>
+
+<DT><B>t</B>[<B>hread</B>]</DT>
+
+<DD>Thread start events</dd>
+</DL>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>con</B>[<B>t</B>] [<I>count</I>]</DT>
+
+
+</DL>
+</TD>
+<TD width=54%>
+<DL>
+<DT>Continues the program. If you do not specify an argument, the program continues once. If you do specify an argument, the program continues the specified number of times. This command is useful for continuing a program when a class load event, exception, or breakpoint stops the debugger. You can use the <B>go</B> command the same way you use <B>cont</B>.</DT>
+</DL>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>del</B>[<B>ete</B>] [<I>breakpoint id</I>, ...]</DT>
+
+
+</DL>
+</TD>
+<TD width=54%>
+<DL>
+<DT>Deletes breakpoints. If you do not specify any arguments, the tool deletes all current breakpoints. If you specify one or more <I>breakpoint id</I> arguments, the tool deletes the specified breakpoints. You can obtain breakpoint identifiers by using the <B>break </B>or <B>stop </B>commands. You can use the <B>remove</B> command the same way you use <B>delete</B>.</DT>
+</DL>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>de</B>[<B>tach</B>]</DT>
+</DL>
+</TD>
+<TD width=54%>
+<DL>
+<DT>Detaches the debugger from the current process. The process automatically continues and runs as if a debugger is not attached to it.</DT>
+</DL>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>d</B>[<B>own</B>] [<I>count</I>]</DT>
+
+
+</DL>
+</TD>
+<TD width=54%>
+<DL>
+<DT>Moves the stack frame pointer down the stack toward frames called by the current frame for inspection purposes. If you do not specify an argument, the stack frame pointer moves down one frame. If you specify an argument, the stack frame pointer moves down by the specified number of frames. If source-level information is available, the tool displays the source line for the frame. This command is frequently used in conjunction with the <B>up</B> command.</DT>
+</DL>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>du</B>[<B>mp</B>] <I>address</I> [<I>count</I>]</DT>
+
+
+</DL>
+</TD>
+<TD width=54%>
+<DL>
+<DT>Dumps a block of memory, with the output in hexadecimal or decimal format depending on the debugger's mode (see <B>mode</B>). The <I>address</I> argument is the address of the block of memory. The <I>count</I> argument is the number of bytes to dump. </DT>
+</DL>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>ex</B>[<B>it</B>]</DT>
+
+
+</DL>
+</TD>
+<TD width=54%>
+<DL>
+<DT>Stops the current process and exits the debugger. You can use the <B>quit</B> command in the same way you use <B>exit</B>.</DT>
+</DL>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>f</B>[<B>unceval</B>] [<I>class</I><B>::</B>] <I>function </I>[ <I>arg0</I> <I>arg1 </I>...<I>argn</I>]</DT>
+
+
+</DL>
+</TD>
+<TD width=54%>
+<DL>
+<DT>Evaluates the specified function on the current thread. The tool stores the new object in the variable <I>$result</I> and can use it 
+for subsequent evaluations. Valid arguments are limited to other variables, 4-byte integers, and the constants <B>Null</B>, <B>True</B>, and <B>False</B>. 
+Note: For a member function, the first argument should be an object of the class 
+or derived class to which the member function belongs.
+</DT>
+</DL>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>g</B>[<B>o</B>] [<I>count</I>]</DT>
+</DL>
+</TD>
+<TD width=54%>
+<DL>
+<DT>See <B>cont</B>.</DT>
+</DL>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>h</B>[<B>elp</B>] [<I>command </I>...]</DT>
+
+
+</DL>
+</TD>
+<TD width=54%>Displays descriptions for the specified commands. If you do not specify any arguments, 
+cordbg displays a list of debugger commands. You can use the <B>? </B>command the same way you use <B>help</B>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>ig</B>[<B>nore</B>] [<I>event</I>]</DT>
+
+
+</DL>
+</TD>
+<TD width=54%>Displays a list of event types or causes the specified event type to be ignored by the debugger. If you do not specify an <I>event</I> 
+argument, the tool displays a list of event types, where event types that are 
+ignored are marked <b>off</b> and event types that stop the debugger are marked
+<b>on</b>. If you specify an argument, the tool ignores events of the specified type. To set an event type to stop the debugger, use the <B>catch</B> command. 
+<P>The <I>event</I> argument can be one of the following event types:
+
+<DL>
+<DT><B>e</B>[<B>xceptions</B>] [exception type]</DT>
+
+<DD>The tool adds the exception type to a list of first-chance exceptions to ignore. If you do not specify an exception type, the tool ignores all first-chance exceptions. The exception type is case-sensitive, for example, <B>System.ArgumentException</B>.</dd>
+
+<DT><B>u</B>[<B>nhandled</B>]</DT>
+
+<DD>Unhandled exceptions.</dd>
+
+<DT><B>c</B>[<B>lass</B>]</DT>
+
+<DD>Class load events.</dd>
+
+<DT><B>m</B>[<B>odule</B>]</DT>
+
+<DD>Module load events.</dd>
+
+<DT><B>t</B>[<B>hread</B>]</DT>
+
+<DD>Thread start events.</dd>
+</DL>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>i</B>[<B>n</B>] [<I>count</I>]</DT>
+</DL>
+</TD>
+<TD width=54%>See<B> step</B>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>k</B>[<B>ill</B>]</DT>
+</DL>
+</TD>
+<TD width=54%>Stops the current process. The debugger remains active to process further commands.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>l</B>[<B>ist</B>] <I>option</I></DT>
+
+
+</DL>
+</TD>
+<TD width=54%>Displays a list of loaded modules, classes, or global functions.
+
+The <I>option</I> argument can be one of the following:<DL>
+
+<DT><B>mod</B> </DT>
+
+<DD>Lists the loaded modules in the process.</dd>
+
+<DT><B>cl</B></DT>
+
+<DD>Lists the loaded classes in the process.</dd>
+
+<DT><B>fu</B></DT>
+
+<DD>Lists global functions for each module in the process.</dd>
+</DL>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>m</B>[<B>ode</B>] [[<I>mode name</I> {<B>0</B>|<B>1</B>} ]</DT>
+
+
+</DL>
+</TD>
+<TD width=54%>Sets and displays debugger modes for various debugger features. To set a value, specify the <I>mode name</I> and a <B>1</B> 
+for <b>on</b> or <B>0</B> for <b>off</b>. If you do not specify an argument, the tool displays a list of current mode settings. The modes are persisted in the Windows registry between runs of 
+cordbg. For more information, see the table of debugger <A HREF="#cpgrfruntimedebuggercordbgexeanchor1">mode arguments</A>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>newo</B>[<B>bj</B>] <I>class</I></DT>
+
+
+</DL>
+</TD>
+<TD width=54%>Creates a new object using the current thread without running a constructor on the object. The new object is initialized to zero. The tool stores the new object in the variable <I>$result</I> and can use it for subsequent evaluations.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>newobjnc</B> <I>class</I></DT>
+
+
+</DL>
+</TD>
+<TD width=54%>Creates a new object using the current thread. The tool stores the new object in the variable <I>$result</I> and can use it for subsequent evaluations.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>news</B>[<B>tr</B>] <I>string</I></DT>
+</DL>
+</TD>
+<TD width=54%>Creates a new string using the current thread. The tool stores the new object in the variable <I>$result</I> and can use it for subsequent evaluations.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>n</B>[<B>ext</B>] [<I>count</I>]</DT>
+</DL>
+</TD>
+<TD width=54%>Steps the program to the next source line, stepping over function calls. If you do not specify an argument, the tool steps one source line. If you specify an argument, the tool steps the specified number of lines. You can use the <B>so</B> command the same way you use <B>next</B>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>ns</B>[<B>ingle</B>] [<I>count</I>]</DT>
+</DL>
+</TD>
+<TD width=54%>Steps the program one or more instructions, skipping over function calls. If you do not specify an argument, the tool steps one instruction. If you specify a <I>count</I> argument, the tool steps the specified number of instructions.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>o</B>[<B>ut</B>] [<I>count</I>]</DT>
+</DL>
+</TD>
+<TD width=54%>Steps the program out of the current function. If you do not specify an argument, the tool performs a step out once for the current function. If you specify an argument, the tool performs a step out the specified number of times.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>pa</B>[<B>th</B>] [<I>new path</I>]</DT>
+</DL>
+</TD>
+<TD width=54%>Displays or sets the path used to search for source files and debugging symbols. If you do not specify an argument, the tool displays the current path. If you specify a <I>new</I> <I>path</I> argument, it becomes the new path used to search for source files and debugging symbols. This path persists between sessions in the Windows registry.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>p</B>[<B>rint</B>] [<I>variable name</I>]</DT>
+</DL>
+</TD>
+<TD width=54%>Displays one or more local variables together with their values. If you do not specify an argument, the tool displays all local variables and their values. If you specify an argument, the tool displays the value of only the specified local variable. For details, see
+<a href="#cpgrfruntimedebuggercordbgexeanchor2">Using the print command</a> in the Examples section.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>pro</B>[<B>cessenum</B>]</DT>
+</DL>
+</TD>
+<TD width=54%>Enumerates all managed processes and the application domains in each process.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>q</B>[<B>uit</B>]</DT>
+</DL>
+</TD>
+<TD width=54%>See <B>exit</B>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>ref</B>[<B>reshsource</B>] [<I>source file</I>]</DT>
+</DL>
+</TD>
+<TD width=54%>Reloads the source code for a given source file. The source file to be reloaded must be part of the currently executing program. After setting a source file path with the <B>path</B> command, you can use the <B>refreshsource</B> command to bring in missing source code.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>regd</B>[<B>efault</B>] [force]</DT>
+</DL>
+</TD>
+<TD width=54%>Sets the default just-in-time (JIT) debugger to cordbg. The command does nothing if another debugger is already registered. Use the force argument to overwrite the registered JIT debugger.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>reg</B>[<B>isters</B>]</DT>
+</DL>
+</TD>
+<TD width=54%>Displays the contents of the registers for the current thread.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>rem</B>[<B>ove</B>] [<I>breakpoint id</I>, ...]</DT>
+</DL>
+</TD>
+<TD width=54%>See <B>delete</B>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>re</B>[<B>sume</B>] [<B>~</B>] [<I>tid</I>]</DT>
+</DL>
+</TD>
+<TD width=54%>Resumes the thread specified by the <I>tid</I> argument when the debugger continues. If you use the <B>~</B> syntax, the tool resumes all threads except the specified thread. If you do not specify an argument, the command has no effect.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>r</B>[<B>un</B>] [<I>executable</I> [<I>args</I>]]</DT>
+</DL>
+</TD>
+<TD width=54%>Terminates the current process (if there is one) and starts a new one. If you do not specify an <I>executable</I> argument, this command runs the program that was previously executed with the <B>run</B> command. If you specify an <I>executable</I> argument, the tool runs the specified program using the optionally supplied <I>args</I>. If 
+cordbg is ignoring class load, module load, and thread start events (as it is by default), the program stops on the first executable instruction of the main thread.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>set</B> <I>variable</I> <I>value</I></DT>
+
+
+</DL>
+</TD>
+<TD width=54%>Sets the value of the specified <I>variable</I> to the specified <I>value</I>. The value can be a literal or another variable. For details, see
+<a href="#cpgrfruntimedebuggercordbgexeanchor3">Using the set command</a> in the Examples section.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>setip</B> <I>line number</I></DT>
+</DL>
+</TD>
+<TD width=54%>Sets the next statement to execute to the specified <I>line number</I>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>sh</B>[<B>ow</B>] [<I>count</I>]</DT>
+
+
+</DL>
+</TD>
+<TD width=54%>Displays source code lines. If you do not specify an argument, the tool displays the five source code lines before and after the current source code line. If you specify an argument, the tool displays the specified number of lines before and after the current line. The last <I>count</I> specified becomes the default for the current session.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>si </B>[&lt;<I>count</I>&gt;]</DT>
+</DL>
+</TD>
+<TD width=54%>See <B>step</B>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>so</B> [&lt;<I>count</I>&gt;]</DT>
+</DL>
+</TD>
+<TD width=54%>See<B> next</B>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>ss</B>[<B>ingle</B>] [<I>count</I>]</DT>
+</DL>
+</TD>
+<TD width=54%>Steps the program one or more instructions, stepping into function calls. If you do not specify an argument, the tool steps into only one instruction. If you specify an argument, the tool performs the specified number of steps.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>s</B>[<B>tep</B>] [<I>count</I>]</DT>
+</DL>
+</TD>
+<TD width=54%>Steps the program to the next source line, stepping into function calls. If you do not specify an argument, the program steps to the next line. If you specify an argument, the program steps the specified number of lines. You can use the<B> si </B>command or the <B>in</B> command the same way you use <B>step</B>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>stop</B> [[<I>file</I><B>:</B>] <I>line number</I>] | </DT>
+
+<DT>[[<I>class</I><B>::</B>] <I>function</I>[<B>:</B><I>offset</I>]] |</DT>
+
+<DT>[<B>=0x</B><I>address</I>]</DT>
+</DL>
+</TD>
+<TD width=54%>See <B>break</B>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>su</B>[<B>spend</B>] [<B>~</B>] [<I>tid</I>] </DT>
+
+
+</DL>
+</TD>
+<TD width=54%>Suspends the thread specified by the <I>tid</I> argument when the debugger continues. If you use the <B>~</B> syntax, the tool suspends all threads except the specified thread. If you do not specify an argument, the command has no effect.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>t</B>[<B>hreads</B>] [<I>tid</I>]</DT>
+</DL>
+</TD>
+<TD width=54%>Displays a list of threads, or sets the current thread. If you do not specify an argument, the tool displays the list of all threads that are still 
+active and that have run managed code. If you specify an argument, the tool sets the current thread to the specified thread.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>up</B> [<I>count</I>]</DT>
+
+
+</DL>
+</TD>
+<TD width=54%>Moves the stack frame pointer up the stack toward frames that called the current frame for inspection purposes. If you do not specify an argument, the stack frame pointer moves up one frame. If you specify an argument, the stack frame pointer moves up by the specified number of stack frames. If source-level information is available, the tool displays the source line for the frame.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>w</B>[<B>here</B>] [<I>count</I>]</DT>
+</DL>
+</TD>
+<TD width=54%>Displays a stack trace for the current thread. If you do not specify an argument, the tool displays a complete stack trace. If you specify an argument, the tool displays the specified number of stack frames.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>wr</B>[<B>itememory</B>] <I>address</I> <I>count</I> <I>byte</I>, ...</DT>
+</DL>
+</TD>
+<TD width=54%>Writes the specified bytes to the target process. The <I>address</I> argument specifies the location in which to write the bytes. The <I>count</I> argument specifies the number of bytes to write. The <I>byte</I> arguments specify what to write to the process. If the number of bytes in the list is less than the <I>count</I> argument, the tool wraps the byte list and copies it again. If the number of bytes in the list is more than the <I>count</I> argument, the tool ignores the extra bytes.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>wt</B></DT>
+</DL>
+</TD>
+<TD width=54%>Steps the application by native instructions, starting from the current instruction and printing the call tree as it goes. The tool prints the number of native instructions executed in each function with the call trace. Tracing stops when the tool reaches the return instruction for the function in which the command was originally executed. At the end of the trace, the tool prints the total number of instructions executed. This command mimics the 
+Windows NT Symbolic Debugger <B>wt</B> command, and you can use it for basic performance analysis. Currently, the tool only counts managed code.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>x</B> <I>modulename </I><B>!</B> <I>string_to_look_for</I></DT>
+</DL>
+</TD>
+<TD width=54%>Displays symbols in the specified module that match the pattern specified by the <I>string_to_look_for</I> argument.  You can use the asterisk (*) character in the <I>string_to_look_for</I> argument to indicate to the tool to match anything. The tool ignores any characters after the * character.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>?</B> [<I>command </I>...]</DT>
+</DL>
+</TD>
+<TD width=54%>See <B>help</B>. </TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%><B>&gt;</B><I>filename</I>
+
+</TD>
+<TD width=54%>Writes all executed commands to the specified <I>filename</I>. If you do not specify <I>filename</I>, the command stops writing commands to the file.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=46%>
+<DL>
+<DT><B>&lt;</B><I>filename</I></DT>
+
+</DL>
+</TD>
+<TD width=54%>Reads and executes commands from the specified <I>filename</I>.</TD>
+</TR>
+</table>
+
+<P class=indent>Note: The Runtime Debugger commands are case-sensitive. In addition, several commands have synonyms, meaning that you can use any one of several commands to produce the same result. For example, you can use either the <B>break</B> or the <B>stop </B>command to set breakpoints. </P>
+
+<h2><A NAME="cpgrfruntimedebuggercordbgexeanchor1"></A>Mode Arguments</h2>
+
+<P>You can specify mode arguments using the fewest number of characters necessary to make the mode unique. For example, "mode m 1" is equivalent to "mode moduleloads 1".</P>
+<table border="1" width="90%">
+
+<TR VALIGN="top">
+<TH width=33%>Argument</TH>
+<TH width=67%>Description</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>AppDomainLoads</B></TD>
+<TD width=67%>Displays application domain and assembly load events.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>ClassLoads</B></TD>
+<TD width=67%>Displays class load events.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>DumpMemoryInBytes</B></TD>
+<TD width=67%>Displays memory contents as bytes or DWORDS.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>EnhanceDiag</B></TD>
+<TD width=67%>Displays enhanced diagnostic information.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>HexDisplay</B></TD>
+<TD width=67%>Displays numbers in hexadecimal or decimal format.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>ILNatPrint</B></TD>
+<TD width=67%>Displays offsets in common intermediate language (CIL) or native-relative language, or both.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>ISAll</B></TD>
+<TD width=67%>Steps through all interceptors.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>ISClinit</B></TD>
+<TD width=67%>Steps through class initializers.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>ISExceptF</B></TD>
+<TD width=67%>Steps through exception filters.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>ISInt</B></TD>
+<TD width=67%>Steps through user interceptors.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>ISPolicy</B></TD>
+<TD width=67%>Steps through context policies.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>ISSec</B></TD>
+<TD width=67%>Steps through security interceptors.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>JitOptimizations</B></TD>
+<TD width=67%>Specifies whether JIT compilation generates code that is easier to debug.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>LoggingMessages</B></TD>
+<TD width=67%>Displays managed code log messages.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>ModuleLoads</B></TD>
+<TD width=67%>Displays module load events.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>SeparateConsole</B></TD>
+<TD width=67%>Specifies whether the process being debugged gets its own console.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>ShowArgs</B></TD>
+<TD width=67%>Displays method arguments in the stack trace.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>ShowModules</B></TD>
+<TD width=67%>Displays module names in the stack trace.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>ShowStaticsOnPrint</B></TD>
+<TD width=67%>Displays <b>static</b> fields for objects.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>ShowSuperClassOnPrint</B></TD>
+<TD width=67%>Displays contents of base class for objects.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>USAll</B></TD>
+<TD width=67%>Steps through all unmapped stop locations.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>USEpi</B></TD>
+<TD width=67%>Steps through method epilogs.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>USPro</B></TD>
+<TD width=67%>Steps through method prologs.</TD>
+</TR>
+
+</table>
+
+<h3>Remarks</h3>
+
+<P>You should compile the application to debug using compiler-specific flags, which cause your compiler to generate debugging symbols. Refer to your compiler's documentation for more information about these flags. You can still debug optimized applications, but some debugging information will be missing. For example, many local variables will not be visible, and source lines will be inaccurate. </P>
+
+<P>After you compile the application, type <B>cordbg</B> at the command prompt to start a debugging session, as shown in the following example.</P>
+
+<PRE>
+C:\Program Files\Microsoft Visual Studio 8&gt;cordbg <br />Microsoft (R) Common Language Runtime Test Debugger Shell Version 2.0.50727.42 (RTM.050727-4200) <br />Copyright (C) Microsoft Corporation. All rights reserved. <br />
+(cordbg) </PRE>
+
+<P>The (cordbg) prompt indicates that you are in the debugger.</P>
+
+<P>Once you are in the debugger, use the commands and appropriate arguments to invoke the required functionality.</P>
+
+<P>When you start a debugging session from the command line, you can also provide the name of the application you want to debug, program arguments, and optional arguments. The 
+Managed Debugger optional arguments are the same commands that you would use while in 
+cordbg but you must prefix them with the exclamation point (!) character. You can use the ! character as a literal in a string by prefixing it with the backslash (\) character. This is necessary when using the <B>x</B> command.</P>
+
+<P>If a numeric argument to a command begins with the prefix <B>0x</B>, cordbg assumes the argument is in hexadecimal format. Otherwise, it assumes the argument is in decimal format.</P>
+
+<P>Most commands in cordbg can be prefixed with an asterisk (*), which causes the command to execute once for each managed thread in the process. The command is executed in the context of each thread. The most useful command to prefix with an asterisk is the <B>w</B>[<B>here</B>] command. For example, <B>*w</B> will cause the stack trace of every managed thread to be printed.</P>
+
+<h3>Examples</h3>
+
+<h4><B><A NAME="cpgrfruntimedebuggercordbgexeanchor4"></A></B>Starting a cordbg Session</h4>
+
+<P>The following command starts a cordbg session for the application <CODE>MyApplication.exe</CODE> with the program arguments <CODE>a</CODE> and <CODE>2</CODE> and the following optional commands: set a breakpoint in <CODE>MyApplication.cs</CODE> at line 42; continue the application; display symbols in <CODE>MyApplication.exe</CODE> matching the string <CODE>'SomeString'</CODE>.</P>
+
+<PRE>cordbg MyApplication.exe a 2 !b MyApplication.cs:42 !g !x MyApplication.exe\!SomeString</PRE>
+
+<h4><B><A NAME="cpgrfruntimedebuggercordbgexeanchor5"></A></B>Running an executable inside a 
+cordbg session</h4>
+
+<P>The following command entered from within a cordbg session (at the<CODE> (cordbg) </CODE>prompt) runs the executable <CODE>MyApplication.exe</CODE> with the program arguments <CODE>a</CODE> and <CODE>2</CODE>.</P>
+
+<PRE>run MyApplication.exe a 2 b</PRE>
+
+<h4><B><A NAME="cpgrfruntimedebuggercordbgexeanchor2"></A></B>Using the print command</h4>
+
+<P>The following commands demonstrate that you can use dot notation with the <B>print</B> command to specify variables within objects.</P>
+
+<PRE>print obj.var1
+print obj1.obj2.var1</PRE>
+
+<P>If a class extends another class, the <B>print</B> command shows both the specified class's fields and the base class's fields. 
+For example, if class <b>m1</b> has fields <b>a</b>, <b>b</b>, and <b>c</b> and class 
+<b>m2</b> extends <b>m1</b> and has fields <b>d</b>, <b>e</b>, and <b>f</b>, then an instance 
+<i>myInstance</i> of <b>m2</b> prints as follows.</P>
+
+<PRE>myInstance = &lt;addr&gt; &lt;m2&gt;
+      a = 1
+      b = 2
+      c = 3
+      m2::d = 4
+      m2::e = 5
+      m2::f = 6</PRE>
+
+<P>You can specify class static variables by prefixing the variable name with the class name, as follows.</P>
+
+<PRE>print MyClass::StaticVar1
+print System::Boolean::True</PRE>
+
+<P>Array indexes must be simple expressions. The following array indexes are valid for use with the <B>print</B> command.</P>
+
+<PRE>print arr[1]
+print arr[i]
+print arr1[arr2[1]]
+print md[1][5][myObject.a]</PRE>
+
+<P>The following array indexes are not valid for use with the <B>print</B> command, because the array index is not a simple expression.</P>
+
+<PRE>print arr[i + 1]
+print arr[i + 2]</PRE>
+
+<h4><B><A NAME="cpgrfruntimedebuggercordbgexeanchor3"></A></B>Using the set command</h4>
+
+<P>When you use the <B>set</B> command, the value being assigned to the specified variable can be a literal or another variable. 
+The following are valid uses of the <B>set</B> command.</P>
+
+<PRE>set int1 0x2a
+set float1 3.1415
+set char1 'a'
+set bool1 true
+set obj1 0x12345678
+set obj1 obj2
+set obj1.m_length[obj1.m_height] obj3.m_length[2]</PRE>
+
+<hr>
+
+<p><i>Copyright (c) 2006 Microsoft Corporation. All rights reserved.</i></p>
+</BODY>
+</HTML>

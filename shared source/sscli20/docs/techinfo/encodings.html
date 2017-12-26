@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> <head>
+<title>Encodings used in the Shared Source CLI</title>
+<link rel="stylesheet" type="text/css" href="../rotor.css">
+</head>
+<body>
+<h1 align="left">Encodings Used in the Shared Source CLI 2.0</h1>
+
+<p>Three encoding techniques  are used repeatedly in the  Shared 
+Source CLI (SSCLI) 2.0.&nbsp; These are referred to as 
+Unsigned, Signed, and UDelta encodings.</p>
+
+<h3><strong style="font-weight: 400">Unsigned</strong></h3>
+
+<p>This is a sequence of bytes where every byte but the last has the 0x80 bit 
+set. The bytes are stored in order from most to least significant. One byte can 
+thus encode the numbers 0 to 127 (0x00 to 0x7F), two bytes can encode 128 (0x81 
+0x00) to 16383 (0xFF 0x7F), and so forth. Five bytes would be the maximum number 
+of bytes needed to encode the largest 32-bit unsigned values.
+</p>
+<h3><strong style="font-weight: 400">Signed</strong></h3>
+<p>This is a sequence of bytes where every byte but the last has the 0x80 bit 
+set. The first byte uses the 0x40 bit to encode the sign. The bytes are stored 
+in order from most to least significant. After accumulating the unsigned values 
+(6 bits from the first byte and 7 bits from each succeeding byte) the result is 
+stored in two's complement format if the sign bit was set.&nbsp; One byte can 
+thus encode the numbers -63 (0x7f) to 63 (0x3F), two bytes can encode -8191 
+(0xFF 0x7F) to 8191 (0xBF 0x7F), and so forth. Five bytes would be the maximum 
+number of bytes needed to encode the largest magnitude 32-bit signed values.
+</p>
+<h3><strong style="font-weight: 400">UDelta</strong></h3>
+<p>This is a series of Unsigned encodings where each is an increment to the sum 
+of all of the previous values. This is used to encode a stream of 
+ever-increasing values (such as offsets in the code segment or in a stack 
+frame).
+</p>
+<hr>
+<p><i>Copyright (c) 2006 Microsoft Corporation. All rights reserved.</i></p>
+</body>
+</html>

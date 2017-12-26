@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> 
+<head>
+<TITLE>PEVerify Tool (Peverify.exe)</TITLE>
+<link rel="stylesheet" type="text/css" href="../rotor.css">
+</head>
+<body>
+<H1>PEVerify Tool (peverify.exe)</H1>
+
+<P>The PEVerify tool helps developers who generate common intermediate language (CIL), 
+such as compiler writers, script engine developers, and so forth, to determine whether their 
+CIL code and associated metadata meet type safety requirements.  </P>
+
+<P>The application file for the PEVerify tool is named <code>peverify.exe</code> 
+in the Shared Source CLI (SSCLI) when  on Microsoft Windows&reg;.</P>
+    <p>
+        Some compilers generate verifiably type-safe code only if you avoid using certain language constructs. If, as a developer, you are using such a compiler, you 
+might want to verify that you have not compromised the type safety of your code. In this situation, you can run the 
+PEVerify tool on your files to check the 
+CIL and metadata.</p>
+
+<h4>Usage</h4>
+
+<blockquote>
+
+<PRE>peverify <I>filename</I> [<B>/md</B>] [<B>/il</B>] [<B>/break=</B><I>maxErrorCount</I>]
+[<B>/hresult</B>] [<B>/ignore=</B> <I>hex.code</I>] [<B>/ignore=</B>@<I>responseFile</I>]
+[<B>/unique</B>] [<B>/quiet</B>]</PRE>
+</blockquote>
+<table border=1 width="100%">
+
+<TR VALIGN="top" width=100%>
+<TH width=31%>Argument</TH>
+<TH width=69%>Description</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><I>filename</I></TD>
+<TD width=69%>The portable executable (PE) file for which to check the CIL and metadata.</TD>
+</TR>
+</table>
+<h4>Options</h4>
+
+<p>Options can be specified using either a dash ('-') or a slash ('/'). </p>
+
+<table border=1 width=100%>
+
+<TR VALIGN="top">
+<TH width=31%>Option</TH>
+<TH width=69%>Description</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/break=</B><I>maxErrorCount</I></TD>
+<TD width=69%>Aborts verification after <I>maxErrorCount</I> errors.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/clock</B></TD>
+<TD width=69%>Measures and reports the following verification times in milliseconds: 
+<ul>
+  <li>MD Val. cycle<ul>
+    <li>Metadata validation cycle</li>
+  </ul>
+  </li>
+  <li>MD Val. pure<ul>
+    <li>Metadata validation pure</li>
+  </ul>
+  </li>
+  <li>IL Ver. cycle<ul>
+    <li>Common intermediate language (CIL) verification cycle</li>
+  </ul>
+  </li>
+  <li>IL Ver pure<ul>
+    <li>CIL verification pure</li>
+  </ul>
+  </li>
+</ul>
+
+<P>The MD Val. cycle and IL Ver. cycle times include the time required to perform necessary startup and shutdown procedures. The MD Val. pure and IL Ver pure times reflect the time required to perform the validation or verification only.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/help</B></TD>
+<TD width=69%>Displays command syntax and options for the tool.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/hresult</B></TD>
+<TD width=69%>Displays error codes in hexadecimal format.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/ignore=</B><I>hex.code</I> [, <I>hex.code</I>]</TD>
+<TD width=69%>Ignores the specified error codes.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/ignore=@</B><I>responseFile</I></TD>
+<TD width=69%>Ignores the error codes listed in the specified response file.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/il</B></TD>
+<TD width=69%>Performs CIL type safety verification checks for methods implemented in the assembly specified by <I>filename</I>. The tool returns detailed descriptions for each problem found unless you specify the <B>/quiet</B> option. </TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/md</B></TD>
+<TD width=69%>Performs metadata validation checks on the assembly specified by <I>filename</I>. This walks the full metadata structure within the file and reports all validation problems encountered.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/quiet</B></TD>
+<TD width=69%>Specifies quiet mode; suppresses output of the verification problem reports. 
+The PEVerify tool still reports whether the file is type safe, but does not report information on problems preventing type safety verification.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/unique</B></TD>
+<TD width=69%>Ignores repeating error codes.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/?</B></TD>
+<TD width=69%>Displays command syntax and options for the tool.</TD>
+</TR>
+</table>
+
+<H4>Remarks</H4>
+
+<P>The common language runtime relies on the type-safe execution of application code to enforce security and isolation mechanisms. Normally, code that is not verifiably type safe cannot run, although you can set security policy to allow the execution of trusted but unverifiable code.</P>
+
+<P>If neither the <B>/md</B> nor <B>/il</B> options are specified, the PEVerify 
+tool performs both types of checks. The PEVerify tool performs <B>/md</B> checks first. If there are no errors, <B>/il</B> checks are made. If you specify both <B>/md</B> and <B>/il</B>, <B>/il</B> checks are made even if there are errors in the metadata. Thus, if there are no metadata errors, </P>
+
+<blockquote>
+
+<P>peverify <I>filename</I> </P>
+
+</blockquote>
+
+<P>is equivalent to:</P>
+
+<blockquote>
+
+<P>peverify <I>filename</I> <B>/md</B> <B>/il</B>. </P>
+
+</blockquote>
+
+<P>The PEVerify tool performs comprehensive CIL verification checks based on 
+dataflow analysis plus a list of several hundred rules on valid metadata. </P>
+
+<H4>Examples</H4>
+
+<P>The following command performs metadata validation checks and CIL type safety verification checks for methods implemented in the assembly <CODE>myAssembly.exe</CODE>.</P>
+
+<PRE>peverify myAssembly.exe /md /il</PRE>
+
+<P>Upon successful completion of the above request, the PEVerify tool displays the following message.</P>
+
+<PRE>All classes and methods in myAssembly.exe Verified</PRE>
+
+<P>The following command performs metadata validation checks and CIL type safety verification checks for methods implemented in the assembly <CODE>myAssembly.exe</CODE>. The tool displays the time required to perform these checks.</P>
+
+<PRE>peverify myAssembly.exe /md /il /clock</PRE>
+
+<P>Upon successful completion of the above request, the PEVerify tool displays the following message.</P>
+
+<PRE>All classes and methods in myAssembly.exe Verified
+Timing: Total run     320 msec
+        MD Val.cycle  40 msec
+        MD Val.pure   10 msec
+        IL Ver.cycle  270 msec
+        IL Ver.pure   230 msec</PRE>
+
+<P>The following command performs metadata validation checks and CIL type safety verification checks for methods implemented in the assembly <CODE>myAssembly.exe</CODE>. 
+the PEVerify tool stops, however, when it reaches the maximum error count of 100.  The tool also ignores the specified error codes.</P>
+
+<PRE>peverify myAssembly.exe /break=100 /ignore=0x12345678,0xABCD1234</PRE>
+
+<P>The following command produces the same result as the  previous example, but specifies the error codes to ignore in the response file <CODE>ignoreErrors.rsp</CODE>.</P>
+
+<PRE>peverify myAssembly.exe /break=100 /ignore@ignoreErrors.rsp</PRE>
+
+<P>The response file can contain a comma-separated list of error codes. </P>
+
+<PRE>0x12345678, 0xABCD1234</PRE>
+
+<P>Alternatively, the response file can be formatted with one error code per line.</P>
+
+<PRE>0x12345678
+0xABCD1234</PRE>
+
+<h5>See Also</h5>
+
+<P><a href="tools_index.html">Tools Index</a></P>
+<hr>
+<p><i>Copyright (c) 2006
+    Microsoft Corporation. All rights reserved.</i></p>
+</BODY>
+</HTML>

@@ -1,0 +1,113 @@
+# ==++==
+#
+#   
+#    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+#   
+#    The use and distribution terms for this software are contained in the file
+#    named license.txt, which can be found in the root of this distribution.
+#    By using this software in any fashion, you are agreeing to be bound by the
+#    terms of this license.
+#   
+#    You must not remove this notice, or any other, from this software.
+#   
+#
+# ==--==
+# ============================================================================
+# File: makefile.common.in
+# Common makefile for the PAL.
+# ============================================================================
+
+TOOL_SUBDIR = $(TOP_SRC_DIR)/build_tools/obj$(BUILD_ALT_DIR)/$(_BUILDARCH)
+INCLUDE_DIRS = -I$(TOP_SRC_DIR)/../inc -I$(TOP_SRC_DIR)/include \
+               -I$(TOP_SRC_DIR)/obj$(BUILD_ALT_DIR)/$(_BUILDARCH)
+MD_INCLUDE_DIRS = -I$(TOP_SRC_DIR)/../inc -I$(TOP_SRC_DIR)/include \
+                  -I$(TOP_SRC_DIR)/obj$(BUILD_ALT_DIR)/$(_BUILDARCH)
+# The ':' here is required to keep autoconf from deleting VPATH.
+VPATH = ../..:
+
+CC = @CC@
+CXX = @CXX@
+LDPARTIAL = @LDPARTIAL@
+CFLAGS = @CFLAGS@ @EXTRA_EXPORT_FLAGS@
+
+ALLCFLAGS = $(REQUIRED_CFLAGS) $(CFLAGS)
+
+ASMFLAGS = @ASMFLAGS@
+ASM_WITH_CPP_FLAGS = @ASM_WITH_CPP_FLAGS@
+
+PALDEFS= @DEFS@
+
+.SUFFIXES:
+.SUFFIXES: .c .s .o .cpp
+
+.PHONY: all check_env clean depend target target_clean
+
+TARGET_OBJ = $(TOP_SRC_DIR)/obj$(BUILD_ALT_DIR)/$(_BUILDARCH)/$(MODULE_NAME)objs.o
+OBJS = $(C_SRCS:.c=.o) $(ASM_SRCS:.s=.o) $(CPP_SRCS:.cpp=.o)
+
+# Targets
+# =======
+
+all: check_env makefile $(TOP_SRC_DIR)/obj$(BUILD_ALT_DIR)/$(_BUILDARCH)/config.h
+	$(MAKE) COMMON_PREFIX=$(TOP_SRC_DIR)/ target
+
+clean: check_env
+	$(MAKE) COMMON_PREFIX=$(TOP_SRC_DIR)/ target_clean
+
+target: check_env $(TARGET_OBJ)
+
+check_env:
+	@if test ! $(BUILD_ALT_DIR) ; then \
+	    echo "Environment not set. Run '. env.sh' before building the PAL"; \
+	    exit 1; \
+	 fi
+
+$(TARGET_OBJ): $(OBJS)
+#perform partial link to aggregate all object files in a single one
+	$(LDPARTIAL) $(OBJS) -o $@
+
+makefile: ../../makefile.in
+	@echo $? is newer than $@, please rerun $(TOP_SRC_DIR)/obj$(BUILD_ALT_DIR)/$(_BUILDARCH)/configure.
+	@exit 1
+
+# configure won't regenerate config.h if nothing's changed, so the rm -f
+# here forces it to do so.
+$(TOP_SRC_DIR)/obj$(BUILD_ALT_DIR)/$(_BUILDARCH)config.h: $(TOP_SRC_DIR)/config.h.in
+	@echo $? is newer than $@, please rerun $(TOP_SRC_DIR)/obj$(BUILD_ALT_DIR)/$(_BUILDARCH)/configure.
+	@rm -f $@
+	@exit 1
+
+depend: makefile $(TOP_SRC_DIR)/obj$(BUILD_ALT_DIR)/$(_BUILDARCH)/config.h $(TOOL_SUBDIR)/mdtool
+	@echo Making dependencies for $(MODULE_NAME) module
+	cd ../.. &&	$(TOOL_SUBDIR)/mdtool $(PALDEFS) $(ALLCFLAGS) $(MD_INCLUDE_DIRS) $(LOCAL_INCLUDE_DIRS) $(C_SRCS) $(CPP_SRCS) && cd obj$(BUILD_ALT_DIR)/$(_BUILDARCH)
+
+$(TOOL_SUBDIR)/mdtool:
+	cd $(TOOL_SUBDIR) && $(MAKE) mdtool
+
+# Delete all of the .o files in obj$(BUILD_ALT_DIR). This ensures that we
+# clean up properly even if the directory contains an object file from a
+# file that has since been deleted from the PAL.
+target_clean:  check_env
+	rm -f *.o
+	rm -f $(TARGET_OBJ)
+	cd ../..
+
+.c.o:
+	$(CC) -c $(PALDEFS) $(ALLCFLAGS) $(INCLUDE_DIRS) $(LOCAL_INCLUDE_DIRS) -o $@ $<
+
+.s.o:
+	if test X"$(USE_VAC_CC)" = "X1" ; then \
+            cp $< $@__tmp__.c; \
+            $(CC) $(ASMFLAGS) $(ASM_WITH_CPP_FLAGS) -c $(PALDEFS) $(ALLCFLAGS) $(INCLUDE_DIRS) \
+                $(LOCAL_INCLUDE_DIRS) $@__tmp__.c -E > $@__tmp__.s; \
+            rm -f $@__tmp__.c; \
+            $(CC) $(ASMFLAGS) $(ASM_WITH_CPP_FLAGS) -c $(PALDEFS) $(ALLCFLAGS) $(INCLUDE_DIRS) \
+                $(LOCAL_INCLUDE_DIRS) -o $@ $@__tmp__.s; \
+            rm -f $@__tmp__.s; \
+	else \
+	    $(CC) $(ASMFLAGS) $(ASM_WITH_CPP_FLAGS) -c $(PALDEFS) $(ALLCFLAGS) $(INCLUDE_DIRS) \
+	        $(LOCAL_INCLUDE_DIRS) -o $@ $<; \
+	fi
+
+.cpp.o:
+	$(CXX) -c $(PALDEFS) $(ALLCFLAGS) $(INCLUDE_DIRS) $(LOCAL_INCLUDE_DIRS) -o $@ $<

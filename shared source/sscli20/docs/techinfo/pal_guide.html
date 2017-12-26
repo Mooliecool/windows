@@ -1,0 +1,2071 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> 
+<head>
+<link rel="stylesheet" type="text/css" href="../rotor.css">
+
+<title>Rotor Shared Source CLI Platform Adaptation Layer Specification</title>
+<link rel="stylesheet" type="text/css" href="../rotor.css">
+</head>
+
+<body>
+
+<h1 align="left">Shared Source Common Language Infrastructure Platform Adaptation Layer 
+Specification</h1>
+
+<h2>Contents</h2>
+<ul>
+  <li><a href="#Notes">SSCLI 2.0 Notes</a></li>
+    <li><a href="#Overview">Overview</a> </li>
+  <li><a href="#HostRequirements">Host Machine and Operating System Requirements</a>
+  <ul>
+    <li><a href="#HostMachine">Host Machine</a></li>
+    <li><a href="#HostOperatingSystem">Host Operating System</a></li>
+    <li><a href="#CompilationEnvironment">Compilation Environment</a></li>
+  </ul>
+  </li>
+  <li><a href="#BasicRequirements">Basic Requirements</a></li>
+  <li><a href="#Assumptions">Assumptions</a></li>
+  <li><a href="#PALEntrypoints">PAL-specific Entry Points</a></li>
+  <li><a href="#Win32Entrypoints">Win32 Entry Points</a>
+  <ul>
+    <li><a href="#user32">User32.dll</a></li>
+    <li><a href="#kernel32">Kernel32.dll</a></li>
+    <li><a href="#cruntime">C Runtime</a></li>
+    <li><a href="#winsock">Wsock32.dll, Ws2_32.dll</a></li>
+  </ul>
+  </li>
+  <li><a href="#ImplementationDetails">Implementation Details</a>
+  <ul>
+    <li><a href="#APITracing">API Call Tracing</a></li>
+    <li><a href="#FileNames">File and Path Names</a></li>
+    <li><a href="#Handles">HANDLEs</a></li>
+    <li><a href="#LastError">LastError</a></li>
+    <li><a href="#Printf">Printf Format Specifiers</a></li>
+    <li><a href="#ResourceUse">Use of Resource After It Has Been Freed</a></li>
+    <li><a href="#EnvironmentCase">Case Sensitivity in Environment Variables</a></li>
+    <li><a href="#SxSSupport">Side-by-Side:  Named Shared Objects and the User Configuration Directory</a></li>
+  </ul>
+  </li>
+  <li><a href="#GeneralIssues">General Issues</a>
+  <ul>
+    <li><a href="#IOCompletion">I/O Completion Ports and Asynchronous I/O</a></li>
+    <li><a href="#OutOfStack">Out-of-Stack</a></li>
+    <li><a href="#Exceptions">Exceptions</a></li>
+    <li><a href="#SEHMacros">SEH Macros</a></li>
+    <li><a href="#SEHForJit">SEH for JIT-compiled Code</a></li>
+    <li><a href="#SEHImplementation">SEH Implementation</a></li>
+    <li><a href="#Resources">Localized Resource Strings</a></li>
+    <li><a href="#Security">Security</a></li>
+    <li><a href="#DLLMain">DLLMain</a></li>
+    <li><a href="#UnexpectedTermination">Unexpected Termination</a></li>
+  </ul>
+  </li>
+  <li><a href="#AppendixA">Appendix A: Building rotor_pal.satellite</a>
+</ul>
+
+<h1><a name="#Notes"></a>SSCLI 2.0 Notes</h1>
+While the source code to the PAL has been updated for the SSCLI 2.0 release, this particular document has not. This document has been left for reference.&nbsp;<h1><a name="Overview"></a>Overview</h1>
+This specification and the C header file (%ROTOR_DIR%\pal\inc\rotor_pal.h) together with the relevant portions of the 
+Microsoft&reg; MSDN online documentation (<a href="http://msdn.microsoft.com">msdn.microsoft.com</a>), 
+form the specification for the Shared Source Common Language Infrastructure (SSCLI) Platform Adaptation 
+Layer (PAL). The PAL has been specified such that correct implementation will 
+enable the portable subset of the .NET Framework to be run on a variety of non-Microsoft&reg; Windows&reg; operating systems.  
+
+<p>Note: The PAL alone is not sufficient to accomplish a port of the SSCLI 
+implementation - the recompilation of the portable subset and the 
+construction of an appropriate just-in-time (JIT) compiler are required as well.</p>
+
+<p>The specification consists of the following sections:
+<ul>
+  <li>Top-Level Requirements - specifications affecting the entire PAL.</li>
+  <li>Assumptions - a list of clarifying assumptions about this specification.</li>
+  <li>PAL specific APIs - a list of APIs that are callable by clients of the PAL to perform required or optional PAL services.</li>
+  <li>API specifications by importer -  a series of sections in which the APIs are specified and organized by 
+  the major functional unit that requires them.  Each API is listed in only one section with a specification that spans the requirements of the whole system.</li>
+  <li>Implementation hints - a section outlining  suggestions for how to implement some of the more 
+  complex parts of the PAL.</li>
+  <li>General issues - a section containing items that have yet to be fully 
+  specified and that will be addressed in future versions of this specification.</li>
+</ul>
+
+
+
+<h1><a name="HostRequirements"></a>Host Computer and Operating System Requirements</h1>
+This section describes the features that the underlying platform is expected to 
+support and programmatically expose to the PAL.
+<h2><a name="HostMachine"></a>Host Computer</h2>
+The current PAL implementation requires a 32-bit architecture.
+<h2><a name="HostOperatingSystem"></a>Host Operating System</h2>
+
+<p>The following are requirements for any operating system on which you wish to 
+host the PAL.</p>
+<h4>File System Requirements</h4>
+      <ul>
+	<li>Must support a hierarchical directory tree (read-only at startup, but read-write to run non-trivial applications)</li>
+	<li>Must support enumeration of files within a directory</li>
+	<li>Can support files as large as 2^64 - 1 bytes</li>
+      </ul>
+  <h4>Memory Requirements</h4>
+      <ul>
+	<li>Must have memory-mapped files</li>
+	<li>Must support shared-libraries, including dynamic load, unload, and symbol lookup</li>
+	<li>Must have 16 megabytes (MB) of memory commit available for each SSCLI process</li>
+	<li>Address 0 must be reserved and must trigger an exception</li>
+	<li>Must support shared-memory between processes, with no explicit synchronization or update.  Writes must be automatically visible to all other processes that share the memory.</li>
+	<li>Must support runtime code-generation.  Note that the FlushInstructionCache() API will be called to notify the PAL after the code has been generated/modified and before executing it.</li>
+	<li>Must have one fixed page size for the entire address space.</li>
+      </ul>
+  <h4>Threading Requirements</h4>
+      <ul>
+	<li>Must support pre-emptive multi-threading, where threads share one common address space.</li>
+        <li>Must have a mechanism for storing and fetching per-thread data.</li>
+	<li>Must support large stacks - 256k or larger per thread.</li>
+	<li>Must support a fixed number of processors - SSCLI queries the number of processors at startup and self-tunes for 
+    single processor vs. multiprocessor, including making assumptions about atomicity of memory accesses.</li>
+       </ul>
+   <h4>Miscellaneous Operating System Requirements</h4>
+<p>Furthermore, the host operating system must support the following:</p>
+<ul>
+   <li>UNIX system-based style signal() handlers, or an equivalent mechanism for catching software errors such as accessing memory at an invalid address.  The mechanism must be able to report back the CPU's registers at the time of the fault.</li>
+   <li>All code is expected to run within a usermode process, and within the security context of that process.</li>
+   <li>BSD UNIX system-style network sockets, to support managed <b>System.Net.Sockets</b>.</li>
+   <li>Optional TCL/TK implementation, to support the managed platform 
+   independent user interface (PIGUI).</li>
+</ul>
+
+<h2><a name="CompilationEnvironment"></a>Compilation Environment</h2>
+The compilation environment requires:
+<ul>
+  <li>Assumes the following types in C/C++:</li>
+	<li>sizeof(char)==1</li>
+	<li>sizeof(short)==2</li>
+	<li>sizeof(int)==4</li>
+	<li>sizeof(long)==4</li>
+	<li>sizeof(void*)==4</li>
+   <li>4-byte and 8-byte IEEE real data types and arithmetic available in the C/C++ compiler</li>
+   <li>64-bit integer data type supporting 64-bit arithmetic</li>
+</ul>
+
+
+
+<h1><a name="BasicRequirements"></a>Basic Requirements</h1>
+
+<p>The following are basic requirements of the PAL:</p>
+<ul>
+  <li>The PAL binary is a shared library named librotor_pal.so for most UNIX system-based platforms, librotor_pal.dylib on Mac OS X, and rotor_pal.dll 
+  on the Windows platform.</li>
+  <li>The PAL uses dynamic linking to bind to system-provided libraries such as 
+  the C runtime.</li>
+  <li>The PAL may not spawn child processes, except on behalf of the PAL client.  It 
+  may not spawn worker processes or daemon processes.</li>
+  <li>Once built, the PAL must not require any installation or configuration before it can be run.</li>
+  <li>Do not copy source code or headers from other sources into the PAL implementation.&nbsp; 
+  Copied code might have undesirable licensing issues.</li>
+  <li>The PAL has a standalone test suite which validates that the implementation functions as expected, in tests/palsuite</li>
+  <li>The PAL should include API tracing in the debug build. API trace logs are an invaluable debugging tool 
+  for understanding bugs in both the CLI implementation and the PAL.</li>
+  <li>Source location. The PAL will be rooted under /sscli (the root directory 
+  of the distribution) as follows:
+      <ul>
+        <li>.../sscli/pal/<ul>
+          <li>inc/rotor_pal.h - the PAL public header file</li>
+          <li>unix/... - UNIX system-based PAL implementation</li>
+          <li>win32/... - Windows PAL implementation</li>
+        </ul>
+        </li>
+        <li>... - other future platform PAL implementations</li>
+  </ul>
+  </li>
+</ul>
+      It is expected that the PAL implementation in the /unix directory will be ported to various 
+  UNIX systems by using #ifdef switches added to the existing UNIX system-based code.&nbsp; The PAL sources for 
+  UNIX system-based platforms should not be under a unix/freeBSD/... directory or 
+  other directory named for a specific UNIX system-based platform implementation.  All file and directory names must be lowercase.
+
+<h1><a name="Assumptions"></a>Assumptions and Format</h1>
+In constructing this specification, the following assumptions and formatting 
+styles were used:
+<ul>
+  <li>Unless otherwise stated, the detailed documentation of each API listed should be taken from the MSDN CDs.  The October 2001 edition is the base line for the reference.</li>
+  <li>For each API listed below, the descriptive material should be interpreted as a delta (either additive, subtractive or modification) from the baseline outline in the previous line item.  Unless specifically stated otherwise, the API descriptions below do not replace the base specification outlined in the previous line item.</li>
+  <li>The reference implementation for the PAL is Windows XP Professional.</li>
+  <li>In instances where the MSDN documentation differs from the Windows XP Professional behavior, the Windows XP Professional behavior should be considered correct, and the MSDN documentation considered incorrect.</li>
+  <li>Each API has the following form:<ul>
+  <li>API Name in Bold.</li>
+  <li>[Optional delta from the MSDN documentation.]</li>
+</ul>
+
+
+  </li>
+  <li>Lines terminating in a hyphen indicate that there was no noted change from 
+  the MSDN documentation for that item; it is merely listed for completeness.</li>
+</ul>
+
+
+
+<h1><a name="PALEntrypoints"></a>PAL-specific Entry Points</h1>
+<h4>PAL_Initialize</h4>
+The <b>PAL_Initialize</b> function is to be called by all clients of the PAL, to allow the PAL to perform  required initialization.  It returns 0 on success and a nonzero 
+error value on failure.  In the failure case, the PAL should display a meaningful error message if possible, since the host application will be unable to call any PAL APIs to print messages.  The PAL must support the 
+<b>exit()</b> and <b>ExitProcess() </b>functions even if PAL_Initialize returns a failure code.  
+<b>PAL_Initialize</b> may be called multiple times if multiple PAL clients are loaded into the same process.  The PAL should keep an internal count of the number of 
+<b>PAL_Initialize</b> calls.
+
+<p>The caller must pass its argument list (argc/argv), in order to support GetCommandLine on systems 
+that do not otherwise have a system call to fetch back the command-line arguments.  Calls after the first should ignore argc/argv.
+
+<p>On return, the floating-point environment must be set up to be compatible with the default 
+Microsoft Win32&reg; environment:
+<ul>
+  <li>Floating-point exceptions masked.</li>
+  <li>Round to nearest.</li>
+  <li>53-bit precision.</li>
+</ul>
+All new threads created using <b>CreateThread()</b> must also have the floating-point environment initialized to these settings.
+
+<h4>PAL_Terminate</h4>
+PAL clients must call <b>PAL_Terminate</b> if they have previously called PAL_Initialize and it has succeeded.   After this call, if the count of outstanding PAL clients drops to 0, then the only PAL APIs that must continue to function are
+<b>exit()</b> and <b>ExitProcess()</b>.
+
+<h4>PAL_GetUserConfigurationDirectoryW</h4>
+The PAL should return  the directory in which the host should store 
+per-user configuration data. On Windows, this should be located under the
+per-user  directory returned from <b>SHGetSpecialFolderPath()</b> for CSIDL_PROFILE
+(that is, the %userprofile% directory).  On UNIX system-based platforms, it should be under
+the user's home directory, and should be prefixed by "." so it is hidden.
+To support multiple different SSCLI implementations running concurrently,
+the user configuration directory should be unique per-PAL, as determined by
+examining the full path to the PAL library.  For more information see
+<a href="#SxSSupport">Side-by-side support</a>.<p>The PAL must create the directory upon the first call to this API.
+
+<h4>PAL_RegisterLibrary PAL_UnregisterLibrary</h4>
+Called to register or unregister statically linked dynamic libraries. For details see the <a href="#DLLMain">DllMain</a> section.
+
+<ul>
+  <li>lpLibFileName - base name of the statically linked library (in other 
+  words, "sscoree" with no extension or "lib" prefix).</li>
+</ul>
+
+<h4>PAL_GetPALDirectoryW</h4>
+Returns the fully qualified directory name with which the PAL DLL was loaded, 
+including a trailing path separator. On failure, it returns FALSE and sets the 
+LastError value to a meaningful error code. For success, if the PAL was loaded 
+from, for example, &quot;D:\rotor\v1.x86chk.rotor\rotor_pal.dll&quot;, the returned path 
+should be &quot;D:\rotor\v1.x86chk.rotor\&quot;. This API will be used to form path names 
+that point back to the directory where the SSCLI binaries are installed.
+
+<h4>PAL_Random</h4>
+Source of a good randomness implementation. A correct implementation gathers randomness from multiple non deterministic sources like interrupt and network latencies. 
+The lpBuffer is filled with dwLen random bytes. Optionally, the caller can populate the buffer with data to use as an auxiliary random seed before calling the function.
+
+<ul>
+  <li>bStrong - set to TRUE if cryptographically strong randomness is required 
+  (for example, for key generation).</li>
+</ul>
+
+On Windows, this function should be implemented using CryptGenRandom. On UNIX 
+system-based platforms, this function should be implemented by reading from /dev/random or /dev/urandom. If neither /dev/random or /dev/urandom is available, a stronger randomness function than the C runtime's 
+<b>rand()</b> function should be used.
+
+<h4>PAL_get_stdout PAL_get_stdin PAL_get_stderr</h4>
+These functions are called from the PAL-defined "stdout", "stdin", and "stderr" macros.
+
+<h4>PAL_errno</h4>
+Returns a pointer to the per-thread errno value.<h4>
+
+<a name=PAL_LocalHandleToRemote></a>PAL_LocalHandleToRemote</h4>
+<ul>
+  <li>hLocal - a HANDLE to a mutex, event, or process.  Other types of HANDLE such as files are not required to be remotable.</li>
+</ul>
+Converts a HANDLE valid in the current process into a "cookie" that can be passed to another PAL-based process on the same 
+computer, and converted into a HANDLE valid in that process.  Conversion from remote RHANDLE to local HANDLE is accomplished by calling 
+<b>PAL_RemoteHandleToLocal</b>.
+
+<p>The return value is INVALID_HANDLE_VALUE on failure, due to out-of-memory or invalid HANDLE value or type.
+
+<p>For more details on local and remote HANDLEs, see <a href="#DuplicateHandle">DuplicateHandle</a>.
+
+<h4><a name=PAL_RemoteHandleToLocal></a>PAL_RemoteHandleToLocal</h4>
+<ul>
+  <li>hRemote - a remotable cookie created using PAL_LocalHandleToRemote in another process.</li>
+</ul>
+Creates a local HANDLE that corresponds to a HANDLE in a remote process, where the remote HANDLE has been marshaled 
+using <b>PAL_LocalHandleToRemote()</b>.
+
+<p>The return value is INVALID_HANDLE_VALUE on failure, due to out-of-memory, 
+and so on.  The results are undefined if the RHANDLE was not created using <b>PAL_LocalHandleToRemote()</b>.
+
+<h1><a name="Win32Entrypoints"></a>Win32 Entry Points</h1>
+
+<h2><a name="user32"></a>User32.dll</h2>
+
+<h4>CharNextA</h4>
+
+<h4>CharNextExA</h4>
+<ul>
+  <li>CodePage - either CP_ACP or CP_OEMCP.</li>
+  <li>lpCurrentChar -</li>
+  <li>dwFlags - always 0.</li>
+</ul>
+
+<h4>wsprintfW</h4>
+The format string must support %x, %s, %d, and other C runtime standard printf formatters, plus %ws.
+
+<h4>wsprintfA</h4>
+
+<h4>MessageBoxW</h4>
+
+hWnd - always NULL.<ul>
+  <li>lpText -</li>
+  <li>lpCaption -</li>
+  <li>uType - 
+  <ul>
+    <li>Buttons:<ul>
+      <li>MB_OK</li>
+      <li>MB_OKCANCEL</li>
+      <li>MB_ABORTRETRYIGNORE</li>
+      <li>MB_YESNO</li>
+      <li>MB_RETRYCANCEL</li>
+    </ul>
+    </li>
+    <li>Icons:<ul>
+      <li>MB_ICONEXCLAMATION</li>
+      <li>MB_ICONINFORMATION</li>
+      <li>MB_ICONSTOP</li>
+      <li>MB_ICONQUESTION</li>
+    </ul>
+    </li>
+    <li>Flags:<ul>
+      <li>MB_TASKMODAL</li>
+      <li>MB_SYSTEMMODAL</li>
+      <li>MB_SERVICE_NOTIFICATION</li>
+      <li>MB_SETFOREGROUND</li>
+      <li>MB_TOPMOST</li>
+    </ul>
+    </li>
+  </ul>
+  </li>
+</ul>
+
+<p>The implementation of <b>MessageBox()</b> should not show any UI to the user.  Instead, it should take the text and any other relevant process 
+or thread information and log it to the host operating system's event-logging mechanism.
+</p>
+
+<p>The return value will be:
+      <ul>
+	<li>IDOK if the button was MB_OK.</li>
+	<li>IDCANCEL if the button was MB_OKCANCEL.</li>
+	<li>IDABORT if the button was MB_ABORTRETRYIGNORE.</li>
+	<li>IDNO if the button was MB_YESNO.</li>
+	<li>IDCANCEL if the button was MB_RETRYCANCEL.</li>
+      </ul>
+
+
+<h2><a name="kernel32"></a>Kernel32.dll</h2>
+<h3>File I/O</h3>
+
+<h4>CreateFileA CreateFileW</h4>
+The file name will never be of the form \\.\*. This excludes named pipes, 
+mailslots, disk devices, and tape devices. The file name will be either a fully 
+qualified pathname (such as &quot;c:\windows\myfile.txt&quot; on Win32 or 
+&quot;/etc/rotor.conf&quot; on UNIX system-based platforms), or a partially qualified pathname 
+(such as "myfile.txt" or "windows\myfile.txt").
+
+<p>CreateFile does not need to support file names starting with &quot;\\.\&quot;. 
+Therefore, named pipes, mailslots, disk devices, and tape devices are not 
+supported, because all of those names start with &quot;\\.\&quot;. Files and directories 
+should be supported, though not with the Windows-specific &quot;\\.\C:&quot; format. 
+Communications resources and consoles are not supported through the Windows NT 
+names such as CON:, COM1:, CONIN$, and so on. CreateFile should only support 
+opening names within the file system - files, directories, and on UNIX system-based 
+platforms, devices mounted in the file system, such as &quot;/dev/tty&quot;. 
+CreateFile does not need to map the built-in DOS device names to underlying 
+operating system device names.
+
+<p>The rationale for not mapping the DOS device names to the UNIX system-based 
+platform names is that, 
+for many standard DOS device names the devices require additional APIs for 
+configuring the device, and these APIs are not exposed through the PAL API.&nbsp; 
+For example, COMx: support in CreateFile does not make sense because there is no way for the code calling the PAL 
+<b>CreateFile()</b> to configure the baud rate, control flow, and other parameters.
+
+<h4>dwShareMode &amp; FILE_SHARE_DELETE</h4>
+
+<p>If passed in subsequent calls to CreateFile do not require DELETE access to 
+be specified for the open to succeed.
+<ul>
+  <li>lpFileName - see above.</li>
+  <li>dwDesiredAccess - any combination of:<ul>
+  <li>GENERIC_READ</li>
+	<li>GENERIC_WRITE</li>
+	<li>0</li>
+</ul>
+
+  </li>
+   <li>dwShareMode - any combination of:
+      <ul>
+	<li>FILE_SHARE_READ</li>
+	<li>FILE_SHARE_WRITE</li>
+	<li>FILE_SHARE_DELETE</li>
+        <li>0</li>
+      </ul>
+   <li>lpSecurityAccess - either NULL, or a pointer to a SECURITY_ATTRIBUTES whose lpSecurityDescriptor is NULL and whose bInheritHandle is TRUE.  In this case, the handle is destined to be passed to CreateProcess as one of the STARTUPINFO standard handles and is expected to be inherited by the child.  In 
+   other words, the default is that file handles should close on execution on 
+   computers running UNIX system-based platforms, unless bInheritHandle is TRUE.</li>
+    <li>dwCreationDisposition - one of:
+      <ul>
+	<li>CREATE_NEW</li>
+	<li>CREATE_ALWAYS</li>
+	<li>OPEN_EXISTING</li>
+	<li>OPEN_ALWAYS</li>
+	<li>TRUNCATE_EXISTING</li>
+      </ul>
+    <li>dwFlagsAndAttributes - one or more of:
+      <ul>
+	<li>FILE_ATTRIBUTE_NORMAL</li>
+	<li>FILE_FLAG_SEQUENTIAL_SCAN</li>
+	<li>FILE_FLAG_WRITE_THROUGH</li>
+	<li>FILE_FLAG_NO_BUFFERING</li>
+	<li>FILE_FLAG_RANDOM_ACCESS</li>
+        <li>FILE_FLAG_BACKUP_SEMANTICS</li>
+      </ul>
+    <li>hTemplateFile - always NULL.</li>
+</ul>
+
+<p>FILE_FLAG_BACKUP_SEMANTICS is specified when the caller wants to open a directory as a file.  The directory HANDLE is used only in 
+<b>GetFileTime()</b> or <b>SetFileTime()</b> calls, so the caller will request write access.  However, 
+UNIX system-based platforms allow directories to be opened only for read access, though the directory's lastaccess and lastwrite time 
+can be altered through that file descriptor, so <b>CreateFileA()</b> might choose to ignore the dwDesiredAccess value if FILE_FLAG_BACKUP_SEMANTICS is specified.
+
+<h4>AreFileApisANSI</h4>
+
+<h4>CopyFileA CopyFileW</h4>
+
+<h4>DeleteFileA DeleteFileW</h4>
+
+<h4>MoveFileW (MoveFileA not required)</h4>
+
+<h4>MoveFileExW (MoveFileExA not required)</h4>
+<ul>
+  <li>lpExistingFileName -</li>
+  <li>lpNewFileName -</li>
+  <li>dwFlags may be one or more of:
+      <ul>
+	<li>MOVEFILE_COPY_ALLOWED</li>
+	<li>MOVEFILE_REPLACE_EXISTING</li>
+      </ul>
+</ul>
+
+<h4>CreateDirectoryA CreateDirectoryW</h4>
+<ul>
+  <li>lpPathName - the path name should be limited to MAX_PATH characters for 
+  UNIX system-based platforms.  MSDN documents the maximum length on Win32 to be slightly shorter than MAX_PATH.</li>
+  <li>lpSecurityAttributes - always NULL.</li>
+</ul>
+
+<h4>RemoveDirectoryW (RemoveDirectoryA not required)</h4>
+
+<h4>FindFirstFileA FindFirstFileW FindNextFileW FindNextFileA FindClose</h4>
+Note: The HANDLE return type on Win32 is not allocated from the same pool as 
+other HANDLE types like events and files.&nbsp; It can never be passed to <b>CloseHandle()</b>, 
+it should only be passed to <b>FindNextFileA/W()</b> and <b>FindClose()</b>.
+
+<h4>GetFileAttributesA GetFileAttributesW</h4>
+To support  a CLI implementation, the return value must support FILE_ATTRIBUTE_DIRECTORY, -1 (for file-not-found), and FILE_ATTRIBUTE_READONLY.  To support 
+<b>System.IO.File.GetAttributes</b>, the PAL needs to implement as much functionality as feasible.
+
+<h4>GetFileAttributesExW (GetFileAttributesExA not required)</h4>
+<ul>
+  <li>lpFileName -</li>
+  <li>fInfoLevelId - always GetFileExInfoStandard.</li>
+  <li>lpFileInformation - always an OUT pointer to a WIN32_FILE_ATTRIBUTE_DATA.</li>
+</ul>
+
+<h4>SetFileAttributesA SetFileAttributesW</h4>
+To correctly support <b>System.IO.File.SetAttributes</b> in a CLI 
+implementation, the PAL needs to implement as much functionality as feasible. 
+Attributes that cannot be supported, such as FILE_ATTRIBUTE_HIDDEN on UNIX 
+system-based platforms, can be silently ignored by the PAL.
+
+<h4>WriteFile</h4>
+<ul>
+  <li>hFile -</li>
+  <li>lpBuffer -</li>
+  <li>nNumberOfBytesToWrite -</li>
+  <li>lpNumberOfBytesWritten -</li>
+  <li>lpOverlapped - always NULL.</li>
+</ul>
+
+<h4>GetStdHandle</h4>
+The handles returned from GetStdHandle may be passed to CreateProcess in the STARTUPINFO structure.
+
+<h4>SetEndOfFile</h4>
+
+<h4>SetFilePointer</h4>
+
+<h4>ReadFile</h4>
+<ul>
+  <li>hFile -</li>
+  <li>lpBuffer -</li>
+  <li>nNumberOfBytesToRead -</li>
+  <li>lpNumberOfBytesRead -</li>
+  <li>lpOverlapped - always NULL.</li>
+</ul>
+
+<h4>GetFileSize</h4>
+
+<h4>CompareFileTime</h4>
+
+<h4>SetFileTime</h4>
+
+<h4>GetFileTime</h4>
+
+<h4>FlushFileBuffers</h4>
+
+<h4>FileTimeToLocalFileTime</h4>
+
+<h4>FileTimeToDosDateTime</h4>
+Note that the range of allowable dates might differ from the range available on Win32.  Implementations must allow dates up to year 2037.
+
+<h4>DosDateTimeToFileTime</h4>
+
+<h4>GetSystemTimeAsFileTime</h4>
+
+<h4>LocalFileTimeToFileTime</h4>
+
+<h4>GetFileType</h4>
+The return value must be FILE_TYPE_DISK for HANDLE types that represent files.  
+This value is really used to determine whether the HANDLE supports seek 
+operations.
+
+<h4>GetConsoleCP</h4>
+
+<h4>GetConsoleOutputCP</h4>
+
+<h4>GetFullPathNameW GetFullPathNameA</h4>
+<ul>
+  <li>lpFileName -</li>
+  <li>nBufferLength -</li>
+  <li>lpBuffer -</li>
+  <li>lpFilePart - may be NULL.</li>
+</ul>
+
+<h4>GetLongPathNameW</h4>
+On file systems that do not support long vs. short pathnames, or if the short path does not exist, it should return 0 without altering the contents of lpszLongPath.
+
+<h4>GetTempFileNameA GetTempFileNameW</h4>
+<ul>
+  <li>lpFileName - must not be NULL</li>
+  <li>lpPrefixString -</li>
+  <li>uUnique - always 0</li>
+  <li>lpTempFileName - the case of the returned file name is implementation-specific, though it must be valid on the current platform.  The extension 
+  can be ".tmp" or ".TMP", for example.</li>
+</ul>
+
+<h4>GetTempPathA GetTempPathW</h4>
+
+<h4>GetCurrentDirectoryA GetCurrentDirectoryW</h4>
+
+<h4>SetCurrentDirectoryA SetCurrentDirectoryW</h4>
+
+<h4>LockFile</h4>
+
+<h4>UnlockFile</h4>
+
+<h4>GetDiskFreeSpaceW</h4>
+<ul>
+  <li>lpRootPathName - on Windows, will be a path of the form "x:\" or UNC path with a trailing '\' character.  On 
+  UNIX system-based platforms, it will be a fully-qualified path name, though the path 
+  might not exist.</li>
+  <li>lpSectorsPerCluster -</li>
+  <li>lpBytesPerSector -</li>
+  <li>lpNumberOfFreeClusters - the caller will ignore this output value.</li>
+  <li>lpTotalNumberOfClusters - the caller will ignore this output value.</li>
+</ul>
+The SSCLI managed assembly location implementation uses this API to round file sizes up to their actual  on-disk 
+size based on the BytesPerSector*SectorsPerCluster, that must equal the minimum allocation granularity for files stored under lpRootPathName.  This value is known as the "cluster size" on Windows, and the "frag-size" on 
+UNIX system-based platforms.
+
+<h4>SearchPathA SearchPathW</h4>
+<ul>
+  <li>lpPath - always non-NULL.  Paths within the string are separated by the native platform's environment variable separator character (";" on Win32, ":" on 
+  UNIX system-based platforms).</li>
+  <li>lpFileName - always non-NULL, may be relative or fully qualified.</li>
+  <li>lpExtension - always NULL.</li>
+  <li>nBufferLength -</li>
+  <li>lpBuffer -</li>
+  <li>lpFilePart - may be NULL or non-NULL.  If the pointer is non-NULL, the value written into the variable is implementation-defined:  the PAL 
+  might not write anything, or it might write NULL, or it might write the value matching the MSDN documentation, or it 
+  might write any other value.</li>
+</ul>
+
+
+<h3>Threads and Processes</h3>
+
+<h4>CreateSemaphoreA CreateSemaphoreW ReleaseSemaphore</h4>
+<ul>
+  <li>lpSemaphoreAttributes - always NULL.</li>
+  <li>lpName - always NULL, so the semaphore is always scoped within a process.</li>
+</ul>
+
+<h4>CreateEventA CreateEventW</h4>
+<ul>
+  <li>lpEventAttributes - always NULL.</li>
+  <li>bManualReset - either TRUE or FALSE.</li>
+  <li>bInitialState - either TRUE or FALSE.</li>
+  <li>lpName - See <a href="#SxSSupport">Side-by-side support</a> for more information.</li>
+</ul>
+
+<h4>SetEvent</h4>
+
+<h4>ResetEvent</h4>
+
+<h4>OpenEventW (OpenEventA not required)</h4>
+<ul>
+  <li>dwDesiredAccess - always EVENT_ALL_ACCESS.</li>
+  <li>bInheritHandle -</li>
+  <li>lpName - always non-NULL.  See <a href="#SxSSupport">Side-by-side support</a> for more information.</li>
+</ul>
+
+<h4>CreateMutexW (CreateMutexA not required)</h4>
+<ul>
+  <li>lpMutexAttributes - always NULL.</li>
+  <li>bInitialOwner -</li>
+  <li>lpName - may be non-NULL.  See <a href="#SxSSupport">Side-by-side support</a> for more information.</li>
+</ul>
+
+<h4>ReleaseMutex</h4>
+
+<h4>GetCurrentProcessId</h4>
+
+<h4>CreateProcessA CreateProcessW</h4>
+<ul>
+  <li>lpApplicationName - always NULL.</li>
+  <li>lpCommandLine -</li>
+  <li>lpProcessAttributes - either NULL or a pointer to a SECURITY_ATTRIBUTES whose lpSecurityDescriptor is NULL and whose bInheritHandle is TRUE.  Note that the newly created process and thread handles do not need to be inherited by the child - the security descriptors may be ignored entirely.</li>
+  <li>lpThreadAttributes - always NULL.</li>
+  <li>bInheritHandles - if FALSE, then no handles are inherited by the child.  If TRUE, then the standard in/out/error handles must be inherited by the child.</li>
+  <li>dwCreationFlags - either 0 or CREATE_NEW_CONSOLE, which may be ignored on systems which do not support multiple console windows</li>
+  <li>lpEnvironment - </li>
+  <li>lpCurrentDirectory -</li>
+  <li>lpStartupInfo - the cb field will be set. dwFlags may be 0 or 
+  STARTF_USESTDHANDLES. If STARTF_USESTDHANDLES is set, then hStdOutput, 
+  hStdInput, and hStdError will be Win32 HANDLEs for the standard in/out/error 
+  streams, instead of the parent's standard in/out/error streams.</li>
+  <li>lpProcessInformation - on successful return from this API, only the 
+  hProcess, ProcessId, and hThread fields must be filled in.</li>
+</ul>
+
+The CreateProcess implementation must probe the type of the binary pointed to by 
+the lpCommandLine parameter. If the file is an IL-only PE/COFF image, then CreateProcess must prepend the fully-qualified path to "clix " (found in the PAL_GetPALDirectoryW() directory) to the lpCommandLine parameter before launching the child process, so that the IL-only binary is launched within a new 
+SSCLI process.  Otherwise, the lpCommandLine should be considered to be a native system executable and launched as such.
+
+<h4>WaitForSingleObject</h4>
+<ul>
+  <li>hHandle - basically any waitable HANDLE type (process, event, and so on.).</li>
+  <li>dwMilliseconds can be INFINITE, or a value in milliseconds.</li>
+</ul>
+
+<h4>GetExitCodeProcess</h4>
+The return code from the child process might be truncated on some platforms, to 
+the size of that platform's process exit code data type. The PAL 
+GetExitCodeProcess will sign-extend the native platform's process exit code data 
+type up to 32 bits and return as a DWORD. For PAL APIs that exit the process 
+and specify a return code, if the return value is outside of the valid range for 
+the host platform, the PAL will truncate the return value to fit. In other 
+words,  on platforms where the return value is a signed char, return values less than -128 will become 128, and return values greater than 127 will become 127.
+
+<h4><a name=DuplicateHandle></a>DuplicateHandle</h4>
+<ul>
+  <li>hSourceProcessHandle - </li>
+  <li>hSourceHandle - may be a process handle or GetCurrentThread().</li>
+  <li>hTargetProcessHandle - </li>
+  <li>lpTargetHandle will be non-NULL.</li>
+  <li>dwDesiredAccess - can be ignored.</li>
+  <li>bInheritHandle - always FALSE.</li>
+  <li>dwOptions will always be DUPLICATE_SAME_ACCESS.</li>
+</ul>
+If hSourceProcessHandle is not the current process, then hSourceHandle is a local handle created via <a href="#PAL_RemoteHandleToLocal">PAL_RemoteHandleToLocal</a>.  Similarly, if hTargetProcessHandle is not the current process, then lpTargetHandle should contain a HANDLE value suitable for passing to <a href="#PAL_LocalHandleToRemote">PAL_LocalHandleToRemote</a> for remoting.
+
+<p>For cases where either source or destination is not the current process, DuplicateHandle() can be implemented as a simple copy of hSourceHandle to *lpTargetHandle, if PAL_LocalHandleToRemote() and PAL_RemoteHandleToLocal() are used to remote HANDLE 
+types.  Alternatively, if the DuplicateHandle() can perform cross-process HANDLE duplication, then PAL_LocalHandleToRemote() and PAL_RemoteHandleToLocal() can be implemented as 
+NO-OPs, returning the HANDLE value unmodified.
+
+<h4>GetCurrentProcess</h4>
+
+<h4>GetCurrentThreadId</h4>
+
+<h4>Sleep</h4>
+
+<h4>SleepEx</h4>
+
+<h4>SwitchToThread</h4>
+
+<h4>CreateThread</h4>
+<ul>
+  <li>lpSecurityAttributes - always NULL.</li>
+  <li>dwStackSize - Treat this as the minimal size the caller expects for the stack - the implementation of CreateThread may choose a larger value.</li>
+  <li>lpStartAddress -</li>
+  <li>lpParameter -</li>
+  <li>dwCreationFlags - may be 0 or CREATE_SUSPENDED.</li>
+  <li>lpThreadId</li>
+</ul>
+
+See PAL_Initialize() for information on the initial floating-point environment for the newly-created thread.
+
+<p>Note that the lpThreadId pointer must be updated by the CreateThread() 
+implementation before the newly-created thread is allowed to run.&nbsp; For 
+example, if the lpThreadId points to a global variable, the new thread must be able to confirm that its GetCurrentThreadId() value matches the contents of the global 
+variable.
+
+<h4>SuspendThread</h4>
+<ul>
+  <li>hThread - always within the current process, and never the current thread.</li>
+</ul>
+
+<h4>ResumeThread</h4>
+<ul>
+  <li>hThread - either within the current process, or the hThread returned from CreateProcess(), if the child was created as suspended.</li>
+</ul>
+
+<h4>QueueUserAPC</h4>
+
+<h4>GetThreadContext</h4>
+<ul>
+  <li>hThread - Always represents a thread within the current process.  If the hThread is not the current thread, then the thread will have been suspended via SuspendThread().</li>
+  <li>pContext - Must support at least CONTEXT_CONTROL and CONTEXT_INTEGER.</li>
+</ul>
+
+<h4>SetThreadContext</h4>
+<ul>
+  <li>hThread - always a thread within the current process and never the current thread.  The thread will always be suspended at the time of the call.</li>
+  <li>pContext - may have CONTEXT_CONTROL and/or CONTEXT_INTEGER set.</li>
+</ul>
+
+<h4>GetCurrentThread</h4>
+
+<h4>GetThreadPriority</h4>
+
+<h4>SetThreadPriority</h4>
+<ul>
+  <li>hThread -</li>
+  <li>nPriority - must support all of the THREAD_PRIORITY_* constants, and must 
+  map THREAD_PRIORITY_IDLE to the least-priority value the host operating system 
+  allows, as the common language runtime sets threads to THREAD_PRIORITY_IDLE 
+  then busy-waits with a Sleep(0) loop until the garbage collection thread has run, with the 
+  garbage collection thread at a priority greater than idle.</li>
+</ul>
+
+<h4>WaitForMultipleObjectsEx</h4>
+This API may be called with any handle type or types that are supported in the 
+PAL and are documented as waitable in the Win32 API documentation.
+
+<h4>WaitForMultipleObjects</h4>
+
+<h4>TerminateProcess</h4>
+<ul>
+  <li>hProcess - </li>
+  <li>uExitCode - may be truncated to a signed char.&nbsp; For details see <b>GetExitCodeProcess()</b>.  This parameter may be ignored if hProcess is not the current process.  In that case, the exit code of the terminated process may be any value except zero.</li>
+</ul>
+
+<h4>ExitThread</h4>
+
+<h4>GetProcessTimes</h4>
+<ul>
+  <li>hProcess - always the return from GetCurrentProcess().</li>
+  <li>lpCreationTime - unused.</li>
+  <li>lpExitTime - unused.</li>
+  <li>lpKernelTime -</li>
+  <li>lpUserTime -</li>
+</ul>
+
+<h4>TlsGetValue</h4>
+This API should not be logged,  to avoid a performance hit, as  this API is called frequently.
+
+<h4>TlsSetValue</h4>
+
+<h4>TlsFree</h4>
+
+<h4>TlsAlloc</h4>
+The PAL must guarantee that at least 32 TLS slots are available to the calling application.
+
+
+<h4>EnterCriticalSection TryEnterCriticalSection</h4>
+These need to support recursion on enter.
+
+<h4>LeaveCriticalSection</h4>
+
+<h4>DeleteCriticalSection</h4>
+
+<h4>InitializeCriticalSection</h4>
+
+<h4>SetErrorMode</h4>
+<ul>
+  <li>uMode - may be one or more of:
+      <ul>
+	<li>SEM_FAILCRITICALERRORS</li>
+	<li>SEM_NOOPENFILEERRORBOX</li>
+      </ul>
+</ul>
+The PAL may implement this function as a NO-OP, ignoring the input parameter, and always returning 0.
+
+<h4>ExitProcess</h4>
+<ul>
+  <li>ExitCode - may be truncated to a signed char.&nbsp; For details see 
+  GetExitCodeProcess.</li>
+</ul>
+
+<h4>WriteProcessMemory</h4>
+The PAL does not need to enforce memory protection:  attempts to write to read-only pages in the destination process may either succeed by altering the page to be read/write, or may cause WriteProcessMemory to return a failure code.
+
+<h4>OpenProcess</h4>
+<ul>
+  <li>dwDesiredAccess - always PROCESS_ALL_ACCESS</li>
+  <li>bInheritHandle - always FALSE</li>
+  <li>dwProcessID - process ID to open.  If the process is not a PAL process, then OpenProcess may fail</li>
+</ul>
+
+This API is used by cordbg's "attach" command, to attach the debugger to the specified process.
+
+
+<h3>Memory Management</h3>
+
+<h4>CreateFileMappingA CreateFileMappingW</h4>
+<ul>
+  <li>hFile - may be file handle or -1 (in other words, allocate from swap).</li>
+  <li>lpAttributes - always NULL.</li>
+  <li>flProtect - one or more of PAGE_READONLY, PAGE_READWRITE, or PAGE_WRITECOPY.</li>
+  <li>dwMaximumSizeHigh is always 0.</li>
+  <li>dwMaximumSizeLow will be non-zero if the hFile is -1 (in other words, allocate from swap).</li>
+  <li>lpName - may be NULL or non-NULL.  If hFile is not -1, then lpName will always be NULL.&nbsp; If hFile is -1 then lpName may or may not be NULL.  See <a href="#SxSSupport">Side-by-side support</a> for more information.</li>
+</ul>
+
+<h4>OpenFileMappingA OpenFileMappingW</h4>
+<ul>
+  <li>dwDesiredAccess - be one or more of FILE_MAP_READ , FILE_MAP_WRITE, or FILE_MAP_ALL_ACCESS.</li>
+  <li>bInheritHandle -</li>
+  <li>lpName - See <a href="#SxSSupport">Side-by-side support</a> for more information.</li>
+</ul>
+
+<h4>MapViewOfFile</h4>
+<ul>
+  <li>hFileMappingObject - the return value from a <b>CreateFileMapping()</b> or 
+  <b>OpenFileMapping()</b> call.</li>
+  <li>dwDesiredAccess will be one of the following:<ul>
+  <li>FILE_MAP_WRITE</li>
+  <li>FILE_MAP_READ</li>
+  <li>FILE_MAP_ALL_ACCESS</li>
+  <li>FILE_MAP_COPY (only if the mapping was created with PAGE_WRITECOPY)</li>
+  <li>dwFileOffsetHigh - always 0.</li>
+  <li>dwFileOffsetLow - always 0.</li>
+  <li>dwNumberOfBytesToMap - 0 or nonzero.</li>
+</ul>
+
+  </li>
+</ul>
+
+<h4>UnmapViewOfFile</h4>
+
+<h4>LoadLibraryA LoadLibraryW</h4>
+These APIs will be used only to load and call unmanaged dynamic libraries.  There is no requirement that they support loading of IL-only PE/COFF files.  Like Win32 LoadLibrary, the PAL must first search the directory that the application was loaded from, but beyond that, it may search whatever directories a native shared-library loader would use, in whatever order it would search.  It need not use the PATH environment variable.
+
+<h4>FreeLibrary</h4>
+Calls to <b>FreeLibrary()</b> made after <b>PAL_Terminate()</b> or <b>ExitProcess()</b> must be ignored and treated as success regardless of the validity of the module handle.  The application may call 
+<b>FreeLibrary()</b> from within a <b>DllMain()</b> routine that is handling a DLL_PROCESS_DETACH message.
+
+<h4>FreeLibraryAndExitThread</h4>
+
+<h4>GetProcAddress</h4>
+GetProcAddress must support binding to both functions and data by name.  Binding by ordinal is not required, though some implementations may support it.  It is illegal to attempt to bind by ordinal on implementations that do not support it.
+
+<h4>DisableThreadLibraryCalls</h4>
+Calls to DisableThreadLibraryCalls made after <b>PAL_Terminate()</b> or <b>ExitProcess()</b> must be ignored and treated as success regardless of the validity of the module handle.  The application may call 
+<b>DisableThreadLibraryCalls()</b> from within a DllMain() routine that is handling a DLL_PROCESS_DETACH message.
+
+<h4>GetModuleFileNameA GetModuleFileNameW</h4>
+<ul>
+  <li>hModule - always NULL</li>
+  <li>lpFileName -</li>
+  <li>nSize -</li>
+</ul>
+
+<h4>VirtualAlloc</h4>
+<ul>
+  <li>lpAddress - may be NULL or non-NULL.</li>
+  <li>dwSize -</li>
+  <li>flAllocationType - may be one or more of:
+      <ul>
+	<li>MEM_COMMIT</li>
+	<li>MEM_RESERVE</li>
+	<li>MEM_TOP_DOWN (can be ignored)</li>
+      </ul>
+  <li>flProtect - may be one of:
+      <ul>
+	<li>PAGE_NOACCESS</li>
+	<li>PAGE_READONLY</li>
+	<li>PAGE_READWRITE</li>
+	<li>PAGE_EXECUTE</li>
+	<li>PAGE_EXECUTE_READ</li>
+	<li>PAGE_EXECUTE_READWRITE</li>
+      </ul>
+</ul>
+
+<h4>VirtualFree</h4>
+
+<h4>VirtualProtect</h4>
+<ul>
+  <li>lpAddress - any usermode address (may not have been allocated through <b>VirtualAlloc()</b>
+   - it may be an address within a mapped section or within a system-native DLL's code)</li>
+  <li>dwSize -</li>
+  <li>flNewProtect - any of:
+      <ul>
+	<li>PAGE_NOACCESS</li>
+	<li>PAGE_READONLY</li>
+	<li>PAGE_READWRITE</li>
+	<li>PAGE_EXECUTE</li>
+	<li>PAGE_EXECUTE_READ</li>
+	<li>PAGE_EXECUTE_READWRITE</li>
+	<li>Any other values returned back in lpflOldProtect.</li>
+      </ul>
+  <li>lpflOldProtect -</li>
+</ul>
+
+<h4>VirtualQuery</h4>
+If the address to query is not contained within an allocation created using 
+<b>VirtualAlloc()</b>, then <b>VirtualQuery()</b> may return MEM_FREE, even if the address is not 
+available for use by <b>VirtualAlloc()</b>.&nbsp; If the memory is in use as a DLL,  heap or mapped file, 
+<b>VirtualQuery()</b> may return MEM_FREE rather than MEM_COMMIT.  This is compatible with the usage patterns in clr\src\vm\gcsmp.cpp and clr\src\utilcode\util.cpp.
+<p>In the event of a return of MEM_FREE for the unknown region, the returned MEMORY_BASIC_INFORMATION.RegionSize should be zero.
+
+<h4>ReadProcessMemory</h4>
+<ul>
+  <li>hProcess - If this is <b>GetCurrentProcess()</b>, then the ReadProcessMemory is being used as a test to determine if the lpBaseAddress points to committed, readable memory.  If hProcess is not the current process, then  the debugger 
+  is calling it to read memory from the debuggee's address space.</li>
+</ul>
+
+<h4>GetProcessHeap</h4>
+This can return any value - the return value is passed to <b>HeapAlloc()</b> or
+<b>HeapFree()</b> 
+only as a cookie.
+
+<h4>HeapAlloc</h4>
+<ul>
+  <li>hHeap -</li>
+  <li>dwFlags - may be either 0 or HEAP_ZERO_MEMORY.</li>
+  <li>dwBytes -</li>
+</ul>
+
+<h4>HeapReAlloc</h4>
+<ul>
+  <li>hHeap -</li>
+  <li>dwFlags - always 0.</li>
+  <li>lpMem -</li>
+  <li>dwBytes -</li>
+</ul>
+
+<h4>HeapFree</h4>
+<ul>
+  <li>hHeap -</li>
+  <li>dwFlags - always 0.</li>
+  <li>lpMem -</li>
+</ul>
+
+<h4>LocalAlloc</h4>
+<ul>
+  <li>uFlags - always 0.</li>
+  <li>uBytes -</li>
+</ul>
+
+<h4>LocalFree</h4>
+  
+<h4>FlushInstructionCache</h4>
+The range of memory specified by lpBaseAddress + dwSize must be committed.
+<ul>
+  <li>hProcess - always the current process.</li>
+  <li>lpBaseAddress -</li>
+  <li>dwSize -</li>
+</ul>
+
+<h4>RtlMoveMemory</h4>
+
+<h4>CopyMemory</h4>
+
+
+<h3>Locale Information</h3>
+
+<h4>GetStringTypeExW</h4>
+<ul>
+  <li>Locale - always LOCALE_USER_DEFAULT</li>
+  <li>dwInfoType - always CT_CTYPE1</li>
+  <li>lpSrcStr - always a pointer to one Unicode character</li>
+  <li>cchSrc - always 1</li>
+  <li>lpCharType - the callers bitwise-AND the [out] value with C1_DIGIT and C1_SPACE  to determine if the character is a digit or white space.</li>
+</ul>
+
+<h4>CompareStringW</h4>
+<ul>
+  <li>Locale - always 0x0409</li>
+  <li>dwCmpFlags  - always NORM_IGNORECASE|NORM_IGNOREWIDTH.</li>
+  <li>lpString1 -</li>
+  <li>cchCount1 -</li>
+  <li>lpString2 -</li>
+  <li>cchCount2 -</li>
+</ul>
+
+<h4>GetLocaleInfoW</h4>
+<ul>
+  <li>Locale - always LOCALE_NEUTRAL.</li>
+  <li>LCType - any one of:
+      <ul>
+	<li>LOCALE_SDECIMAL</li>
+	<li>LOCALE_STHOUSAND</li>
+	<li>LOCALE_ILZERO</li>
+	<li>LOCALE_SCURRENCY</li>
+	<li>LOCALE_SMONDECIMALSEP</li>
+	<li>LOCALE_SMONTHOUSANDSEP</li>
+      </ul>
+  <li>lpLCData -</li>
+  <li>cchData -</li>
+</ul>
+
+<h4>GetACP</h4>
+
+<h4>GetCPInfo</h4>
+<ul>
+  <li>CodePage - code page for which to get information. CP_UTF8 and CP_UTF7 code pages do not need to be handled, but the code page of the console does.</li>
+  <li>lpCPInfo - on return, only the <b>MaxCharSize</b> field needs to be filled in.</li>
+</ul>
+
+<h4>IsValidCodePage</h4>
+
+<h4>WideCharToMultiByte</h4>
+<ul>
+  <li>CodePage - any valid codepage.</li>
+  <li>dwFlags - always 0.</li>
+  <li>lpWideCharStr -</li>
+  <li>cchWideChar -</li>
+  <li>lpMultiByteStr -</li>
+  <li>cbMultiByte -</li>
+  <li>lpDefaultChar - always NULL.</li>
+  <li>lpUsedDefaultChar - always NULL.</li>
+</ul>
+
+<h4>MultiByteToWideChar</h4>
+<ul>
+  <li>CodePage - any valid code page.</li>
+  <li>dwFlags - either one or more of MB_PRECOMPOSED and MB_ERR_INVALID_CHARS.</li>
+  <li>lpMultiByteStr -</li>
+  <li>cbMultiByte -</li>
+  <li>lpWideCharStr -</li>
+  <li>cchWideChar -</li>
+</ul>
+
+<h4>GetSystemDefaultLangID</h4>
+
+<h4>GetUserDefaultLangID</h4>
+
+<h4>SetThreadLocale</h4>
+
+<h4>GetThreadLocale</h4>
+
+<h4>GetUserDefaultLCID</h4>
+
+<h4>GetTimeZoneInformation</h4>
+
+<h4>IsValidLocale</h4>
+<ul>
+  <li>Locale -</li>
+  <li>dwFlags - either LCID_SUPPORTED or LCID_INSTALLED.</li>
+</ul>
+
+<h4>GetConsoleOutputCP</h4>
+If the console code page is not the same as <b>GetACP()</b>,  the C# compiler tries to remap its output strings by first converting to Unicode, then into ANSI using the console's code page.
+
+<h4>IsDbcsLeadByteExW</h4>
+
+<h4>GetCalendarInfoW</h4>
+<ul>
+  <li>Locale - always LOCALE_USER_DEFAULT.</li>
+  <li>Calendar - one of the CAL_ constants from 1 to 13..</li>
+  <li>CalType - always CAL_ITWODIGITYEARMAX|CAL_RETURN_NUMBER</li>
+  <li>lpCalData - always NULL.</li>
+  <li>cchData - always 0.</li>
+  <li>lpValue - pointer to the buffer to hold the return value.</li>
+</ul>
+
+If this API fails by returning 0, the natural language support (NLS) code will fall back to a set of default values compatible with the 
+common language runtime when running on Windows 95.
+
+<h4>GetDateFormatW</h4>
+<ul>
+  <li>Locale - either the return value from GetSystemDefaultLCID() or 0x0404 (SUBLANG_CHINESE_TRADITIONAL/LANG_CHINESE).</li>
+  <li>dwFlags - always DATE_USE_ALT_CALENDAR.</li>
+  <li>lpDate - always NULL.</li>
+  <li>lpFormat - always Unicode "gg".</li>
+  <li>lpDateStr - pointer to the string buffer to hold the result.</li>
+  <li>cchDate - length of the lpDateStr buffer in Unicode characters.</li>
+</ul>
+
+This API will only be called only from within <b>System.Globalization.DateTimeFormatInfo</b> when the calendar is CAL_TAIWAN.
+
+
+<h3>Miscellaneous</h3>
+
+<h4>OutputDebugStringA OutputDebugStringW</h4>
+If the PAL can determine whether a native debugger is present then the following 
+is applicable:
+
+<ul>
+  <li>If the debugger is present, output should go to the debugger.</li>
+  <li>Otherwise the API should produce no output.</li>
+</ul>
+<p>If the PAL cannot determine whether a native debugger is present then the 
+following is applicable: </p>
+<ul>
+  <li>If the environment variable PAL_OUTPUTDEBUGSTRING is set, output should go 
+  to stderr.</li>
+  <li>Otherwise the API should produce no output.</li>
+</ul>
+
+<h4>DebugBreak</h4>
+
+<h4>lstrcatW</h4>
+
+<h4>lstrcpyW</h4>
+
+<h4>lstrlenA lstrlenW</h4>
+
+<h4>lstrcpynW</h4>
+
+<h4>GetEnvironmentVariableA GetEnvironmentVariableW</h4>
+
+<h4>SetEnvironmentVariableA SetEnvironmentVariableW</h4>
+
+<h4>CloseHandle</h4>
+
+<h4>RaiseException</h4>
+<ul>
+  <li>dwExceptionCode -</li>
+  <li>dwExceptionFlags - can be ignored.&nbsp; All explicitly raised exceptions may be considered noncontinuable.</li>
+  <li>nNumberOfArguments -</li>
+  <li>lpArguments -</li>
+</ul>
+
+<h4>GetTickCount</h4>
+
+<h4>QueryPerformanceCounter</h4>
+
+<h4>QueryPerformanceFrequency</h4>
+
+<h4>SetUnhandledExceptionFilter</h4>
+
+<h4>InterlockedExchange</h4>
+This API should not be logged to avoid a performance hit because  this API is called frequently.
+
+<h4>InterlockedExchangePointer</h4>
+This API should not be logged to avoid a performance hit because this API is called frequently.
+
+<h4>InterlockedDecrement</h4>
+This API should not be logged to avoid a performance hit because this API is called frequently.
+
+<h4>InterlockedIncrement</h4>
+This API should not be logged to avoid a performance hit because this API is called frequently.&nbsp;
+
+<h4>InterlockedCompareExchange</h4>
+This API should not be logged to avoid a performance hit because this API is called frequently.
+
+<h4>InterlockedCompareExchangePointer</h4>
+This API should not be logged to avoid a performance hit because this API is called frequently.
+
+<h4>IsBadReadPtr</h4>
+
+<h4>IsBadWritePtr</h4>
+
+<h4>IsBadCodePtr</h4>
+
+<h4>GetSystemTime</h4>
+
+<h4>FormatMessageW (FormatMessageA not required)</h4>
+<ul>
+  <li>dwFlags - may be any of:
+      <ul>
+	<li>FORMAT_MESSAGE_FROM_SYSTEM</li>
+	<li>FORMAT_MESSAGE_FROM_STRING</li>
+	<li>FORMAT_MESSAGE_IGNORE_INSERTS</li>
+	<li>FORMAT_MESSAGE_ARGUMENT_ARRAY</li>
+	<li>FORMAT_MESSAGE_ALLOCATE_BUFFER</li>
+	<li>Note:  if both *_FROM_STRING flags are passed, the function should return an error.  Win32 FormatMessageW appears to silently ignore *_FROM_STRING if both flags are passed.</li>
+      </ul>
+  <li>lpSource - set only if FORMAT_MESSAGE_FROM_STRING is set in dwFlags.</li>
+  <li>dwMessageID - a LastError code or HRESULT.</li>
+  <li>dwLanguageID - may be 0, or MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT).</li>
+  <li>lpBuffer -</li>
+  <li>nSize -</li>
+  <li>variable arguments - if FORMAT_MESSAGE_ARGUMENT_ARRAY is set then the first arg is a pointer to an array of DWORD_PTR arguments.  Otherwise this is a printf-style list of arguments.</li>
+</ul>
+
+You may implement
+
+FORMAT_MESSAGE_FROM_SYSTEM  by dynamically loading the PAL 
+runtime (PAL RT) and then calling the satellite APIs (for details see <a
+href="#Resources">Localized Resource Strings</a>) to map the Win32 error
+codes to text.  Because the PAL is built and run before the PAL RT has
+been built, the PAL may not statically link to the PAL RT and must be
+robust against failures to load it. <a href="#AppendixA">Appendix A</a>
+has information on how to generate a rotor_pal.satellite file containing
+the error-to-text mappings using a Windows operating system.
+
+<p>Note:  Windows 2000 and Windows XP have different behavior for format strings that use the printf-style format specifier "lS".  For example, "%3!lS!".  Use of 
+the "lS" specifier in the PAL FormatMessageW is disallowed; the implementation is PAL-specific.
+</p>
+
+<h4>GetLastError</h4>
+The error codes supported by the PAL are listed in rotor_pal.h.
+
+<h4>SetLastError</h4>
+
+<h4>FreeEnvironmentStringsW (FreeEnvironmentStringsA not required)</h4>
+
+<h4>GetEnvironmentStringsW (GetEnvironmentStrings not required)</h4>
+
+<h4>GetCommandLineW (GetCommandLineA not required)</h4>
+
+<h4>GetVersionExA GetVersionExW)</h4>
+Only the dwMajorVersion, dwMinorVersion, and dwPlatformID need to be set.  On 
+UNIX system-based platforms, dwPlatformId should be VER_PLATFORM_UNIX.
+ 
+<h4>GetSystemInfo</h4>
+<ul>
+  <li>lpSystemInfo - must fill in the following:
+      <ul>
+	<li>dwNumberOfProcessors</li>
+	<li>dwPageSize</li>
+	<li>lpMinimumApplicationAddress (the lowest address where memory could be possibly be committed).</li>
+	<li>lpMaximumApplicationAddress (the highest address where memory could possibly be committed).</li>
+      </ul>
+</ul>
+
+<h4>SetConsoleCtrlHandler</h4>
+<ul>
+  <li>HandlerRoutine - must be non-NULL.</li>
+  <li>Add -</li>
+</ul>
+
+Note that the PAL must notify the callback routine of CTRL+C events (or whatever key sequence signals a process to exit), but the PAL may not notify the callback routine of other events such as window-close or user logoff.  The intent is to allow command-line tools to clean up any temporary output files in the event.<h4>GenerateConsoleCtrlEvent</h4>
+<ul>
+  <li>dwCtrlEvent -</li>
+  <li>dwProcessGroupId - must be 0.</li>
+</ul>
+
+Raise a CTRL+C or CTRL+Break event in the current process, used to test the SetConsoleCtrlHandler() implementation.  The current process, or the current process and its subgroup may receive the event, depending on the PAL implementation.
+
+<h4>CreatePipe</h4>
+<ul>
+  <li>hReadPipe -</li>
+  <li>hWritePipe -</li>
+  <li>lpPipeAttrbutes -  pointer to a SECURITY_ATTRIBUTES whose lpSecurityDescriptor is NULL and whose bInheritHandle is TRUE.  The handle is destined to be passed to CreateProcess as one of the STARTUPINFO standard handles and is expected to be inherited by the child</li>
+  <li>nSize - always 1024, and the value may be ignored</li>
+</ul>
+
+
+<h2><a name="cruntime"></a>C Runtime</h2>
+
+<h4>memcmp</h4>
+<h4>memset</h4>
+<h4>memcpy</h4>
+<h4>memmove</h4>
+<h4>strlen</h4>
+<h4>wcstol</h4>
+<h4>wcscpy</h4>
+<h4>wcslen</h4>
+<h4>wcsrchr</h4>
+<h4>wcscat</h4>
+<h4>wcsncmp</h4>
+<h4>wcschr</h4>
+<h4>_wcsnicmp</h4>
+<h4>swprintf</h4>
+<h4>malloc</h4>
+<h4>free</h4>
+<h4>_alloca</h4>
+<h4>atexit</h4>
+<h4>operator new</h4>
+<h4>operator delete</h4>
+<h4>qsort</h4>
+<h4>_fdopen</h4>
+<h4>_close</h4>
+<h4>fclose</h4>
+<h4>wcspbrk</h4>
+<h4>sprintf</h4>
+<h4>feof</h4>
+<h4>ferror</h4>
+<h4>fread</h4>
+<h4>fwrite</h4>
+<h4>_swab</h4>
+<h4>_stricmp</h4>
+<h4>fgets</h4>
+<h4>fputs</h4>
+<h4>_mbslen</h4>
+<h4>_mbsinc</h4>
+<h4>_mbsninc</h4>
+<h4>_mbsdec</h4>
+<h4>isspace</h4>
+<h4>iswspace</h4>
+<h4>isprint</h4>
+<h4>vprintf</h4>
+<h4>fprintf</h4>
+<h4>fwprintf</h4>
+<h4>vsprintf</h4>
+<h4>_vsnprintf</h4>
+<h4>_snprintf</h4>
+<h4>vswprintf</h4>
+<h4>_vsnwprintf</h4>
+<h4>_snwprintf</h4>
+<h4>sscanf</h4>
+<h4>strstr</h4>
+<h4>_strlwr</h4>
+<h4>wcsstr</h4>
+<h4>_wcslwr</h4>
+<h4>_putw</h4>
+<h4>fseek</h4>
+<h4>ftell</h4>
+<h4>_getw</h4>
+<h4>iswdigit</h4>
+<h4>isxdigit</h4>
+<h4>iswxdigit</h4>
+<h4>bsearch</h4>
+<h4>_finite</h4>
+<h4>_isnan</h4>
+<h4>realloc</h4>
+<h4>memchr</h4>
+<h4>strcmp</h4>
+<h4>strncmp</h4>
+<h4>_strnicmp</h4>
+<h4>strcat</h4>
+<h4>strncat</h4>
+<h4>strcpy</h4>
+<h4>strncpy</h4>
+<h4>strchr</h4>
+<h4>strrchr</h4>
+<h4>strpbrk</h4>
+<h4>atoi</h4>
+<h4>atol</h4>
+<h4>tolower</h4>
+<h4>toupper</h4>
+<h4>towupper</h4>
+<h4>wcscmp</h4>
+<h4>wcsncat</h4>
+<h4>wcsncpy</h4>
+<h4>_itow</h4>
+<h4>_i64tow</h4>
+<h4>_ui64tow</h4>
+<h4>iswupper</h4>
+<h4>iswprint</h4>
+<h4>towlower</h4>
+<h4>fflush</h4>
+<h4>isalpha</h4>
+<h4>isalnum</h4>
+<h4>isupper</h4>
+<h4>islower</h4>
+<h4>__iscsym</h4>
+<h4>strtok</h4>
+<h4>strspn</h4>
+<h4>strtoul</h4>
+<h4>wcstok</h4>
+<h4>strcspn</h4>
+<h4>getenv</h4>
+<h4>_putenv</h4>
+<h4>_rotl</h4>
+<h4>_rotr</h4>
+<h4>abs</h4>
+<h4>log</h4>
+<h4>log10</h4>
+<h4>exp</h4>
+<h4>pow</h4>
+<h4>acos</h4>
+<h4>asin</h4>
+<h4>atan</h4>
+<h4>atan2</h4>
+<h4>cos</h4>
+<h4>sin</h4>
+<h4>tan</h4>
+<h4>cosh</h4>
+<h4>sinh</h4>
+<h4>tanh</h4>
+<h4>fmod</h4>
+<h4>floor</h4>
+<h4>fabs</h4>
+<h4>getc</h4>
+<h4>ungetc</h4>
+<h4>_ecvt</h4>
+<h4>modf</h4>
+<h4>ctime</h4>
+<h4>rand</h4>
+<h4>srand</h4>
+
+<h4>exit</h4>
+The exit code may be truncated to a signed char.&nbsp; For details, see 
+<b>GetExitCodeProcess</b>.
+
+<h4>strtod wcstod</h4>
+If an overflow occurs, MSDN states that these routines return +/-HUGE_VAL. On 
+the PAL, the value of HUGE_VAL is undefined. Thus on overflow strtod and wcstod must return a valid double-precision value, but the value does not need to be the same across different PAL implementations.  There is no symbolic name "HUGE_VAL" in the PAL.
+
+<h4>atof</h4>
+The 'nnne+nnn' format will not be supported. Calls must  use only 'nnnd+nnn'.
+
+<h4>_splitpath _wsplitpath _makepath _wmakepath</h4>
+On host operating systems that don't support drive letters, the "drive" parameter must always be either NULL or a pointer to an empty string.  By supporting "" as a drive string, _makepath can be used on the output of a previous _splitpath call.
+
+<h4>_fullpath</h4>
+<ul>
+  <li>abspath - must be non-NULL.</li>
+  <li>relpath -</li>
+  <li>maxLength -must be less than or equal to _MAX_PATH.</li>
+</ul>
+
+<h4>swscanf</h4>
+Scan string may be "%[^,],%[^,],%s" or "%u%n" or "%[^,],%[^,],%[^,],%c,%c".<h4>time</h4>
+
+<h4>localtime</h4>
+
+<h4>mktime</h4>
+
+<h4>_gcvt</h4>
+<ul>
+  <li>value -</li>
+  <li>ndec - either 8 or 17.  If the caller passes 8, then the value is really a 'float' type that was upcast to 'double' immediately before the call.  If the value is 17, then the value is truly a 'double'.</li>
+  <li>buffer -</li>
+</ul>
+
+<h4>_open_osfhandle</h4>
+<ul>
+  <li>osfhandle - always a pipe handle returned from CreatePipe().</li>
+  <li>flags - always _O_RDONLY</li>
+</ul>
+
+<h4>wcstoul</h4>
+On overflow or underflow, it must return ULONG_MAX and set errno to ERANGE.
+
+<h4>errno</h4>
+The only value that must be supported is ERANGE, in the event that <b>wcstoul()</b> fails due to overflow.  Other values of errno are allowable, but no constants are defined - the PAL is free to return just 0 and ERANGE, or 0, ERANGE, and some other nonzero values.  In the PAL header file, errno is a macro 
+that calls <b>PAL_errno()</b> to get the pointer to the per-thread errno value, then references that pointer.
+
+<h4>fopen</h4>
+<ul>
+  <li>filename -</li>
+  <li>mode - must support "r", "w", "a", "r+", "w+", "a+", plus "t" and "b" translation modes.</li>
+</ul>
+
+<h4>_wfopen</h4>
+<ul>
+  <li>filename -</li>
+  <li>mode - must support "wb", "rb", and "rt" modes.</li>
+</ul>
+
+
+<h2><a name="winsock"></a>Wsock32.dll, Ws2_32.dll</h2>
+
+<h4>gethostbyname</h4>
+
+<h4>gethostbyaddr</h4>
+<ul>
+  <li>addr - </li>
+  <li>len - always sizeof(int).</li>
+  <li>type - always 2, AF_INET.</li>
+</ul>
+
+<h4>gethostname</h4>
+
+<h4>inet_addr</h4>
+
+<h4>getpeername</h4>
+
+<h4>getsockopt</h4>
+<ul>
+  <li>s -</li>
+  <li>level - see below.</li>
+  <li>optname - see below.</li>
+  <li>optval -</li>
+  <li>optlen -</li>
+</ul>
+
+getsockopt must support the following level/optname combinations:
+<ul>
+  <li>SOL_SOCKET:  SO_LINGER, SO_RECVBUF, SO_SNDBUF, SO_RECVTIMEO, SO_SNDTIMEO.</li>
+  <li>IPPROTO_TCP:  TCP_NODELAY.</li>
+</ul>
+The PAL may support more level and  optname values;  these are the minimum set.  The PAL may return WSAEINVAL if the level is unknown, or WSAENOPROTOOPT if the option is unsupported by the protocol family.
+
+<h4>setsockopt</h4>
+<ul>
+  <li>s -</li>
+  <li>level - see below.</li>
+  <li>optname - see below.</li>
+  <li>optval -</li>
+  <li>optlen -</li>
+</ul>
+
+setsockopt must support the following level/optname combinations:
+<ul>
+  <li>SOL_SOCKET:  SO_LINGER, SO_RECVBUF, SO_SNDBUF, SO_RECVTIMEO, SO_SNDTIMEO, SO_BROADCAST</li>
+  <li>IPPROTO_IP: IP_ADD_MEMBERSHIP, IP_DROP_MEMBERSHIP, IP_MULTICAST_TTL</li>
+  <li>IPPROTO_TCP:  TCP_NODELAY</li>
+</ul>
+The PAL may support more level and  optname values,  these are the minimum set.  The PAL may return WSAEINVAL if the level is unknown, or WSAENOPROTOOPT if the option is unsupported by the protocol family.
+
+<h4>connect</h4>
+If the 'namelen' parameter is invalid and the API fails, the exact failure code returned from 
+<b>GetLastError()</b> is implementation-dependent.
+
+<h4>send</h4>
+
+<h4>recv</h4>
+
+<h4>closesocket</h4>
+
+<h4>accept</h4>
+
+<h4>listen</h4>
+
+<h4>bind</h4>
+
+<h4>shutdown</h4>
+If the socket is connectionless (as in DGRAM) and has not had <b>connect()</b> called on it, the PAL may either succeed or return WSAENOTCONN.
+
+<h4>sendto</h4>
+If the socket is connectionless (in other words, DGRAM), there are several implementation-specific options:
+<ul>
+  <li>If connect() has been called on the socket, then sendto may either succeed or fail with WSAEISCONN, depending on the PAL implementation.</li>
+  <li>If MSG_OOB is specified, then the PAL may either ignore MSG_OOB and send the data as-is, or it may fail the call with WSAEOPNOTSUPP.</li>
+  <li>If the destination is INADDR_ANY, then the behavior is implementation-defined.  The call may fail, or it may succeed.</li>
+</ul>
+
+If the socket is connection-oriented but not connected, the behavior is implementation-defined:  PAL may either fail the call or may connect the socket.
+
+<p>The PAL need not validate the namelen parameter.
+
+<h4>recvfrom</h4>
+
+<h4>getsockname</h4>
+
+<h4>select</h4>
+<ul>
+  <li>nfds - always 0</li>
+  <li>readfds -</li>
+  <li>writefds -</li>
+  <li>exceptfds -</li>
+  <li>timeout -</li>
+</ul>
+
+<h4>socket</h4>
+If multiple parameters are incorrect, precisely which error is reported is 
+implementation-defined.&nbsp; For example, different implementations may validate parameters in a different order, affecting which error code is returned.
+
+<h4>WSAStartup</h4>
+<ul>
+  <li>wVersionRequested - always 0x0202</li>
+  <li>lpWSAData - No fields are required; the caller allocates a buffer, passes it to WSAStartup, 
+  and then frees it without examining any fields.</li>
+</ul>
+
+<h4>WSACleanup</h4>
+
+<h4>WSASend</h4>
+<ul>
+  <li>s -</li>
+  <li>lpBuffers -</li>
+  <li>dwBufferCount -</li>
+  <li>lpNumberOfBytesSent -</li>
+  <li>dwFlags -</li>
+  <li>lpOverlapped - always non-NULL.</li>
+  <li>lpCompletionRoutine - always NULL.</li>
+</ul>
+
+<h4>WSASendTo</h4>
+<ul>
+  <li>s-</li>
+  <li>lpBuffers -</li>
+  <li>dwBufferCount - always 1.</li>
+  <li>lpNumberOfBytesSent -</li>
+  <li>dwFlags -</li>
+  <li>lpTo -</li>
+  <li>iToLen -</li>
+  <li>lpOverlapped - always non-NULL.</li>
+  <li>lpCompletionRoutine - always NULL.</li>
+</ul>
+
+<h4>WSARecv</h4>
+<ul>
+  <li>s -</li>
+  <li>lpBuffers -</li>
+  <li>dwBufferCount - always 1.</li>
+  <li>lpNumberOfBytesRecvd -</li>
+  <li>lpFlags -</li>
+  <li>lpOverlapped - always non-NULL.</li>
+  <li>lpCompletionRoutine - always NULL.</li>
+</ul>
+
+<h4>WSARecvFrom</h4>
+<ul>
+  <li>s -</li>
+  <li>lpBuffers -</li>
+  <li>dwBufferCount - always 1.</li>
+  <li>lpNumberOfBytesRecvd -</li>
+  <li>lpFlags -</li>
+  <li>lpFrom -</li>
+  <li>lpFromLen -</li>
+  <li>lpOverlapped - always non-NULL.</li>
+  <li>lpCompletionRoutine - always NULL.</li>
+</ul>
+
+<h4>WSAEventSelect</h4>
+<ul>
+  <li>s -</li>
+  <li>hEventObject -</li>
+  <li>lNetworkEvents - either FD_CONNECT or FD_SELECT.</li>
+</ul>
+
+<h4>WSASocketA</h4>
+<ul>
+  <li>af -</li>
+  <li>type -</li>
+  <li>protocol -</li>
+  <li>lpProtocolInfo - always NULL.</li>
+  <li>g - always 0.</li>
+  <li>dwFlags - always WSA_FLAG_OVERLAPPED.</li>
+</ul>
+
+<h4>WSAIoctl</h4>
+<ul>
+  <li>s -</li>
+  <li>dwIOControlCode - can be any value that Winsock2 supports.&nbsp; The 
+  managed type of this parameter is 'int'; there is no enum.</li>
+  <li>lpvInBuffer -</li>
+  <li>cbInBuffer -</li>
+  <li>lpvOutBuffer -</li>
+  <li>cbOutBuffer -</li>
+  <li>lpcbBytesReturned -</li>
+  <li>lpOverlapped - always NULL</li>
+  <li>lpCompletionRoutine - always NULL</li>
+</ul>
+The PAL need only implement ioctls that reasonably map  to the host operating system's socket code.  There are no functional requirements from within 
+SSCLI itself:  the API is never called, except on behalf of a managed application calling
+<b>System.Net.Sockets.IOControl</b>.
+
+<h4>WSAEnumNetworkEvents</h4>
+<ul>
+  <li>s -</li>
+  <li>hEventObject -</li>
+  <li>lpNetworkEvents -</li>
+</ul>
+
+<h4>ioctlsocket</h4>
+<ul>
+  <li>s -</li>
+  <li>cmd - either FIONREAD or FIONBIO</li>
+  <li>argp -</li>
+</ul>
+
+
+
+<h1><a name="ImplementationDetails"></a>Implementation Details</h1>
+
+<h2><a name="APITracing"></a>API Call Tracing</h2>
+The PAL should include API tracing in the debug build.  API trace logs will be an invaluable debugging tool, for understanding bugs in both the CLI and the PAL.
+
+<p>Tracing should be controlled by an environment variable that is read during PAL per-process initialization.  
+If the variable, PAL_API_TRACING is set, it is either a file name to write to, or "stdout" or "stderr".  If the name is "stdout" or "stderr" then logging should be performed to the C runtime stdout or stderr file.  Otherwise, the PAL should open the file, truncate it if it exists, and write the trace information to that file.
+
+<p>Ideally, each API should log the following information:
+<ul>
+  <li>One line containing the current ThreadId, the API name, and the names and values of each of the parameters.  It is not necessary to do  deep logging and print the contents of all byref structures, 
+  and so on, but inbound strings like file names should be logged to assist debugging.  This should be logged on entry into the API.</li>
+  <li>A separate line containing the current ThreadId, the API name, the return type, and the value of the API return, logged on exit from the API.  If the contents of  an  out byref parameter are particularly relevant to the API, its name and value should also be logged on the same line.</li>
+</ul>
+
+Care must be taken to format the entire line to be logged into one buffer before being written to the log file, so concurrent API calls on different threads do not have logging interleaved together within a single line.
+
+<p>Example:
+<pre>000000ba CopyFileW(lpExistingFileName=001259a0 L"test.txt", lpNewFileName=00126762 L"baz.txt", bFailIfExists=0)
+000000c0 FindClose(hFindFile=10a3cdb0)
+000000c0 FindClose BOOL 1
+000000ba CopyFileW BOOL 1
+</pre>
+
+<h2><a name="FileNames"></a>File and Path Names</h2>
+On UNIX system-based platform file systems, any PAL APIs operating on file or path names must be prepared to accept DOS/Win32-style pathnames and translate them into paths acceptable for the host 
+file system.  In particular:
+<ul>
+  <li>The &quot;\&quot; character used as a path separator should be converted to &quot;/&quot; on 
+  UNIX system-style file systems.&nbsp; Thus, "\sscli/src\test/pal" should be considered to be four distinct components of the path name - "sscli", "buiild", "test", and "pal".  The equivalent UNIX 
+  system-style path would be "/sscli/src/test/pal".</li>
+  <li>The trailing dot character &quot;.&quot; should be stripped from any directory or 
+  file name.&nbsp; Thus  "/sscli./test/pal." should be converted to "/sscli/test/pal" on UNIX 
+  system-based platform file systems.</li>
+  <li>The wildcard character pattern &quot;*.*&quot; should be replaced by &quot;*&quot; for APIs where 
+  wildcard characters are appropriate, assuming the file name expansion is similar to 
+  &quot;glob&quot; on UNIX system-based platforms.&nbsp; Thus DOS/Win32 "*.*" should expand to contain all files in the following list:  "test", "test.bat", "test.c".  The wildcard pattern "*." is subject to the second rule and should be replaced 
+  with "*".</li>
+  <li>DOS/Win32 drive letters should never appear.&nbsp; Thus "c:\test.txt" can be safely translated to "c:/test.txt" on 
+  UNIX system-based platforms, meaning a relative directory name "c:" and a name "test.txt" below it.</li>
+</ul>
+
+However, the PAL does not need to implement case insensitivity for compatibility with Win32.  If the underlying 
+file system is case-sensitive, then the PAL file system APIs should also be case-sensitive.
+
+<p>On Win32, <b>CreateFile()</b>, fopen, and other file-open APIs all fail if the string parameter refers to a directory instead of a file.
+
+<p>On file systems that support symbolic links, the PAL APIs must always open the 
+destination of the link (in other words, follow the link and 
+operate on what the link references), rather than operate on the link itself.
+
+<p>PAL file I/O APIs do not need to support file names starting with "\\.\" or names of DOS devices.  Therefore, named pipes, mailslots, disk devices, and tape devices are not supported, 
+because all of those names start with "\\.\", and names of DOS devices such as "lpt1", "aux", "com1" need not be supported.  The PAL does not need to map the built-in DOS device names to underlying 
+operating system device names.
+
+<p>The rationale for not mapping the DOS device names to the UNIX system-style names is that 
+many standard DOS device names  require additional APIs for 
+configuring the device, and these APIs are not exposed through the PAL API.&nbsp; 
+Thus, COMx: support in <b>CreateFile()</b> does not make sense because there is no way for the code calling the PAL CreateFile to configure the baud rate, control flow, and other parameters.
+<h2><a name="Handles"></a>HANDLE Types</h2>
+The allocator used to manage HANDLE types should not need to be robust against 
+mis-use such as double-close of a HANDLE or use of a HANDLE after it was closed.&nbsp; 
+However, it will likely be worthwhile to code some robustness into the free 
+version and add some more expensive validation code into the checked and 
+fastchecked versions.<br>
+<br>
+&nbsp;<p>On 64-bit systems, sizeof(HANDLE)==8, and consumers of HANDLE types will never truncate.  On 
+Microsoft Win64&reg;, sizeof(HANDLE)==8, but the upper 4 bytes can be truncated, and then the 32-bit value can be sign-extended to recreate a HANDLE.
+<h2><a name="LastError"></a>LastError</h2>
+The PAL must accept following error codes as SetLastError values and may set the lasterror value to any of these codes as the result of an error encountered during execution of a PAL API..  The full list can be found in rotor_pal.h - search for "winerror.h codes" and "Socket error codes".
+<h2><a name="Printf"></a>Printf Format Specifiers</h2>
+All printf-style routines may share a single format specification list.  The specification list should follow 
+ANSI-C, with the following exceptions and notes:
+<ul>
+  <li>%e and %E - the precision of the mantissa and exponent are dependent on the PAL implementation.</li>
+  <li>%p - must exactly follow Win32's, printing 8 or 16 hex digits with no leading "0x".</li>
+  <li>%ws, %wc, and %w must be supported, to print Unicode strings and characters.</li>
+  <li>%I64 - must be supported, to print an __int64.</li>
+  <li>%qu - does not need to be supported.</li>
+</ul>
+
+<h2><a name="ResourceUse"></a>Use of Resource After It Has Been Freed</h2>
+If the calling application allocates a resource (HANDLE, socket, heap allocation, 
+and so on.), uses the resource, and then frees it (using <b>CloseHandle()</b>, 
+<b>close</b>, <b>free</b>, 
+and so on), the behavior of subsequent API calls is undefined, if the calling application continues to pass the now-freed resource handle.  The PAL may crash, assert, terminate the process, corrupt memory, falsely report success, or choose any other kind of behavior.  Where reasonable, the PAL should be robust against such errors in the calling application, but it is not a requirement.
+
+<h2><a name="EnvironmentCase"></a>Case Sensitivity in Environment Variables</h2>
+Environment-variable APIs such as <b>getenv</b>, <b>putenv</b>, <b>GetEnvironmentVariableA</b>, and 
+the like. are case-insensitive on Win32.  The PAL may implement them as case-sensitive if the host operating system's environment variables are case-sensitive.
+
+<h2><a name="SxSSupport"></a>Side-by-Side:  Named Shared Objects and the User Configuration Directory</h2>
+In order to support multiple different SSCLI processes running side-by-side under the same user logon account, each PAL implementation must use its own isolated namespace for named shared objects.  Named shared objects can be created 
+using APIs such as CreateEventW(), CreateMutexW(), and CreateFileMappingA().
+
+<p>Isolation should be per-PAL, as determined by examining the full path to the PAL .dll/.so/.dylib file.  Therefore, if multiple processes use /usr/bin/librotor_pal.so, then those processes should share one namespace, while processes using ~/experimental/librotor_pal.so should share a separate namespace.  One possible implementation is to hash the fully-qualifed pathname to the PAL .dll/.so/.dylib into a short string 
+that can then be merged with the shared object name.
+
+<p>The additional uniqueness string must not exceed 50 characters in length.  If the named object name plus the uniqueness string exceed MAX_PATH, the PAL API may return failure, with LastError set to ERROR_FILENAME_EXCED_RANGE.
+
+<p>The per-user configuration directory returned by PAL_GetUserConfigurationDirectoryW() should also be per-PAL.
+
+
+
+<h1><a name="GeneralIssues"></a>General Issues</h1>
+
+<h2><a name="IOCompletion"></a>I/O Completion Ports and Async I/O</h2>
+I/O completion ports do not map well onto UNIX system-based platforms.  Asynchronous I/O  has very limited support 
+in general, and the APIs to use it are not standardized.  For example, POSIX 4 aio_* APIs exist on Linux, but each asynchronous file open creates a new thread, causing very poor performance if a large number of files are open.&nbsp; I/O completion ports and asynchronous I/O will not be exposed 
+through the PAL.
+
+<p>The framework classes expose asynchronous I/O through the base <b>Stream.BeginRead</b> and 
+<b>Stream.BeginWrite</b> methods, and the FileStream class derives from Stream.    The implementation of 
+<b>FileStream</b>'s <b>BeginRead</b> and <b>BeginWrite</b> 
+methods will automatically fall back to synchronous reads and writes if 
+asynchronous is not available.
+<h2><a name="OutOfStack"></a>Out-of-Stack</h2>
+On Win32, the common language runtime can use the guard page at the bottom of the stack to understand where the stack bounds are and avoid hitting the end of stack.
+<h2><a name="Exceptions"></a>Exceptions</h2>
+On non-Win32 platforms, Win32 structured exception handling (SEH) is not supported.  Instead, the PAL implements a subset of SEH 
+using a combination of compile-time macros and runtime help.  The goal is to replace code like:
+<pre>	... local variable declarations
+	try {
+	        ... code which references locals from above
+	} except ( ExceptionFilter() ) {
+	        ...  code which references locals from above            
+	}
+</pre>
+with:
+<pre>	... local variable declarations
+	PAL_TRY {
+		... code which references locals from above
+	} PAL_EXCEPT_FILTER(ExceptionFilter) {
+	        ...  code which references locals from above   
+	} PAL_ENDTRY
+</pre>
+and cause no additional code expansion in the Win32 build.
+<h2><a name="SEHMacros"></a>SEH Macros</h2>
+PAL_TRY
+<ul>
+  <li>A direct replacement for Win32 &quot;try&quot;.  Note that the only way to exit from within a PAL_TRY/PAL_EXCEPT block is by either throwing an exception, or by using PAL_LEAVE.  Exiting the block 
+  using 'return' or 'goto' is not supported.</li>
+</ul>
+
+<p>PAL_EXCEPT_FILTER(pfnFilter, pvParameter)
+<p>PAL_EXCEPT_FILTER_EX(LabelName, pfnFilter, pvParameter)
+<ul>
+  <li>Functions similarly to Win32 &quot;except&quot;, but not entirely the same. The key 
+  difference is that Win32 &quot;except&quot; takes an expression as its argument that, 
+  essentially the compiler turns into a nested function called by the SEH exception dispatcher.  The PAL version takes an actual pointer to a function 
+  that acts as the exception filter.  The pvParameter is passed verbatim to the exception filter routine - it can be used to store the addresses of local variables that would have been accessible in the nested filter function on Win32.</li>
+  <li>The EX flavor has to be used in functions with multiple try/finally blocks. LabelName must be a unique name within the body of the C/C++ function containing multiple try/finally blocks.</li>
+</ul>
+
+<p>PAL_EXCEPT (disposition)
+<p>PAL_EXCEPT_EX(LabelName, disposition)
+<ul>
+  <li>A shorthand for "except(disposition)". The valid values for disposition are EXCEPTION_EXECUTE_HANDLER, EXCEPTION_CONTINUE_SEARCH, and EXCEPTION_CONTINUE_EXECUTION.</li>
+</ul>
+
+<p>PAL_FINALLY
+<p>PAL_FINALLY_EX(LabelName)
+<ul>
+  <li>Functions similarly to Win32 "finally".  The LabelName must be a unique name within the body of the C/C++ function containing the try/finally.  It is used to implement PAL_LEAVE</li>
+</ul>
+
+<p>PAL_LEAVE
+<p>PAL_LEAVE_EX(LabelName)
+<ul>
+  <li>Functions similarly to Win32 "leave" as a way to exit a "try" block within a try/finally.  The LabelName must match the name given to the corresponding, PAL_EXCEPT_FILTER, PAL_ FILTER or PAL_FINALLY.</li>
+</ul>
+
+<p>PAL_ENDTRY
+<ul>
+  <li>	No equivalent on Win32 - put this macro after the closing '}' at the end of the try/finally or try/except.</li>
+</ul>
+
+On UNIX system-based platforms, SEH is implemented by means of wrappers on top of setjmp/longjmp, so both SEH setup and exception dispatching will likely be larger and slower than x86 Win32 or even RISC Win32.  
+Note: use sparingly.
+<h2><a name="SEHForJit"></a>SEH for JIT-Compiled Code</h2>
+
+Every entry into JIT-compiled code is enclosed in a <b>try/catch</b> block. The handler 
+associated with this try/catch block calls the appropriate JIT-compiled exception 
+handlers in case exception is thrown. Thus, the JIT-compiled code itself does not know 
+about the implementation details of exception handling (EH).
+
+<p>Unfortunately, the <b>try/catch</b> block around the JIT-compiled code cannot be the regular C/C++ SEH try block. It is the native EH record plugged directly into the fs:[0] chain in the Windows i386 version.
+
+<p>The main feature difference between the Win32 native EH and C/C++ SEH is in the stack state at the invocation of the body of 
+<b>catch</b> or <b>finally</b> clauses during the second pass:
+<ul>
+  <li>The C/C++ SEH unwinds the stack first and then calls the body of catch or finally clause.</li>
+  <li>The native Win32 EH calls the handler with the stack unwound up to the *previous* EH record. It is up to the handler to unwind the stack up to itself.</li>
+</ul>
+
+It should be clear  why it is  enough for JIT-compiled code to be enclosed in the regular C/C++ SEH 
+<b>try</b> block: it will 
+not be possible to invoke the JIT-compiled second pass handlers because  the stack they depend on would be gone. 
+
+<p>It is also not a good idea to invoke both first and second pass JIT-compiled 
+handlers in the first pass of C/C++ SEH. The CLI depends on the 
+interop between the native and managed exceptions. The exception search often 
+flies through multiple floors of JIT-compiled and CLI code before the exception is 
+caught and the second pass starts. Invoking both first and second pass 
+JIT-compiled handlers in the first pass would change the order in which  the 
+JIT-compiled handlers are executed.
+
+<p>Thus, it is necessary to emulate the Win32 native EH in addition to C/C++ SEH in the PAL. The differences between Win32 native EH and the C/C++ SEH are:
+<ul>
+  <li>dwFlags in PPAL_EXCEPTION_REGISTRATION is set to  PAL_EXCEPTION_FLAGS_UNWINDONLY on PAL_TryEnter entry for Win32 native EH. It is 0 for C/C++ SEH.</li>
+  <li>C/C++ SEH transfers the execution using longjmp in the second pass. Win32 native EH calls the handler function again instead: ExceptionRecord in PAL_EXCEPTION_POINTERS points to the exception information with 
+  the EXCEPTION_UNWINDING bit set on dwFlags. ContextRecord in PAL_EXCEPTION_POINTERS is NULL.</li>
+  <li>The bottommost registration is the registration preceding the active registration on entry to the 
+  <b>catch</b> or <b>finally</b> blocks in C/C++ SEH. The bottommost registration is the active registration on call to the handler in Win32 EH.</li>
+  <li>The second pass call to the handler function in Win32 native SEH returns 
+  EXCEPTION_CONTINUE_SEARCH or never returns (for example, when JIT-compiled code handled the exception and continues running).</li>
+  <li>Win32 native EH frames and C/C++ SEH can be mixed with no limitations.</li>
+</ul>
+
+<h2><a name="SEHImplementation"></a>SEH Implementation</h2>
+
+The following routines must be implemented by PALs on non-Win32 platforms:
+
+<p>PAL_TryHelper
+<ul>
+  <li>On entry, the PPAL_EXCEPTION_REGISTRATION record will have the pfnFilter, pvFilterParameter and dwFlags fields filled in.  The other fields will be uninitialized.</li>
+  <li>The ReservedForPAL[] field may be used for storage of implementation-specific data.  It is intended  as a C runtime jmp_buf.</li>
+  <li>The return value should be 0 on the initial call, to indicate that the SEH 
+  handler has been registered. The routine may modify any fields within the 
+  PPAL_EXCEPTION_REGISTRATION. The caller treats the record as opaque after the call.  If an exception happens subsequently, control should resume within PAL_TryHelper and the return value should be the exception code.</li>
+  <li>Note: there is no error code.&nbsp; The PAL may not fail the call due to 
+  low-memory, and so on.</li>
+</ul>
+
+<p>PAL_EndTryHelper
+<ul>
+  <li>On entry, the PPAL_EXCEPTION_REGISTRATION record will be the one returned from the previous PAL_TryHelper call.  It would be helpful for the PAL to carefully check that PAL_TryHelper and PAL_EndTryHelper calls are matched - if an errant PAL_LEAVE macro or other code flow construct does a "leave" to the wrong "try", it 
+  might corrupt the stack.</li>
+</ul>
+
+<p>PAL_GetBottommostRegistration
+<ul>
+  <li>Returns the PPAL_EXCEPTION_REGISTRATION record that is bottommost on the stack.  The API will always return non-NULL, assuming that the PAL has placed one of these at the top of the stack before calling the thread entry point.</li>
+</ul>
+
+<p>PAL_SetBottommostRegistration
+<ul>
+  <li>Sets the PPAL_EXCEPTION_REGISTRATION record that is bottommost on the stack.</li>
+</ul>
+
+<p>PAL_GetBottommostRegistrationPtr
+<ul>
+  <li>Returns PPAL_EXCEPTION_REGISTRATION * where this is the address of the bottommost PPAL_EXCEPTION_REGISTRATION stored for the current thread.</li>
+</ul>
+
+<h2><a name="Resources"></a>Localized Resource Strings</h2>
+Several components within the common language runtime use LoadLibrary and then LoadString  to fetch localizable text resources from satellite DLLs.  Rather than duplicating this PE/COFF resource structure within a 
+UNIX system-style shared-library, a better solution is to switch to a generic text-based system.  This solution is implemented in the PAL 
+runtime, on top of the PAL APIs, so it can be shared among all platforms.  However, it is documented here, as it may be useful in the PAL's implementation of FormatMessage.
+
+<p>LoadLibrary/LoadLibraryEx calls used to load satellite DLLs will be replaced by:
+<pre>        typedef HANDLE HSATELLITE;
+
+        PALIMPORT
+        HSATELLITE
+        PALAPI
+        PAL_LoadSatelliteResourceW(LPCWSTR SatelliteResourceFileName);
+        #ifdef UNICODE
+        #define LoadSatelliteResource LoadSatelliteResourceW
+        #endif
+</pre>
+
+LoadString calls to fetch strings from the satellite DLL will be replaced by:
+<pre>	PALIMPORT
+	int
+	PALAPI
+	PAL_LoadSatelliteStringW(HSATELLITE SatelliteResource,
+		UINT uID,
+		LPWSTR lpBuffer,
+		int nBufferMax);
+	PALIMPORT
+	int
+	PALAPI
+	PAL_LoadSatelliteStringA(HSATELLITE SatelliteResource,
+		UINT uID,
+		LPSTR lpBuffer,
+		int nBufferMax);
+	#ifdef UNICODE
+	#define PAL_LoadSatelliteResource PAL_LoadSatelliteResourceW
+	#else
+	#define PAL_LoadSatelliteResource PAL_LoadSatelliteResourceA
+	#endif
+</pre>
+
+FreeLibrary calls to release satellite DLLs will be replaced by:
+<pre>	PALIMPORT
+	BOOL
+	PALAPI
+	PAL_FreeSatelliteResource(HSATELLITE SatelliteResource);
+</pre>
+
+<p>The format of the satellite DLL will be a UTF-8 encoded file containing a 
+list of pairs of decimal numbers and quoted string pairs, with a whitespace 
+between. The maximum string length is 511 bytes, not including the required 
+quotes.&nbsp; For example, the following three messages are valid:
+<pre>1 "This is a message"
+2 "This is a message"
+     39 "This is
+another message"
+</pre>
+
+<p>But the following are not valid:
+<pre>A "This is a message"
+1 2
+</pre>
+
+<p>The LoadSatelliteString APIs will scan through the table by reading in each message number and quoted string pair, one at a time until the desired message number is found or EOF is hit.  If an 
+invalid message or string pair is found, then the APIs should immediately return failure.  Note: 
+Checks for duplicated message 
+IDs are not required; the API behavior is undefined.
+
+<p>The satellite message files will be generated using a  tool,
+<a href="../buildtools/resourcecompiler.html">resourcecompiler</a>, which 
+functions like the Win32 Resource compiler, converting STRINGTABLE resources in 
+the .rc file into the new satellite message file format. The conversion tool 
+should check that no duplicated message IDs are present, and either emit a file 
+containing all legal ID/string pairs, or error out. The SSCLI includes an implementation 
+of the new resource compiler tool that produces the satellite files.  Note that resource IDs in both the source .rc file and as parameters to LoadSatelliteResource are both truncated to 16-bit values, for compatibility with Win32 resource IDs.
+
+<p>The satellite resource data will be reference-counted; multiple calls to LoadSatelliteResource() to load the same resource file name are permitted, and each call must have a matching FreeSatelliteResource() call.  Satellite resource files are considered to be the same only if their fully qualified path names are identical.&nbsp;
+
+<p>Note: 
+The file or path name passed to LoadSatelliteResource() may be a partial path that must be fully qualified by the PAL implementation.
+
+<p>It would be useful to reuse the managed resource format (System.Resources.ResourceManager), but this will add a significant bootstrapping dependency since so many unmanaged binaries depend on these for core functionality.
+
+<p>This routine will be implemented within the core URT tree, not within the PAL.  It can easily be built on top of the PAL APIs.
+<h2><a name="Security"></a>Security</h2>
+The PAL must avoid introducing security holes that can be exploited from managed code.  In particular, the sequence of 
+<b>CreateFile</b>/<b>ReadFile</b>/<b>CreateFileMapping</b>/<b>MapViewOfFile</b> must guarantee that if the file was opened with deny-write,  that exactly the same data is read from the file 
+through both <b>ReadFile</b> and <b>MapViewOfFile</b>.&nbsp; In other words, <b>CreateFileMapping</b> or 
+<b>MapViewOfFile</b> cannot be implemented using an additional file-open API call 
+that uses the file name, because this could potentially result in opening a different file 
+because another process could rename the first file and substitute a new file with the name of the first file.
+
+<p>The PAL must also avoid buffer overruns when dealing with strings such as file and directory names.
+<h2><a name="DLLMain"></a>DLLMain</h2>
+LoadLibrary will call DllMain if there is one on PROCESS_ATTACH / PROCESS_DETACH / THREAD_ATTACH / THREAD_DETACH.  DisableThreadLibraryCalls will work as usual. The Win32 DllMain thread safety invariant (only one DllMain is called on one thread at a time) holds.
+
+<p>If DLL is statically linked to other PAL DLLs, it has to call PAL_RegisterLibrary  for all DLLs it depends on in its PROCESS_ATTACH handler and PAL_UnregisterLibrary in its PROCESS_DETACH handler.
+
+<p>In the UNIX system-based platform PAL implementation, PAL_Register/PAL_Unregister calls are identical to LoadLibrary / FreeLibrary. In the Win32 PAL implementation, these calls are 
+NO-OPs.
+
+<p>Calls to DllMain from LoadLibrary should be protected against cyclic references between DLLs.
+
+<p>This solution minimizes changes in the Win32 code. The only change necessary is 
+a couple of calls to PAL_RegisterLibrary/PAL_UnregisterLibrary under #ifdef FEATURE_PAL. It has also a very simple implementation in the Win32 PAL.
+<h2><a name="UnexpectedTermination"></a>Unexpected Termination</h2>
+In some circumstances, the PAL might acquire and use resources shared between several cooperating processes.  If the process running the PAL terminates or blocks unexpectedly due to an asynchronous event, and the PAL is currently executing code within a PAL API, then the state of the shared resources 
+might be inconsistent.
+
+<p>For example, if the PAL is currently executing CreateEvent() and the event is named, and at the precise moment that the event name is being copied into memory shared between all PAL processes, the user kills the process with 'kill -f', then the shared memory 
+might be locked forever, or the contents might contain only a fragment of the event's name.   In this case, it is acceptable for other PAL processes to block forever or crash, if they access the PAL's shared memory.
+
+<p>The PAL should not acquire and hold locks when no PAL APIs are executing, and should not hold locks across long-running APIs such as WaitForSingleObject().
+
+<p>An alternative solution to this problem is to create a common, trusted, helper process to store the shared state; PAL client processes would request reads and writes 
+using LRPC calls.  The server could be robust against errant clients, and reduce the points of failure down to just the trusted helper.
+
+
+<h2><a name="AppendixA"></a>Appendix A: Building rotor_pal.satellite</h2>
+
+<p>The current implementation of the  Shared Source CLI provides tools 
+support for generating a rotor_pal.satellite file which is a string resource 
+file as described above in <a href="#Resources">Localized String Resources</a>.<p>
+  In %ROTOR_DIR%\pal\unix, there is a rotor_pal.satellite file, which contains 
+  the mapping from Win32 LastError codes to English strings. This mapping is used by the 
+  PAL implementation of FormatMessage. The rotor_pal.satellite is 
+  computer-generated by building tools\palsatellite on a computer running Windows, and 
+  executing it while the current directory is set to %ROTOR_DIR%\pal:<ul>
+    <li>cd %ROTOR_DIR%\tools\palsatellite</li>
+    <li>build</li>
+    <li>cd %ROTOR_DIR%\pal</li>
+    <li>%ROTOR_DIR%\tools\palsatellite\rotor_x86\palsatellite.exe</li>
+    </ul>
+
+<p>This will create a new rotor_pal.satellite file in %ROTOR_DIR%\pal, which 
+needs to be manually moved to %ROTOR_DIR%\pal\unix.<br>
+<br>
+The tool works by scanning rotor_pal.h for lines starting with &quot;#define ERROR_&quot;.&nbsp; 
+The tool captures the error number constant, then calls Win32 FormatMessage, 
+captures the output, and then formats it into a SSCLI satellite file.&nbsp; 
+After running the tool, the LastError mapping prints exactly the same messages 
+on both the Windows and UNIX system-based SSCLI PAL implementation.<br>
+<br>
+This tool needs to be re-run whenever new ERROR_ constants are added to 
+rotor_pal.h. They can be a cut and pasted from the Win32 Platform SDK file, 
+winerror.h.<p><i>Copyright (c) 2002 Microsoft Corporation. All rights reserved.</i></p>
+</body> 
+</html>

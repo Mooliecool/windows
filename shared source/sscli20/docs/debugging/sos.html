@@ -1,0 +1,3058 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta name="GENERATOR" content="Microsoft FrontPage 5.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>SOS Debugging Extension</title>
+<link rel="stylesheet" type="text/css" href="../rotor.css">
+</head>
+
+<body>
+
+<h1>SOS Debugging Extension</h1>
+
+<h3>Contents</h3>
+<ul>
+  <li><a href="#Changes">Important Changes in SSCLI 2.0</a></li>
+  <li><a href="#Overview">Overview</a></li>
+  <li><a href="#SOSonWindows">SOS on Windows</a><ul>
+    <li><a href="#SOSOnWindowsDebuggers">SOS on Windows Debuggers</a></li>
+    <li><a href="#SOSOnVisualStudio2005">SOS on Visual Studio 2005</a></li>
+    <li><a href="#ConsoleOutput">Seperating debugging from Console Output</a></li>
+    <li><a href="#GettingtoaStateWhereSOSisFunctional">Getting to a State Where SOS is Functional</a></li>
+  </ul>
+  </li>
+  <li><a href="#ExampleSOSDebuggingSession">Example SOS Debugging Session</a></li>
+  <li><a href="#SOSDebuggingCommands">SOS Debugging Commands</a><ul>
+    <li><a href="#DumpClassCommand">DumpClass Command</a></li>
+    <li><a href="#DumpDomainCommand">DumpDomain Command</a></li>
+    <li><a href="#DumpMDCommand">DumpMD Command</a></li>
+    <li><a href="#DumpModuleCommand">DumpModule Command</a></li>
+    <li><a href="#DumpMTCommand">DumpMT Command</a></li>
+    <li><a href="#DumpObjCommand">DumpObj Command</a></li>
+    <li><a href="#DumpStackCommand">DumpStack Command</a></li>
+    <li><a href="#DumpStackObjectsCommand">DumpStackObjects Command</a></li>
+    <li><a href="#EEStackCommand">EEStack Command</a></li>
+    <li><a href="#IP2MDCommand">IP2MD Command</a></li>
+    <li><a href="#Name2EECommand">Name2EE Command</a></li>
+    <li><a href="#SyncBlkCommand">SyncBlk Command</a></li>
+    <li><a href="#ThreadPoolCommand">ThreadPool Command</a></li>
+    <li><a href="#ThreadsCommand">Threads Command</a></li>
+    <li><a href="#Token2EECommand">Token2EE Command</a></li>
+    <li><a href="#UCommand">U Command</a></li>
+  </ul>
+  </li>
+  <li><a href="#Glossary">Glossary</a></li>
+</ul>
+<h2><a name="Changes"></a>Important Changes in SSCLI 2.0</h2>
+<p>
+    Changes to the build system in SSCLI version 2.0 have resulted in a slightly more
+    convoluted SOS installation experience. To make up for the installation pain, SOS
+    is now supported in Visual Studio 2005. Please see the SOS on Windows section to
+    install SOS properly using the latest Windows based debuggers.<p>
+        </p>
+
+<h2>Overview</h2>
+<p>One of the debugging options available for use with the Shared Source CLI 
+(SSCLI)
+    2.0 is the SOS debugging extension. This debugging extension allows 
+you to access facilities that help in debugging the execution environment and 
+managed code.</p>
+<p>You would use the SOS debugging extension if you want to debug 
+managed applications but see the implementation details of the internal data 
+structures used by the CLI as it runs managed code.</p>
+<p>The file name for the SOS debugger extension is sos.dll on Windows.</p>
+<p>Although you can use debugging tools with checked and free builds, the 
+preferred build for debugging purposes is the debug build. This is 
+because both the checked
+    and free builds use some optimizations during 
+compilation that might result in code locations in source code no longer matching 
+the observed location in the debugger. Furthermore, key logging 
+functionality is not available in free builds, so the ability to halt the 
+debugger at desired locations can be impaired.</p>
+<p>All the examples below use a debug build.</p>
+<p>The following table describes all the functions that appear in the SOS help 
+output and indicates whether they are supported in the SSCLI and under what platforms.&nbsp; 
+Only functionality that is supported by the SSCLI is described.&nbsp;Some 
+commands appear to function but have problems and are listed with the 
+description: &quot;Not  functional in the SSCLI.&quot;</p>
+<table border="1" width="90%">
+  <tr>
+    <th width="9%" valign="top" height="24">SOS command</th>
+    <th width="29%" valign="top" height="24">Description</th>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24">COMState</td>
+    <td width="29%" valign="top" height="24">Not implemented in the SSCLI.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24">debug</td>
+    <td width="29%" valign="top" height="24">Not implemented in the SSCLI.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24"><a href="#DumpClassCommand">
+    DumpClass</a></td>
+    <td width="29%" valign="top" height="24">Displays the details of a type.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="42"><a href="#DumpDomainCommand">
+    DumpDomain</a></td>
+    <td width="29%" valign="top" height="42">List statistics for an application 
+    domain including the assemblies and modules that it contains.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24">DumpEEHash</td>
+    <td width="29%" valign="top" height="24">Not implemented in a functional state 
+    in either the .NET Framework or the SSCLI.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24">DumpHeap</td>
+    <td width="29%" valign="top" height="24">Not  functional in the SSCLI.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24"><a href="#DumpMDCommand">DumpMD</a></td>
+    <td width="29%" valign="top" height="24">Displays the details of a 
+    MethodDesc (For more information, see <a href="#Glossary">Glossary</a>).</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24"><a href="#DumpModuleCommand">
+    DumpModule</a></td>
+    <td width="29%" valign="top" height="24">Displays the details of a module.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24"><a href="#DumpMTCommand">DumpMT</a></td>
+    <td width="29%" valign="top" height="24">Displays the details of a 
+    MethodTable (For more information, see <a href="#Glossary">Glossary</a>).</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="22"><a href="#DumpObjCommand">DumpObj</a></td>
+    <td width="29%" valign="top" height="22">Displays the details of an  object 
+    that is an internal representation of a stack or heap item.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24"><a href="#DumpStackCommand">
+    DumpStack</a></td>
+    <td width="29%" valign="top" height="24">Displays the combined managed and 
+    unmanaged stack contents.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24"><a href="#DumpStackObjectsCommand">
+    DumpStackObjects</a></td>
+    <td width="29%" valign="top" height="24">Displays the currently allocated 
+    stack objects.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24">EEDebug</td>
+    <td width="29%" valign="top" height="24">Not implemented in the SSCLI.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24">EEDLLPath</td>
+    <td width="29%" valign="top" height="24">Not implemented in the SSCLI.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24">EEHeap</td>
+    <td width="29%" valign="top" height="24">Not  functional in the SSCLI.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24"><a href="#EEStackCommand">EEStack</a></td>
+    <td width="29%" valign="top" height="24">Displays stack information 
+    segregated by thread.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24">EEVersion</td>
+    <td width="29%" valign="top" height="24">Not implemented in the SSCLI.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24">FinalizeQueue</td>
+    <td width="29%" valign="top" height="24">Not  functional in the SSCLI.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24">GCInfo</td>
+    <td width="29%" valign="top" height="24">Not implemented in the SSCLI.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24">GCRoot</td>
+    <td width="29%" valign="top" height="24">Not  functional in the SSCLI.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24"><a href="#IP2MDCommand">IP2MD</a></td>
+    <td width="29%" valign="top" height="24">Converts a instruction pointer 
+    address to a MethodDesc.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24"><a href="#Name2EECommand">Name2EE</a></td>
+    <td width="29%" valign="top" height="24">Converts a method or type name to a 
+    MethodDesc or MethodTable, respectively.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24">ObjSize</td>
+    <td width="29%" valign="top" height="24">Not  functional in the SSCLI.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24">ProcInfo</td>
+    <td width="29%" valign="top" height="24">Not implemented in the SSCLI.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24">RWLock</td>
+    <td width="29%" valign="top" height="24">Not implemented in the SSCLI.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24"><a href="#SyncBlkCommand">SyncBlk</a></td>
+    <td width="29%" valign="top" height="24">Displays a table of information 
+    about the sync block.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24"><a href="#ThreadPoolCommand">
+    ThreadPool</a></td>
+    <td width="29%" valign="top" height="24">Displays information about the 
+    threadpool table.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24"><a href="#ThreadsCommand">Threads</a></td>
+    <td width="29%" valign="top" height="24">Displays information about managed 
+    threads.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24"><a href="#Token2EECommand">Token2EE</a></td>
+    <td width="29%" valign="top" height="24">Converts a metadata token to a 
+    memory address.</td>
+  </tr>
+  <tr>
+    <td width="9%" valign="top" height="24"><a href="#UCommand">U</a></td>
+    <td width="29%" valign="top" height="24">Displays just-in-time (JIT)-compiled assembly code 
+    with managed code symbolic names at a specific address.</td>
+  </tr>
+</table>
+<h2><a name="SOSOnWindowsDebuggers"></a>SOS on Windows</h2>
+<p>Before attempting to use the SOS debugging extension it is important to 
+upgrade your Windows debuggers.&nbsp; Go to
+<a href="http://www.microsoft.com/whdc/devtools/ddk/default.mspx">Microsoft Debugging Tools</a> and install the latest version of the Microsoft debugging tools for 
+Windows.&nbsp; Although both Windows XP and Windows 2000 ship with the NTSD debugger, the version that ships with Windows 2000 will not work with the SOS debugging 
+extension. After installation, you should make sure that the location where 
+you installed the new debuggers is in your path before the NTSD debugger in the 
+%windir%\system32 directory.</p>
+<p>If you are using the older version of the debugger you might see the 
+following error:</p>
+<blockquote>
+  <pre>The procedure entry point SymGetTypeInfo could not be located in the dynamic 
+link library DBGHELP.dll.</pre>
+</blockquote>
+<p>When you install the latest debuggers you will have three debuggers available 
+that will work with the SOS extension: </p>
+<ul>
+  <li>WinDbg</li>
+  <li>NTSD</li>
+  <li>CDB</li>
+</ul>
+<p>The last two debuggers are simply variations on the NTSD debugger.&nbsp; NTST 
+always starts in a new console window and CDB runs in the current console 
+window.&nbsp; Because the CDB debugger does not ship with the operating system, 
+by using this debugger command instead of NTSD you can always be sure of running the 
+updated version from the debugger tools installation.&nbsp; If you want the same 
+behavior as NTSD simply use the start command:</p>
+<blockquote>
+  <pre>start cdb clix iserializable.exe</pre>
+</blockquote>
+<p>To understand the basics of how these debuggers work, consult the 
+documentation installed with the Microsoft debugging tools for Windows.This will load the clix launcher into the debugger.&nbsp; The debugger 
+  commands shown below will be prefaced with &quot;0:000&gt;&quot;.
+</p><p></p>
+    <h3>
+      <a name="SOSOnVisualStudio2005"></a>SOS on Windows debuggers</h3>
+    <p>
+        1. Get a fresh copy of Debugging tools for Windows: <a href="http://www.microsoft.com/whdc/devtools/debugging/default.mspx">
+            http://www.microsoft.com/whdc/devtools/debugging/default.mspx</a></p>
+    <p>
+        2. Copy %_NTTREE%\sos.dll.manifest next to your preferred (or all supported) debugger.
+        For example, if your preferred debugger is installed in c:\debuggers, the following
+        command will do the trick:
+    </p>
+    <p>
+        &nbsp; &nbsp; &nbsp; copy %_NTTREE%\sos.dll.manifest c:\debuggers\windbg.exe.manifest</p>
+    <p>
+        3. Start a Rotor managed program under your favourite debugger and break in to the
+        debugger once the runtime has been initialized. For example:</p>
+    <p>
+        &nbsp; &nbsp; &nbsp; windbg clix %_NTTREE%\samples\hello\helloxml.exe<br />
+        &nbsp; &nbsp; &nbsp; 0:000&gt; g<br />
+        &nbsp; &nbsp; &nbsp; (should automatically finish, or you can break in to the debugger
+        using Ctrl+Break after 5-10 seconds)</p>
+    <p>
+        4. Load SOS by calling the command !loadby sos mscorwks</p>
+    <p>
+        &nbsp; &nbsp; &nbsp; 0:000&gt; !loadby sos mscorwks</p>
+    <p>
+        5. Verify that SOS is loaded and working by issuing the !Threads command</p>
+    <p>
+        &nbsp; &nbsp; &nbsp; 0:000&gt; !Threads<br />
+        &nbsp; &nbsp; &nbsp; ThreadCount: 2&nbsp;<br />
+        &nbsp; &nbsp; &nbsp; UnstartedThread: 0
+        <br />
+        &nbsp; &nbsp; &nbsp; BackgroundThread: 2
+        <br />
+        &nbsp; &nbsp; &nbsp; PendingThread: 0&nbsp;<br />
+        &nbsp; &nbsp; &nbsp; DeadThread: 0
+        <br />
+        &nbsp; &nbsp; &nbsp; Hosted Runtime: no&nbsp;<br />
+        &nbsp; &nbsp; &nbsp; ...</p>
+    <p></p>
+
+<h3>SOS on Visual Studio 2005</h3><p>
+        &nbsp;To get SOS working in Visual Studio 2005, the following steps must be taken to install and run SOS:
+</p>
+           <p>
+        1. Add the content of %_NTTREE%\sos.dll.manifest to C:\Program Files\Microsoft Visual Studio 8\Common7\IDE\devenv.exe.manifest in your favorite xml editor (copy over the whole &lt;dependency&gt;&lt;/dependency&gt;<dependency>... </dependency>tag and add it next to the other dependency tags in devenv.exe.manifest.
+
+</p>
+    <p>
+        2. Start a Rotor managed code program under devenv.exe and break in to the debugger
+        once the engine has been initialized:</p>
+    <p>
+        &nbsp; &nbsp; &nbsp; "c:\Program Files\Microsoft Visual Studio 8\Common7\ide\devenv.exe"
+        /debugexe clix %_NTTREE%\samples\howto\reflection\emit\reflectionemit.exe<br />
+        &nbsp; &nbsp; &nbsp; F5<br />
+        &nbsp; &nbsp; &nbsp; (wait until runtime is bootstrapped, or after 10 seconds, hit
+        Ctrl-Alt-Break)</p>
+    <p>
+        3. Load SOS by opening an immediate window (Debug/Windows/Immediate) and issuing
+        the following command:</p>
+    <p>
+        &nbsp; &nbsp; &nbsp; !Load C:\sscli20\binaries.x86chk.rotor\sos.dll&nbsp;<br />
+        &nbsp; &nbsp; &nbsp; "extension C:\sscli20\binaries.x86chk.rotor\sos.dll loaded"</p>
+    <p>
+        4. Verify that SOS works by issuing the !Threads command:</p>
+    <p>
+        &nbsp; &nbsp; &nbsp; !Threads</p>
+    <p>
+        </p>
+        <h3><a name="ConsoleOutput"></a>Seperating debugging from Console Output</h3>
+    <p>
+        Instead of simply loading the clix application launcher directly, you can 
+also attach to a running clix process. The benefit of this 
+debugging technique is that the process being debugged runs in a separate console window so 
+that its output is not intermixed with that of the debugger. You can attach to 
+a running process with the CDB debugger by using the <b>-pn</b> debugger 
+option. The following example commands and debugger output simulate the steps you 
+might use to attach to a clix process. Commands entered by user are in 
+bold. Some debugger output has been removed for clarity.</p>
+<blockquote>
+  <pre>C:\sscli20&gt;<strong>start clix samples\howto\reflection\emit\reflectionemit.exe </strong>C:\sscli20&gt;<b>cdb -pn clix.exe -logo cdb.log</b>
+
+Microsoft (R) Windows Debugger Version 6.5.0003.7 <br />Copyright (c) Microsoft Corporation. All rights reserved.<br />...<br />
+0:003&gt; <b>.load sos.dll</b>
+0:003&gt; <b>bp rotor_pal!pal_writefile
+</b>(hit option 1 in seperate console window)
+0:003&gt; <b>g</b>
+0:000&gt; <b>!dumpstackobjects</b>
+OS Thread Id: 0x758 (0) <br />ESP/REG Object Name <br />001ae754 00cd2878 Microsoft.Win32.SafeHandles.SafeFileHandle <br />001ae790 00cd2878 Microsoft.Win32.SafeHandles.SafeFileHandle <br />001ae794 00cd5e5c System.Byte[] <br />001ae7a8 00cd5e5c System.Byte[] <br />001ae7ac 00cd2878 Microsoft.Win32.SafeHandles.SafeFileHandle <br />001ae7d0 00cd5e5c System.Byte[] <br />001ae7d4 00cd2878 Microsoft.Win32.SafeHandles.SafeFileHandle<a name="GettingtoaStateWhereSOSisFunctional"></a><br />...
+</pre></blockquote>
+
+<h3><a name="GettingtoaStateWhereSOSisFunctional"></a>Getting to a State Where SOS is Functional</h3>
+
+<p>The SOS debugger extension utilizes functionality within the CLI execution environment 
+to support its debugging facilities. The CLI execution environment state 
+has to be at a point where internal data structures are initialized for SOS to 
+be generally useful.&nbsp; For example, until the default <b>AppDomain</b> is 
+initialized the <b>DumpDomain</b> command cannot work. The error you would see 
+if you invoke a command and the execution state was not yet ready might be 
+something like this:</p>
+<blockquote>
+  <pre>80000003 Exception in sos.dll.dumpdomain debugger extension.
+PC: 602ddcf2 VA: 0006cb90 R/W: 0 Parameter: 00060000</pre>
+</blockquote>
+
+<p>You might also see Assert error dialog boxes. </p>
+<p>The objective is to stop at a point during execution before the managed code 
+of interest has run but after the CLI environment has initialized. How to reach 
+this point depends on what you are debugging and where you need to stop the 
+debugger.</p>
+<p>The following  options  will allow you to stop the debugger after 
+the execution environment has been initialized.</p>
+<h4>Set Breakpoint in PAL</h4>
+<p>You can set a breakpoint in the platform adaptation layer (PAL) on a function 
+that will be called only by managed code. For example, if the managed code you 
+are debugging contains Console.WriteLine statements, use the following 
+breakpoint command.</p>
+<blockquote>
+  <pre>bp rotor_pal!pal_writefile</pre>
+</blockquote>
+<p>By inspecting the managed code you are debugging you can select the correct 
+PAL API on which to set the breakpoint.</p>
+<h4>Set the JitHalt Environment Variable on a Managed Function</h4>
+<p>You can use the logging infrastructure to break automatically when 
+JIT compilation occurs. Set the following environment variable.</p>
+<blockquote>
+  <pre>set COMPlus_JitHalt=&lt;<i>FunctionName</i>&gt;</pre>
+</blockquote>
+<p>The value &lt;<i>FunctionName</i>&gt; should be the name of the managed function you want 
+to halt in, just before JIT compilation. After setting this environment variable, 
+start the debugger and run the <b>go</b> command. This will execute the code 
+until just before JIT compilation  occurs in the function.</p>
+
+<h4>
+    Breaking in to the debugger after a specified period of time</h4>
+<p>
+    Hitting Ctrl-Break on cdb, ntsd and Windbg debuggers, and Ctrl-Alt-Break on VS2005
+    is a good way to break in to a running program during execution (after which the
+    execution engine has been initialized). This mechanism is used in the SOS on Windows
+    section.</p>
+<h2><a name="ExampleSOSDebuggingSession"></a>Example SOS Debugging Session</h2>
+<p>For more example debugging sessions, see the individual <a href="#SOSDebuggingCommands">SOS commands</a>.</p>
+<p>One common usage for the SSCLI implementation of the SOS debugging extension 
+is to examine or debug the process of JIT-compiling managed code. To be able to 
+do this, however, requires being able to stop in the debugger in both code that is 
+about to be JIT-compiled and  code that has been JIT-compiled. The most 
+consistent way to do this is to use the COMPlus_ logging-environment 
+variables to halt at the proper point in the debugger.&nbsp;For more details of 
+the CLI logging infrastructure, see
+<a href="../techinfo/logging.html">logging.html</a> and the
+<a href="debugging_overview.html">debugging overview</a>.</p>
+<p>The following environment variables are useful when debugging with the SOS 
+debugging extension.</p>
+<table  border="1" WIDTH="1003" >
+  <tr>
+    <th valign="top" width="261">Configuration setting</th>
+    <th valign="top" width="216">Values</th>
+    <th valign="top" width="486">Comment</th>
+  </tr>
+  <tr>
+    <td valign="top" width="261">COMPlus_JitBreak</td>
+    <td valign="top" width="216"><i>ClassName.MethodName</i></td>
+    <td valign="top" width="486">Breaks into the debugger before the methid is 
+    JIT-compiled.</td>
+  </tr>
+  <tr>
+    <td valign="top" width="261">COMPlus_JitHalt</td>
+    <td valign="top" width="216"><i>ClassName.MethodName</i></td>
+    <td valign="top" width="486">Breaks into the debugger just after 
+    the method is JIT-compiled</td>
+  </tr>
+</table>
+<h3>Stopping Before and After JIT Compilation</h3>
+<p>In order to stop in the debugger just before a method is JIT-compiled, set 
+the COMPlus_JitBreak environment variable to the desired method name.</p>
+<p>In order to stop just after a methed has been JIT-compiled but before execution of 
+the JIT-compiled code, set the COMPlus_JitHalt environment variable to the 
+desired method name.</p>
+<h4>Example</h4>
+<p>The following example demonstrates debugging the iserializable.exe sample application on 
+Windows.</p>
+<p>Some debugger output has been removed for clarity.</p>
+<pre>
+C:\sscli20\binaries.x86chk.rotor\samples\howto\reflection\emit&gt;<strong>set COMPlus_JitBreak=Main</strong> <br />C:\sscli20\binaries.x86chk.rotor\samples\howto\reflection\emit&gt;<strong>
+    set COMPlus_JitHalt=Main</strong> 
+C:\sscli20\binaries.x86chk.rotor\samples\howto\reflection\emit&gt;<strong>cdb clix reflectionemit.exe</strong>
+
+Microsoft (R) Windows Debugger Version 6.5.0003.7 <br />Copyright (c) Microsoft Corporation. All rights reserved. <br />CommandLine: clix reflectionemit.exe<br />0:000&gt; <strong>
+    g </strong>Assert failure(PID 2112 [0x00000840], Thread: 640 [0x280]): !"JITBreak" <br />    File: c:\sscli20\clr\src\fjit\fjitcompiler.cpp, Line: 225 Image:<br />C:\sscli20\binaries.x86chk.rotor\clix.exe <br />Assert failure(PID 2112 [0x00000840], Thread: 640 [0x280]): !"JITBreak" <br />    File: c:\sscli20\clr\src\fjit\fjitcompiler.cpp, Line: 225 Image: <br />C:\sscli20\binaries.x86chk.rotor\clix.exe<br />...<br />
+0:000&gt; <strong>!load sos.dll </strong><br />0:000&gt; <strong>!name2ee reflectionemit.exe
+    ReflectionEmitSample.Main</strong> <br />Module: 00a42960 (reflectionemit.exe) <br />Token: 0x06000001 <br />MethodDesc: 00a42d50 <br />Name: ReflectionEmitSample.Main(System.String[]) <br />Not JITTED yet. Use !bpmd -md 00a42d50 to break on run.
+0:000&gt; <strong>!dumpmd 00a42d50</strong> <br />Method Name: ReflectionEmitSample.Main(System.String[]) <br />Class: 00a41510 <br />MethodTable: 00a42e2c <br />mdToken: 06000001 <br />Module: 00a42960 <br />IsJitted: no <br />m_CodeOrIL: ffffffff</pre>
+<p>
+    This method has not been JIT compiled, as specified by the IsJitted output. Now proceed to the JitHalt breakpoint to get to the point where the FillTree 
+method has been JIT-compiled.</p>
+<pre>
+0:000> g <br />(840.280): Break instruction exception - code 80000003 (first chance) <br />eax=00a42d50 ebx=003dcf50 ecx=00cd2260 edx=794e1289 esi=00000400 edi=003dcba8<br />eip=0375c2b8 esp=001ae8f8 ebp=001ae904 iopl=0 nv up ei pl nz ac pe nc <br />cs=001b ss=0023 ds=0023 es=0023 fs=003b gs=0000 efl=00000212 <br />0375c2b8 cc int 3 <br />0:000&gt; <strong>
+    !dumpmd 00a42d50</strong> <br />Method Name: ReflectionEmitSample.Main(System.String[]) <br />Class: 00a41510 <br />MethodTable: 00a42e2c <br />mdToken: 06000001 <br />Module: 00a42960 <br />IsJitted: yes <br />m_CodeOrIL: 0375c2b8</pre>
+<p>
+    Now that the method has been jitted, we can take a look at the resulting native
+    code output.</p>
+<pre>
+0:000> <strong>!u 0375c2b8</strong> <br />Normal JIT generated code <br />ReflectionEmitSample.Main(System.String[]) <br />Begin 0375c2b8, size 353 <br />&gt;&gt;&gt; 0375c2b8 cc int 3 <br />0375c2b9 55 push ebp <br />0375c2ba 8bec mov ebp,esp <br />0375c2bc 56 push esi <br />0375c2bd 33f6 xor esi,esi <br />0375c2bf 56 push esi <br />0375c2c0 51 push ecx <br />0375c2c1 52 push edx <br />0375c2c2 b90b000000 mov ecx,0xb</pre>
+<p>(This example produces too much output to list.)</p>
+<h1><a name="SOSDebuggingCommands"></a>SOS Debugging Commands</h1>
+<p>
+    <strong>Note</strong>: This section has not been updated for version 2.0. The SOS
+    commands for the most part are the same, however there may be differences in output
+    compared with the examples.
+</p>
+    <p>
+        The following SOS debugger extension commands are supported by the SSCLI 
+implementation of SOS.</p>
+<h2><b><a name="DumpClassCommand"></a>DumpClass Command</b></h2>
+<p>This command dumps EEClass information.</p>
+<h4>Syntax</h4>
+<blockquote>
+  <pre>!DumpClass <i>EEClassAddress</i></pre>
+</blockquote>
+<h4>Parameters</h4>
+<table border="1" width="90%" valign="top">
+  <tr>
+    <th vAlign="top" width="33%" height="16">Name</th>
+    <th vAlign="top" width="33%" height="16">Description</th>
+    <th vAlign="top" width="33%" height="16">Obtained from</th>
+  </tr>
+  <tr>
+    <td vAlign="top" width="33%" height="18"><i>EEClassAddress</i></td>
+    <td vAlign="top" width="33%" height="18">Address value of EEClass item.</td>
+    <td vAlign="top" width="33%" height="18">
+    <ul>
+      <li>From Name2EE command.</li>
+      <li>From !DumpMT command.</li>
+    </ul>
+    </td>
+  </tr>
+</table>
+<h4>Example</h4>
+<p>The following example shows a debug session on the reflection invoke sample on Windows.</p>
+<p>Some debugger output has been removed for clarity.</p>
+<pre>D:\sscli\build\v1.x86chk.rotor\samples\howto\reflection\invoke&gt;cdb clix reflectioninvoke.exe</pre>
+<pre>Microsoft (R) Windows Debugger Version 6.0.0017.0
+Copyright (c) Microsoft Corporation. All rights reserved.</pre>
+<pre>0:000&gt; <b>.load sos.dll</b>
+0:000&gt; <b>bp rotor_pal!pal_writefile</b>
+0:000&gt; <b>!name2ee reflectioninvoke.exe TestClass</b>
+--------------------------------------
+MethodTable: 007b537c
+EEClass: <b><font color="#FF0000">071210ec</font></b>
+Name: TestClass
+0:000&gt; <b>!dumpclass <font color="#FF0000">071210ec</font></b>
+Class Name : TestClass[reflectioninvoke.exe]
+mdToken : 02000003 (d:\sscli\build\v1.x86chk.rotor\samples\howto\reflection\invoke\reflectioninvoke.exe)
+Parent Class : 02c27ef4
+ClassLoader : 00095370
+Method Table : 007b537c
+Vtable Slots : 4
+Total Method Slots : d
+Class Attributes : 100001 :
+Flags : 3100023
+NumInstanceFields: 3
+NumStaticFields: 0
+ThreadStaticOffset: 0
+ThreadStaticsSize: 0
+ContextStaticOffset: 0
+ContextStaticsSize: 0
+FieldDesc*: 007b51c8
+      MT    Field   Offset                 Type       Attr    Value Name
+007b537c  4000001        4                CLASS   instance           Name
+007b537c  4000002        8                CLASS   instance           values
+007b537c  4000003        c         System.Int32   instance           methodCalled
+0:000&gt;
+</pre>
+<h4>Output Format</h4>
+
+<table border="1" width="90%">
+  <tr>
+    <th width="28%" valign="top">Item</th>
+    <th width="959%" valign="top">Description</th>
+  </tr>
+  <tr>
+    <td width="22%" valign="top">Class Name</td>
+    <td width="953%" valign="top">Name of the class that is being dumped.</td>
+  </tr>
+  <tr>
+    <td width="22%" valign="top">mdToken</td>
+    <td width="953%" valign="top">Metadata token.</td>
+  </tr>
+  <tr>
+    <td width="22%" valign="top">Parent Class</td>
+    <td width="953%" valign="top">Class from which the current class is derived. 
+    The address value can be used with the <b>DumpClass</b> command.</td>
+  </tr>
+  <tr>
+    <td width="22%" valign="top">ClassLoader</td>
+    <td width="953%" valign="top"><b>ClassLoader</b> for the class.</td>
+  </tr>
+  <tr>
+    <td width="22%" valign="top">Method Table</td>
+    <td width="953%" valign="top">Method Table for class.&nbsp; This address 
+    value can be used with the <b>DumpMT</b> command.</td>
+  </tr>
+  <tr>
+    <td width="22%" valign="top">Vtable Slots</td>
+    <td width="953%" valign="top">Number of vtable methods in hexadecimal. The 
+    vtable includes derived methods.</td>
+  </tr>
+  <tr>
+    <td width="22%" valign="top">Total Method Slots</td>
+    <td width="953%" valign="top">Total number of methods in hexadecimal. The 
+    vtable includes derived methods.</td>
+  </tr>
+  <tr>
+    <td width="22%" valign="top">Class Attributes</td>
+    <td width="953%" valign="top">
+    <ul>
+      <li>ValueType</li>
+      <li>Enum</li>
+      <li>UnmanagedValueType</li>
+      <li>Interface</li>
+      <li>Abstract</li>
+      <li>Import</li>
+    </ul>
+    </td>
+  </tr>
+  <tr>
+    <td width="22%" valign="top">Flags</td>
+    <td width="953%" valign="top">Bitmasked DWORD for assigning class attribute 
+    values.</td>
+  </tr>
+  <tr>
+    <td width="22%" valign="top">NumInstanceFields</td>
+    <td width="953%" valign="top">Number of non static or shared member 
+    variables.</td>
+  </tr>
+  <tr>
+    <td width="22%" valign="top">NumStaticFields</td>
+    <td width="953%" valign="top">Number of static or shared member variables.</td>
+  </tr>
+  <tr>
+    <td width="22%" valign="top">FieldDesc</td>
+    <td width="953%" valign="top">Pointer to fielddata printed in the Fields 
+    table. </td>
+  </tr>
+</table>
+
+<p>The following table contains more details on the MT column of the output.</p>
+<table border="1" width="90%">
+  <tr>
+    <th width="28%" valign="top">MT column item</th>
+    <th width="959%" valign="top">Description</th>
+  </tr>
+  <tr>
+    <td width="97%" valign="top">MT</td>
+    <td width="878%" valign="top">Method table the particular field comes from. 
+    You can use <b>DumpMT</b> to find out which class this field is defined in, 
+    such as the 
+    current class or those classes that the current class derives from.</td>
+  </tr>
+  <tr>
+    <td width="97%" valign="top">Field</td>
+    <td width="878%" valign="top">mdToken (mdtFieldDef) for the particular 
+    field.<br>
+    Note: You cannot&nbsp;use <b>Token2EE</b> on the field as <b>Token2EE</b> only supports 
+    mdtMethodDef, mdtTypeDef and mdtTypeRef.</td>
+  </tr>
+  <tr>
+    <td height="22" width="97%" valign="top">Type</td>
+    <td height="22" width="878%" valign="top">Type of field. This can be one of 
+    the following types:
+    <ul>
+      <li>PTR</li>
+      <li>BYREF</li>
+      <li>VALUETYPE</li>
+      <li>CLASS</li>
+      <li>VAR</li>
+      <li>ARRAY</li>
+      <li>VALUEARRAY</li>
+      <li>Native Real</li>
+      <li>FNPTR</li>
+      <li>SZARRAY</li>
+      <li>GENERICARRAY</li>
+      <li>Base type name.&nbsp; For example, <b>System.Int32</b>.</li>
+    </ul>
+    </td>
+  </tr>
+  <tr>
+    <td width="97%" valign="top">Attr</td>
+    <td width="878%" valign="top">Field attribute.&nbsp; Might be one of the 
+    following:
+    <ul>
+      <li>shared</li>
+      <li>shared static</li>
+      <li>static</li>
+      <li>instance</li>
+    </ul>
+    
+    <p>For shared static, you will also get an extra line for each domain except 
+     
+    the system domain and the shared domain as shown below:</p>
+    <blockquote>
+      <pre>0da689e4 4000bc8 8 CLASS shared static EventError 
+
+    &gt;&gt; Domain:Value 00150718:NotInit  001a57b8:<strong><font color="red">050c7510</font></strong> &lt;&lt;</pre>
+    </blockquote>
+    
+    <p>&quot;Domain:&quot; is followed by all available domains and whether 
+     
+    the variable is initialized in the specific domain.&nbsp;NotInit, FailInit 
+    or UnInit2 appears if the static is not initialized in the specific domain. 
+    Use <b>DumpDomain</b> on the domain address to display information about the 
+    domain. <br>
+    <br>
+    You can dump out the object using <b>DumpObj</b>.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="97%" valign="top">Value</td>
+    <td width="878%" valign="top">Can be empty if it is an instance field, or 
+    static if it is an uninitialized shared variable. If a shared/static 
+    variable is initialized the value is shown here.</td>
+  </tr>
+  <tr>
+    <td width="97%" valign="top">Name</td>
+    <td width="878%" valign="top">Name of field (member variable).</td>
+  </tr>
+</table>
+<h2><a name="DumpDomainCommand"></a>DumpDomain Command</h2>
+<p>This command lists assemblies and modules in a domain.</p>
+<h4>Comments</h4>
+<p><font color="#000000">Shows the addresses of the heaps for the current domain 
+and all assemblies loaded within the domain.</font></p>
+<h4>Syntax</h4>
+<blockquote>
+  <pre>!DumpDomain [<i>DomainAddress</i>]</pre>
+</blockquote>
+<h4>Parameters</h4>
+<table border="1" width="90%">
+  <tr>
+    <th vAlign="top">Parameter</th>
+    <th vAlign="top">Description</th>
+  </tr>
+  <tr>
+    <td vAlign="top"><em>DomainAddress</em></td>
+    <td vAlign="top">You can get the domain address of the thread 
+    from !Threads.
+    <p>If you don't provide an address all current&nbsp;domains will be dumped.</td>
+  </tr>
+</table>
+<h4>Example</h4>
+<p>The following example demonstrates debugging the hello.exe sample on Windows.</p>
+<p>Some console output has been removed for clarity.</p>
+<pre>CommandLine: clix hello.exe
+ntdll!DbgBreakPoint:
+77f97704 cc               int     3
+0:000&gt; <b>.load sos.dll</b>
+0:000&gt; <b>bp rotor_pal!pal_writefile</b>
+0:000&gt; <b>g</b>
+Breakpoint 0 hit
+eax=0006d9a4 ebx=0008a218 ecx=0006d99b edx=00000007 esi=0006d980 edi=0006d9d0
+eip=79b03890 esp=0006d968 ebp=0006d9d0 iopl=0         nv up ei pl nz ac pe cy
+cs=001b  ss=0023  ds=0023  es=0023  fs=0038  gs=0000             efl=00000213
+rotor_pal!PAL_WriteFile:
+79b03890 55               push    ebp
+0:000&gt; <b>!dumpdomain</b>
+--------------------------------------
+System Domain: 797bbb90
+LowFrequencyHeap: 797bbc24
+HighFrequencyHeap: 797bbc80
+StubHeap: 797bbcdc
+Name:
+Assembly: 0008dff0  ClassLoader: 0008e0b8
+  Module Name
+0008e528 d:\rotor\build\v1.x86chk.rotor\mscorlib.dll
+--------------------------------------
+Shared Domain: 797bc5e8
+LowFrequencyHeap: 797bc67c
+HighFrequencyHeap: 797bc6d8
+StubHeap: 797bc734
+Assembly: 0008dff0  ClassLoader: 0008e0b8
+  Module Name
+0008e528 d:\rotor\build\v1.x86chk.rotor\mscorlib.dll
+--------------------------------------
+Domain 1: 846d8
+LowFrequencyHeap: 0008476c
+HighFrequencyHeap: 000847c8
+StubHeap: 00084824
+Name: iserializable.exe
+Assembly: 00094af0  ClassLoader: 00094f08
+  Module Name
+00096f18 d:\rotor\build\v1.x86chk.rotor\samples\howto\serialization\iserializabl
+e.exe
+Assembly: 0009a670  ClassLoader: 0009a738
+  Module Name
+0009a8d0 d:\rotor\build\v1.x86chk.rotor\assembly\gac\system.runtime.serializatio
+n.formatters.soap\1.0.3300.0__b03f5f7f11d50a3a\system.runtime.serialization.form
+atters.soap.dll
+0:000&gt;</pre>
+<h2><a name="DumpMDCommand"></a>DumpMD Command</h2>
+<p>This command dumps method description information.</p>
+<h4>Syntax</h4>
+<blockquote>
+  <pre>!DumpMD <i>MethodDescriptor</i></pre>
+</blockquote>
+<h4>Parameters</h4>
+<table border="1" width="90%">
+  <tr>
+    <th vAlign="top">Parameter</th>
+    <th vAlign="top">Description</th>
+  </tr>
+  <tr>
+    <td vAlign="top" width="20%"><em>MethodDescriptor</em></td>
+    <td vAlign="top">Method descriptor address of method for which information 
+    is to be dumped.</td>
+  </tr>
+</table>
+<h4>Example</h4>
+<p>The following example demonstrates debugging the iserializable.exe sample on Windows.</p>
+<p>Some debugger output has been removed for clarity.</p>
+<pre>D:\sscli\build\v1.x86chk.rotor\samples\howto\serialization&gt;cdb clix iserializable.exe
+
+Microsoft (R) Windows Debugger  Version 6.0.0017.0
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+CommandLine: clix iserializable.exe
+
+0:000&gt; <b>.load sos.dll</b>
+0:000&gt; <b>bp rotor_pal!pal_writefile</b>
+0:000&gt; <b>g</b>
+Breakpoint 0 hit
+rotor_pal!PAL_WriteFile:
+0:000&gt; <b>!name2ee iserializable.exe SimpleGraph.Main</b>
+--------------------------------------
+MethodDesc: <b><font color="#FF0000">7b50b8</font></b>
+Name: [DEFAULT] Void SimpleGraph.Main(SZArray String)
+-----------------------
+0:000&gt; <b>!dumpmd <font color="#FF0000">7b50b8</font></b>
+Method Name : [DEFAULT] Void SimpleGraph.Main(SZArray String)
+Class : 714108c
+MethodTable 7b5128
+mdToken: 06000001
+Flags : 10
+Method VA : 06ca0304
+0:000&gt;
+
+</pre>
+<h4>Output Format</h4>
+<table width="90%" border="1">
+  <tr>
+    <th vAlign="top">Column</th>
+    <th vAlign="top">Description</th>
+  </tr>
+  <tr>
+    <td class="outputname" width="135" valign="top">Method Name</td>
+    <td class="outputcontents" width="656" valign="top">Method name including 
+    parameters. The [hasThis] statement indicates that the method requires an 
+    instance of the class to be called. The calling convention can be one of the 
+    following values:<ul>
+      <li>[DEFAULT]</li>
+      <li>[C]</li>
+      <li>[STDCALL]</li>
+      <li>[THISCALL]</li>
+      <li>[FASTCALL]</li>
+      <li>[VARARG]</li>
+      <li>[FIELD]</li>
+      <li>[LOCALSIG]</li>
+      <li>[PROPERTY]</li>
+      <li>[UNMANAGED]<br>
+      </li>
+    </ul>
+    </td>
+  </tr>
+  <tr>
+    <td class="outputname" width="135" valign="top">MethodTable</td>
+    <td class="outputcontents" width="656" valign="top">Method table containing the&nbsp;method 
+    descriptor.&nbsp; Use <b>DumpMT</b> to get more information about the 
+    method table.</td>
+  </tr>
+  <tr>
+    <td class="outputname" width="135" valign="top">Module</td>
+    <td class="outputcontents" width="656" valign="top">Module containing the method 
+    descriptor.&nbsp; Use <b>DumpModule</b> to get more information about 
+    the module.</td>
+  </tr>
+  <tr>
+    <td class="outputname" width="135" valign="top">mdToken</td>
+    <td class="outputcontents" width="656" valign="top">Metadata token for the 
+    method descriptor.</td>
+  </tr>
+  <tr>
+    <td class="outputname" width="135" valign="top">Flags</td>
+    <td class="outputcontents" width="656" valign="top">Flags associated with 
+    the method descriptor.&nbsp; Bit-masked DWORD. </td>
+  </tr>
+  <tr>
+    <td class="outputname" width="135" valign="top">Method VA<blockquote>
+      <p>or</p>
+    </blockquote>
+    <p>IL RVA </td>
+    <td class="outputcontents" width="656" valign="top">If Method  VA is displayed, 
+    it indicates that the location in native code to 
+    which the method has been JIT-compiled.&nbsp; You can use a <b>U</b> on 
+    this address to display the assembly code.&nbsp; If IL RVA is displayed, this means the method has not 
+    yet been JIT-compiled.</td>
+  </tr>
+</table>
+
+<h4>Comments</h4>
+<p>A&nbsp;method descriptor&nbsp; address can be obtained from using <b>
+DumpStack</b>, <b>
+DumpMT</b>, <b>Name2EE</b> or&nbsp;<b>IP2MD</b>.</p>
+<h2><a name="DumpModuleCommand"></a>DumpModule Command</h2>
+<p>This command dumps module information.</p>
+<h4>Syntax</h4>
+<blockquote>
+  <pre>!DumpModule <i>ModuleAddress</i></pre>
+</blockquote>
+<h4>Parameters</h4>
+<table border="1" width="90%">
+  <tr>
+    <th vAlign="top">Parameter</th>
+    <th vAlign="top">Description</th>
+  </tr>
+  <tr>
+    <td vAlign="top" width="20%"><i>ModuleAddress</i></td>
+    <td vAlign="top">Can be obtained from <b>DumpMT</b> or <b>DumpDomain</b>.</td>
+  </tr>
+</table>
+<h4>Example 1: Using the <b>DumpDomain</b> Command</h4>
+<p>The following example demonstrates debugging the iserializable.exe sample on Windows.</p>
+<p>Some debugger output has been removed for clarity.</p>
+<pre>D:\sscli\build\v1.x86chk.rotor\samples\howto\serialization&gt;cdb clix iserializable.exe
+
+Microsoft (R) Windows Debugger  Version 6.0.0017.0
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+CommandLine: clix iserializable.exe
+
+0:000&gt; <b>.load sos.dll</b>
+0:000&gt; <b>bp rotor_pal!pal_writefile</b>
+0:000&gt; <b>g</b>
+Breakpoint 0 hit
+rotor_pal!PAL_WriteFile:
+79b03880 55               push    ebp
+0:000&gt; <b>!dumpdomain</b>
+--------------------------------------
+System Domain: 798abe90
+LowFrequencyHeap: 798abf24
+HighFrequencyHeap: 798abf80
+StubHeap: 798abfdc
+Name:
+Assembly: 0008e1b8  ClassLoader: 0008e280
+  Module Name
+0008e6f0 d:\sscli\build\v1.x86chk.rotor\mscorlib.dll
+--------------------------------------
+Shared Domain: 798ac8e8
+LowFrequencyHeap: 798ac97c
+HighFrequencyHeap: 798ac9d8
+StubHeap: 798aca34
+Assembly: 000470dc  --------------------------------------
+Domain 1: 84900
+LowFrequencyHeap: 00084994
+HighFrequencyHeap: 000849f0
+StubHeap: 00084a4c
+Name: iserializable.exe
+Assembly: 000950d8  ClassLoader: 00094ca8
+  Module Name
+<font color="#FF0000"><b>00095688</b></font> d:\sscli\build\v1.x86chk.rotor\samples\howto\serialization\iserializable.exe
+Assembly: 00099608  ClassLoader: 0009a978
+  Module Name
+0009aaa8 d:\rotor\build\v1.x86chk.rotor\assembly\gac\system.runtime.serialization.formatters.soap
+\1.0.3300.0__b03f5f7f11d50a3a\system.runtime.serialization.formatters.soap.dll
+0:000&gt;<b> !dumpmodule <font color="#FF0000">00095688</font></b>
+Name d:\sscli\build\v1.x86chk.rotor\samples\howto\serialization\iserializable.exe
+dwFlags 00000080
+Attribute PEFile
+Assembly 000950d8
+LoaderHeap* 0009574c
+TypeDefToMethodTableMap* 07150010
+TypeRefToMethodTableMap* 0715001c
+MethodDefToDescMap* 07150080
+FieldDefToDescMap* 071500bc
+MemberRefToDescMap* 071500cc
+FileReferencesMap* 07150168
+AssemblyReferencesMap* 0715016c
+0:000&gt;</pre>
+<h4>Example 2: Using the <b>DumpMT</b> Command</h4>
+<p>The following example demonstrates debugging the iserializable.exe sample on Windows.</p>
+<p>Some debugger output has been removed for clarity.</p>
+<pre>D:\sscli\build\v1.x86chk.rotor\samples\howto\serialization&gt;cdb clix iserializable.exe
+
+Microsoft (R) Windows Debugger  Version 6.0.0017.0
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+CommandLine: clix iserializable.exe
+
+0:000&gt; <b>.load sos.dll</b>
+0:000&gt; <b>bp rotor_pal!pal_writefile</b>
+0:000&gt; <b>g</b>
+Breakpoint 0 hit
+rotor_pal!PAL_WriteFile:
+79b03880 55               push    ebp
+0:000> <b>!name2ee iserializable.exe SimpleGraph</b>
+--------------------------------------
+MethodTable: <b><font color="#FF0000">007b5128</font></b>
+EEClass: 06ef108c
+Name: SimpleGraph
+0:000> <b>!dumpmt <font color="#FF0000">007b5128</font></b>
+EEClass : 06ef108c
+Module : <b><font color="#0000FF">00095688</font></b>
+Name: SimpleGraph
+mdToken: 02000002  (d:\sscli\build\v1.x86chk.rotor\samples\howto\serialization\iserializable.exe)
+MethodTable Flags : 80000
+Number of IFaces in IFaceMap : 0
+Interface Map : 007b5178
+Slots in VTable : 7
+0:000> <b>!dumpmodule <font color="#0000FF">00095688</font></b>
+Name d:\sscli\build\v1.x86chk.rotor\samples\howto\serialization\iserializable.exe
+dwFlags 00000080
+Attribute PEFile
+Assembly 000950d8
+LoaderHeap* 0009574c
+TypeDefToMethodTableMap* 06f00010
+TypeRefToMethodTableMap* 06f0001c
+MethodDefToDescMap* 06f00080
+FieldDefToDescMap* 06f000bc
+MemberRefToDescMap* 06f000cc
+FileReferencesMap* 06f00168
+AssemblyReferencesMap* 06f0016c
+0:000></pre>
+<h4>Output Format</h4>
+<table border="1" width="90%">
+  <tr>
+    <th vAlign="top">Column</th>
+    <th vAlign="top">Description</th>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top">Name</td>
+    <td class="outputcontents" valign="top">Physical location of the module .</td>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top">dwFlags</td>
+    <td class="outputcontents" valign="top">Bitmasked DWORD for assigning 
+    attribute values </td>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top">Attributes</td>
+    <td class="outputcontents" valign="top">Lists the attributes that are set in 
+    dwFlags.
+    <p>Can be any of the following values: </p>
+    <ul>
+      <li>InMemory</li>
+      <li>PreLoad</li>
+      <li>PEFile</li>
+      <li>Reflection</li>
+      <li>PreCompile</li>
+      <li>Edit&amp;Continue</li>
+      <li>SupportsUpdateableMethods </li>
+    </ul>
+    </td>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top">Assembly</td>
+    <td class="outputcontents" valign="top">Address of the assembly containing 
+    the module.</td>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top">LoaderHeap</td>
+    <td class="outputcontents" valign="top">The LoaderHeap used to store the 
+    table lookups described below. </td>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top">TypeDefToMethodTableMap</td>
+    <td class="outputcontents" valign="top">Starting location of all type 
+    definitions (mdTypeDep) for the module.
+    <p>Method tables&nbsp;for the type definitions are stored within the 
+    TypeDefToMethodTableMap and TypeRefToMethodTableMap addresses and can be 
+    dumped out using the <b>DumpMT</b> command.</p>
+    <p>For example: </p>
+    <pre>0:000&gt; <b>!dumpmodule 00095688</b>
+Name d:\sscli\build\v1.x86chk.rotor\samples\howto\serialization\iserializable.exe
+dwFlags 00000080
+Attribute PEFile
+Assembly 000950d8
+LoaderHeap* 0009574c
+TypeDefToMethodTableMap* <font color="#FF0000"><b>07150010</b></font>
+TypeRefToMethodTableMap* 0715001c
+MethodDefToDescMap* 07150080
+FieldDefToDescMap* 071500bc
+MemberRefToDescMap* 071500cc
+FileReferencesMap* 07150168
+AssemblyReferencesMap* 0715016c
+0:000&gt; <b>dd <font color="#FF0000">07150010</font> 0715001c</b>
+07150010 00000000 00000000 <font color="#FF0000"><b>007b5128</b></font> 00000000
+0:000&gt; <b>!dumpmt <font color="#FF0000">007b5128</font></b>
+EEClass : 0714108c
+Module : 00095688
+Name: SimpleGraph
+mdToken: 02000002 (d:\sscli\build\v1.x86chk.rotor\samples\howto\serialization\iserializable.exe)
+MethodTable Flags : 80000
+Number of IFaces in IFaceMap : 0
+Interface Map : 007b5178
+Slots in VTable : 7
+0:000&gt;</pre>
+    <p>In this example,&nbsp;you can see that the SimpleGraph class in the 
+    iserializable module.<br>
+    <br>
+    However, this is incomplete, as there is another class defined in the 
+    module. The listing does not include the last class defined in the module.<br>
+    </td>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top">TypeRefToMethodTableMap</td>
+    <td class="outputcontents" valign="top">Starting location of all type 
+    references (mdTypeRef) for the module.
+    <p>Method tables&nbsp;for the type references are stored within the 
+    TypeRefToMethodTableMap and MethodDefToDescMap addresses and can be dumped 
+    out using the <b>DumpMT</b> command. </p>
+    <p>For example: </p>
+    <pre>0:000&gt; <b>!dumpmodule 00095688</b>
+Name d:\sscli\build\v1.x86chk.rotor\samples\howto\serialization\iserializable.exe
+dwFlags 00000080
+Attribute PEFile
+Assembly 000950d8
+LoaderHeap* 0009574c
+TypeDefToMethodTableMap* 07150010
+TypeRefToMethodTableMap* <font color="#FF0000"><b>0715001c</b></font>
+MethodDefToDescMap* 07150080
+FieldDefToDescMap* 071500bc
+MemberRefToDescMap* 071500cc
+FileReferencesMap* 07150168
+AssemblyReferencesMap* 0715016c
+0:000&gt; <b>dd <font color="#FF0000">0715001c</font> 7150064</b>
+0715001c 00000000 <font color="#0000FF"><b>003e22b0</b></font> <font color="#0000FF"><b>02c55ba8</b></font> 00000000
+0715002c 00000000 00000000 <font color="#0000FF"><b>071195f8</b></font> <font color="#0000FF"><b>07118110</b></font>
+0715003c <font color="#0000FF"><b>0711a6d0</b></font> 00000000 00000000 00000000
+0715004c <font color="#0000FF"><b>007b5d24</b></font> <font color="#0000FF"><b>07113180</b></font> 00000000 00000000
+0715005c 00000000 00000000 00000000
+0:000&gt; <b>!dumpmt <font color="#0000FF">003e22b0</font></b>
+EEClass : 02c27ef4
+Module : 0008e6f0
+Name: System.Object
+mdToken: 02000002 (d:\sscli\build\v1.x86chk.rotor\mscorlib.dll)
+MethodTable Flags : 2080000
+Number of IFaces in IFaceMap : 0
+Interface Map : 003e231c
+Slots in VTable : 14</pre>
+    <pre>0:000&gt; <b>!dumpmt <font color="#0000FF">02c55ba8</font></b>
+EEClass : 02c28468
+Module : 0008e6f0
+Name: System.Runtime.Serialization.ISerializable
+mdToken: 02000013 (d:\sscli\build\v1.x86chk.rotor\mscorlib.dll)
+MethodTable Flags : 2080000
+Number of IFaces in IFaceMap : 0
+Interface Map : 02c55be0
+Slots in VTable : 1</pre>
+    <pre>0:000&gt; <b>!dumpmt <font color="#0000FF">071195f8</font></b>
+EEClass : 02c2c48c
+Module : 0008e6f0
+Name: System.IO.TextWriter
+mdToken: 0200022a (d:\sscli\build\v1.x86chk.rotor\mscorlib.dll)
+MethodTable Flags : 2040000
+Number of IFaces in IFaceMap : 1
+Interface Map : 0711970c
+Slots in VTable : 55</pre>
+    <pre>0:000&gt; <b>!dumpmt <font color="#0000FF">07118110</font></b>
+EEClass : 02c2c42c
+Module : 0008e6f0
+Name: System.Console
+mdToken: 02000054 (d:\sscli\build\v1.x86chk.rotor\mscorlib.dll)
+MethodTable Flags : 2000000
+Number of IFaces in IFaceMap : 0
+Interface Map : 07118250
+Slots in VTable : 64</pre>
+    <pre>0:000&gt; <b>!dumpmt <font color="#0000FF">0711a6d0</font></b>
+EEClass : 02c2c4ec
+Module : 0008e6f0
+Name: System.IO.File
+mdToken: 0200023e (d:\rotor\build\v1.x86chk.rotor\mscorlib.dll)
+MethodTable Flags : 2080000
+Number of IFaces in IFaceMap : 0
+Interface Map : 0711a784
+Slots in VTable : 32</pre>
+    <pre>0:000&gt; <b>!dumpmt <font color="#0000FF">007b5d24</font></b>
+EEClass : 071436e4
+Module : 0009aaa8
+Name: System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+mdToken: 02000003 (d:\sscli\build\v1.x86chk.rotor\assembly\gac\system.runtime.s
+erialization.formatters.soap\1.0.3300.0__b03f5f7f11d50a3a\system.runtime.seriali
+zation.formatters.soap.dll)
+MethodTable Flags : c0000
+Number of IFaces in IFaceMap : 2
+Interface Map : 007b5db0
+Slots in VTable : 22</pre>
+    <pre>0:000&gt; <b>!dumpmt <font color="#0000FF">07113180</font></b>
+EEClass : 02c2be54
+Module : 0008e6f0
+Name: System.IO.Stream
+mdToken: 0200022e (d:\rotor\build\v1.x86chk.rotor\mscorlib.dll)
+MethodTable Flags : 2040000
+Number of IFaces in IFaceMap : 1
+Interface Map : 07113230
+Slots in VTable : 30
+0:000&gt;</pre>
+    <p>In this example&nbsp;the following external types are 
+    uses in the iserializable module: </p>
+    <ul>
+      <li><b>System.Object</b></li>
+      <li><b>System.Runtime.Serialization.ISerializable</b></li>
+      <li><b>System.IO.TextWriter</b></li>
+      <li><b>System.Console</b></li>
+      <li><b>System.IO.File</b></li>
+      <li><b>System.Runtime.Serialization.Formatters.Soap.SoapFormatter</b></li>
+      <li><b>System.IO.Stream</b><br>
+      </li>
+    </ul>
+    </td>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top">MethodDefToDescMap</td>
+    <td class="outputcontents" valign="top">Starting location of all method 
+    definitions (mdMethodDef) for the module.
+    <p>Method descriptors&nbsp;for the method definitions are stored within the 
+    MethodDefToDescMap and FieldDefToDescMap addresses and can be dumped out 
+    using the <b>DumpMD</b> command. </p>
+    <p>For example: </p>
+    <pre>0:000&gt; <b>!dumpmodule 00095688</b>
+Name d:\sscli\build\v1.x86chk.rotor\samples\howto\serialization\iserializable.exe
+dwFlags 00000080
+Attribute PEFile
+Assembly 000950d8
+LoaderHeap* 0009574c
+TypeDefToMethodTableMap* 07150010
+TypeRefToMethodTableMap* 0715001c
+MethodDefToDescMap* <font color="#FF0000"><b>07150080</b></font>
+FieldDefToDescMap* 071500bc
+MemberRefToDescMap* 071500cc
+FileReferencesMap* 07150168
+AssemblyReferencesMap* 0715016c
+0:000&gt; <b>dd <font color="#FF0000">07150080</font> 71500B0</b>
+07150080 00000000 <font color="#0000FF"><b>007b50b8</b></font> <font color="#0000FF"><b>007b50e0</b></font> <font color="#0000FF"><b>007b5108</b></font>
+07150090 <font color="#0000FF"><b>007b5258</b></font> <font color="#0000FF"><b>007b5280</b></font> <font color="#0000FF"><b>007b53f8</b></font> <font color="#0000FF"><b>007b52a8</b></font>
+071500a0 <font color="#0000FF"><b>007b52d0</b></font> <font color="#0000FF"><b>007b52f8</b></font> <font color="#0000FF"><b>007b5320</b></font> <font color="#0000FF"><b>007b5348</b></font>
+071500b0 <font color="#0000FF"><b>007b5370</b></font>
+0:000&gt; <b>!dumpmd <font color="#0000FF">007b50b8</font></b>
+Method Name : [DEFAULT] Void SimpleGraph.Main(SZArray String)
+Class : 714108c
+MethodTable 7b5128
+mdToken: 06000001
+Flags : 10
+Method VA : 06ca0304
+
+<b>...</b></pre>
+    <pre>0:000&gt; <b>!dumpmd <font color="#0000FF">007b5370</font></b>
+Method Name : [DEFAULT] [hasThis] String TreeNode.ToString()
+Class : 71410ec
+MethodTable 7b5438
+mdToken: 0600000c
+Flags : 0
+IL RVA : 0000241c
+0:000&gt;</pre>
+    <p>In this example&nbsp;the following methods are defined 
+    in the iserializable module: </p>
+    <ul>
+      <li><b>SimpleGraph.Main(SZArray String)</b></li>
+    </ul>
+    <p>...</p>
+    <ul>
+      <li><b>TreeNode.ToString()</b><br>
+      </li>
+    </ul>
+    </td>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top">FieldDefToDescMap</td>
+    <td class="outputcontents" valign="top">Starting location of all field 
+    definitions (mdFieldDef) for the module.
+    <p>FieldDescs for the field definitions are stored within the 
+    FieldDefToDescMap and MemberRefToDescMap addresses and can be dumped out 
+    using the <b>DumpObj</b> command. </p>
+    <p>For example: </p>
+    <pre>0:000&gt; <b>!dumpmodule 00095688</b>
+Name d:\sscli\build\v1.x86chk.rotor\samples\howto\serialization\iserializable.exe
+dwFlags 00000080
+Attribute PEFile
+Assembly 000950d8
+LoaderHeap* 0009574c
+TypeDefToMethodTableMap* 07150010
+TypeRefToMethodTableMap* 0715001c
+MethodDefToDescMap* 07150080
+FieldDefToDescMap* <font color="#FF0000"><b>071500bc</b></font>
+MemberRefToDescMap* 071500cc
+FileReferencesMap* 07150168
+AssemblyReferencesMap* 0715016c
+0:000&gt; <b>dd <font color="#FF0000">071500bc</font> 71500C4</b>
+071500bc 00000000 00000000 <font color="#0000FF"><b>007b5220</b></font>
+0:000&gt; <b>!dumpobj <font color="#0000FF">007b5220</font></b>
+Name: TreeNode
+MethodTable 0x007b5438
+EEClass 0x071410ec
+Size  16(0x10) bytes
+mdToken: 02000003  (d:\rotor\build\v1.x86chk.rotor\samples\howto\serialization\iserializable.exe)
+FieldDesc*: 007b5220
+      MT    Field   Offset                 Type       Attr    Value Name
+007b5438  4000002        4                CLASS   instance 10000002 m_value
+007b5438  4000003        8                CLASS   instance 90000000 m_children
+0:000&gt;
+</pre>
+    <p>In this example the following fields are defined in 
+    the iserializable module:</p>
+    <ul>
+      <li>m_value</li>
+      <li>m_children<br>
+      </li>
+    </ul>
+    </td>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top">MemberRefToDescMap</td>
+    <td class="outputcontents" valign="top">Starting location of all member 
+    references (mdMemberRef) for the module. <br>
+    <p>Method descriptors&nbsp;for the member references are stored within the 
+    MemberRefToDescMap and FileReferencesMap addresses and can be dumped out 
+    using the <b>DumpMD</b> command. </p>
+    <p>For example:</p>
+    <pre>0:000&gt; <b>!dumpmodule 00095688</b>
+Name d:\sscli\build\v1.x86chk.rotor\samples\howto\serialization\iserializable.exe
+dwFlags 00000080
+Attribute PEFile
+Assembly 000950d8
+LoaderHeap* 0009574c
+TypeDefToMethodTableMap* 07150010
+TypeRefToMethodTableMap* 0715001c
+MethodDefToDescMap* 07150080
+FieldDefToDescMap* 071500bc
+MemberRefToDescMap* <font color="#FF0000"><b>071500cc</b></font>
+FileReferencesMap* 07150168
+AssemblyReferencesMap* 0715016c
+0:000&gt; <b>dd <font color="#FF0000">071500cc</font> 715011C</b>
+071500cc 00000000 <font color="#0000FF"><b>02c55b80</b></font> <font color="#0000FF"><b>07117ca8</b></font> <font color="#0000FF"><b>071177e8</b></font>
+071500dc <font color="#0000FF"><b>07117d98</b></font> <font color="#0000FF"><b>0711a470</b></font> <font color="#0000FF"><b>007b5b38</b></font> <font color="#0000FF"><b>007b5bd8</b></font>
+071500ec <font color="#0000FF"><b>07112ed8</b></font> <font color="#0000FF"><b>07117a40</b></font> <font color="#0000FF"><b>007b5b88</b></font> 00000000
+071500fc 00000000 00000000 00000000 00000000
+0715010c 00000000 00000000 00000000 00000000
+0715011c 00000000
+0:000&gt; <b>!dumpmd <font color="#0000FF">02c55b80</font></b>
+Method Name : [DEFAULT] [hasThis] Void System.Runtime.Serialization.ISerializabl
+e.GetObjectData(Class System.Runtime.Serialization.SerializationInfo,ValueClass
+System.Runtime.Serialization.StreamingContext)
+Class : 2c28468
+MethodTable 2c55ba8
+mdToken: 06000175
+Flags : 2481
+IL RVA : 00000000
+
+<b>...
+</b>
+0:000&gt; <b>!dumpmd <font color="#0000FF">007b5b88</font></b>
+Method Name : [DEFAULT] [hasThis] Object System.Runtime.Serialization.Formatters
+.Soap.SoapFormatter.Deserialize(Class System.IO.Stream)
+Class : 71436e4
+MethodTable 7b5d24
+mdToken: 0600000a
+Flags : 80
+IL RVA : 00002204
+0:000&gt;</pre>
+    <p>In this example&nbsp;the following external methods are 
+    used in the iserializable module:</p>
+    <ul>
+      <li><b>System.Runtime.Serialization.ISerializable.GetObjectData</b></li>
+    </ul>
+    <p>...</p>
+    <ul>
+      <li><b>System.Runtime.Serialization.Formatters.Soap.SoapFormatter.Deserialize</b><br>
+      </li>
+    </ul>
+    </td>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top">FileReferencesMap</td>
+    <td class="outputcontents" valign="top">Starting location of all file 
+    references used by the module. </td>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top">AssemblyReferencesMap</td>
+    <td class="outputcontents" valign="top">Starting location of all assembly 
+    references used by the module.</td>
+  </tr>
+</table>
+<p>&nbsp;</p>
+<h2><a name="DumpMTCommand"></a>DumpMT Command</h2>
+<p>This command dumps MethodTable information.</p>
+<h4>Syntax</h4>
+<blockquote>
+  <pre>!DumpMT [-MD] <i>MethodTable</i></pre>
+</blockquote>
+<h4>Parameters</h4>
+<table border="1" width="1003">
+  <tr>
+    <th vAlign="top">Parameter</th>
+    <th vAlign="top">Description</th>
+  </tr>
+  <tr>
+    <td vAlign="top" width="122"><strong>-MD</strong></td>
+    <td vAlign="top" width="853">Show all methods in method table.</td>
+  </tr>
+  <tr>
+    <td vAlign="top" width="122"><i>MethodTable</i></td>
+    <td vAlign="top" width="853">Address of method table to display information 
+    about. Can be obtained with <b>!DumpMD</b> or <b>!DumpClass</b>.</td>
+  </tr>
+</table>
+<h4>Example</h4>
+<p>The following example demonstrates debugging the iserializable.exe sample on Windows.</p>
+<p>Some debugger output has been removed for clarity.</p>
+<pre>D:\sscli\build\v1.x86chk.rotor\samples\howto\serialization&gt;cdb clix iserializable.exe
+
+Microsoft (R) Windows Debugger  Version 6.0.0017.0
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+CommandLine: clix iserializable.exe
+0:000&gt; <b>.load sos.dll</b>
+0:000&gt; <b>bp rotor_pal!pal_writefile</b>
+0:000&gt; <b>g</b>
+Breakpoint 0 hit
+rotor_pal!PAL_WriteFile:
+79b03880 55               push    ebp
+0:000&gt; <b>!name2ee iserializable.exe SimpleGraph</b>
+--------------------------------------
+MethodTable: <font color="#FF0000"><b>007b5128</b></font>
+EEClass: 0714108c
+Name: SimpleGraph
+0:000&gt; !<b>dumpmt <font color="#FF0000">007b5128</font></b>
+EEClass : 0714108c
+Module : 00095688
+Name: SimpleGraph
+mdToken: 02000002  (d:\rotor\build\v1.x86chk.rotor\samples\howto\serialization\i
+serializable.exe)
+MethodTable Flags : 80000
+Number of IFaces in IFaceMap : 0
+Interface Map : 007b5178
+Slots in VTable : 7</pre>
+<pre>0:000&gt; <b>!dumpmt -md <font color="#FF0000">007b5128</font></b>
+EEClass : 0714108c
+Module : 00095688
+Name: SimpleGraph
+mdToken: 02000002 (d:\sscli\build\v1.x86chk.rotor\samples\howto\serialization\serializable.exe)
+MethodTable Flags : 80000
+Number of IFaces in IFaceMap : 0
+Interface Map : 007b5178
+Slots in VTable : 7
+--------------------------------------
+MethodDesc Table
+  Entry  MethodDesc   JIT   Name
+003e2073 003e2078    None   [DEFAULT] [hasThis] String System.Object.ToString()
+003e2223 003e2228    None   [DEFAULT] [hasThis] Boolean System.Object.Equals(Object)
+003e2253 003e2258    None   [DEFAULT] [hasThis] I4 System.Object.GetHashCode()
+003e2113 003e2118    None   [DEFAULT] [hasThis] Void System.Object.Finalize()
+06ca0304 007b50b8    EJIT   [DEFAULT] Void SimpleGraph.Main(SZArray String)
+007b50db 007b50e0    None   [DEFAULT] Void SimpleGraph.FillTree(Class TreeNode)
+007b5103 007b5108    None   [DEFAULT] [hasThis] Void SimpleGraph..ctor()
+0:000&gt;
+
+</pre>
+<h4>Output</h4>
+<table border="1" width="90%">
+  <tr>
+    <th class="outputname" valign="top">Column</th>
+    <th class="outputcontents" valign="top" colspan="2">
+    Description</th>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top">EEClass</td>
+    <td class="outputcontents" valign="top" colspan="2">
+    Class containing the method table  . Use the <b>DumpClass</b> command to get information on 
+    the class. </td>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top">Module</td>
+    <td class="outputcontents" valign="top" colspan="2">
+    Module containing the method table. Use the <b>DumpModule</b> command to get information on 
+    the module. </td>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top">Name</td>
+    <td class="outputcontents" valign="top" colspan="2">
+    Name of the class containing the method table.</td>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top">mdToken</td>
+    <td class="outputcontents" valign="top" colspan="2">
+    Metadata token for the method table. </td>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top">MethodTable 
+    Flags</td>
+    <td class="outputcontents" valign="top" colspan="2">
+    Flags associated with the method table.&nbsp;Bit-masked DWORD. </td>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top">Number of IFaces 
+    in IFaceMap</td>
+    <td class="outputcontents" valign="top" colspan="2">
+    Number of interfaces the class implements. </td>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top">Interface Map</td>
+    <td class="outputcontents" valign="top" colspan="2">
+    Pointer to the location of the method tables for the implemented interfaces. 
+    For example, <b>System.String</b> implements the following 
+    interfaces:<br>
+    <br>
+    <b>System.IComparable<br>
+    System.ICloneable<br>
+    System.IConvertible<br>
+    System.Collections.IEnumerable</b><br>
+    <br>
+    <pre>0:000&gt; <b>!name2ee mscorlib.dll System.String</b>
+--------------------------------------
+MethodTable: <font color="#FF0000"><b>003e8388</b></font>
+EEClass: 02c281c8
+Name: System.String
+--------------------------------------
+0:000&gt; <b>!dumpmt <font color="#FF0000">003e8388</font></b>
+EEClass : 02c281c8
+Module : 0008e6f0
+Name: System.String
+mdToken: 02000011 (d:\sscli\build\v1.x86chk.rotor\mscorlib.dll)
+MethodTable Flags : 2000000
+Number of elements in array: 2
+Number of IFaces in IFaceMap : 4
+Interface Map : <font color="#0000FF"><b>003e86c0</b></font>
+Slots in VTable : 191
+0:000&gt; <b>dd <font color="#0000FF">003e86c0</font></b>
+003e86c0 <font color="#008000"><b>003e5c20</b></font> 00140001 <b><font color="#008000">003e29a0</font></b> 00150001
+003e86d0 <b><font color="#008000">003e6000</font></b> 00280001 <b><font color="#008000">003e2a78</font></b> 00270001
+003e86e0 69727473 2a20676e 72747328 2c676e69
+003e86f0 69727473 5d5b676e 00000029 69727473
+003e8700 2a20676e 72747328 2c676e69 69727473
+003e8710 5d5b676e 746e692c 692c3233 3233746e
+003e8720 00000029 33746e69 282a2032 69727473
+003e8730 732c676e 6e697274 6f622c67 00296c6f
+0:000&gt; <b>!dumpmt <font color="#008000">003e5c20</font></b>
+EEClass : 02c28228
+Module : 0008e6f0
+Name: System.IComparable
+mdToken: 0200000f (d:\rotor\build\v1.x86chk.rotor\mscorlib.dll)
+MethodTable Flags : 2080000
+Number of IFaces in IFaceMap : 0
+Interface Map : 003e5c58
+Slots in VTable : 1
+
+0:000&gt; <b>!dumpmt <font color="#008000">003e29a0</font></b>
+EEClass : 02c28014
+Module : 0008e6f0
+Name: System.ICloneable
+mdToken: 02000005 (d:\rotor\build\v1.x86chk.rotor\mscorlib.dll)
+MethodTable Flags : 2080000
+Number of IFaces in IFaceMap : 0
+Interface Map : 003e29d8
+Slots in VTable : 1
+
+0:000&gt; <b>!dumpmt <font color="#008000">003e6000</font></b>
+EEClass : 02c28288
+Module : 0008e6f0
+Name: System.IConvertible
+mdToken: 02000010 (d:\rotor\build\v1.x86chk.rotor\mscorlib.dll)
+MethodTable Flags : 2080000
+Number of IFaces in IFaceMap : 0
+Interface Map : 003e6078
+Slots in VTable : 17
+
+0:000&gt; <b>!dumpmt <font color="#008000">003e2a78</font></b>
+EEClass : 02c28134
+Module : 0008e6f0
+Name: System.Collections.IEnumerable
+mdToken: 02000006 (d:\rotor\build\v1.x86chk.rotor\mscorlib.dll)
+MethodTable Flags : 2080000
+Number of IFaces in IFaceMap : 0
+Interface Map : 003e2ab0
+Slots in VTable : 1
+0:000&gt;</pre>
+    </td>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top">Slots in VTable</td>
+    <td class="outputcontents" valign="top" colspan="2">
+    Number of methods in the method table. </td>
+  </tr>
+  <tr>
+    <td class="outputname" valign="top" rowspan="4">
+    MethodDesc Table</td>
+    <td class="outputcontents" valign="top" colspan="2">
+    Displays the methods in the method table. It has the following columns:</td>
+  </tr>
+  <tr>
+    <td class="outputcontents" valign="top">MethodDesc</td>
+    <td class="outputcontents" valign="top">Method 
+    descriptor for the method. Use the <b>DumpMD</b> command on this address to get more 
+    information.</td>
+  </tr>
+  <tr>
+    <td class="outputcontents" valign="top">JIT</td>
+    <td class="outputcontents" valign="top">Type of 
+    generated code. Can be one of the following values: JIT, EJIT, PreJIT, None</td>
+  </tr>
+  <tr>
+    <td class="outputcontents" valign="top">Name<p>&nbsp;</td>
+    <td class="outputcontents" valign="top">Method 
+    signature.</td>
+  </tr>
+</table>
+<h2><a name="DumpObjCommand"></a>DumpObj Command</h2>
+<p>This command dumps an object on garbage collector heap.</p>
+<h4>Syntax</h4>
+<blockquote>
+  <pre>!DumpObj <i>ObjectAddress</i></pre>
+</blockquote>
+<h4>Parameters</h4>
+<table border="1" width="90%">
+  <tr>
+    <th vAlign="top">Parameter</th>
+    <th vAlign="top">Description</th>
+  </tr>
+  <tr>
+    <td vAlign="top" width="127"><i>ObjectAddress</i></td>
+    <td vAlign="top" width="848">Displays information about fields in the 
+    current object (including inherited fields).</td>
+  </tr>
+</table>
+<h4>Example</h4>
+<p>The following example demonstrates debugging the iserializable.exe sample on Windows.</p>
+<p>Some debugger output has been removed for clarity.</p>
+<pre>D:\sscli\build\v1.x86chk.rotor\samples\howto\serialization&gt;cdb clix iserializable.exe
+
+Microsoft (R) Windows Debugger  Version 6.0.0017.0
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+CommandLine: clix iserializable.exe
+
+0:000&gt; <b>.load sos.dll</b>
+0:000&gt; <b>bp rotor_pal!pal_writefile</b>
+0:000&gt; <b>g</b>
+Breakpoint 0 hit
+rotor_pal!PAL_WriteFile:
+79b03880 55               push    ebp
+0:000&gt; <b>!dumpstackobjects</b>
+ESP/REG Object Name
+0006ee1c <font color="#FF0000"><b>00ad0724</b></font> System.String Creating object graph
+0006ee48 00ad0724 System.String Creating object graph
+0006ee78 00ad0714 System.Object[]
+0006f3d4 00ad0714 System.Object[]
+0006f5c8 00ad0714 System.Object[]
+0006f5d0 00ad0714 System.Object[]
+0006f620 00ad0714 System.Object[]
+0006f644 00ad0714 System.Object[]
+0:000&gt; <b>!dumpobj <font color="#FF0000">00ad0724</font></b>
+Name: System.String
+MethodTable <font color="#0000FF"><b>0x003e8388</b></font>
+EEClass 0x02c281c8
+Size 60(0x3c) bytes
+mdToken: 02000011 (d:\sscli\build\v1.x86chk.rotor\mscorlib.dll)
+String: Creating object graph
+FieldDesc*: 003e67b4
+MT       Field   Offset Type         Attr     Value Name
+003e8388 4000026 4      System.Int32 instance 22    m_arrayLength
+003e8388 4000027 8      System.Int32 instance 21    m_stringLength
+003e8388 4000028 c      System.Char  instance  	43     m_firstChar
+003e8388 4000029 0      CLASS shared static         Empty
+&gt;&gt; Domain:Value 00084900:00acfb6c &lt;&lt;
+003e8388 400002a 4      CLASS shared static WhitespaceChars
+&gt;&gt; Domain:Value 00084900:00acfb80 &lt;&lt;
+0:000&gt;</pre>
+<h4>Comments</h4>
+<table border="1" width="90%">
+  <tr>
+    <th vAlign="top">Column</th>
+    <th vAlign="top">Description</th>
+  </tr>
+  <tr>
+    <td valign="top">Name</td>
+    <td valign="top">Class name</td>
+  </tr>
+  <tr>
+    <td valign="top">MethodTable</td>
+    <td valign="top">Method Table. Use the <b>DumpMT</b> command to get more information
+    <pre>0:000&gt; <b>!dumpmt <font color="#0000FF">0x003e8388</font></b>
+EEClass : 02c281c8
+Module : 0008e6f0
+Name: System.String
+mdToken: 02000011 (d:\rotor\build\v1.x86chk.rotor\mscorlib.dll)
+MethodTable Flags : 2000000
+Number of elements in array: 2
+Number of IFaces in IFaceMap : 4
+Interface Map : 003e86c0
+Slots in VTable : 191
+0:000&gt;</pre>
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">EEClass</td>
+    <td valign="top">EEClass address.&nbsp; Use the <b>DumpClass</b> command for more 
+    detailed information.</td>
+  </tr>
+  <tr>
+    <td valign="top">Size</td>
+    <td valign="top">Size of class in bytes.</td>
+  </tr>
+  <tr>
+    <td valign="top">mdToken</td>
+    <td valign="top">Metadata Token.&nbsp; See MethodTable example above to get 
+    more 
+    information about using metadata tokens.</td>
+  </tr>
+  <tr>
+    <td valign="top">FieldDesc</td>
+    <td valign="top">Address of first field description.</td>
+  </tr>
+  <tr>
+    <td valign="top">MT</td>
+    <td valign="top">Method table for the class containing this member.<p>For 
+    example:<br>
+    </p>
+    <pre>0:000&gt; !<b>dumpmt 003e8388</b>
+EEClass : 02c281c8
+Module : 0008e6f0
+Name: System.String
+mdToken: 02000011 (d:\sscli\build\v1.x86chk.rotor\mscorlib.dll)
+MethodTable Flags : 2000000
+Number of elements in array: 2
+Number of IFaces in IFaceMap : 4
+Interface Map : 003e86c0
+Slots in VTable : 191
+0:000&gt;</pre>
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">Field</td>
+    <td valign="top">Meta data token (mdFieldDef) for the particular field.</td>
+  </tr>
+  <tr>
+    <td valign="top">Type</td>
+    <td valign="top">Type of field. This can be one of the following types:<ul>
+      <li>PTR</li>
+      <li>BYREF</li>
+      <li>VALUETYPE</li>
+      <li>CLASS</li>
+      <li>VAR</li>
+      <li>ARRAY</li>
+      <li>VALUEARRAY</li>
+      <li>Native Real</li>
+      <li>FNPTR</li>
+      <li>SZARRAY</li>
+      <li>GENERICARRAY</li>
+      <li>&lt;base type name&nbsp;ex. System.Int32 &gt;</li>
+    </ul>
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">Attr</td>
+    <td valign="top">Field attribute. Can be one of the following
+    <ul>
+      <li>shared</li>
+      <li>shared static</li>
+      <li>static</li>
+      <li>instance</li>
+    </ul>
+    
+    <p>For shared static you will also get an extra line for each domain except 
+    the system domain and the shared domain as shown in the following example:</p>
+    <pre>003e8388 4000029 0 CLASS shared static Empty
+&gt;&gt; Domain:Value 00084900:<font color="#FF0000"><b>00acfb6c</b></font> &lt;&lt;</pre>
+    
+    <p>&quot;Domain:&quot; is followed by all available domains and whether  the 
+    variable is initialized in the specific domain.&nbsp;NotInit, FailInit, or UnInit2 
+    is displayed if the static is not initialized in the specific domain. Use 
+    the <b>DumpDomain</b> command on the domain address to display information about the domain. <br>
+    <br>
+    You can dump out the object using the <b>DumpObj</b> command.&nbsp; </p>
+    <p>For example:</p>
+    <pre>0:000&gt; <b>!dumpobj <font color="#FF0000">00acfb6c</font></b>
+Name: System.String
+MethodTable 0x003e8388
+EEClass 0x02c281c8
+Size 20(0x14) bytes
+mdToken: 02000011 (d:\rotor\build\v1.x86chk.rotor\mscorlib.dll)
+String:
+FieldDesc*: 003e67b4
+MT Field Offset  Type           Attr     Value Name
+003e8388 4000026 4 System.Int32 instance 1     m_arrayLength
+003e8388 4000027 8 System.Int32 instance 0     m_stringLength
+003e8388 4000028 c System.Char instance 0      m_firstChar
+003e8388 4000029 0 CLASS shared static Empty
+&gt;&gt; Domain:Value 00084900:00acfb6c &lt;&lt;
+003e8388 400002a 4 CLASS shared static WhitespaceChars
+&gt;&gt; Domain:Value 00084900:00acfb80 &lt;&lt;
+0:000&gt;</pre>
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">Value</td>
+    <td valign="top">Can be empty if it is an instance field, or static if it is 
+    an uninitialized shared variable. If a shared or static variable is initialized 
+    the value is shown here.</td>
+  </tr>
+  <tr>
+    <td valign="top">Name</td>
+    <td valign="top">Name of field (member variable).</td>
+  </tr>
+</table>
+<h2><a name="DumpStackCommand"></a>DumpStack Command</h2>
+<p>This command lists the call stack for the current thread (including both managed and 
+native calls).</p>
+<h4>Syntax</h4>
+<blockquote>
+  <pre>!DumpStack [-EE] [-smart] [<i>TopStack</i> [<i>BottomStack</i>]]</pre>
+</blockquote>
+<h4>Parameters</h4>
+<table border="1" width="1003">
+  <tr>
+    <th vAlign="top">Parameter</th>
+    <th vAlign="top">Description</th>
+  </tr>
+  <tr>
+    <td vAlign="top" width="172"><strong>-EE</strong></td>
+    <td vAlign="top" width="803">Shows only managed calls.</td>
+  </tr>
+  <tr>
+    <td vAlign="top" width="172"><strong>-smart</strong></td>
+    <td vAlign="top" width="803">Shows a brief summary of stack information:
+    <ul>
+      <li>The current frame address.</li>
+      <li>The EIP register with instruction pointer.</li>
+      <li>The EBP register.</li>
+      <li>The ESP register.</li>
+    </ul>
+    </td>
+  </tr>
+  <tr>
+    <td vAlign="top" width="172"><i>TopStack</i></td>
+    <td vAlign="top" width="803">Optional address of the starting position 
+    within stack for output.</td>
+  </tr>
+  <tr>
+    <td vAlign="top" width="172"><i>BottomStack</i></td>
+    <td vAlign="top" width="803">Optional address of the ending position within 
+    stack for output.</td>
+  </tr>
+</table>
+<h4>Example</h4>
+<p>The following example demonstrates debugging the iserializable.exe sample on Windows..</p>
+<p>Some debugger output has been removed for clarity.</p>
+<pre>D:\sscli\build\v1.x86chk.rotor\samples\howto\serialization&gt;cdb clix iserializable.exe
+
+Microsoft (R) Windows Debugger  Version 6.0.0017.0
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+CommandLine: clix iserializable.exe
+0:000&gt; <b>.load sos.dll</b>
+0:000&gt; <b>bp rotor_pal!pal_writefile</b>
+0:000&gt; <b>g</b>
+Breakpoint 0 hit
+rotor_pal!PAL_WriteFile:
+79b03880 55               push    ebp
+0:000&gt; <b>!dumpstack</b>
+Current frame: 79b03880
+ChildEBP RetAddr  Caller, Callee
+0006d938 7963359c 7963359c, calling 79af11a4
+0006d9a4 02ca35c4 (MethodDesc 0x71178b0 +0x11c System.Console[mscorlib.dll].GetStandardFile)
+0006d9c4 02ca3480 (MethodDesc 0x71179a0 +0x3c System.Console[mscorlib.dll].OpenStandardOutput)
+0006d9e4 02ca2fec (MethodDesc 0x7117810 +0x24 System.Console[mscorlib.dll]..cctor)
+0006da0c 794388bc 794388bc
+0006da14 7943116b 7943116b, calling 79438894
+0006de4c 79415e63 79415e63, calling 794310d0
+0006dec4 794be044 794be044, calling 7971c80c
+0006decc 79416ecb 79416ecb, calling 794be000
+0006dee8 7945729d 7945729d, calling 7971c81e
+0006df20 7943893a 7943893a, calling 77e876b3
+0006df48 794c227f 794c227f, calling 7971c80c
+0006df50 79416fc6 79416fc6, calling 794c1fc0
+0006df58 79417012 79417012, calling 7971c80c
+0006df64 79415af2 79415af2, calling 7971c866
+0006e098 794156eb 794156eb, calling 794158b0
+0006e0b8 794320d0 794320d0, calling 79415680
+0006e104 79432120 79432120, calling 7971c8c0
+0006e1c4 79432246 79432246, calling 7971c8c0
+0006e234 79432735 79432735, calling 79431ed0
+0006e2d4 794327ee 794327ee, calling 7971c8c0
+0006e33c 79432c97 79432c97, calling 794325f0
+0006ebd4 79432e58 79432e58, calling 7971c8c0
+0006ec2c 7943183f 7943183f, calling 794329a0
+0006ec4c 7949d91e 7949d91e, calling 79431780
+0006eddc 07117ca8  (stub for System.Console[mscorlib.dll].WriteLine), calling 0008afec
+0006ede4 7949d548 7949d548, calling 7949d590
+0006ee04 07117ca8  (stub for System.Console[mscorlib.dll].WriteLine), calling 0008afec
+0006ee0c 0008b035 0008b035, calling 7949d4a0
+0006ee20 02ca2d75 (MethodDesc 0x7b50b8 +0x21 SimpleGraph[iserializable.exe].Main)
+0006ee3c 07117ca8  (stub for System.Console[mscorlib.dll].WriteLine), calling 0008afec
+0006ee40 02ca2d75 (MethodDesc 0x7b50b8 +0x21 SimpleGraph[iserializable.exe].Main)
+0006ee70 794388bc 794388bc
+0006ee7c 7943116b 7943116b, calling 79438894
+0006ef04 0006f865 0006f865, calling 1006ff5d
+0006f2b4 79415e63 79415e63, calling 794310d0
+0006f350 7945729d 7945729d, calling 7971c81e
+0006f388 7943893a 7943893a, calling 77e876b3
+0006f3b4 794c227f 794c227f, calling 7971c80c
+0006f3bc 79416fc6 79416fc6, calling 794c1fc0
+0006f3c4 79417012 79417012, calling 7971c80c
+0006f504 79415873 79415873, calling 794158b0
+0006f588 79415500 79415500, calling 79415820
+0006f5a8 7946438c 7946438c, calling 79415490
+0006f6d4 7946446f 7946446f, calling 7971c8c0
+0006f75c 79463dbb 79463dbb, calling 79464010
+0006f880 79463b94 79463b94, calling 7971c8c0
+0006f908 79463d05 79463d05, calling 7971c8c0
+0006f998 795603ae 795603ae, calling 794636f0
+0006f9b0 793fcbe6 793fcbe6, calling 79560350
+0006fb68 793d191b 793d191b, calling 793fc5d0
+0006fbf0 7943893a 7943893a, calling 77e876b3
+0006fc04 793deed6 793deed6, calling 7971c80c
+0006fc28 793df1ab 793df1ab, calling 7971c80c
+0006fc34 7943893a 7943893a, calling 77e876b3
+0006fc8c 00405aba 00405aba
+0006ff04 00405eac 00405eac, calling 00401019
+0006ff50 0040611c 0040611c, calling 0040100f
+0006ff64 79b0030d 79b0030d
+0006ff88 0040607b 0040607b, calling 79af1181
+0006ffc0 77e9ca90 77e9ca90
+0006ffd0 77fcb740 77fcb740, calling 77f83893
+0006ffd8 77fcb740 77fcb740, calling 77f83893
+0:000&gt;
+</pre>
+<p>The following code continues the example to demonstrate the use of the -<b>EE</b> 
+option.</p>
+<pre>0:000&gt; <b>!dumpstack -ee</b>
+Current frame:
+ChildEBP RetAddr   Caller,Callee
+0006d9a4 02ca35c4 (MethodDesc 0x71178b0 +0x11c System.Console[mscorlib.dll].GetStandardFile)
+0006d9c4 02ca3480 (MethodDesc 0x71179a0 +0x3c System.Console[mscorlib.dll].OpenStandardOutput)
+0006d9e4 02ca2fec (MethodDesc 0x7117810 +0x24 System.Console[mscorlib.dll]..cctor)
+0006ee20 02ca2d75 (MethodDesc 0x7b50b8 +0x21 SimpleGraph[iserializable.exe].Main)
+0006ee40 02ca2d75 (MethodDesc 0x7b50b8 +0x21 SimpleGraph[iserializable.exe].Main)
+0:000&gt;</pre>
+<p>The following code continues the example to demonstrate the use of the -<b>smart</b> 
+option.</p>
+<pre>0:000&gt; <b>!dumpstack -smart</b>
+Current frame: 79b03880
+ChildEBP RetAddr Caller,Callee
+EIP:79b03880 EBP:6d9a4 ESP:6d93c -- EIP:0 EBP:0 ESP:0
+0:000&gt;</pre>
+<p>The following code continues the example to demonstrate the use of the <i>
+TopStack</i> and <i>BottomStack</i> parameters.</p>
+<pre>0:000&gt; <b>!dumpstack 0006ee3c 0006ee70</b>
+Current frame: 79b03880
+ChildEBP RetAddr Caller,Callee
+0006ee3c 07117ca8 (stub for System.Console[mscorlib.dll].WriteLine), calling 00
+08af5c
+0006ee40 02ca2d75 (MethodDesc 0x7b50b8 +0x21 SimpleGraph[iserializable.exe].Main)</pre>
+<h4>Comments</h4>
+<p>DumpStack provides a combined native and managed stack trace.<br>
+For managed calls the stack frame contains a method description for the managed 
+function, in addition to <br>
+the stackpointer <font color="black">and the return address.&nbsp; For example:</font></p>
+<blockquote>
+  <pre>0006ee40 02ca2d75 (MethodDesc 0x7b50b8 +0x21 SimpleGraph[iserializable.exe].Main)</pre>
+</blockquote>
+<p>&nbsp;</p>
+<h2><a name="DumpStackObjectsCommand"></a>DumpStackObjects Command</h2>
+<p>This command dumps all the objects used on the current thread.</p>
+<h4>Syntax</h4>
+<blockquote>
+  <pre>!DumpStackObjects [<i>TopStack </i>[<i>BottomStack</i>]]</pre>
+</blockquote>
+<h4>Parameters</h4>
+<table border="1" width="90%">
+  <tr>
+    <th vAlign="top">Parameter</th>
+    <th vAlign="top">Description</th>
+  </tr>
+  <tr>
+    <td vAlign="top"><i>TopStack </i></td>
+    <td vAlign="top">Stack pointer at top of stack segment you wish to display</td>
+  </tr>
+  <tr>
+    <td vAlign="top"><i>BottomStack</i></td>
+    <td vAlign="top">Stack pointer at&nbsp;bottom of stack segment you wish to 
+    display</td>
+  </tr>
+</table>
+<h4>Example</h4>
+<p>The following example demonstrates debugging the iserializable.exe sample on Windows.</p>
+<p>Some debugger output has been removed for clarity.&nbsp; </p>
+<p>Note that the PAL_WriteFile breakpoint is hit several times  to get 
+to a point where there are more  objects on the stack.</p>
+<pre>D:\sscli\build\v1.x86chk.rotor\samples\howto\serialization&gt;cdb clix iserializable.exe
+
+Microsoft (R) Windows Debugger  Version 6.0.0017.0
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+CommandLine: clix iserializable.exe
+0:000&gt; <b>.load sos.dll</b>
+0:000&gt; <b>bp rotor_pal!pal_writefile</b>
+0:000&gt; <b>g</b>
+Breakpoint 0 hit
+rotor_pal!PAL_WriteFile:
+79b03880 55               push    ebp
+0:000&gt; g
+Breakpoint 0 hit
+rotor_pal!PAL_WriteFile:
+79b03880 55 push ebp
+0:000&gt; g
+Breakpoint 0 hit
+rotor_pal!PAL_WriteFile:
+79b03880 55 push ebp
+ESP/REG  Object   Name
+0006ed60 00ad16ec System.Byte[]
+0006ed90 00ad098c System.IO.__ConsoleStream
+0006ed94 00ad16ec System.Byte[]
+0006edbc 00ad0a50 System.IO.StreamWriter
+0006ede0 00ad0a50 System.IO.StreamWriter
+0006ede4 00ad1d40 System.Char[]
+0006edf0 00ad1d40 System.Char[]
+0006ee10 00ad0a50 System.IO.StreamWriter
+0006ee14 00ad0770 System.String    Creating object graph
+0006ee2c 00ad1970 System.IO.TextWriter/SyncTextWriter
+0006ee30 00ad0770 System.String    Creating object graph
+0006ee48 00ad0770 System.String    Creating object graph
+0006ee78 00ad0714 System.Object[]
+0006f3d4 00ad0714 System.Object[]
+0006f5c8 00ad0714 System.Object[]
+0006f5d0 00ad0714 System.Object[]
+0006f5f4 00ad0748 System.String    cdblog.txt
+0006f620 00ad0714 System.Object[]
+0006f644 00ad0714 System.Object[]
+0:000&gt;</pre>
+<p>The following code continues the example to demonstrate the use of the <i>TopStack</i> and <i>BottomStack</i> 
+parameters.</p>
+<pre>0:000&gt; <b>!dumpstackobjects <font color="#FF0000">0006ee10</font> <font color="#0000FF">0006ee78</font></b>
+ESP/REG  Object   Name
+0006ee10 <font color="#008000"><b>00ad0a50</b></font> System.IO.StreamWriter
+0006ee14 00ad0770 System.String    Creating object graph
+0006ee2c 00ad1970 System.IO.TextWriter/SyncTextWriter
+0006ee30 00ad0770 System.String    Creating object graph
+0006ee48 00ad0770 System.String    Creating object graph
+0:000&gt;</pre>
+<p>The following code continues the example to demonstrate the use of the <b>
+DumpObj</b> command to dump objects found from the <b>DumpStackObjects</b> 
+command.</p>
+<pre>0:000&gt; <b>!dumpobj <font color="#008000">00ad0a50</font></b>
+Name: System.IO.StreamWriter
+MethodTable 0x0711ef3c
+EEClass 0x02c2c6e4
+Size  56(0x38) bytes
+mdToken: 02000252  (d:\sscli\build\v1.x86chk.rotor\mscorlib.dll)
+FieldDesc*: 0711ea30
+      MT    Field   Offset                 Type       Attr    Value Name
+02c67af4  40000ca        4                CLASS   instance 00000000 __identity
+071195f8  4000aad        8                CLASS   instance 00ad14c4 CoreNewLine
+071195f8  4000aae        c                CLASS   instance 00000000 InternalForm
+atProvider
+071195f8  4000aac        0                CLASS     shared   static Null
+    &gt;&gt; Domain:Value 00084990:00ad0bac &lt;&lt;
+0711ef3c  4000b76       10                CLASS   instance 00ad098c stream
+0711ef3c  4000b77       14                CLASS   instance 00ad0a0c encoding
+0711ef3c  4000b78       18                CLASS   instance 00ad14d4 encoder
+0711ef3c  4000b79       1c                CLASS   instance 00ad16ec byteBuffer
+0711ef3c  4000b7a       20                CLASS   instance 00ad14e0 charBuffer
+0711ef3c  4000b7b       28         System.Int32   instance        0 charPos
+0711ef3c  4000b7c       2c         System.Int32   instance      256 charLen
+0711ef3c  4000b7d       30       System.Boolean   instance        1 autoFlush
+0711ef3c  4000b7e       31       System.Boolean   instance        1 haveWrittenPreamble
+0711ef3c  4000b7f       32       System.Boolean   instance        0 closable
+0711ef3c  4000b80       24                CLASS   instance 00000000 allocatedFrom
+0711ef3c  4000b75        0                CLASS     shared   static Null
+    &gt;&gt; Domain:Value 00084990:00ad0a9c &lt;&lt;
+0:000&gt;</pre>
+
+<h4>Comments</h4>
+<p>Use the <b>DumpObj</b> command with the object address to dump out the contents of the 
+objects as shown in the example above.</p>
+<p>THe ESP/REG output column indicates the address location of the object on the 
+stack.</p>
+<h2><a name="EEStackCommand"></a>EEStack Command</h2>
+<p>This command outputs stack information. It is very similar to the <b>
+DumpStack</b> command except that it shows the stack segregated by thread. </p>
+<h4>Syntax</h4>
+<blockquote>
+  <pre>!EEStack [<b>-EE</b>]</pre>
+</blockquote>
+<h4>Parameters</h4>
+<table border="1" width="90%">
+  <tr>
+    <th vAlign="top">Parameter</th>
+    <th vAlign="top">Description</th>
+  </tr>
+  <tr>
+    <td vAlign="top"><strong>-EE</strong></td>
+    <td vAlign="top">Only displays the managed callstacks.</td>
+  </tr>
+</table>
+<h4>Example</h4>
+<p>The following example demonstrates debugging the iserializable.exe sample on Windows.</p>
+<pre>D:\sscli\build\v1.x86chk.rotor\samples\howto\serialization&gt;cdb clix iserializable.exe
+
+Microsoft (R) Windows Debugger  Version 6.0.0017.0
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+CommandLine: clix iserializable.exe
+0:000&gt; <b>.load sos.dll</b>
+0:000&gt; <b>bp rotor_pal!pal_writefile</b>
+0:000&gt; <b>g</b>
+Breakpoint 0 hit
+rotor_pal!PAL_WriteFile:
+79b03880 55               push    ebp
+0:000&gt; <b>!eestack</b>
+---------------------------------------------
+Thread   0
+Current frame: 79b03880
+ChildEBP RetAddr  Caller,Callee
+0006d938 7963359c 7963359c, calling 79af11a4
+0006d9a4 02ca35c4 (MethodDesc 0x71178b0 +0x11c System.Console[mscorlib.dll].GetStandardFile)
+0006d9c4 02ca3480 (MethodDesc 0x71179a0 +0x3c System.Console[mscorlib.dll].OpenStandardOutput)
+0006d9e4 02ca2fec (MethodDesc 0x7117810 +0x24 System.Console[mscorlib.dll]..cctor)
+0006da0c 794388bc 794388bc
+0006da14 7943116b 7943116b, calling 79438894
+0006de4c 79415e63 79415e63, calling 794310d0
+0006dec4 794be044 794be044, calling 7971c80c
+0006decc 79416ecb 79416ecb, calling 794be000
+0006dee8 7945729d 7945729d, calling 7971c81e
+0006df20 7943893a 7943893a, calling 77e876b3
+0006df48 794c227f 794c227f, calling 7971c80c
+0006df50 79416fc6 79416fc6, calling 794c1fc0
+0006df58 79417012 79417012, calling 7971c80c
+0006df64 79415af2 79415af2, calling 7971c866
+0006e098 794156eb 794156eb, calling 794158b0
+0006e0b8 794320d0 794320d0, calling 79415680
+0006e104 79432120 79432120, calling 7971c8c0
+0006e1c4 79432246 79432246, calling 7971c8c0
+0006e234 79432735 79432735, calling 79431ed0
+0006e2d4 794327ee 794327ee, calling 7971c8c0
+0006e33c 79432c97 79432c97, calling 794325f0
+0006ebd4 79432e58 79432e58, calling 7971c8c0
+0006ec2c 7943183f 7943183f, calling 794329a0
+0006ec4c 7949d91e 7949d91e, calling 79431780
+0006eddc 07117ca8  (stub for System.Console[mscorlib.dll].WriteLine), calling 0008afec
+0006ede4 7949d548 7949d548, calling 7949d590
+0006ee04 07117ca8  (stub for System.Console[mscorlib.dll].WriteLine), calling 0008afec
+0006ee0c 0008b035 0008b035, calling 7949d4a0
+0006ee20 02ca2d75 (MethodDesc 0x7b50b8 +0x21 SimpleGraph[iserializable.exe].Main)
+0006ee3c 07117ca8  (stub for System.Console[mscorlib.dll].WriteLine), calling 0008afec
+0006ee40 02ca2d75 (MethodDesc 0x7b50b8 +0x21 SimpleGraph[iserializable.exe].Main)
+0006ee70 794388bc 794388bc
+0006ee7c 7943116b 7943116b, calling 79438894
+0006ef04 0006f865 0006f865, calling 1006ff5d
+0006f2b4 79415e63 79415e63, calling 794310d0
+0006f350 7945729d 7945729d, calling 7971c81e
+0006f388 7943893a 7943893a, calling 77e876b3
+0006f3b4 794c227f 794c227f, calling 7971c80c
+0006f3bc 79416fc6 79416fc6, calling 794c1fc0
+0006f3c4 79417012 79417012, calling 7971c80c
+0006f504 79415873 79415873, calling 794158b0
+0006f588 79415500 79415500, calling 79415820
+0006f5a8 7946438c 7946438c, calling 79415490
+0006f6d4 7946446f 7946446f, calling 7971c8c0
+0006f75c 79463dbb 79463dbb, calling 79464010
+0006f880 79463b94 79463b94, calling 7971c8c0
+0006f908 79463d05 79463d05, calling 7971c8c0
+0006f998 795603ae 795603ae, calling 794636f0
+0006f9b0 793fcbe6 793fcbe6, calling 79560350
+0006fb68 793d191b 793d191b, calling 793fc5d0
+0006fbf0 7943893a 7943893a, calling 77e876b3
+0006fc04 793deed6 793deed6, calling 7971c80c
+0006fc28 793df1ab 793df1ab, calling 7971c80c
+0006fc34 7943893a 7943893a, calling 77e876b3
+0006fc8c 00405aba 00405aba
+0006ff04 00405eac 00405eac, calling 00401019
+0006ff50 0040611c 0040611c, calling 0040100f
+0006ff64 79b0030d 79b0030d
+0006ff88 0040607b 0040607b, calling 79af1181
+0006ffc0 77e9ca90 77e9ca90
+0006ffd0 77fcb740 77fcb740, calling 77f83893
+0006ffd8 77fcb740 77fcb740, calling 77f83893
+---------------------------------------------
+Thread   2
+Current frame: 77f83786
+ChildEBP RetAddr  Caller,Callee
+02a5fe20 77e8780f 77e8780f
+02a5fe48 77e87837 77e87837, calling 77e877b5
+02a5fe58 79b06681 79b06681, calling 77e87828
+02a5fe70 794f7cc2 794f7cc2, calling 79af125d
+02a5fe84 794f7f21 794f7f21, calling 794f7cb0
+02a5ff24 794f8275 794f8275, calling 7971c8c0
+02a5ff74 79b0030d 79b0030d
+02a5ff98 79b06b35 79b06b35, calling 79af1181
+02a5ffb4 77e887dd 77e887dd
+0:000&gt;
+</pre>
+
+<p>The following code continues the example to demonstrate the use of the -<b>EE</b> 
+option.</p>
+<pre>0:000&gt; <b>!eestack -ee</b>
+---------------------------------------------
+Thread   0
+Current frame:
+ChildEBP RetAddr  Caller,Callee
+0006d9a4 02ca35c4 (MethodDesc 0x71178b0 +0x11c System.Console[mscorlib.dll].GetStandardFile)
+0006d9c4 02ca3480 (MethodDesc 0x71179a0 +0x3c System.Console[mscorlib.dll].OpenStandardOutput)
+0006d9e4 02ca2fec (MethodDesc 0x7117810 +0x24 System.Console[mscorlib.dll]..cctor)
+0006ee20 02ca2d75 (MethodDesc 0x7b50b8 +0x21 SimpleGraph[iserializable.exe].Main)
+0006ee40 02ca2d75 (MethodDesc 0x7b50b8 +0x21 SimpleGraph[iserializable.exe].Main)
+---------------------------------------------
+Thread   2
+Current frame:
+ChildEBP RetAddr  Caller,Callee
+0:000&gt;</pre>
+<h2><a name="IP2MDCommand"></a>IP2MD Command</h2>
+<p>This command converts an instruction pointer address into the corresponding MethodDesc. 
+This can be used to move from JIT-compiled code into the execution engine's data 
+structures.</p>
+<h4>Syntax</h4>
+<blockquote>
+  <pre>!IP2MD <i>InstructionPointer</i></pre>
+</blockquote>
+<h4>Parameters</h4>
+<table border="1" width="1003">
+  <tr>
+    <th vAlign="top">Parameter</th>
+    <th vAlign="top">Description</th>
+  </tr>
+  <tr>
+    <td vAlign="top" width="249"><i>InstructionPointer</i></td>
+    <td vAlign="top" width="726">An instruction pointer to JIT-compiled code.</td>
+  </tr>
+</table>
+<h4>Example 1</h4>
+<p>The following example demonstrates debugging the iserializable.exe sample on Windows.</p>
+<p>Some debugger output has been removed for clarity.</p>
+<p>This example uses the COMPlus_JitHalt environment variable to stop the 
+debugger just before the JIT-compiled code for method <b>FillTree</b> is entered.</p>
+<pre>D:\sscli\build\v1.x86chk.rotor\samples\howto\serialization&gt;set COMPlus_JitHalt=FillTree
+D:\sscli\build\v1.x86chk.rotor\samples\howto\serialization&gt;cdb clix iserializable.exe
+
+Microsoft (R) Windows Debugger  Version 6.0.0017.0
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+CommandLine: clix iserializable.exe
+0:000&gt; <b>.load sos.dll</b>
+0:000&gt; <b>g</b>
+Creating object graph
+(1590.157c): Break instruction exception - code 80000003 (first chance)
+eax=06ca0794 ebx=7ffdf000 ecx=00ad2104 edx=0008a130 esi=00000000 edi=0006f2b4
+eip=<font color="#FF0000"><b>02ca776c</b></font> esp=0006ee44 ebp=0006ee70 iopl=0         nv up ei pl nz na po nc
+cs=001b  ss=0023  ds=0023  es=0023  fs=0038  gs=0000             efl=00000206
+02ca776c cc               int     3
+0:000&gt; <b>!ip2md <font color="#FF0000">02ca776c</font></b>
+MethodDesc: 0x007b50e0
+Jitted by EJIT
+Method Name : [DEFAULT] Void SimpleGraph.FillTree(Class TreeNode)
+Class : 6ef108c
+MethodTable 7b5128
+mdToken: 06000002
+Flags : 10
+Method VA : 06ca0794
+0:000&gt;</pre>
+<h4>Example 2</h4>
+<p>The following example demonstrates debugging the iserializable.exe sample on Windows.</p>
+<p>Some debugger output has been removed for clarity.</p>
+<p>This example, like many previous examples, stops on a breakpoint on 
+PAL_WriteFile that is in unmanaged code.&nbsp;The stack is then backtraced to 
+get a return address to use with the <b>IP2MD</b> command.</p>
+<pre>D:\sscli\build\v1.x86chk.rotor\samples\howto\serialization&gt;cdb clix iserializable.exe
+
+Microsoft (R) Windows Debugger  Version 6.0.0017.0
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+CommandLine: clix iserializable.exe
+0:000&gt; <b>.load sos.dll</b>
+0:000&gt; <b>bp rotor_pal!pal_writefile</b>
+0:000&gt; <b>g</b>
+Breakpoint 0 hit
+rotor_pal!PAL_WriteFile:
+79b03880 55               push    ebp
+0:000&gt; <b>k</b>
+ChildEBP RetAddr
+0006d934 79553e4c rotor_pal!PAL_WriteFile [d:\rotor\pal\win32\win32pal.c @ 1700]
+0006d9a0 02ca35c4 sscoree!COMStreams::ConsoleHandleIsValid+0xac [d:\sscli\clr\src\vm\comstreams.cpp @ 153]
+WARNING: Frame IP not in any known module. Following frames may be wrong.
+0006d9c0 02ca3480 0x2ca35c4
+0006d9e0 02ca2fec 0x2ca3480
+0006da08 79358a7c 0x2ca2fec
+0006da10 7935130b sscoree!CallDescrWorkerInternal+0x28
+0006de48 79335fd3 sscoree!CallDescrWorker+0x9b [d:\rotor\clr\src\vm\class.cpp @ 11127]
+0006e094 7933585b sscoree!MethodDesc::CallDescr+0x5b3 [d:\rotor\clr\src\vm\method.cpp @ 1233]
+0006e0b4 79352284 sscoree!MethodDesc::Call+0x6b [d:\rotor\clr\src\vm\method.cpp @ 1009]
+0006e234 793528ef sscoree!EEClass::RunClassInit+0x214 [d:\rotor\clr\src\vm\class.cpp @ 11884]
+0006e33c 79352e51 sscoree!EEClass::DoRunClassInitHelper+0x14f [d:\rotor\clr\src\vm\class.cpp @ 11941]
+0006ec2c 793519df sscoree!EEClass::DoRunClassInit+0x301 [d:\rotor\clr\src\vm\class.cpp @ 12100]
+0006ec4c 793bd73e sscoree!MethodTable::CheckRunClassInit+0xbf [d:\rotor\clr\src\vm\class.cpp @ 11688]
+0006ede4 793bd368 sscoree!MethodDesc::DoPrestub+0x38e [d:\rotor\clr\src\vm\prestub.cpp @ 788]
+0006ee0c 0008afa5 sscoree!PreStubWorker+0xa8 [d:\rotor\clr\src\vm\prestub.cpp @592]
+0006ee20 02ca2d75 0x8afa5
+0006ee70 79358a7c <font color="#FF0000"><b>0x2ca2d75</b></font>
+0006ee7c 7935130b sscoree!CallDescrWorkerInternal+0x28
+0006f2b4 79335fd3 sscoree!CallDescrWorker+0x9b [d:\rotor\clr\src\vm\class.cpp @11127]
+0006f504 793359e3 sscoree!MethodDesc::CallDescr+0x5b3 [d:\rotor\clr\src\vm\method.cpp @ 1233]
+0:000&gt; <b>!ip2md <font color="#FF0000">0x2ca2d75</font></b>
+MethodDesc: 0x007b50b8
+Jitted by EJIT
+Method Name : [DEFAULT] Void SimpleGraph.Main(SZArray String)
+Class : 6ef108c
+MethodTable 7b5128
+mdToken: 06000001
+Flags : 10
+Method VA : 06ca0304
+</pre>
+<h4>Output Format</h4>
+<table border="1" width="90%">
+  <tr>
+    <th vAlign="top">Column</th>
+    <th vAlign="top">Description</th>
+  </tr>
+  <tr>
+    <td valign="top">MethodDesc</td>
+    <td valign="top">Method Description</td>
+  </tr>
+  <tr>
+    <td valign="top">JIT information</td>
+    <td valign="top">Information about how the method was JIT-compiled.<br>
+    <ul>
+      <li>By EJIT</li>
+      <li>By normal JIT</li>
+      <li>By PreJIT</li>
+    </ul>
+    </td>
+  </tr>
+</table>
+<p>The rest of the information is the same information displayed using the <b>
+DumpMD</b> command.</p>
+<h4>Comments</h4>
+<p>It is easy to  confuse a valid instruction pointer with a stub or FCALL.&nbsp; A rough rule of thumb is that a JIT-compiled address 
+tends to be in the vicinity of <b>02000000 </b>(for example, <b>02ca776c) </b>
+&nbsp;whereas  most other addresses tend to be in the vicinity of <b>70000000</b> (for 
+example,<b> 79358a7c)</b>.</p>
+<h2><a name="Name2EECommand"></a>Name2EE Command</h2>
+<p>This command finds a MethodTable given a class name or a MethodDesc given a fully qualified 
+method name.</p>
+<h4>Syntax</h4>
+<blockquote>
+  <pre>!Name2EE <i>ModuleName</i> <i>ClassName</i>[.<i>MethodName</i>]</pre>
+</blockquote>
+<h4>Parameters</h4>
+<table border="1" width="1003">
+  <tr>
+    <th vAlign="top" width="157">Parameter</th>
+    <th vAlign="top" width="818">Description</th>
+  </tr>
+  <tr>
+    <td vAlign="top" width="157"><i>ModuleName</i> </td>
+    <td vAlign="top" width="818">Name of .dll&nbsp;or .exe file in which the class or method&nbsp;is defined, including extension.</td>
+  </tr>
+  <tr>
+    <td vAlign="top" width="157"><i>ClassName</i></td>
+    <td vAlign="top" width="818">Class name.</td>
+  </tr>
+  <tr>
+    <td vAlign="top" width="157"><i>MethodName</i></td>
+    <td vAlign="top" width="818">Fully qualified method name.</td>
+  </tr>
+</table>
+<h4>Example</h4>
+<p>The following example demonstrates debugging the iserializable.exe sample on Windows.</p>
+<p>Some debugger output has been removed for clarity.</p>
+<pre>D:\sscli\build\v1.x86chk.rotor\samples\howto\serialization&gt;cdb clix iserializable.exe
+
+Microsoft (R) Windows Debugger  Version 6.0.0017.0
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+CommandLine: clix iserializable.exe
+0:000&gt; <b>.load sos.dll</b>
+0:000&gt; <b>bp rotor_pal!pal_writefile</b>
+0:000&gt; <b>g
+</b>Breakpoint 0 hit
+rotor_pal!PAL_WriteFile:
+79b03880 55               push    ebp
+0:000&gt; <b>!name2ee iserializable.exe SimpleGraph</b>
+--------------------------------------
+MethodTable: 007b5128
+EEClass: 06ef108c
+Name: SimpleGraph
+0:000&gt; <b>!name2ee iserializable.exe SimpleGraph.FillTree</b>
+--------------------------------------
+MethodDesc: 7b50e0
+Name: [DEFAULT] Void SimpleGraph.FillTree(Class TreeNode)
+-----------------------
+0:000&gt;</pre>
+<h4>Comments</h4>
+<p>This function is commonly used to get the MethodTable or EEClass addresses 
+for a given class name. With those addresses you can use the <b>DumpMT</b> 
+and <b>DumpClass</b> commands to get additional information about the class.&nbsp;</p>
+<p>When given a method name, the <b>Name2EE</b> command returns a MethodDesc. With the MethodDesc 
+address you can use the <b>DumpMD</b> command to get additional information 
+about the method.</p>
+<h2><a name="SyncBlkCommand"></a>SyncBlk Command</h2>
+<p>This command lists synchronization blocks.</p>
+<h4>Syntax</h4>
+<blockquote>
+  <pre>!SyncBlk [-all|&lt;#&gt;]</pre>
+</blockquote>
+<h4>Parameters</h4>
+<table border="1" width="1003">
+  <tr>
+    <th vAlign="top" width="123">Parameter</th>
+    <th vAlign="top" width="852">Description</th>
+  </tr>
+  <tr>
+    <td vAlign="top" width="123"><strong>-all</strong></td>
+    <td vAlign="top" width="852">By default only synchronization blocks with locks will show 
+    up, -all will show all synchronization blocks.</td>
+  </tr>
+  <tr>
+    <td vAlign="top" width="123"><strong>#</strong></td>
+    <td vAlign="top" width="852">Show only a specific syncblock</td>
+  </tr>
+</table>
+<h4>Example</h4>
+<p>The following example demonstrates debugging the iserializable.exe sample on Windows.</p>
+<p>Some debugger output has been removed for clarity.</p>
+<p>Note that the breakpoint is hit several times to get to a position in the 
+code where the output of the <b>SyncBlk</b> command has more valid 
+values.</p>
+<pre>D:\sscli\build\v1.x86chk.rotor\samples\howto\serialization&gt;cdb clix iserializable.exe
+
+Microsoft (R) Windows Debugger  Version 6.0.0017.0
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+CommandLine: clix iserializable.exe
+0:000&gt; <b>.load sos.dll</b>
+0:000&gt; <b>bp rotor_pal!pal_writefile</b>
+0:000&gt; <b>g
+</b>Breakpoint 0 hit
+rotor_pal!PAL_WriteFile:
+79b03880 55               push    ebp
+0:000&gt; <b>g
+</b>Breakpoint 0 hit
+rotor_pal!PAL_WriteFile:
+79b03880 55               push    ebp
+0:000&gt; <b>g
+</b>Breakpoint 0 hit
+rotor_pal!PAL_WriteFile:
+79b03880 55               push    ebp
+0:000&gt; <b>g
+</b>Breakpoint 0 hit
+rotor_pal!PAL_WriteFile:
+79b03880 55               push    ebp
+0:000&gt; <b>!syncblk</b>
+Index SyncBlock MonitorHeld Recursion   Thread  ThreadID     Object Waiting
+    2 000974a4            1         1    8a130  15cc   0   00a01cb4 System.IO.TextWriter/SyncTextWriter
+-----------------------------
+Total           4
+ComCallWrapper  3
+ComPlusWrapper  0
+ComClassFactory 0
+Free            0
+0:000&gt;</pre>
+<h4>Output Layout</h4>
+<table border="1" width="90%">
+  <tr>
+    <th vAlign="top">Column</th>
+    <th vAlign="top">Description</th>
+  </tr>
+  <tr>
+    <td valign="top">Index</td>
+    <td valign="top">Synchronization block index.</td>
+  </tr>
+  <tr>
+    <td valign="top">SyncBlock</td>
+    <td valign="top">Address of synchronization block.</td>
+  </tr>
+  <tr>
+    <td valign="top">Recursion</td>
+    <td valign="top">Levels of recursion.</td>
+  </tr>
+  <tr>
+    <td valign="top">Thread</td>
+    <td valign="top">Address of the thread object&nbsp;waiting on the object this synchronization 
+    block is mapped to.<p>Use the <b>Threads</b> command to get more information about the 
+    thread.</td>
+  </tr>
+  <tr>
+    <td valign="top">ThreadID</td>
+    <td valign="top">ID in hexadecimal of thread waiting on this synchronization block.</td>
+  </tr>
+  <tr>
+    <td valign="top">Thread Number</td>
+    <td valign="top">Thread number as shown in the <b>Threads</b> command of the thread&nbsp;waiting on 
+    this synchronization block.</td>
+  </tr>
+  <tr>
+    <td valign="top">Object</td>
+    <td valign="top">Address of the object waiting on this synchronization block. Use 
+    the <b>DumpObj</b> command 
+    to get information about this object.</td>
+  </tr>
+  <tr>
+    <td valign="top">Waiting</td>
+    <td valign="top">Class of object that is waiting for this synchronization block. If the 
+    synchronization block is no longer in use, this will display free.</td>
+  </tr>
+  <tr>
+    <td valign="top">Total</td>
+    <td valign="top">Total number of synchronization blocks</td>
+  </tr>
+  <tr>
+    <td valign="top">ComCallWrapper</td>
+    <td valign="top">Not implemented in the SSCLI.</td>
+  </tr>
+  <tr>
+    <td valign="top">ComPlusWrapper</td>
+    <td valign="top">Number of ComPlus wrappers.</td>
+  </tr>
+  <tr>
+    <td valign="top">ComClassFactory</td>
+    <td valign="top">Number of ComClass factories.</td>
+  </tr>
+  <tr>
+    <td valign="top">Free</td>
+    <td valign="top">Number of free synchronization blocks.</td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+<h2><a name="ThreadPoolCommand"></a>ThreadPool Command</h2>
+<p>This command displays threadpool state.</p>
+<h4>Syntax</h4>
+<blockquote>
+  <pre>!ThreadPool</pre>
+</blockquote>
+<h4>Example</h4>
+<p>The following example demonstrates debugging the iserializable.exe sample on Windows.</p>
+<p>Some debugger output has been removed for clarity.</p>
+<p>The COMPlusJitHalt environment variable is being used to stop the debugger at 
+a point in the program after threadpool items have been created.&nbsp; It is 
+recommended that you run the utility once outside the debugger so it can strore 
+its settings file. This way you will not have to enter much input for the program while in 
+the debugger.</p>
+<pre>D:\sscli\build\v1.x86chk.rotor\samples\utilities\cleanbuild&gt;cdb clix iserializable.exe
+D:\sscli\build\v1.x86chk.rotor\samples\utilities\cleanbuild&gt;set COMPlus_JitHalt=WaitForOutput
+
+Microsoft (R) Windows Debugger  Version 6.0.0017.0
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+CommandLine: clix cleanbuild.exe
+0:000&gt; <b>.load sos.dll
+</b>
+Settings file found at D:\sscli\build\v1.x86chk.rotor\samples\utilities\cleanbui
+ld\cb.xml
+
+Current program settings are:
+   Build directory path: d:\sscli
+   Tar file location: d:\sscli_20021014.tar
+   Deletion script path: d:\junk\
+   OS type: Windows
+   Verbose: True
+
+Continue with generating deletion list? 'y' or 'n' y
+
+Starting command tar -tf d:\sscli_20021014.tar
+
+(16d0.15d4): Break instruction exception - code 80000003 (first chance)
+eax=07d00b84 ebx=7ffdf000 ecx=00b3450c edx=0008a130 esi=00000000 edi=0006f2b4
+eip=02d98de0 esp=0006edd4 ebp=0006ee3c iopl=0         nv up ei pl nz na po nc
+cs=001b  ss=0023  ds=0023  es=0023  fs=0038  gs=0000             efl=00000206
+02d98de0 cc               int     3
+0:000&gt; <b>!threadpool</b>
+Worker Thread: Total: 2 Running: 2 Idle: 1 MaxLimit: 50 MinLimit: 2
+Work Request in Queue: 1
+QueueUserWorkItemCallback DelegateInfo@0014fe28
+--------------------------------------
+Number of Timers: 0
+--------------------------------------				
+</pre>
+<h2><a name="ThreadsCommand"></a>Threads Command</h2>
+<p>This command lists managed thread information.</p>
+<h4>Syntax</h4>
+<blockquote>
+  <pre>!Threads</pre>
+</blockquote>
+<h4>Example</h4>
+<p>The following example demonstrates debugging the cleanbuild.exe sample on Windows.</p>
+<p>Some debugger output has been removed for clarity.</p>
+<p>The COMPlusJitHalt environment variable is being used to stop the debugger at 
+a point in the program after threadpool items have been created.&nbsp; It is 
+recommended that you run the utility once outside the debugger so it can strore 
+its settings file. This way you will not have to enter much input for the program while in 
+the debugger.</p>
+<pre>D:\sscli\build\v1.x86chk.rotor\samples\utilities\cleanbuild&gt;cdb clix iserializable.exe
+D:\sscli\build\v1.x86chk.rotor\samples\utilities\cleanbuild&gt;set COMPlus_JitHalt=WaitForOutput
+
+Microsoft (R) Windows Debugger  Version 6.0.0017.0
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+CommandLine: clix cleanbuild.exe
+0:000&gt; <b>.load sos.dll
+</b>
+Settings file found at D:\sscli\build\v1.x86chk.rotor\samples\utilities\cleanbui
+ld\cb.xml
+
+Current program settings are:
+   Build directory path: d:\sscli
+   Tar file location: d:\sscli_20021014.tar
+   Deletion script path: d:\junk\
+   OS type: Windows
+   Verbose: True
+
+Continue with generating deletion list? 'y' or 'n' y
+
+Starting command tar -tf d:\sscli_20021014.tar
+
+(16d0.15d4): Break instruction exception - code 80000003 (first chance)
+eax=07d00b84 ebx=7ffdf000 ecx=00b3450c edx=0008a130 esi=00000000 edi=0006f2b4
+eip=02d98de0 esp=0006edd4 ebp=0006ee3c iopl=0         nv up ei pl nz na po nc
+cs=001b  ss=0023  ds=0023  es=0023  fs=0038  gs=0000             efl=00000206
+02d98de0 cc               int     3
+0:000&gt; <b>!threads</b>
+ThreadCount: 3
+UnstartedThread: 0
+BackgroundThread: 2
+PendingThread: 0
+DeadThread: 0
+                             PreEmptive        Lock
+       ID ThreadOBJ    State     GC     Domain Count APT Exception
+  0  15d4 0008a130        20 Disabled 00084900     0
+  2  15cc 0008b180      1220 Enabled  00084900     0 (Finalizer)
+  3   ba0 07bad088   1800220 Disabled 00084900     1 (Threadpool Worker)									</pre>
+<h4>Output Format</h4>
+
+<table border="1" width="1003">
+  <tr>
+    <th vAlign="top" width="163">Column</th>
+    <th vAlign="top" width="812">Description</th>
+  </tr>
+  <tr>
+    <td valign="top" width="163">ThreadCount</td>
+    <td valign="top" width="812">Number of managed threads.</td>
+  </tr>
+  <tr>
+    <td valign="top" width="163">UnstartedThread</td>
+    <td valign="top" width="812">Number of unstarted managed threads.</td>
+  </tr>
+  <tr>
+    <td valign="top" width="163">BackgroundThread</td>
+    <td valign="top" width="812">Number of managed background threads.</td>
+  </tr>
+  <tr>
+    <td valign="top" width="163">PendingThread</td>
+    <td valign="top" width="812">Number of pending managed threads.</td>
+  </tr>
+  <tr>
+    <td valign="top" width="163">DeadThread</td>
+    <td valign="top" width="812">Number of inactive threads.</td>
+  </tr>
+  <tr>
+    <td valign="top" width="163">ID</td>
+    <td valign="top" width="812">Thread ID (in hexadecimal format). If the thread has 
+    terminated when the threads 
+    are displayed this will  show XXX.</td>
+  </tr>
+  <tr>
+    <td valign="top" width="163">ThreadObj</td>
+    <td valign="top" width="812">Address of the thread object for current thread.</td>
+  </tr>
+  <tr>
+    <td valign="top" width="163">State</td>
+    <td valign="top" width="812">Bitmasked DWORD of thread states.</td>
+  </tr>
+  <tr>
+    <td valign="top" width="163">PreEmptive GC</td>
+    <td valign="top" width="812">Enabled or Disabled. Shows if garbage 
+    collection is scheduled cooperatively 
+    with this thread.</td>
+  </tr>
+  <tr>
+    <td valign="top" width="163">Domain</td>
+    <td valign="top" width="812">Address of the domain this thread belongs to. Use 
+    the <b>DumpDomain</b> command 
+    for information about the domain</td>
+  </tr>
+  <tr>
+    <td valign="top" width="163">Lock Count</td>
+    <td valign="top" width="812">Number of locks that this thread is waiting on.</td>
+  </tr>
+  <tr>
+    <td valign="top" width="163">APT</td>
+    <td valign="top" width="812">Apartment threading model. This can be STA, MTA, NTA 
+    (neutral) or Unk (unknown).</td>
+  </tr>
+  <tr>
+    <td valign="top" width="163">Exception</td>
+    <td valign="top" width="812">Describes the type of thread if it is a thread 
+    used by the runtime. The possible values are:
+    <ul>
+      <li>finalizer</li>
+      <li>GC</li>
+      <li>Theadpool Worker</li>
+      <li>Threadpool Completion Port</li>
+    </ul>
+    </td>
+  </tr>
+</table>
+
+<h2><a name="Token2EECommand"></a>Token2EE Command</h2>
+<p>This command finds a memory address from a metadata token.</p>
+<h4>Syntax</h4>
+<blockquote>
+  <pre>!Token2EE <i>ModuleName</i> <i>mdToken</i></pre>
+</blockquote>
+<h4>Parameters</h4>
+<table border="1" width="1003">
+  <tr>
+    <th vAlign="top" width="202">Parameter</th>
+    <th vAlign="top" width="773">Description</th>
+  </tr>
+  <tr>
+    <td vAlign="top" width="202"><i>ModuleName</i></td>
+    <td vAlign="top" width="773">Module name including .dll or .exe extension.</td>
+  </tr>
+  <tr>
+    <td vAlign="top" width="202"><i>mdToken</i></td>
+    <td vAlign="top" width="773">Metadata token. You can obtain the mdToken 
+    value using the <b>DumpMD</b> or <b>DumpMT</b> commands.</td>
+  </tr>
+</table>
+<h4>Example</h4>
+<p>The following example demonstrates debugging the iserializable.exe sample on Windows.</p>
+<p>Some debugger output has been removed for clarity.</p>
+<pre>D:\sscli\build\v1.x86chk.rotor\samples\howto\serialization&gt;cdb clix iserializable.exe
+
+Microsoft (R) Windows Debugger  Version 6.0.0017.0
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+CommandLine: clix iserializable.exe
+
+0:000&gt; <b>.load sos.dll</b>
+0:000&gt; <b>bp rotor_pal!pal_writefile</b>
+0:000&gt; <b>g</b>
+Breakpoint 0 hit
+rotor_pal!PAL_WriteFile:
+0:000&gt; <b>!name2ee iserializable.exe SimpleGraph.Main</b>
+--------------------------------------
+MethodDesc: <b><font color="#FF0000">7b50b8</font></b>
+Name: [DEFAULT] Void SimpleGraph.Main(SZArray String)
+-----------------------
+0:000&gt; <b>!dumpmd <font color="#FF0000">7b50b8</font></b>
+Method Name : [DEFAULT] Void SimpleGraph.Main(SZArray String)
+Class : 714108c
+MethodTable 7b5128
+mdToken: <b><font color="#0000FF">06000001</font></b>
+Flags : 10
+Method VA : 06ca0304
+0:000&gt; <b>!token2ee iserializable.exe <font color="#0000FF">06000001</font></b>
+--------------------------------------
+MethodDesc: 7b50b8
+Name: [DEFAULT] Void SimpleGraph.Main(SZArray String)
+0:000&gt;</pre>
+<p>The following code continues the example to demonstrate using the MethodTable 
+tokens.</p>
+<pre>0:000&gt; <b>!name2ee iserializable.exe SimpleGraph</b>
+--------------------------------------
+MethodTable: <b><font color="#008000">007b5128</font></b>
+EEClass: 06ef108c
+Name: SimpleGraph
+0:000&gt; <b>!dumpmt <font color="#008000">007b5128</font></b>
+EEClass : 06ef108c
+Module : 00095688
+Name: SimpleGraph
+mdToken: <b><font color="#800000">02000002</font></b>  (d:\sscli\build\v1.x86chk.rotor\samples\howto\serialization\iserializable.exe)
+MethodTable Flags : 80000
+Number of IFaces in IFaceMap : 0
+Interface Map : 007b5178
+Slots in VTable : 7
+0:000&gt; <b>!token2ee iserializable.exe <font color="#800000">02000002</font></b>
+--------------------------------------
+MethodTable: 007b5128
+EEClass: 06ef108c
+Name: SimpleGraph
+</pre>
+<h4>Comments</h4>
+<p>Token2EE supports mdtMethodDef, mdtTypeDef and mdtTypeRef tokens. <br>
+<br>
+For mdtMethodDef tokens this command displays the method descriptor address and the method 
+signature. Use the <b>DumpMD</b> command to get information about the method descriptor.<br>
+<br>
+For mdtTypeDef and mdtTypeRef tokens this command displays the method table address, the 
+EEClass address and the class name. Use the <b>DumpMT</b> command to get information about 
+the method table and use <b>!DumpClass</b> to get information about the EEClass.
+</p>
+<h2><a name="UCommand"></a>U Command</h2>
+<p>This command disassembles managed code that has been JIT-compiled.</p>
+<h4>Syntax</h4>
+<blockquote>
+  <p>!U [<em>MethodDescriptor</em>] [<em>InstructionPointer</em>]</p>
+</blockquote>
+<h4>Parameters</h4>
+<table border="1" width="90%">
+  <tr>
+    <th vAlign="top">Parameter</th>
+    <th vAlign="top">Description</th>
+  </tr>
+  <tr>
+    <td vAlign="top" width="81"><em>MethodDescriptor</em></td>
+    <td vAlign="top">Disassembles a method based on the given method descriptor.</td>
+  </tr>
+  <tr>
+    <td vAlign="top" width="81"><em>InstructionPointer</em></td>
+    <td vAlign="top">Disassembles the method containing the given instruction 
+    pointer.</td>
+  </tr>
+</table>
+<h4>Example 1</h4>
+<p>The following example demonstrates debugging the iserializable.exe sample on Windows.</p>
+<p>Some debugger output has been removed for clarity.</p>
+<pre>D:\sscli\build\v1.x86chk.rotor\samples\howto\serialization&gt;cdb clix iserializable.exe
+
+Microsoft (R) Windows Debugger  Version 6.0.0017.0
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+CommandLine: clix iserializable.exe
+
+0:000&gt; <b>.load sos.dll</b>
+0:000&gt; <b>bp rotor_pal!pal_writefile</b>
+0:000&gt; <b>g</b>
+Breakpoint 0 hit
+rotor_pal!PAL_WriteFile:
+0:000&gt; <b>!name2ee iserializable.exe SimpleGraph.Main</b>
+--------------------------------------
+MethodDesc: <b><font color="#FF0000">7b50b8</font></b>
+Name: [DEFAULT] Void SimpleGraph.Main(SZArray String)
+0:000&gt; !u 7b50b8
+EJIT generated code
+[DEFAULT] Void SimpleGraph.Main(SZArray String)
+Begin 02ca2d54, size 6ee1c5b
+02ca2d54 55               push    ebp
+02ca2d55 8bec             mov     ebp,esp
+02ca2d57 56               push    esi
+02ca2d58 33f6             xor     esi,esi
+02ca2d5a 56               push    esi
+02ca2d5b b907000000       mov     ecx,0x7
+02ca2d60 6a00             push    0x0
+02ca2d62 e2fc             loop    02ca2d60
+02ca2d64 b8c000a001       mov     eax,0x1a000c0
+02ca2d69 8b00             mov     eax,[eax]
+02ca2d6b 8bc8             mov     ecx,eax
+02ca2d6d 51               push    ecx
+02ca2d6e b88481ec06       mov     eax,0x6ec8184
+02ca2d73 ff10             call    dword ptr [eax] (System.Console[mscorlib.dll].WriteLine)
+02ca2d75 83c404           add     esp,0x4
+02ca2d78 b82800a001       mov     eax,0x1a00028
+02ca2d7d 8b00             mov     eax,[eax]
+02ca2d7f 50               push    eax
+02ca2d80 b838547b00       mov     eax,0x7b5438 (MT: TreeNode)
+02ca2d85 50               push    eax
+02ca2d86 b824207a00       mov     eax,0x7a2024 (JitHelp: NEWSFAST)
+02ca2d8b ffd0             call    eax (JitHelp: NEWSFAST)
+02ca2d8d 83c404           add     esp,0x4
+02ca2d90 8bf0             mov     esi,eax
+02ca2d92 8bc8             mov     ecx,eax
+02ca2d94 5a               pop     edx
+02ca2d95 52               push    edx
+02ca2d96 51               push    ecx
+02ca2d97 b87c547b00       mov     eax,0x7b547c
+<font color="#0000FF"><b>02ca2d9c</b></font> ff10             call    dword ptr [eax] (TreeNode[iserializable.exe]..ctor)
+02ca2d9e 83c408           add     esp,0x8
+02ca2da1 8bc6             mov     eax,esi
+02ca2da3 be00000000       mov     esi,0x0
+02ca2da8 8945f0           mov     [ebp-0x10],eax
+02ca2dab 8b45f0           mov     eax,[ebp-0x10]
+02ca2dae 8bc8             mov     ecx,eax
+02ca2db0 51               push    ecx
+02ca2db1 b864517b00       mov     eax,0x7b5164
+02ca2db6 ff10             call    dword ptr [eax] (SimpleGraph[iserializable.exe].FillTree)
+</pre>
+<p>(This example produces too much output to list.)</p>
+<p>The following code continues the example to demonstrate using an address 
+within JIT-compiled code.</p>
+<pre>0:000&gt; <b>!u <font color="#0000FF">02ca2d9c</font></b>
+EJIT generated code
+[DEFAULT] Void SimpleGraph.Main(SZArray String)
+Begin 02ca2d54, size 6ee1c5b
+02ca2d54 55               push    ebp
+02ca2d55 8bec             mov     ebp,esp
+02ca2d57 56               push    esi
+02ca2d58 33f6             xor     esi,esi
+02ca2d5a 56               push    esi
+02ca2d5b b907000000       mov     ecx,0x7
+02ca2d60 6a00             push    0x0
+02ca2d62 e2fc             loop    02ca2d60
+02ca2d64 b8c000a001       mov     eax,0x1a000c0
+02ca2d69 8b00             mov     eax,[eax]
+02ca2d6b 8bc8             mov     ecx,eax
+02ca2d6d 51               push    ecx
+02ca2d6e b88481ec06       mov     eax,0x6ec8184
+02ca2d73 ff10             call    dword ptr [eax] (System.Console[mscorlib.dll].
+WriteLine)
+02ca2d75 83c404           add     esp,0x4
+02ca2d78 b82800a001       mov     eax,0x1a00028
+02ca2d7d 8b00             mov     eax,[eax]
+02ca2d7f 50               push    eax
+02ca2d80 b838547b00       mov     eax,0x7b5438 (MT: TreeNode)
+02ca2d85 50               push    eax
+02ca2d86 b824207a00       mov     eax,0x7a2024 (JitHelp: NEWSFAST)
+02ca2d8b ffd0             call    eax (JitHelp: NEWSFAST)
+02ca2d8d 83c404           add     esp,0x4
+02ca2d90 8bf0             mov     esi,eax
+02ca2d92 8bc8             mov     ecx,eax
+02ca2d94 5a               pop     edx
+02ca2d95 52               push    edx
+02ca2d96 51               push    ecx
+02ca2d97 b87c547b00       mov     eax,0x7b547c
+02ca2d9c ff10             call    dword ptr [eax] (TreeNode[iserializable.exe]..
+ctor)
+02ca2d9e 83c408           add     esp,0x8
+02ca2da1 8bc6             mov     eax,esi
+02ca2da3 be00000000       mov     esi,0x0
+02ca2da8 8945f0           mov     [ebp-0x10],eax
+02ca2dab 8b45f0           mov     eax,[ebp-0x10]
+02ca2dae 8bc8             mov     ecx,eax
+02ca2db0 51               push    ecx
+02ca2db1 b864517b00       mov     eax,0x7b5164</pre>
+<p>(This example produces too much output to list.)</p>
+<p>The following code continues the example to demonstrate using items from 
+backtrace for disassembly.</p>
+<pre>0:000> <b>k</b>
+ChildEBP RetAddr
+0006d934 79553e4c rotor_pal!PAL_WriteFile [d:\sscli\pal\win32\win32pal.c @ 1700]
+0006d9a0 02ca35c4 sscoree!COMStreams::ConsoleHandleIsValid+0xac [d:\sscli\clr\src\vm\comstreams.cpp @ 153]
+WARNING: Frame IP not in any known module. Following frames may be wrong.
+0006d9c0 02ca3480 0x2ca35c4
+0006d9e0 02ca2fec 0x2ca3480
+0006da08 79358a7c 0x2ca2fec
+0006da10 7935130b sscoree!CallDescrWorkerInternal+0x28
+0006de48 79335fd3 sscoree!CallDescrWorker+0x9b [d:\rotor\clr\src\vm\class.cpp @11127]
+0006e094 7933585b sscoree!MethodDesc::CallDescr+0x5b3 [d:\rotor\clr\src\vm\method.cpp @ 1233]
+0006e0b4 79352284 sscoree!MethodDesc::Call+0x6b [d:\rotor\clr\src\vm\method.cpp @ 1009]
+0006e234 793528ef sscoree!EEClass::RunClassInit+0x214 [d:\rotor\clr\src\vm\class.cpp @ 11884]
+0006e33c 79352e51 sscoree!EEClass::DoRunClassInitHelper+0x14f [d:\rotor\clr\src\vm\class.cpp @ 11941]
+0006ec2c 793519df sscoree!EEClass::DoRunClassInit+0x301 [d:\rotor\clr\src\vm\class.cpp @ 12100]
+0006ec4c 793bd73e sscoree!MethodTable::CheckRunClassInit+0xbf [d:\rotor\clr\src\vm\class.cpp @ 11688]
+0006ede4 793bd368 sscoree!MethodDesc::DoPrestub+0x38e [d:\rotor\clr\src\vm\prestub.cpp @ 788]
+0006ee0c 0008afa5 sscoree!PreStubWorker+0xa8 [d:\rotor\clr\src\vm\prestub.cpp @592]
+0006ee20 02ca2d75 0x8afa5
+0006ee70 79358a7c <font color="#008000"><b>0x2ca2d75</b></font>
+0006ee7c 7935130b sscoree!CallDescrWorkerInternal+0x28
+0006f2b4 79335fd3 sscoree!CallDescrWorker+0x9b [d:\sscli\clr\src\vm\class.cpp @
+11127]
+0006f504 793359e3 sscoree!MethodDesc::CallDescr+0x5b3 [d:\sscli\clr\src\vm\method.cpp @ 1233]
+0:000> <b>!u <font color="#008000">0x2ca2d75</font></b>
+EJIT generated code
+[DEFAULT] Void SimpleGraph.Main(SZArray String)
+Begin 02ca2d54, size 6ee1c5b
+02ca2d54 55               push    ebp
+02ca2d55 8bec             mov     ebp,esp
+02ca2d57 56               push    esi
+02ca2d58 33f6             xor     esi,esi
+02ca2d5a 56               push    esi
+02ca2d5b b907000000       mov     ecx,0x7
+02ca2d60 6a00             push    0x0
+02ca2d62 e2fc             loop    02ca2d60
+02ca2d64 b8c000a001       mov     eax,0x1a000c0
+02ca2d69 8b00             mov     eax,[eax]
+02ca2d6b 8bc8             mov     ecx,eax
+02ca2d6d 51               push    ecx
+02ca2d6e b88481ec06       mov     eax,0x6ec8184
+02ca2d73 ff10             call    dword ptr [eax] (System.Console[mscorlib.dll].
+WriteLine)
+02ca2d75 83c404           add     esp,0x4
+02ca2d78 b82800a001       mov     eax,0x1a00028
+02ca2d7d 8b00             mov     eax,[eax]</pre>
+<p>(This example produces too much output to list.)</p>
+<h4>Comments</h4>
+<p>The output first displays the type of generated code. In the SSCLI it will 
+always be:</p>
+<blockquote>
+  <p><br>
+  EJIT generated code</p>
+</blockquote>
+<p><br>
+Next the output displays the method signature and then  the resulting 
+native instructions for the method. </p>
+<p><br>
+This command can be useful to disassembly managed code when looking at a call 
+stack. If the method has not yet been JIT-compiled, it will display &quot;Not jitted 
+yet&quot;.
+</p>
+<h2><a name="Glossary"></a>Glossary</h2>
+<table border="1" width="1003">
+  <tr>
+    <th vAlign="top">Term</th>
+    <th vAlign="top">Description</th>
+  </tr>
+  <tr>
+    <td width="200"><strong>Assembly</strong></td>
+    <td width="775">A reusable, versionable, and self-describing building 
+    block of a common language runtime application.</td>
+  </tr>
+  <tr>
+    <td width="200"><strong>Domain</strong></td>
+    <td width="775">A secure and versatile unit of processing that the common 
+    language runtime can use to provide isolation between applications. You can 
+    run several application domains in a single process with the same level of 
+    isolation that would exist in separate processes, but without incurring the 
+    additional overhead of making cross-process calls or switching between 
+    processes. The ability to run multiple applications within a single process 
+    dramatically increases server scalability.</td>
+  </tr>
+  <tr>
+    <td width="200"><strong>EEClass</strong></td>
+    <td width="775">A managed class.</td>
+  </tr>
+  <tr>
+    <td width="200"><strong>Field declarations (mdFieldDef)</strong></td>
+    <td width="775">Declarations of data members as members of classes or 
+    interfaces or as global module-level data members. </td>
+  </tr>
+  <tr>
+    <td width="200"><strong>mdToken</strong></td>
+    <td width="775">A metadata token; a 4-byte value.&nbsp;The most-significant byte 
+    specifies the type of the token.&nbsp;For example, a value of 1 means it is 
+    a TypeDef token, while a value of 4 means it is a FieldDef token.&nbsp;For 
+    the full list, with their values, see the CorTokenType enumeration in 
+    corhdr.h .<p>The lower 3 bytes give the index of the row that the token 
+    refers to within a metadata table.&nbsp;&nbsp; The lower 3 bytes is called 
+    the RID, or Record IDentifier.&nbsp;The metadata token with value 
+    0x01000007 is a way to refer to row number 7 in the TypeDef table, within 
+    the current scope. Similarly, token 0x0400001A refers to row number 26 
+    (decimal) in the FieldDef table within the current scope. Nothing is 
+    stored in row zero of a metadata table. A metadata token whose RID is 
+    zero is called a "nil" token. The metadata API defines a host of such 
+    nil tokens, one for each token type. For example, mdTypeDefNil with value 
+    0x01000000.&nbsp;</td>
+  </tr>
+  <tr>
+    <td width="200"><strong>Member references (mdMemberRef)</strong></td>
+    <td width="775">References to methods and fields.&nbsp; A member reference is generated 
+    in metadata for every method invocation or field access that is made by any 
+    implementation in this module, and a token is persisted in the MSIL stream. (Note that there is no runtime support for property or event references.)
+    </td>
+  </tr>
+  <tr>
+    <td width="200"><strong>Method definitions (mdMethodDef)</strong></td>
+    <td width="775">Definitions of methods as members of classes or interfaces or as global 
+    module-level methods. </td>
+  </tr>
+  <tr>
+    <td width="200"><strong>MethodDesc</strong></td>
+    <td width="775">Method descriptor. A CLI internal method 
+    representation.</td>
+  </tr>
+  <tr>
+    <td width="200"><strong>MethodTable</strong></td>
+    <td width="775">A CLI internal representation of a type.</td>
+  </tr>
+  <tr>
+    <td width="200"><strong>RVA(Relative Virtual Address)</strong></td>
+    <td width="775">The address of an item once loaded into memory, with the 
+    base address of the image file subtracted from it (such as the offset from the base 
+    address where the file is loaded). The RVA of an item will almost always 
+    differ from its position within the file on disk. </td>
+  </tr>
+  <tr>
+    <td width="200"><strong>Type declarations (mdTypeDef)</strong></td>
+    <td width="775">Declarations of runtime reference types (classes and interfaces) and 
+    of value types. </td>
+  </tr>
+  <tr>
+    <td width="200"><strong>Type references (mdTypeRef)</strong></td>
+    <td width="775">References to runtime reference types and value types, such as 
+    might 
+    occur when declaring variables as runtime reference or value types or in 
+    declaring inheritance or implementation hierarchies.&nbsp;In a very real 
+    sense, the collection of type references in a module is the collection of 
+    compile-time import dependencies. </td>
+  </tr>
+</table>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+</body>
+
+</html>

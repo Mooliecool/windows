@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> 
+<head>
+<title>Rotor SSCLI Managed Application Launcher</title>
+<link rel="stylesheet" type="text/css" href="../rotor.css">
+</head>	
+<body>
+	
+
+<h1>Shared Source CLI Managed Application Launcher</h1>
+<p>The Shared Source CLI (SSCLI) execution environment requires that managed 
+applications be executed using the clix application launcher.&nbsp; This tool  loads the 
+SSCLI execution environment which  then loads the managed application 
+and starts its execution from the initial entry point. The initial  entry point is  by default 
+defined as a <b>static</b> method named  <b>Main</b> in some class 
+in the assembly.&nbsp; If there are multiple static classes named  <b>Main</b>, the 
+entry point must be specified by using the<b> /main</b>:<i>method</i> option of the 
+al.exe Assembly Linker or <b>/main</b>:<i>type</i> option of the C# compiler.</p>
+
+
+<p>You must use clix.exe to execute applications under 
+the SSCLI execution environment.&nbsp; If you fail to use the clix launcher on 
+Microsoft Windows® and simply execute the application name, the managed 
+application might execute under the .NET Framework if it is installed.</p>
+
+
+<p>The clix application will be in your path if you have used env.bat to 
+set your SSCLI environment variables and you have successfully built the source 
+tree.</p>
+
+
+<h4>Usage</h4>
+
+
+<blockquote>
+
+
+<PRE class="syntax"><B>clix</B> <i>managed_application [optional arguments to managed application]</i></PRE>
+
+ 
+</blockquote>
+
+ 
+<p>The following table describes the options available.</p>
+
+ 
+<table border=1>
+
+<TR VALIGN="top">
+<TH width=33%>Option</TH>
+<TH width=67%>Description</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><i>managed_application</i></TD>
+<TD width=67%>The file name of the managed application file you want to execute 
+in the SSCLI execution environment.&nbsp; The file name must fully specify 
+the path to the managed application if the application is not in the current directory.<p>The 
+application must be a managed executable file which has an initial execution 
+entry point as defined by the <b>/main</b>:<i>method</i> option of the Assembly Linker or the <b>/main</b>:<i>type </i>option of the C# compiler.</p>
+<p>The .exe extension is inferred if it is not directly specified.<p>If no 
+extension is supplied and the filename does not exist exactly as specified, clix appends &quot;.exe&quot; (lowercase) to the name specified by <i>
+managed_application
+</i>and attempts to load a file with that name.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%>optional arguments to <i>managed_application</i></TD>
+<TD width=67%>Arguments passed to the managed application.</TD>
+</TR>
+
+</table>
+
+ 
+<p>The following table describes clix errors.</p>
+
+ 
+<table border=1>
+
+<TR VALIGN="top">
+<TH width=33%>Error</TH>
+<TH width=67%>Description</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%>Out of memory</TD>
+<TD width=67%>The application launcher failed to allocate sufficient memory.&nbsp; 
+The application might be too large to load into memory or there might be a configuration 
+problem with the execution environment.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%>Invalid EXE file size</TD>
+<TD width=67%>The file size exceeds the file size limit of 4,294,967,295 
+((DWORD)0xFFFFFFFF)</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%>Invalid EXE format</TD>
+<TD width=67%>The specified managed application file is not an executable file. 
+It is probably a text or other document or data file.</TD>
+</TR>
+
+<tr>
+<TD width=33%>Invalid EXE signature</TD>
+<TD width=67%>The PE image header of the .exe file contains an invalid signature 
+value.</TD>
+</tr>
+
+<TR VALIGN="top">
+<TD width=33%>EXE is not Managed</TD>
+<TD width=67%>The specified managed application file is not a managed 
+executable file.&nbsp; It is probably an unmanaged application or library.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%>Failed to load execution environment from <i>filename</i>.
+<p><i>Reason for error</i></TD>
+<TD width=67%>The application launcher is unable to load the SSCLI 
+execution environment.&nbsp; Either the environment configuration or environment 
+variables are incorrect or specific required files are missing.<p>For example, 
+the full error</p>
+<blockquote>
+<pre>Failed to load execution environment from sscoree.dll. 
+The specified module could not be found.</pre>
+</blockquote>
+indicates that the critical Shared Source CLI file, sscoree.dll, could not be found.&nbsp; 
+Your build process might have failed to build the file, or the file might have been 
+deleted or corrupted.&nbsp; Build again and check closely for build errors. </TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%>Could not open file <i>filename</i>.
+<p><i>Reason for error</i></TD>
+<TD width=67%>The specified managed application file,<i> filename, </i>could not 
+be opened.&nbsp; The <i>reason for error </i>text indicates the reason 
+for the error.&nbsp; For example, the reason
+<blockquote>
+  <pre>The system cannot find the file specified.</pre>
+</blockquote>
+<p>indicates that the file cannot be found at the specified location.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><p>Could not find CorExeMain in the execution environment at <i>
+filename</i>. <p><i>Reason for error</i></TD>
+<TD width=67%>The specified managed application file did not contain an 
+execution entry point.&nbsp; It is either a managed library assembly or an 
+incorrectly linked managed application assembly.</TD>
+</TR>
+
+</table>
+
+ 
+<h4>Source Location</h4>
+<p>Source code for the clix.exe application launcher can be found by searching 
+the SSCLI source tree for the clix directory.&nbsp; The default 
+location is <a href="../../clr/src/tools/clix"> sscli20\clr\src\tools\clix</a><i>.</i></p>
+
+<hr>
+
+<p><i>Copyright (c) 2006
+    Microsoft Corporation. All rights reserved.</i></p>
+</body> 
+</html>

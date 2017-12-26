@@ -1,0 +1,58 @@
+# ==++==
+# 
+#   
+#    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+#   
+#    The use and distribution terms for this software are contained in the file
+#    named license.txt, which can be found in the root of this distribution.
+#    By using this software in any fashion, you are agreeing to be bound by the
+#    terms of this license.
+#   
+#    You must not remove this notice, or any other, from this software.
+#   
+# 
+# ==--==
+
+BUILD_USING_VC7PDBS=1
+
+PROJECT_ROOT=$(BASEDIR)\csharp
+!include $(DEVDIV_TOOLS)\sources.inc
+
+TARGETNAME=csc
+TARGETTYPE=PROGRAM
+TARGETPATH=$(_OBJ_DIR)
+CREATE_BIN_CONFIG=1
+CREATE_URT_CONFIG=1
+
+UMTYPE=console
+NO_NTDLL=1
+USE_MSVCRT=1
+USE_STATIC_ATL=1
+NO_UM_ENTRY=1
+
+
+USER_INCLUDES=..\inc;$(SDK_INC_PATH);$(_NTTREE)\inc\$(TARGET_DIRECTORY);$(VB_INC_PATH)
+
+C_DEFINES=$(C_DEFINES) -DX86 -D_MBCS -DTESTCMD -D_WINDOWS -DSTRICT -DNT -D_USRDLL
+
+
+!if !$(FREEBUILD)
+# add runtime checks in debug build
+#USER_C_FLAGS=$(USER_C_FLAGS) -RTCs -RTCv -RTCc
+!endif
+
+# These files are listed in alphabetical order.  Keep them that way!
+SOURCES= \
+	scc.rc \
+	scc.cpp \
+        CompilerHost.cpp        
+
+TARGETLIBS= \
+    $(_NTTREE)\lib\*\cscutil$(ALT_STATIC_LIB_CHAR).lib \
+    $(PAL_LIB_PATH)\unilib.lib \
+
+PRECOMPILED_INCLUDE=stdafx.h
+PRECOMPILED_SOURCEFILE=stdafx.cpp
+PRECOMPILED_PCH=stdafx.pch
+PRECOMPILED_OBJ=stdafx.obj
+PRECOMPILED_CXX=1

@@ -1,0 +1,84 @@
+#
+# 
+#  Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+# 
+#  The use and distribution terms for this software are contained in the file
+#  named license.txt, which can be found in the root of this distribution.
+#  By using this software in any fashion, you are agreeing to be bound by the
+#  terms of this license.
+# 
+#  You must not remove this notice, or any other, from this software.
+# 
+#
+
+NO_NTDLL=1
+
+INCLUDES        = $(INCLUDES);$(VCTOOLS_INC_PATH)
+
+TARGETNAME      = mscorejt
+TARGETPATH      = $(_OBJ_DIR)
+TARGETTYPE      =DYNLINK
+UMTYPE          =windows
+
+###############################################################################
+# Compiler options
+###############################################################################
+PRECOMPILED_INCLUDE    =jitpch.h
+PRECOMPILED_CXX        =1
+
+!if !$(FREEBUILD) && "$(FEATURE_PAL)"!="1"
+DELAYLOADLIST   = msdis150.dll
+!ENDIF
+
+!if "$(DELAYLOAD)" != ""
+DELAYLOAD               =$(DELAYLOAD);$(DELAYLOADLIST)
+!else
+DELAYLOAD               =$(DELAYLOADLIST)
+!endif
+
+USE_DELAYIMP_LIB = 1
+
+!if $(FREEBUILD)
+USER_C_FLAGS     = $(USER_C_FLAGS) -DFAST=1
+!if "$(FEATURE_PAL)"!="1" || "$(ROTOR_TOOLSET)"=="MSVC"
+USER_C_FLAGS     = $(USER_C_FLAGS) -Oxs
+MSC_OPTIMIZATION =
+!endif
+!else
+!endif
+
+WIN32DLL_LIBS=                         \
+        $(CLR_LIB_PATH)\utilcode.lib   \
+
+###############################################################################
+# Other libs we need to link to
+###############################################################################
+
+
+!if !$(FREEBUILD)
+
+!endif
+
+CONDITIONAL_INCLUDES = $(CONDITIONAL_INCLUDES) \
+        new strstream
+
+###############################################################################
+# Source files
+###############################################################################
+
+SOURCES=            \
+    Fjit.cpp            \
+    Fjitcompiler.cpp    \
+    FjitEncode.cpp \
+    fjitverifier.cpp \
+    native.rc
+
+DLLENTRY        =_DllMainCRTStartup
+
+i386_SOURCES=i386\x86fjitasm.asm
+
+ROTOR_X86_SOURCES=rotor_x86\x86fjitasm.asm
+
+PPC_SOURCES=ppc\ppcfjitasm.s
+
+#NO_AUTOMATIC_MANIFEST=1

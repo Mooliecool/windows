@@ -1,0 +1,40 @@
+# /*++
+# 
+#  Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+# 
+#  The use and distribution terms for this software are contained in the file
+#  named license.txt, which can be found in the root of this distribution.
+#  By using this software in any fashion, you are agreeing to be bound by the
+#  terms of this license.
+# 
+#  You must not remove this notice, or any other, from this software.
+# 
+#
+# Module Name : arch/makefile.in
+#
+# process this file with configure to create a makefile
+#
+# --*/
+
+SHELL = @SHELL@
+
+TOP_SRC_DIR = @top_srcdir@
+
+# Location of architecture-dependent code
+ARCH_DIR = @ARCH_DIR@
+
+
+all: archobjs makefile
+
+archobjs: makefile
+	cd ../../$(ARCH_DIR)/obj$(BUILD_ALT_DIR)/$(_BUILDARCH) && $(MAKE) && cd ../../../obj$(BUILD_ALT_DIR)/$(_BUILDARCH)
+
+makefile : ../../makefile.in
+	@echo $? is newer than $@, please rerun $(TOP_SRC_DIR)/$(_BUILDARCH)/configure.
+	@exit 1
+
+depend: makefile
+	cd ../../$(ARCH_DIR)/obj$(BUILD_ALT_DIR)/$(_BUILDARCH) && $(MAKE) depend && cd ../../../obj$(BUILD_ALT_DIR)/$(_BUILDARCH)
+
+clean: makefile
+	cd ../../$(ARCH_DIR)/obj$(BUILD_ALT_DIR)/$(_BUILDARCH) && $(MAKE) clean && cd ../../../obj$(BUILD_ALT_DIR)/$(_BUILDARCH)

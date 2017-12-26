@@ -1,0 +1,76 @@
+# ==++==
+# 
+#   
+#    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+#   
+#    The use and distribution terms for this software are contained in the file
+#    named license.txt, which can be found in the root of this distribution.
+#    By using this software in any fashion, you are agreeing to be bound by the
+#    terms of this license.
+#   
+#    You must not remove this notice, or any other, from this software.
+#   
+# 
+# ==--==
+
+BUILD_USING_VC7PDBS=1
+
+!include $(DEVDIV_TOOLS)\sources.inc
+
+TARGETNAME=cscutil$(ALT_STATIC_LIB_CHAR)
+TARGETTYPE=LIBRARY
+TARGETPATH=$(_NTTREE)\lib
+TARGETTEXT=lib
+
+# This lib is published, turn off LTCG for Whidbey Beta 1
+LTCG=0
+
+UMTYPE=windows
+
+USE_STATIC_ATL=1
+
+
+#we do NOT use exception handling
+!UNDEF USE_NATIVE_EH
+
+
+C_DEFINES=$(C_DEFINES) -D_ATL_NO_ATTRIBUTES
+USER_INCLUDES=\
+	$(VB_INC_PATH);\
+	..\inc;\
+	$(_NTTREE)\inc\$(TARGET_DIRECTORY);\
+    $(ENV_INC_PATH)
+
+!if "$(FEATURE_PAL)" != "1" || "$(ROTOR_TOOLSET)" == "MSVC"
+
+# The compiler doesn't do any fp-calculations except what comes from source, which must be precise
+!if "$(FEATURE_PAL)" != "1" || "$(ROTOR_TOOLSET_VERSION)" >= "80"
+MSC_OPTIMIZATION=$(MSC_OPTIMIZATION) /fp:precise
+!else
+MSC_OPTIMIZATION=$(MSC_OPTIMIZATION) /Op
+!endif
+!endif
+
+SOURCES=\
+        locks.cpp \
+	checksum.cpp \
+        file.cpp \
+        mempool_wrap.cpp \
+        node.cpp \
+	PositionData.cpp \
+	satellite.cpp \
+        strbuild.cpp \
+        table.cpp \
+
+PRECOMPILED_INCLUDE=pch.h
+PRECOMPILED_PCH=pch.pch
+PRECOMPILED_OBJ=pch.obj
+PRECOMPILED_CXX=1
+
+!IF "$(BUILD_BROWSE)"!="no"
+!IF "$(NO_BROWSE_INFO)"==""
+BROWSER_INFO=1
+NO_BROWSER_FILE=1
+!ENDIF
+!ENDIF
+

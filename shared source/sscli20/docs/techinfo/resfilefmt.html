@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> 
+<head>
+<title>Default Resource File Format</title>
+<link rel="stylesheet" type="text/css" href="../rotor.css">
+</head>
+<body>
+ <h1>Default Resource File Format</h1>
+     
+ <p>There are four sections to the default file format: </p>
+ <ul>
+   <li>Section 1 - Resource Manager header.</li>
+   <li>Section 2 - RuntimeResourceReader header.</li>
+   <li>Section 3 - RuntimeResourceReader Name section.</li>
+   <li>Section 4 - RuntimeResourceReader Data section.</li>
+   </ul>
+
+ <table border="1" width="90%">
+   <tr>
+     <th width="50%">Field</th>
+     <th width="50%">Type of data</th>
+   </tr>
+   <tr>
+     <td width="100%" colspan="2" align="center">Section 1: Resource Manager header</td>
+   </tr>
+   <tr>
+     <td width="50%">Magic Number (0xBEEFCACE) </td>
+     <td width="50%">Int32 </td>
+   </tr>
+   <tr>
+     <td width="50%">Resource Manager header version </td>
+     <td width="50%">Int32 </td>
+   </tr>
+   <tr>
+     <td width="50%">Number of bytes to skip from here to get past this header </td>
+     <td width="50%">Int32 </td>
+   </tr>
+   <tr>
+     <td width="50%">Class name of <b>IResourceReader</b> to parse this file </td>
+     <td width="50%">String </td>
+   </tr>
+   <tr>
+     <td width="50%">Class name of <b>ResourceSet</b> to parse this file </td>
+     <td width="50%">String </td>
+   </tr>
+   <tr>
+     <td width="100%" colspan="2" align="center">Section 2: RuntimeResourceReader header</td>
+   </tr>
+   <tr>
+     <td width="50%"><b>RuntimeResourceReader</b> version number </td>
+     <td width="50%">Int32 </td>
+   </tr>
+   <tr>
+     <td width="50%">Number of resources in the file </td>
+     <td width="50%">Int32 </td>
+   </tr>
+   <tr>
+     <td width="50%">Number of types in the type table </td>
+     <td width="50%">Int32 </td>
+   </tr>
+   <tr>
+     <td width="50%">Padding bytes for 8-byte alignment (use PAD)</td>
+     <td width="50%">Bytes (0-7) </td>
+   </tr>
+   <tr>
+     <td width="50%">Name of each type </td>
+     <td width="50%">Set of Strings</td>
+   </tr>
+   <tr>
+     <td width="50%">Hash values for each resource name </td>
+     <td width="50%">Int32 array, sorted </td>
+   </tr>
+   <tr>
+     <td width="50%">Virtual offset of each resource name </td>
+     <td width="50%">Int32 array, coupled with hash values </td>
+   </tr>
+   <tr>
+     <td width="100%" colspan="2" align="center">Section 3: RuntimeResourceReader Name Section</td>
+   </tr>
+   <tr>
+     <td width="50%">Name and virtual offset of each resource </td>
+     <td width="50%">Set of [UTF-16 String, Int32] pairs</td>
+   </tr>
+   <tr>
+     <td width="100%" colspan="2" align="center">Section 4: RuntimeResourceReader Data Section</td>
+   </tr>
+   <tr>
+     <td width="50%">Type and Value of each resource </td>
+     <td width="50%">Set of [Int32, BLOB of bytes] pairs </td>
+   </tr>
+ </table>
+ 
+ <p>The first section is the Resource Manager header, which consists of a
+ magic number that identifies this as a Resource file, and a <b>ResourceSet</b>
+ class name.
+  
+ <p>The second section in the system default file format is the 
+ RuntimeResourceSet specific header.  This contains a version number for
+ the .resources file, the number of resources in this file, and the number of 
+ different types contained in the file, followed by a list of fully 
+ qualified type names.  This is followed by an array of hash values for
+ each resource name, then an array of virtual offsets into the name section
+ of the file.  The hashes allow you to do a binary search on an array of 
+ integers to find a resource name very quickly without doing many string 
+ compares (until you have found the target type).  If a hash
+ matches, the index into the array of hash values is used as the index
+ into the name position array to find the name of the resource.  The hash
+ function used to compute these values is as follows:
+ <pre>    uint hash = 5381;
+    for(int i=0; i &lt; key.Length; i++)
+        hash = ((hash &lt;&lt; 5) + hash) ^ key[i];
+    return (int) hash;
+ </pre>
+ You must use exactly this hash function for reading and writing .resources
+ files, because the values are saved to files on the disk.  Do not use the 
+ <b>String.GetHashCode</b> method because its implementation might change in the
+ future as developers find better and faster hash functions. The type table
+ allows you to read multiple different classes from the same
+ file,  including user-defined types, in a more efficient way than using 
+   serialization, at least when your .resources file contains a reasonable 
+ proportion of base data types such as strings or integers.  All non-intrinsic types are saved using serialization.
+ 
+ <p>The third section of the file is the name section.  It contains a 
+ series of resource names, written out as byte-length prefixed little-endian Unicode strings (UTF-16).  After each name is a four-byte virtual
+ offset into the data section of the file, pointing to the relevant 
+ string or serialized BLOB for this resource name.
+     
+ <p>The fourth section in the file is the data section, which consists
+ of a type and a BLOB of bytes for each item in the file.  The type is 
+ an integer index into the type table.  The data is specific to that type,
+ but can be a number written in binary format, a String, or a serialized 
+ Object.
+ 
+ <p>This implementation, when used with the default <b>ResourceReader</b> class, 
+ loads only the strings that you look up. The implementation can do string comparisons without 
+ having to create a new <b>String</b> instance due to some memory-mapped file 
+ optimizations in the <b>ResourceReader</b> and <b>FastResourceComparer</b> classes. 
+ Therefore the memory that is touched when loading 
+ resources is kept to a minimum.
+
+ <p>In addition, the resource implementation supports object serialization in a 
+ similar fashion. The ResourceManager builds an array of class types contained 
+ in this file and writes it to the RuntimeResourceReader header section of the 
+ file. Every resource will contain its type (as an index into the array of 
+ classes) with the data for that resource. The Resource Manager will use the CLI serialization support.
+ 
+ <p>All strings in the file format are written with <b>BinaryReader</b> and
+ <b>BinaryWriter</b>, which write out the length of the string as a 7-bit-encoded
+ integer, and then the contents as Unicode characters encoded in UTF-8.&nbsp; The
+ 
+ 7-bit encoding works as follows: If the value will fit completely in 
+ seven bits, then a single byte is written; otherwise the high bit on the 
+ first byte is set and a second byte is created by shifting the value 
+ by 7 bits.  This is repeated until there are enough bytes to hold 
+ the value.&nbsp; In the name table, each resource name is written in UTF-16 so 
+ it is possible to do a byte-by-byte comparison against the contents of the file
+ without allocating objects.
+
+ <p>Support for serialization is required for objects that will be embedded in 
+ resource files. CLI implementers should ensure that their
+ <b>BinaryReader</b>, <b>BinaryWriter</b>, and <b>BinaryFormatter</b> classes are working correctly.
+ 
+ <p>The offsets of each resource string are relative to the beginning of the 
+ Data section of the file. This way, if a tool decides to add 
+ one resource to a file, it    needs to increment only the number of 
+ resources, add the hash and location of the last byte in the name section
+ to the array of resource hashes and resource name positions (carefully
+ keeping these arrays sorted), add the name to the end of the name and 
+ offset list, possibly add the  list of types  (and increase 
+ the number of items in the type table), and add the resource value at 
+ the end of the file.  The other offsets would not need to be updated to 
+ reflect the longer header section.
+ 
+ <p>Resource files are currently limited to 2 gigabytes because of these 
+ design parameters.</p>
+
+ 
+
+<p><i>Copyright (c) 2006 Microsoft Corporation. All rights reserved.</i></p>
+</body>
+</html>

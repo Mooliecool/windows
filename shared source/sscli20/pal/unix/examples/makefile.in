@@ -1,0 +1,86 @@
+# /*++
+# 
+#  Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+# 
+#  The use and distribution terms for this software are contained in the file
+#  named license.txt, which can be found in the root of this distribution.
+#  By using this software in any fashion, you are agreeing to be bound by the
+#  terms of this license.
+# 
+#  You must not remove this notice, or any other, from this software.
+# 
+#
+# Module Name : examples/makefile.in
+#
+# --*/
+
+############################
+# constant parts of makefile
+
+SHELL = @SHELL@
+
+TOP_SRC_DIR = @top_srcdir@
+SRC_DIR = @top_srcdir@/examples
+TOOL_SUBDIR = $(TOP_SRC_DIR)/build_tools/obj$(BUILD_ALT_DIR)/$(_BUILDARCH)
+INCLUDE_DIRS = -I$(TOP_SRC_DIR)/../inc
+
+CC = @CC@
+LDPARTIAL = @LDPARTIAL@
+
+# only use configure's CFLAGS if no environment variable is set for it.
+# any mandatory compiler flags should be placed in REQUIRED_CFLAGS (see below)
+CFLAGS = @CFLAGS@
+
+ALLCFLAGS = $(REQUIRED_CFLAGS) $(CFLAGS)
+
+PALDEFS=
+
+.SUFFIXES:
+.SUFFIXES: .c .o
+
+###########################
+# variable part of makefile
+
+TOP_BUILD_DIR = ..
+
+REQUIRED_CFLAGS =
+
+PTHREAD_OPTIONS = @PTHREAD_OPTIONS@
+
+MODULE_NAME = examples
+TARGET_OBJ = example1
+C_SRCS = ../../example1.c
+OBJS = example1.o
+
+#################
+# targets
+
+all: makefile $(TARGET_OBJ)
+
+$(TARGET_OBJ): makefile $(OBJS)
+	$(CC) @PTHREAD_OPTIONS@ $(OBJS) -o $@ -L$(_NTTREE) -lrotor_pal @LDFLAGS@
+
+makefile : ../../makefile.in
+	@echo $? is newer than $@, please rerun $(TOP_SRC_DIR)/obj$(BUILD_ALT_DIR)/$(_BUILDARCH)/configure.
+	@exit 1
+
+depend: makefile $(TOOL_SUBDIR)/mdtool
+#run mdtool
+	@echo Making dependencies for $(MODULE_NAME) module
+	$(TOOL_SUBDIR)/mdtool $(PALDEFS) $(ALLCFLAGS) $(INCLUDE_DIRS) $(C_SRCS)
+
+$(TOOL_SUBDIR)/mdtool:
+	cd $(TOOL_SUBDIR) && $(MAKE) mdtool
+
+clean:
+	mkdir -p obj$(BUILD_ALT_DIR)
+	rm -f $(TARGET_OBJ)
+	rm -f $(OBJS)
+	rmdir obj$(BUILD_ALT_DIR)
+
+$(OBJS) : $(C_SRCS)
+	mkdir -p obj$(BUILD_ALT_DIR)
+	$(CC) -c $(PALDEFS) $(ALLCFLAGS) $(INCLUDE_DIRS) -o $@ $(C_SRCS)
+
+#don't add anything below this line!
+#mdtool output goes here>

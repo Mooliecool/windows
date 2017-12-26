@@ -1,0 +1,299 @@
+dnl /*++
+dnl 
+dnl  Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+dnl 
+dnl  The use and distribution terms for this software are contained in the file
+dnl  named license.txt, which can be found in the root of this distribution.
+dnl  By using this software in any fashion, you are agreeing to be bound by the
+dnl  terms of this license.
+dnl 
+dnl  You must not remove this notice, or any other, from this software.
+dnl 
+dnl
+dnl Module Name : configure.in
+dnl
+dnl process this file with autoconf to create a configure script
+dnl --*/
+
+AC_INIT(pal/inc/rotor_pal.h)
+rm -f config.status
+
+if test ! "$BUILD_ALT_DIR"
+then
+    echo "Environment not set. Run '. env.sh' before building Rotor."
+    exit
+fi
+
+dnl Some subdirectories have their own configure scripts.
+dnl This is run by make itself so don't run it here
+dnl AC_CONFIG_SUBDIRS(pal/unix/)
+
+dnl configure options propagated from subdirectories go here.
+
+AC_ARG_ENABLE(debug,
+[  --disable-debug          compile out all debug-only code],
+[if test "$enableval" = "no"; then DEBUG_ENABLED="no"; fi])
+
+AC_ARG_ENABLE(dbgmsg,
+[  --disable-dbgmsg         compile out all debugging messages],
+[if test "$enableval" = "no"; then DEBUG_MSGS="no"; fi])
+
+AC_ARG_WITH(vac,
+[  --with-vac   use visual age compiler instead of gcc],
+USE_VAC_CC=1)
+ 
+dnl Local environment checks.
+
+dnl set default value for CXX, for the platforms where we don't
+dnl override it.
+CXX=g++
+
+AC_MSG_CHECKING(architecture)
+ARCH_DIR=`(/usr/bin/uname -p | sed -e s/powerpc/ppc/ -e s/i.86/i386/) 2>/dev/null`
+if test X"$ARCH_DIR" = "X"; then
+  ARCH_DIR=`(/usr/bin/uname -s | sed -e s/HP-UX/parisc/) 2>/dev/null || echo unknown`
+fi
+if test "$ARCH_DIR" = "ppc"; then
+  if test `uname -s` = "AIX"; then
+    ARCH_DIR="aixppc"
+    if test "$USE_VAC_CC" = "1"; then
+        CC=xlC_r
+        CXX=xlC_r
+    else
+        CC=$CC
+        CXX=$CXX
+    fi
+  fi
+fi
+AC_MSG_RESULT($ARCH_DIR)
+
+dnl Define output variable SET_MAKE to be empty because make sets MAKE.
+AC_PROG_MAKE_SET
+
+
+dnl Compiler characteristics
+
+if test "$USE_VAC_CC" = "1";
+then
+     CFLAGS="$CFLAGS -qlanglvl=extc99 -qlanglvl=extended"
+     CFLAGS="$CFLAGS -L/usr/lib -D__STDC_VERSION__=199901L -qcpluscmt -D_VAC_"
+     NOSTDINC_FLAGS="-qnostdinc"
+else
+     NOSTDINC_FLAGS="-nostdinc"
+fi
+AC_SUBST(NOSTDINC_FLAGS)
+
+dnl Define CC to be the C compiler (hopefully GCC)
+AC_PROG_CC
+
+dnl Define CPP to be the C preprocessor (typically gcc -E)
+AC_PROG_CPP
+
+dnl Define linker prefix command for purify
+AC_SUBST(PURIFY_CMD)
+
+dnl Define BIGENDIAN if the current system is big-endian.
+dnl The presence of this macro causes autoconf 2.13 to print a warning
+dnl about cross-compiling.  The warning is a non-issue and can't be
+dnl disabled without modifying autoconf.
+AC_C_BIGENDIAN
+if test "$ac_cv_c_bigendian" = yes; then
+    BIGENDIAN="-DBIGENDIAN"
+else
+    dnl For completeness
+    BIGENDIAN=""
+fi
+AC_SUBST(BIGENDIAN)
+
+dnl Figure out what our C runtime library is. At the same time, we can
+dnl set an assortment of other flags that are different on Mac OS X and
+dnl FreeBSD.
+
+PTHREAD_OPTIONS=
+MAX_THREAD_OPTIONS=
+
+dnl Default compiler flags. These only apply to the tools and the PAL
+dnl test suite.  The PAL's compiler flags are set in pal/unix/configure.in,
+dnl and the compiler flags for the CLR are set in various files in
+dnl rotorenv/bin.
+dnl We turn on debugging and optimizations, build position-independent code,
+dnl and enable all warnings.
+dnl All code whose makefiles we build with configure is LP64 compatible (i.e.
+dnl does not assume long is always 32-bits)
+if test "$USE_VAC_CC" = "1"; then
+    CFLAGS="$CFLAGS -O2 -qflag=w:w -DPIC -DPLATFORM_UNIX -DLP64COMPATIBLE -qnoipa -qdbxextra"
+else
+    CFLAGS="-g -O2 $ALL_WARNINGS_FLAG -fPIC -DPIC -DPLATFORM_UNIX -DLP64COMPATIBLE"
+fi
+
+if test "$FEATURE_CASE_SENSITIVE_FS" = "1"; then
+    CFLAGS="$CFLAGS -DFEATURE_CASE_SENSITIVE_FILESYSTEM"
+fi
+
+if test "$BUILD_ALT_DIR" = "m"; then
+    CFLAGS="$CFLAGS -DPAL_PERF"
+fi
+
+CPPMUNGE_CFLAGS="-g $ALL_WARNINGS_FLAG -O2 -DPLATFORM_UNIX $BIGENDIAN"
+
+dnl consolidate platform-dependent (rather than feature-dependent) stuff 
+dnl here.  
+AC_MSG_CHECKING(which platform)
+if test `uname -s` = "AIX"; then
+    C_RUNTIME=c
+
+    if test "$USE_VAC_CC" = "1"; then
+	C_RUNTIME=c_r
+        SHARED_LIB="-G -bM:SRE -bnoentry"
+        CPPMUNGE_CFLAGS="-g -qflag=w:w -O2 -DPLATFORM_UNIX $BIGENDIAN -+"
+    else
+        SHARED_LIB=-shared
+    fi
+
+    SHARED_LIB_EXTENSION=.a
+    FRAMEWORKS=
+    dnl AIX has libpthreads.
+    LIBS="$LIBS -lpthreads"
+    EXTRA_LIBS="-lpthreads"
+    ASMFLAGS="-Wa,-mppc"
+    MAX_THREAD_OPTIONS=-Wl,\"-bmaxdata:0x80000000\"
+    REQUIRED_C_LIBS="/usr/lib/crt0_r.o"    
+
+    if test "$USE_VAC_CC" = "1"; then
+        GCC_LIB="/usr/lib/libC_r.a /usr/lib/libc_r.a" 
+    else
+        GCC_LIB="$GCC_LIB_DIR/libgcc.a $GCC_LIB_DIR/libstdc++.a /usr/lib/libc_r.a"
+    fi
+
+    dnl Disable some instruction reordering to allow our SEH code to work.
+    if test "$USE_VAC_CC" = "1"; then
+        dnl don't do anything for Visual Age Compiler
+        CFLAGS="$CFLAGS"
+    else
+        CFLAGS="$CFLAGS -fno-schedule-insns"
+    fi
+    LINKER_CC=ld
+    LINKER_CXX=ld
+    AC_MSG_RESULT(AIX)
+elif test `uname -s` = "HP-UX"; then
+    C_RUNTIME=c
+    SHARED_LIB="-Wl,-b -nostartfiles"
+    FRAMEWORKS=
+    LIBS="$LIBS -lpthread"
+    EXTRA_LIBS="-lpthread"
+    SHARED_LIB_EXTENSION=.sl
+    LINKER_CC=ld
+    LINKER_CXX=ld
+    if test `uname -m` = "ia64"; then
+        if test "$_BIT64" = "1"; then
+            CFLAGS="$CFLAGS -mlp64 -DBIT64 -D_WIN64  -nodefaultlibs "
+            LDFLAGS="$LDFLAGS -mlp64"
+        fi
+        EXTRA_LIBS="$EXTRA_LIBS -L/usr/local/lib/hpux64/ -L/usr/lib/hpux64/"
+        AC_MSG_RESULT(HPUX-Itanium)
+    else
+        REQUIRED_C_LIBS="/usr/lib/crt0.o"    
+        GCC_LIB="$GCC_LIB_DIR/libgcc.a /usr/local/lib/libstdc++.a /usr/lib/libc_r.sl"
+        CFLAGS="$CFLAGS -fno-schedule-insns"
+        AC_MSG_RESULT(HPUX - PA-RISC)
+    fi
+elif test `uname -s` = "FreeBSD"; then
+    SHARED_LIB=-shared
+    SHARED_LIB_EXTENSION=.so
+    FRAMEWORKS=
+    PTHREAD_OPTIONS=-pthread
+    if test "$ROTOR_TOOLSET_VERSION" \> "3.0.0 "; then
+        CFLAGS="$CFLAGS -fnon-call-exceptions"
+    fi
+
+    dnl 
+    dnl pthread library of FreeBSD restricts the maximum stack size of the
+    dnl initial thread to be 1MB. Currently, there is no way to change this
+    dnl other than recompiling the library.
+    dnl
+    CFLAGS="$CFLAGS -DPTHREAD_RESTRICTS_INITIAL_THREAD_STACKSIZE=1"
+    CFLAGS="$CFLAGS -DPTHREAD_INITIAL_THREAD_MAX_STACKSIZE=0x100000"
+
+    dnl Need to use -pthread when we link binaries against librotor_pal, as this is 
+    dnl a conventional wall to ensure that libc_r is used. Linking
+    dnl both libc and libc_r into a program causes crashes, and librotor_pal is
+    dnl linked against libc_r. 
+    LINKER_FLAGS=$PTHREAD_OPTIONS
+    LINKER_CC=$CC
+    LINKER_CXX=$CXX
+    AC_MSG_RESULT(FREEBSD)
+elif test `uname -s` = "Darwin"; then
+    dnl libSystem is Darwin's C runtime.
+    C_RUNTIME=System
+    SHARED_LIB=-dynamiclib
+    SHARED_LIB_EXTENSION=.dylib
+    FRAMEWORKS="-framework CoreFoundation"
+    AC_DEFINE(HAVE_CFSTRING)
+    AC_CHECK_LIB(System, _NSGetEnviron, AC_DEFINE(HAVE__NSGETENVIRON))
+    DLCOMPAT_DIR=dlcompat
+    DLCOMPAT_OBJ="obj\$(BUILD_ALT_DIR)/dlcompatobjs.o"
+    DLCOMPAT_INC="-I../\$(TOP_SRC_DIR)/dlcompat"
+    AC_DEFINE(HAVE_DYLIBS)
+    CFLAGS="$CFLAGS -no-cpp-precomp -fexceptions -fnon-call-exceptions"
+    EXTRA_LIBS="-sub_library libSystem"
+    CC_SONAME="-install_name \$(_NTTREE)/\$(MODULE_NAME)"
+    LINKER_CC=$CC
+    LINKER_CXX=$CXX
+    AC_MSG_RESULT(MACOSX)
+elif test `uname -s` = "SunOS"; then
+    SHARED_LIB=-shared
+    SHARED_LIB_EXTENSION=.so
+    FRAMEWORKS=
+    dnl 64-bit Solaris changes
+    if test "$_BIT64" = "1"; then
+        CFLAGS="$CFLAGS -fno-schedule-insns -DBIT64 -D_WIN64"
+        CC=/usr/local64/bin/gcc
+        CXX=/usr/local64/bin/g++
+    else
+        CFLAGS="$CFLAGS -fno-schedule-insns -fsjlj-exceptions"
+    fi
+    LINKER_FLAGS=
+    LINKER_CC=$CC
+    LINKER_CXX=$CXX
+    AC_MSG_RESULT(SOLARIS)
+else
+    AC_MSG_ERROR(Unknown Platform!)
+fi
+
+AC_SUBST(REQUIRED_C_LIBS)
+AC_SUBST(CPPMUNGE_CFLAGS)
+AC_SUBST(GCC_LIB)
+AC_SUBST(SHARED_LIB)
+AC_SUBST(SHARED_LIB_EXTENSION)
+AC_SUBST(LINKER_FLAGS)
+AC_SUBST(PTHREAD_OPTIONS)
+AC_SUBST(CXX)
+AC_SUBST(LINKER_CC)
+AC_SUBST(LINKER_CXX)
+AC_SUBST(MAX_THREAD_OPTIONS)
+
+dnl Here are the files to generate
+dnl !!!!  The absolute paths in the AC_OUTPUT must stay there, if you use relative paths instead (like ../..) the files will be generated at the right
+dnl   place, but they will contain wrong values for some variables (especially TOP_SRC_DIR). The only way to work this around I was able to find
+dnl   is by using the absolute paths. The only disadvantage of this is, that during the configure run it will output error emssages that it can't
+dnl   go to some subdirectories (it will try to add this absolute path to the current directory path), but that's no problem since
+dnl   even these messages all works fine.
+
+AC_OUTPUT([
+makefile:../../makefile.in
+makefile.common:../../makefile.common.in
+$ROTOR_DIR/tools/binplace/obj${BUILD_ALT_DIR}/${_BUILDARCH}/makefile:../../tools/binplace/makefile.in
+$ROTOR_DIR/tools/build/obj${BUILD_ALT_DIR}/${_BUILDARCH}/makefile:../../tools/build/makefile.in
+$ROTOR_DIR/tools/cppmunge/obj${BUILD_ALT_DIR}/${_BUILDARCH}/makefile:../../tools/cppmunge/makefile.in
+$ROTOR_DIR/tools/nmake/obj${BUILD_ALT_DIR}/${_BUILDARCH}/makefile:../../tools/nmake/makefile.in
+$ROTOR_DIR/tests/harness/test_harness/obj${BUILD_ALT_DIR}/${_BUILDARCH}/harness_comp_commands.h:../../tests/harness/test_harness/harness_comp_commands.h.in
+ ])
+ 
+dnl put the path of all output files to config.output_files
+dnl for checkconfig.pl to read.
+echo $ac_config_headers > config.output_files
+echo $ac_config_files >> config.output_files
+
+echo
+echo "Configure finished. Run './buildall' to build Rotor."
+echo

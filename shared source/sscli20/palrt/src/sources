@@ -1,0 +1,81 @@
+#
+# 
+#  Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+# 
+#  The use and distribution terms for this software are contained in the file
+#  named license.txt, which can be found in the root of this distribution.
+#  By using this software in any fashion, you are agreeing to be bound by the
+#  terms of this license.
+# 
+#  You must not remove this notice, or any other, from this software.
+# 
+#
+
+BUILD_CONSUMES=rotor_palrt_s.lib
+
+USE_NOLIBS                              = 1
+NO_NTDLL                                = 1
+
+TARGETLIBNAME=rotor_palrt
+TARGETNAME=rotor_palrt
+TARGETTYPE=DYNLINK
+TARGETPATH=$(_OBJ_DIR)
+TARGETPATHLIB=$(PAL_LIB_DEST)
+
+COFFBASE=rotor_palrt
+
+DLLENTRY=_DllMainCRTStartup
+
+ROTOR_USE_NOLIBS=1
+!ifndef PLATFORM_UNIX
+LINKLIBS=$(LINKLIBS)                   \
+        $(PAL_LIB_PATH)\rotor_pal.lib   
+!endif
+LINKLIBS=$(LINKLIBS)                   \
+        $(PAL_LIB_PATH)\rotor_palrt_s.lib   
+UNIX_DLL_LIBS=-lrotor_pal
+
+INCLUDES=$(INCLUDES);..\inc;..\..\pal
+
+EXCEPTION_HANDLING  = $(SEHONLY)
+
+!if "$(MINGW_BUILD)" != "1"
+# For the MinGW build, use the .def file for this library
+MINGW_USE_DLLDEF=1
+!endif
+
+DLLDEF = $(O)\rotor_palrt.def
+
+SOURCES=bignum.cpp \
+        bstr.cpp \
+        cocreate.cpp \
+        coguid.cpp \
+        comem.cpp \
+        convert.cpp \
+        crtstuff.cpp \
+        decarith.cpp \
+        decimal.cpp \
+        dllmain.cpp \
+        errinfo.cpp \
+        crypt.cpp \
+        inifile.cpp \
+        loadstring.cpp \
+        md5.cpp \
+        memorystream.cpp \
+        numprs.cpp \
+        palconfig.cpp \
+        path.cpp \
+        rotor_palrt.rc \
+        sarray.cpp \
+        sha1.cpp \
+        shstr.cpp \
+        strings.cpp \
+        urlpars.cpp \
+        variant.cpp
+
+!ifdef LINKONLY
+MISCFILES=$(ROTOR_DIR)\palrt\inc\*.h
+!ifndef PLATFORM_UNIX
+MISCFILES=$(MISCFILES) $(TARGETPATHLIB)\$(TARGET_DIRECTORY)\$(TARGETLIBNAME).lib
+!endif
+!endif

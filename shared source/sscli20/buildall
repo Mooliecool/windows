@@ -1,0 +1,235 @@
+#!/bin/sh
+# ==++==
+# 
+#   
+#    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+#   
+#    The use and distribution terms for this software are contained in the file
+#    named license.txt, which can be found in the root of this distribution.
+#    By using this software in any fashion, you are agreeing to be bound by the
+#    terms of this license.
+#   
+#    You must not remove this notice, or any other, from this software.
+#   
+# 
+# ==--==
+
+if test X"${_NTTREE}" = "X" 
+then
+    echo "ERROR: The _NTTREE environment variable isn't set."
+    echo "Please source the appropriate env.sh or env.csh file."
+    exit 1
+fi
+
+CLEANOPTION=$1
+VTTYOPTION=$2
+BUILDOPTIONS=$*
+if test -r ${ROTOR_DIR}/buildall.out; then rm -f ${ROTOR_DIR}/buildall.out;fi
+    
+    
+ReportError()
+{
+    echo \*\*\* Error while building ${BUILDALL_BUILDING}
+    echo     Open ${BUILDALL_ERRORLOG} to see the error log.
+    if test X"${BUILDITALL}" != "X"
+    then
+        echo setenv BUILDALL_BUILDING ${BUILDALL_BUILDING} > ${ROTOR_DIR}/buildall.out
+        echo setenv BUILDALL_ERRORLOG ${BUILDALL_ERRORLOG} >>${ROTOR_DIR}/buildall.out
+        echo setenv BUILDALL_WARNINGLOG ${BUILDALL_WARNINGLOG} >>${ROTOR_DIR}/buildall.out
+    fi
+    exit 1
+}
+
+ReportBuildError()
+{
+    BUILDALL_ERRORLOG=${BUILDALL_BUILDING}/${LOGBASENAME}.err
+    BUILDALL_WARNINGLOG=${BUILDALL_BUILDING}/${LOGBASENAME}.wrn
+    ReportError
+}
+
+RunMake()
+{
+    BUILDALL_BUILDING=$1
+    echo Building $2
+    BUILDALL_ERRORLOG=${BUILDALL_BUILDING}/${LOGBASENAME}.log
+    BUILDALL_WARNINGLOG=
+    if test -r ${BUILDALL_ERRORLOG}; then rm -f ${BUILDALL_ERRORLOG};fi
+    cd ${BUILDALL_BUILDING}
+    if test X"${CLEANOPTION}" = "X-c"
+    then
+        echo $MAKE clean:>>${BUILDALL_ERRORLOG}
+        $MAKE clean >>${BUILDALL_ERRORLOG} 2>&1
+        if test $? != 0 ; then ReportError; fi
+    fi
+    echo $MAKE: >>${BUILDALL_ERRORLOG}
+    $MAKE >${BUILDALL_ERRORLOG} 2>&1
+    if test $? != 0 ; then ReportError; fi
+    return 0
+}
+
+RunBuild()
+{
+    BUILDALL_BUILDING=$1
+    echo Building $2
+
+    cd ${BUILDALL_BUILDING}
+    if test X"${VTTYOPTION}" = "X-vtty"; then BUILDOPTIONS = "$BUILDOPTIONS -vtty"; fi
+    build $3 $4 $5 $BUILDOPTIONS
+    if test $? != 0 ; then ReportBuildError; fi
+}
+
+RunSetup()
+{
+    BUILDALL_BUILDING="${BUILDALL_SETUP_SCRIPT}"
+    echo Setting up $1
+    BUILDALL_ERRORLOG="${BUILDALL_SETUP_LOG}"
+    BUILDALL_WARNINGLOG=
+    perl ${BUILDALL_BUILDING} $2 $3 >>${BUILDALL_ERRORLOG}
+    if test $? != 0 ; then ReportError; fi
+}
+
+RunConfigure()
+{
+    BUILDALL_BUILDING="${ROTOR_DIR}/make configure"
+    BUILDALL_ERRORLOG=${ROTOR_DIR}/obj${BUILD_ALT_DIR}/${_BUILDARCH}/${LOGBASENAME}.log
+    mkdir -p ${ROTOR_DIR}/obj${BUILD_ALT_DIR}/${_BUILDARCH}
+    if [ X"${_BUILDTYPE}" = "Xprf" ] || [ X"${CLEANOPTION}" = "X-c" ]
+    then
+        $MAKE clean_configure >>${BUILDALL_ERRORLOG} 2>&1
+        if test $? != 0 ; then ReportError; fi
+    fi
+    $MAKE configure >>${BUILDALL_ERRORLOG} 2>&1
+    if test $? != 0; then ReportError; fi
+}
+
+MakeClean()
+{
+    echo $MAKE clean:>>${BUILDALL_ERRORLOG}
+    $MAKE clean >>${BUILDALL_ERRORLOG} 2>&1
+    if test $? != 0 ; then ReportError; fi
+
+    echo $MAKE depend: >>${BUILDALL_ERRORLOG}
+    $MAKE depend >>${BUILDALL_ERRORLOG} 2>&1
+    if test $? != 0 ; then ReportError; fi
+}
+
+BuildPAL()
+{
+    if test $1 = perf 
+    then
+        echo Building the PAL performance library...
+    else
+        echo Building the PAL library...
+    fi
+    
+    BUILDALL_BUILDING=${ROTOR_DIR}/pal/${PAL_UNIX_DIR}
+    BUILDALL_ERRORLOG=${BUILDALL_BUILDING}/${LOGBASENAME}.log
+    if [ "$1" != "pass2" ]
+    then 
+        if test -r ${BUILDALL_ERRORLOG}; then rm -f ${BUILDALL_ERRORLOG}; fi
+    fi
+    cd ${BUILDALL_BUILDING}
+    
+    if [ X"${CLEANOPTION}" = "X-c" ]
+    then
+        MakeClean
+    fi
+    
+    echo $MAKE: >>${BUILDALL_ERRORLOG}
+    $MAKE >>${BUILDALL_ERRORLOG} 2>&1
+    if test $? != 0 ; then ReportError; fi
+}
+
+BuildBaseTools()
+{
+    RunMake ${ROTOR_DIR}/tools/nmake "nmake tool"
+    RunMake ${ROTOR_DIR}/tools/cppmunge "cppmunge tool"
+    RunMake ${ROTOR_DIR}/tools/binplace "binplace tool"
+    RunMake ${ROTOR_DIR}/tools/build "build tool"
+    RunBuild ${ROTOR_DIR}/tools/resourcecompiler "Resource Compiler"
+}
+
+BuildPalRT()
+{
+    RunBuild ${ROTOR_DIR}/palrt "PAL RT"
+    RunBuild ${ROTOR_DIR}/palrt/msgs "PAL Resources"
+
+    if test -r ${ROTOR_DIR}/palrt/unilib/sources; then RunBuild ${ROTOR_DIR}/palrt/unilib "UniLib"; fi
+}
+
+if test X"${CLEANOPTION}" = "X-c" ; then 
+    rm -r -f ${_NTTREE}; 
+fi
+
+mkdir -p ${_NTTREE}
+mkdir -p ${_NTTREE}/sdk/pal/lib/${_BUILDTYPE}/${_BUILDARCH}
+mkdir -p ${NDPDIR}/clr/lib/${_BUILDTYPE}/${_BUILDARCH}
+
+# Allow custom makes. We can use bsdmake on Mac OS X, for example.
+if test X"$MAKE" = "X"
+then
+    MAKE=make
+    export MAKE
+fi
+
+
+# Run the configure for the rotor directory
+echo Running configure...
+RunConfigure $1
+
+BuildPAL normal
+
+BUILDALL_SETUP_SCRIPT=${ROTOR_DIR}/env/bin/setup.pl
+BUILDALL_SETUP_LOG=${_NTTREE}/setup${BUILD_ALT_DIR}_${_BUILDARCH}.log
+
+echo Copy prebuilt files.
+mkdir -p ${ROTOR_DIR}/prebuilt/idl/obj${BUILD_ALT_DIR}/${_BUILDARCH}
+cp -p -f ${ROTOR_DIR}/prebuilt/idl/*.h ${ROTOR_DIR}/prebuilt/idl/obj${BUILD_ALT_DIR}/${_BUILDARCH}/
+cp -p -f ${ROTOR_DIR}/prebuilt/idl/*_i.c ${ROTOR_DIR}/prebuilt/idl/obj${BUILD_ALT_DIR}/${_BUILDARCH}/
+mkdir -p ${ROTOR_DIR}/prebuilt/yacc/obj${BUILD_ALT_DIR}/${_BUILDARCH}
+cp -p -f ${ROTOR_DIR}/prebuilt/yacc/*.c ${ROTOR_DIR}/prebuilt/yacc/obj${BUILD_ALT_DIR}/${_BUILDARCH}/
+
+BuildBaseTools
+
+BuildPalRT
+
+RunBuild ${BASEDIR}/csharp "C# Compiler"
+
+RunBuild ${NDPDIR}/clr/src "CLR"
+
+BUILD_OPTIONS="~misc"
+export BUILD_OPTIONS
+RunBuild ${NDPDIR}/fx/src "FX - pass1 only" -L
+
+BUILD_OPTIONS=""
+export BUILD_OPTIONS
+RunBuild ${NDPDIR}/clr/src/managedlibraries "Remoting - pass1 only" -L
+RunBuild ${VSADIR} "JScript - pass1 only" -L
+
+RunBuild ${NDPDIR}/fx/src/sys "FX - System.dll"
+RunSetup "System.dll" GAC System.dll
+
+BUILD_OPTIONS="~sys ~misc"
+export BUILD_OPTIONS
+RunBuild ${NDPDIR}/fx/src "FX"
+RunSetup "System.Configuration.dll" GAC System.Configuration.dll
+
+BUILD_OPTIONS=""
+export BUILD_OPTIONS
+
+RunSetup "System.Configuration.dll" GAC System.Configuration.dll
+RunSetup "System.Xml.dll" GAC System.Xml.dll
+RunSetup "System.Data.SqlXml.dll" GAC System.Data.SqlXml.dll
+
+RunBuild ${NDPDIR}/fx/src/misc "FX - Misc"
+
+
+RunBuild ${NDPDIR}/clr/src/managedlibraries "Remoting"
+RunBuild ${VSADIR} "JScript"
+
+RunSetup "everything"
+
+RunBuild ${ROTOR_DIR}/samples "the samples"
+
+exit 0
+

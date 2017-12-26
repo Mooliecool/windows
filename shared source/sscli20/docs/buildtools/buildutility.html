@@ -1,0 +1,1719 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> 
+<head>
+<title>Build Utility (build.exe)</title>
+<link rel="stylesheet" type="text/css" href="../rotor.css">
+</head>
+<body>		
+
+<h1>Build Utility (build.exe/build)</h1>
+
+ 
+<p>Contents:</p>
+
+ 
+<ul>
+  <li><a href="#Overview">Overview</a></li>
+  <li><a href="#Usage">Usage</a></li>
+  <li><a href="#Features">Features</a></li>
+  <li><a href="#SpecialFiles">Special Files</a></li>
+  <li><a href="#EnvironmentVariables">Environment Variables</a></li>
+  <li><a href="#MacroDefinitions">Macro Definitions</a></li>
+  <li><a href="#OptionalMacros">Optional Macros</a></li>
+  <li><a href="#Multi-processorBuildIssues">Multiprocessor Build Issues</a></li>
+  <li><a href="#SpecifyingLibraries">Specifying Libraries</a></li>
+  <li><a href="#PrecompiledHeaders">Precompiled Headers</a></li>
+</ul>
+
+ 
+<h4><a name="Overview"></a>Overview</h4>
+
+ 
+<p>The build utility is the core of the Shared Source CLI (SSCLI) 2.0 build process.&nbsp; It is also 
+included 
+with the Microsoft&reg; Windows&reg; Device Driver Development Kit (DDK). You can find 
+additional documentation  by searching for &quot;build utility&quot; on <a href="http://msdn.microsoft.com/">
+msdn.microsoft.com</a>.</p>
+
+ 
+<p>The application file for the build utility is named <code>build.exe</code> on Windows.</p>
+
+ 
+<p>This tool is a driver that uses the Microsoft Program Maintenance Utility (nmake.exe) build tool.&nbsp;It is responsible for: </p>
+<ol>
+  <li>Recursing down directories listed in <i>dirs</i> files.</li>
+  <li>Producing one binary output per directory.&nbsp; Sources files contain 
+  instructions on how to produce a single binary output. This will be one of the 
+  following:
+  <ul>
+    <li>An archive (.lib on Windows). </li>
+    <li>A static code library (.lib on Win32). These are destined 
+  to be linked together into shared libraries </li>
+    <li>A shared library (.dll on Windows). </li>
+    <li>An executable (.exe on Win32). </li>
+  </ul>
+  </li>
+  <li>Starting nmake and the other build tools, then parsing their output, to 
+produce the build*.log, build*.wrn, and build*.err log output files. </li>
+</ol>
+<p>The build utility, together with its core makefiles (in env/bin), provides a 
+separation of build environment (compiler flags for example) from the actual 
+description of the sources to be compiled, allowing for multiple target 
+platforms with minimal changes to the build system. It also provides 
+standardized error reporting, and a number of developer conveniences, such as 
+spreading compilation across multiple processors. </p>
+
+<p>The build utility searches the dirs file for the macros DIRS and OPTIONAL_DIRS. It 
+then recurses to each directory listed where it might find another dirs file 
+(indicating more directories to recurse into) or a sources file (indicating 
+something needs to be built). If it finds a sources file, it looks for the macros SOURCES, 
+INCLUDES, TARGETNAME, and TARGETPATH. These are parsed to determine the 
+dependencies, the list of files to build, and the end result. Typically, this 
+information is then kept in a file called build.dat that the build utility will 
+create for future reference. Depending on the options you pass to the build 
+utility, it performs 
+the appropriate action and then calls a make program (For more information, see 
+BUILD_MAKE_PROGRAM) to build the component. There are files (makefil0 and 
+makefile.inc) that the build utility will recognize in special circumstances (for 
+instance, only on a clean build). When the entire directory tree is built, the 
+utility 
+terminates. </p>
+
+<h4><a name="Usage"></a>Usage:</h4>
+
+<blockquote>
+
+<PRE>build [options] [~]<i>directories</i></PRE>
+
+</blockquote>
+
+<h4><a name="Features"></a>Features of the Build Utility</h4>
+<p>The build utility:</p>
+<ul>
+  <li>Automatically establishes file dependencies.</li>
+  <li>Provides tools to build products for multiple hardware platforms without 
+  specifying any target-specific information.</li>
+  <li>Abstracts from the details of the various compilers and computer 
+  architectures.</li>
+  <li>Is multiprocessor aware for speedier compilation.</li>
+  <li>Provides detailed information about the build process.</li>
+  <li>Provides feedback during compilation, including:
+  <ul>
+    <li>How much longer before the build will finish.</li>
+    <li>How many lines are compiling.</li>
+    <li>How fast lines are being compiled.</li>
+    <li>How many files will be linked.</li>
+    <li>How many targets  will be created.</li>
+  </ul>
+  </li>
+</ul>
+
+<h4>Arguments</h4>
+<table border=1  width="100%">
+
+<TR VALIGN="top">
+<TH width=30%>Argument</TH>
+<TH width=70%>Description</TH>
+</TR>
+
+<tr>
+<TD width=30% valign="top"><i>directories</i></TD>
+<TD width=70% valign="top">Non-switch parameters specify additional source directories.&nbsp; 
+Specifying * builds all optional source directories.<p>Specifying the &quot;~&quot; (&quot;not&quot;) option 
+removes a directory from the default build.</TD>
+</tr>
+
+</table>
+
+<h4>Options</h4>
+
+<p>Options can be specified using either a dash ('-') or a slash ('/').</p>
+<table border=1  width="100%">
+
+<TR VALIGN="top">
+<TH width=30%>Option</TH>
+<TH width=70%>Description</TH>
+</TR>
+
+<tr>
+<TD width=30% valign="top"><b>-?</b></TD>
+<TD width=70% valign="top">Display usage message<p>When you use this tool on UNIX 
+system-based platforms, <b>/?</b> might expand to a filename. Instead either use the 
+<b>/help</b> option 
+variation, use <b>-?</b>, or enclose the <b>/?</b> option in quotes: &quot;<b>/?</b>&quot;.</TD>
+</tr>
+
+<TR VALIGN="top">
+<TD width=30%><b>-#</b></TD>
+<TD width=70%>Forces _objects.mac to be regenerated.</TD>
+</TR>
+
+<tr>
+<TD width=30% valign="top"><b>-$</b></TD>
+<TD width=70% valign="top">Displays the complete dependency tree hierarchically.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-0</b></TD>
+<TD width=70% valign="top">Runs pass 0 generation only, with no compilation and 
+no linking.</TD>
+</tr>
+<tr>
+<TD width=30% valign="top"><b>-2</b></TD>
+<TD width=70% valign="top">Performs only a two-pass build; does not run pass 0. 
+(Same as old <b>-Z.</b>)</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-3</b></TD>
+<TD width=70% valign="top">Performs three passes, with no dependency checking or 
+scanning of source files. Same as <b>-Z</b>.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-a</b></TD>
+<TD width=70% valign="top">Allows synchronized blocks and drains during link pass.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-b</b></TD>
+<TD width=70% valign="top">Displays full error message text (does not truncate 
+messages).</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-B</b> <i>baseline</i></TD>
+<TD width=70% valign="top">Checks the build failures against a baseline.&nbsp; If there is no 
+baseline, terminate the build on the first error.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-c</b></TD>
+<TD width=70% valign="top">Deletes all object files.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-C</b></TD>
+<TD width=70% valign="top">Deletes all .lib files only.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-D</b></TD>
+<TD width=70% valign="top">Checks dependencies before building.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-e</b></TD>
+<TD width=70% valign="top">Generates build.log, build.wrn, and build.err files.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-E</b></TD>
+<TD width=70% valign="top">Always keeps the .log, .wrn, and .err files (use with 
+<b>-z</b>).</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-f</b></TD>
+<TD width=70% valign="top">Forces a rescan of all source and include files.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-F</b></TD>
+<TD width=70% valign="top">Prints the full path when displaying errors or warnings to stdout.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-G</b></TD>
+<TD width=70% valign="top">Enables target-specific dirs files if and only if one target 
+exists.</TD>
+</tr>
+    <tr>
+        <td valign="top" width="30%">
+            <strong>-H [n]</strong></td>
+        <td valign="top" width="70%">
+            Run only phase n of the build; otherwise all phases.</td>
+    </tr>
+
+<tr>
+<TD width=30% valign="top"><b>-i</b></TD>
+<TD width=70% valign="top">Ignores extraneous dependency warning messages.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-I</b></TD>
+<TD width=70% valign="top">Prevents display of thread index if this is a multiprocessor build.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-k</b></TD>
+<TD width=70% valign="top">Prevents deletion of out-of-date targets.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-l</b></TD>
+<TD width=70% valign="top">Links only, does not compile.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-L</b></TD>
+<TD width=70% valign="top">Compiles only, does not perform a link phase.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-m</b></TD>
+<TD width=70% valign="top">Runs build in the idle priority class.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-M</b> <i>n</i></TD>
+<TD width=70% valign="top">Performs a multiprocessor build (for MP machines)  where <i>n</i> is the 
+number of processors.&nbsp; 
+<p>If -M is not specified, <i>n </i>defaults to one processor.&nbsp; If -M is 
+specified but <i>n</i> is not, then <i>n </i>defaults to the number of processors 
+on the computer.</TD>
+</tr>
+    <tr>
+        <td valign="top" width="30%">
+            <strong>-n</strong></td>
+        <td valign="top" width="70%">
+            No SYNCHRONIZE_BLOCK and SYNCHRONIZE_DRAIN directives</td>
+    </tr>
+
+<tr>
+<TD width=30% valign="top"><b>-o</b></TD>
+<TD width=70% valign="top">Displays out-of-date files.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-O</b></TD>
+<TD width=70% valign="top">Generates an obj[d]\_objects.mac file for current directory.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-P</b></TD>
+<TD width=70% valign="top">Reports the elapsed time to build each directory.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-q</b></TD>
+<TD width=70% valign="top">Queries only; does not run nmake.exe tool.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-r</b> <i>dirpath</i></TD>
+<TD width=70% valign="top">Restarts a clean build at the specified directory path <i>dirpath.</i></TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-s</b></TD>
+<TD width=70% valign="top">Displays a status line at the top of the display.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-S</b></TD>
+<TD width=70% valign="top">Displays a status line with include file line counts.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-t</b></TD>
+<TD width=70% valign="top">Displays the first level of the dependency tree.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-T</b></TD>
+<TD width=70% valign="top">Displays the complete dependency tree.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-$</b></TD>
+<TD width=70% valign="top">Displays the complete dependency tree hierarchically.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-u</b></TD>
+<TD width=70% valign="top">Displays unused BUILD_OPTIONS.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-v</b></TD>
+<TD width=70% valign="top">Enables include file version checking.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-w</b></TD>
+<TD width=70% valign="top">Shows warnings on the screen.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-y</b></TD>
+<TD width=70% valign="top">Shows the files scanned.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-z</b></TD>
+<TD width=70% valign="top">Performs one pass with compilation and linking, but 
+no dependency checking or scanning of source files. 
+<p>&nbsp;</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-Z</b></TD>
+<TD width=70% valign="top">Performs three passes, with no dependency checking or 
+scanning of source files.<p>Same as <b>-3.</b></TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-why</b></TD>
+<TD width=70% valign="top">Lists reasons for building targets.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-386</b></TD>
+<TD width=70% valign="top">Builds targets for the i386.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-x86</b></TD>
+<TD width=70% valign="top">Builds targets for the i386 (same option as <b>-386</b>).</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-ia64</b></TD>
+<TD width=70% valign="top">Builds targets for Itanium.</TD>
+</tr>
+    <tr>
+        <td valign="top" width="30%">
+            <strong>-amd64</strong></td>
+        <td valign="top" width="70%">
+            Builds targets for AMD64</td>
+    </tr>
+
+<tr>
+<TD width=30% valign="top"><b>-dynamic</b> <i>machine</i></TD>
+<TD width=70% valign="top">Builds targets for given <i>machine.</i></TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-x</b> <i>filename</i></TD>
+<TD width=70% valign="top">Excludes include file, <i>filename,</i> from dependency checks.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-j</b> <i>filename</i></TD>
+<TD width=70% valign="top">Uses <i>filename</i> as the name for log files.&nbsp; The 
+<b>-j</b> switch 
+changes the first field, so it produces filename.log, filename.wrn, and 
+filename.err. </TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-jpath</b> <i>pathname</i></TD>
+<TD width=70% valign="top">Uses <i>pathname </i>as the path for log files instead of the 
+current directory.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-nmake</b> <i>arg</i></TD>
+<TD width=70% valign="top">Provides the argument, <i>arg,</i> to pass to nmake.exe.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top"><b>-clean</b></TD>
+<TD width=70% valign="top">Causes all existing binary built output to be erased 
+and rebuilt.</TD>
+</tr>
+
+</table>
+
+<h4><a name="SpecialFiles"></a>Special Files</h4>
+
+ 
+<table border=1  width="100%">
+
+<TR VALIGN="top">
+<TH width=30%>File name</TH>
+<TH width=70% colspan="2">Description</TH>
+</TR>
+
+<tr>
+<TD width=30% valign="top">build.dat</TD>
+<TD width=70% colspan="2" valign="top">When you use the build utility, it looks for a sources 
+file and a dirs file. It processes the dependencies and builds a file called 
+build.dat. Build.dat is basically a dump from the build utility of what the dependency 
+graph looks like. </TD>
+</tr>
+<tr>
+<TD width=30% rowspan="3" valign="top">dirs</TD>
+<TD width=70% colspan="2" valign="top">You can instruct the build utility to recursively 
+build an entire source tree by using the dirs file. The dirs file resides in a 
+directory that contains subdirectories (that is, at the root of a source code 
+tree or subtree). Each subdirectory can be a source directory or another source 
+tree. Place a dirs file at the root of each source code subtree. Then go to the 
+leaf node in each source code subdirectory and specify the build products in a 
+sources file.
+<p class="MsoNormal">You should define the following macros in your dirs file:</TD>
+</tr>
+<tr>
+<TD width="35%" valign="top">DIRS</TD>
+<TD width="35%" valign="top">This macro lists the directories that the build utility should 
+always go into. Specify a list of subdirectories to be built unconditionally. 
+Separate the entries in this list with spaces or tabs</TD>
+</tr>
+<tr>
+<TD width="35%" valign="top">OPTIONAL_DIRS</TD>
+<TD width="35%" valign="top">This macro lists the directories that the build utility does not 
+have to go into, and by default will not go into. Specify a list of 
+subdirectories to be built only if they are explicitly specified on the original 
+build command line.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top">makefile.def</TD>
+<TD width=70% colspan="2" valign="top">The build utility makes use of a generic makefile 
+called makefile.def, which contains all the macro definitions that the sources 
+file uses. The build utility sets the appropriate header and library include paths, compiler 
+names and switches, and linker switches that are defined in makefile.def, and 
+invokes nmake.exe. </TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top">makefile.plt</TD>
+<TD width=70% colspan="2" valign="top">The platform-specific information for the makefiles is 
+contained in makefile.plt. You can include makefile.plt in your own makefiles to 
+select the build target and set platform-specific variables.</TD>
+</tr>
+
+<tr>
+<TD width=30% valign="top">sources </TD>
+<TD width=70% colspan="2" valign="top">You describe build products in a file named <i>sources</i> 
+that resides in each source code subdirectory. The sources file contains a 
+series of macro definitions that are recognized by the build utility. </TD>
+</tr>
+
+</table>
+
+<h4><a name="EnvironmentVariables"></a>Environment Variables</h4>
+
+ 
+<table border=1  width="100%">
+
+<TR VALIGN="top">
+<TH width=30%>Environment variable</TH>
+<TH width=70%>Description</TH>
+</TR>
+
+<tr>
+<TD width=30% valign="top">BUILD_ALT_DIR</TD>
+<TD width=70% valign="top">Use this to specify an alternate object directory name. It must be 
+ten characters or fewer and contain no spaces. The value is added to the end of 
+the .obj name and (if no -j switch is used for build.exe) the logfile name.<br>
+If you do not set this, the default is nothing. Use this macro when you want to 
+build the same source in different console windows using different language, 
+optimizations, or debugging information.</TD>
+</tr>
+<tr>
+<TD width=30% valign="top">BUILD_DEFAULT_TARGETS</TD>
+<TD width=70% valign="top">Use this to specify the default target platform for which you are 
+building. Usually, you can just set it to the platform you are hosted on, such 
+as <i>build -x86</i></TD>
+</tr>
+<tr>
+<TD width=30% valign="top">BUILD_DEFAULT</TD>
+<TD width=70% valign="top">Use this to specify options to build. For example:<br>
+&nbsp;<p>c:\&gt; build -eswM -nmake -i <br>
+<br>
+is equivalent to:<br>
+<br>
+c:\&gt; set BUILD_DEFAULT=-eswM -nmake -i<br>
+c:\&gt; build</TD>
+</tr>
+<tr>
+<TD width=30% valign="top">BUILD_MAKE_PROGRAM</TD>
+<TD width=70% valign="top">Use this to specify the make program to execute. The default is 
+nmake.exe, which is the only make tool designed to build the SSCLI source 
+tree.</TD>
+</tr>
+<tr>
+<TD width=30% valign="top">BUILD_OPTIONS</TD>
+<TD width=70% valign="top">Use this to specify the OPTIONAL_DIRS to process. For example:
+<p> <br>
+// DIRS file:<br>
+DIRS=dir1 dir2 dir3<br>
+OPTIONAL_DIRS=OptDir1 OptDir2 OptDir3<br>
+<br>
+c:\&gt; build OptDir1 OptDir2 OptDir3<br>
+<br>
+is equivalent to:<br>
+<br>
+c:\&gt; set BUILD_OPTIONS=OptDir1 OptDir2 OptDir3<br>
+c:\&gt; build</TD>
+</tr>
+
+</table>
+
+<h4><a name="MacroDefinitions"></a>Macro Definitions</h4>
+
+ 
+<p>Set the variables for most of the following macros in a sources file; a few 
+are set in your environment (for a list of these, see
+<a href="#EnvironmentVariables">Environment Variables</a>). Except for DIRS and 
+OPTIONAL_DIRS, which are used by the build utility, these macros are all used by nmake.exe. 
+The build utility simply opens all the files, determines the dependencies, and 
+ 
+calsl nmake.exe. The other macros used in the build process are all used by 
+nmake. The following table lists the macro names, how they are used, and why you would want to 
+put them in your sources file.</p>
+
+ 
+<table border=1  width="100%">
+
+<TR VALIGN="top">
+<TH width=30%>Macro</TH>
+<TH width=70%>Description</TH>
+</TR>
+
+<tr>
+<TD width=30% valign="top">INCLUDES</TD>
+<TD width=70% valign="top">Use this macro in your sources file to indicate to the build 
+utility where to find the headers that you are including in your build. Specify 
+a list of the paths to be searched for include files during compilation. 
+Separate the entries in this list with a semicolon. Path names can be absolute 
+or relative. For example:<blockquote>
+  <p>INCLUDES=bunny;inc<br>
+  INCLUDES=.\<br>
+  INCLUDES=.\inc</p>
+</blockquote>
+<p>The build utility reads the INCLUDES 
+variable that you specify in your sources file to figure out where to find the 
+header files that you are including in your source code so it can build the 
+dependency tree.</p>
+<p>Specify header files that do not exist but might be built as part of the build 
+process in USER_INCLUDES.</TD>
+</tr>
+<tr>
+<TD width=30% valign="top">SOURCES</TD>
+<TD width=70% valign="top">The SOURCES macro is the most important macro for the build 
+utility. You must have this macro in your sources file. The SOURCES macro 
+specifies which files are going to be compiled. The build utility will look at 
+these files and generate a dependency list. If any of those dependencies change, 
+the build utility will rebuild this source file. 
+<p>Use this macro to list your source filenames (except for the file containing 
+main. Include the filename extension and separate the entries in this list with 
+spaces or tabs. </TD>
+</tr>
+<tr>
+<TD width=30% valign="top">TARGETLIBS</TD>
+<TD width=70% valign="top">Use this macro to specify other libraries that you want 
+to link against when building your image. This macro should be the primary 
+method you use to specify the libraries or objects that you want to link against 
+to build your image.
+<p><b>TARGETLIBS Paths</b><br>
+Paths specified in TARGETLIBS must be absolute. Separate the entries in this 
+list with spaces or tabs. </p>
+<p>For example: </p>
+<blockquote>
+  <p>TARGETLIBS=$(SDK_LIB_PATH)\kernel32.lib \<br>
+  $(SDK_LIB_PATH)\advapi32.lib \<br>
+  $(SDK_LIB_PATH)\user32.lib \<br>
+  $(SDK_LIB_PATH)\spoolss.lib </p>
+</blockquote>
+<p>The TARGETLIBS path names must be defined in a special way. Because the build 
+utility can create build products for several hardware platforms, the 
+destination path for build products is constructed as follows: </p>
+<blockquote>
+  <p>%TARGETPATH%\&lt;cpu_type&gt;\ </p>
+</blockquote>
+<p>where TARGETPATH is defined in the sources file, and cpu_type specifies the 
+platform for which the products were built. </p>
+<p>For example, if TARGETPATH is defined as LIB and a build request is made for 
+an x86 processor, the build products will be directed to the following 
+subdirectory: </p>
+<blockquote>
+  <p>lib\i386\ </p>
+</blockquote>
+<p>Because of this convention, TARGETLIBS entries must specify library names in 
+the following form: </p>
+<blockquote>
+  <p>&lt;targetpath&gt;\*\&lt;library_name&gt; </p>
+</blockquote>
+<p>where targetpath is identical to the value assigned to TARGETPATH in the 
+sources file, and library_name is the full file name of the library to be linked 
+to the executable file. The build utility replaces the asterisk (*) with the 
+target platform type. </p>
+<p><b>LINKLIBS and UMLIBS</b><br>
+You can also use the LINKLIBS macro to specify the libraries that you need to 
+link against. This macro is needed for some DLL builds, but it must be used 
+carefully. For more information, see its reference page. </p>
+    <p>Use LINKLIBS only for the case that meets the following conditions:</p>
+    <ul>
+      <li>You are building a dynamic link.</li>
+      <li>You are exporting something that is defined in some other component 
+      library that you also build.</li>
+      <li>In your dirs file in the subdirectory above, you have ordered it so 
+      that the component libraries are built before you build the dynamic link.
+      </li>
+    </ul>
+    <p>There is a similar macro called UMLIBS that you can use if you are 
+    building UMAPPLs.</TD>
+</tr>
+<tr>
+<TD width=30% valign="top">TARGETEXT</TD>
+<TD width=70% valign="top">Use this macro to specify the extension name (such as .cpl) when 
+you want the DLLs to have something other than .dll as the filename extension.<p>
+If you specify something unexpected, you will see a message &quot;Unexpected Target 
+Ext.&quot; </TD>
+</tr>
+<tr>
+<TD width=30% valign="top">TARGETNAME</TD>
+<TD width=70% valign="top">Use this macro to specify the name of the library being built, 
+excluding the filename extension. You must have this macro in your sources file.</TD>
+</tr>
+<tr>
+<TD width=30% valign="top">TARGETPATH</TD>
+<TD width=70% valign="top">Use this macro to specify the target directory name that is the 
+destination of all build products ( such as .exe, .dll, and .lib files). Notice 
+that object files always end up in the obj subdirectory. You must have this 
+macro in your sources file. For example:<blockquote>
+  <p>TARGETPATH=obj</p>
+</blockquote>
+</TD>
+</tr>
+<tr>
+<TD width=30% valign="top">TARGETTYPE</TD>
+<TD width=70% valign="top">Use this macro to specify the type of product being 
+built. TARGETTYPE gives the build utility clues about some of the input files 
+that it should expect. You must include this macro in your sources file.The valid values for TARGETYPE include:<p>
+PROGLIB - Executable program that also exports functions for other programs.</p>
+<p>PROGRAM - User-mode program that does not export anything.</p>
+<p>DYNLINK - Dynamic-link library (DLL). This could be a control panel program 
+or anything that can be dynamically loaded.&nbsp; The DLL switch is passed to the linker to indicate 
+it is not a stand-alone .exe file. When you build a dynamic link, you might also need 
+to set the TARGETEXT macro.</p>
+<p>LIBRARY - Import library containing code that will be linked with other code. 
+This is a library of objects, not an import library. (An import library is built 
+as a side effect of building a dynamic link. Anytime you build a dynamic link, 
+you get a .lib file and a .dll file. When you build a library, you just get a 
+.lib file.)</TD>
+</tr>
+
+</table>
+
+<h4><a name="OptionalMacros"></a>Optional Macros</h4>
+
+ 
+<table border="1" width="100%">
+  <tr>
+<TH width=30% valign="top">Macro</TH>
+<TH width=70% valign="top">Description</TH>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">BASEDIR</td>
+    <td width="67%" valign="top">Use this macro when referring to the base of the 
+    source tree. By default, the source tree starts at $(_NTDRIVE)\nt, but this 
+    is 
+    not required. By using BASEDIR to refer to the base you eliminate 
+    hard-coding a specific path.</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">BINPLACE_FLAGS</td>
+    <td width="67%" valign="top">Use this macro to specify arguments that you want to pass to 
+    the Build Output Manager. Type binplace-? to display a list of these switches. </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">BINPLACE_PLACEFILE</td>
+    <td width="67%" valign="top">Use this macro to specify the placefile used by 
+    the Build Output Manager. If 
+    nothing is listed, 
+    <blockquote>
+      <p>$(BASEDIR)\public\sdk\lib\placefil.txt </p>
+    </blockquote>
+    <p>is used by default. </p>
+    <p>For more information, see binplace.exe. </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">C_DEFINES</td>
+    <td width="67%" valign="top">Use this macro to specify switches you want passed to the 
+    compiler. Typically, they are compiler <b>#define</b> directives.<p>&nbsp;You might specify:</p>
+    <blockquote>
+      <p><br>
+      C_DEFINES = /DDEBUG_BUILD</p>
+    </blockquote>
+    <p><br>
+    to define DEBUG_BUILD to the compiler. There is no limit to what this #define 
+    can be except that C_DEFINES gets passed to the compiler and it also gets 
+    passed to the resource compiler. Therefore, you cannot put compiler 
+    optimization or other processor-specific or tool-specific switches in the C_DEFINES 
+    macro. Instead, use one of the following macros for this:</p>
+    <ul>
+      <li>MSC_OPTIMIZATION</li>
+      <li>MSC_WARNING_LEVEL</li>
+      <li>USER_C_FLAGS</li>
+    </ul>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">COFFBASE</td>
+    <td width="67%" valign="top">Use this macro to specify the name to look up in 
+    COFFBASE_TXT_FILE. If you do not specify a name, it defaults to the value of 
+    TARGETNAME (if you are building a DYNLINK) or usermode (if you are building a 
+    UMAPPL, PROGLIB, or PROGRAM). If you want to specify an absolute base 
+    address for your image and not use a global file for all, see DLLBASE or 
+    UMBASE. </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">COFFBASE_TXT_FILE</td>
+    <td width="67%" valign="top">Use this macro  to specify the name of the 
+    file that contains the base addresses for the images you build. By default, 
+    this is %ddkroot%\bin\coffbase.txt. If a different file is specified in this 
+    macro, the contents of this file will be passed to the linker The file 
+    should have three columns. The first is the name of the image. The second is 
+    the starting address for the image. The last is the maximum size of the 
+    image. There should also be an entry with the name &quot;usermode&quot; that is the 
+    default value. For example:<blockquote>
+      <p>usermode 0x60000000 0x20000000<br>
+      MyDll1 0x70000000 0x00010000<br>
+      MyDll2 0x70010000 0x00010000</p>
+    </blockquote>
+    <p>The build utility assumes that coffbase.txt will be in \\public\sdk\lib 
+    and will be called coffbase.txt. You can override this filename and call it 
+    anything you want by using COFFBASE_TXT_FILE.</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">COMPILER_WARNINGS</td>
+    <td width="67%" valign="top">Use this macro to specify the name of the 
+    file that contains warning information. By default, this is 
+    $(SDK_INC_PATH)\warning.h. If a different file is specified in this macro, 
+    the name of this file will be passed to the compiler with the /FI switch. 
+    The file contains a list of compiler options used to disable, enable, or 
+    promote warnings for the entire build.</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">CRT_INC_PATH</td>
+    <td width="67%" valign="top">Use this macro to specify the path to the C runtime headers. The default is 
+    $(BASEDIR)\public\sdk\inc\crt.</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">CRT_LIB_PATH</td>
+    <td width="67%" valign="top">Use this macro to specify the path to the C runtime 
+    libraries. The default is $(BASEDIR)\public\sdk\lib\*</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">DEBUG_CRTS</td>
+    <td width="67%" valign="top">Use this macro to specify which set of C runtime 
+    libraries should be used.<blockquote>
+      <p>DEBUG_CRTS=1</p>
+    </blockquote>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">DLLBASE</td>
+    <td width="67%" valign="top">Use this macro to set the base address for the DLL 
+    image that you are creating. You only need to use this macro when you are 
+    building a DLL (that is, when your TARGETTYPE macro is set to DYNLINK).
+    <p>You can override the default address by specifying an address with the 
+    DLLBASE macro (for example, 0x04000000). You can set DLLBASE to be the 
+    hard-coded base address or a hexadecimal address. </p>
+    <p>If DLLBASE is omitted or left blank, the build utility will assume that 
+    the target name in coffbase.txt is the name of your image. It will take the 
+    value of COFFBASE, if defined, as a key; otherwise, it will take TARGETNAME 
+    as a key. The target name in coffbase.txt plus this key will be used to 
+    choose the base address.</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">DLLDEF</td>
+    <td width="67%" valign="top">Use this macro to specify the name of the .def file 
+    that the build utility will pass to the librarian when building the export 
+    and import files. 
+    <p>If you do not set this value, the build utility will assume it is the 
+    same name as the image you are building (in other words, equal to 
+    $(TARGETNAME).def). </p>
+    <p>The most common usage is:</p>
+    <blockquote>
+      <p>DLLDEF=mydll.def</p>
+    </blockquote>
+    <p>Additionally, there is a standard inference rule that will run the C 
+    preprocessor over the .def or .src file in the current directory to create 
+    build-specific .def files in the object subdirectory. The same compiler 
+    define directives that you key off of in your source code can be used in the 
+    root .def or .src file to create the export list. To enable it, use 
+    something like:</p>
+    <blockquote>
+      <p>DLLDEF=$O\mydll.def</p>
+    </blockquote>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">DLLENTRY</td>
+    <td width="67%" valign="top">Use this macro to specify the DLL entry point. By 
+    default, no entry point is assumed. For example, when you bring over 
+    programs that were built in the Visual C++&reg; build environment or that use 
+    the C runtime, you will probably set:<blockquote>
+      <p>DLLENTRY=_DllMainCRTStartup</p>
+    </blockquote>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">DLLLIBOBJECTS</td>
+    <td width="67%" valign="top">Use the DLLLIBOBJECTS macro to specify extra objects to add 
+    to an import library.
+    <p>Usually, when the TARGETTYPE is DYNLINK, the end result is a DLL and an 
+    import library. If you want to have different LIB objects for each platform, 
+    you can override this value to create different platform-specific DLL LIB 
+    objects. DLLLIBOBJECTS enables you to specify additional objects to add to 
+    the import library. </p>
+    <p>For example, you might have an OLE custom control (with GUIDs used to 
+    identify this control) that also exports a non-OLE C interface from an 
+    import library. Rather than build two separate libraries (for example, 
+    mydll.lib and myuuid.lib), you can list the GUID data object(s) in 
+    DLLLIBOBJECTS. The result is a single library that your users will link 
+    against.</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">DLLORDER</td>
+    <td width="67%" valign="top">Use the DLLORDER macro to specify an order file that will be 
+    passed to the linker when you are building a DLL.<p>The order file lists the 
+    functions and the order in which they should be linked together. By default, 
+    the build utility passes the name of the DLL as the name of the order file. 
+    For example, if you are building kernel32.dll, the build utility expects 
+    kernel32.prf as the order file. </p>
+    <p>You can use the DLLORDER macro to specify another name. The build utility 
+    will use whatever name you give it. It can be in a different subdirectory, 
+    have a different name, or have a different  extension. You can set DLLORDER to 
+    whatever you want it to be, and you can give it a fully qualified path name.
+    </p>
+    <p>This macro can be used instead of NTPROFILEINPUT.</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">DRIVERBASE</td>
+    <td width="67%" valign="top">Use this macro to specify the base address for a 
+    driver. This macro is similar to the DLLBASE and UMBASE macros. It is not 
+    generally necessary to set this value, because it will be relocated at run 
+    time.</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">FREEBUILD</td>
+    <td width="67%" valign="top">Use this macro to specify whether your build is 
+    checked (debug) or free (retail). This macro can be used in statements of 
+    the form:<blockquote>
+      <p>If $FREEBUILD <i>(do things for a retail build)</i></p>
+    </blockquote>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">LANGUAGE</td>
+    <td width="67%" valign="top">Use this macro to specify the language when you set up 
+    dependencies so that you can include country/region-specific parts in your build.</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">LINKER_FLAGS</td>
+    <td width="67%" valign="top">Use this macro to override any default linker 
+    switch that you want to pass to the linker. Type link-? to view a list of 
+    all the linker switches. This macro just gives you a way to pass in flags 
+    that you cannot pass in another way.</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">LINKER_NOREF</td>
+    <td width="67%" valign="top">Use this macro to turn off switches to the linker. The build 
+    utility turns some switches on, by default. One of them is the 
+    OPTICAL_AND_REF switch, which says, &quot;Throw out everything that is not 
+    referenced in this module.&quot; </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">LINKLIBS</td>
+    <td width="67%" valign="top">
+    <p class="MsoNormal">Use this macro to specify the libraries that 
+    you need to link against. <br>
+    <br>
+    The only difference between TARGETLIBS and LINKLIBS is the ordering on the 
+    command line. LINKLIBS usually gets passed first; TARGETLIBS gets passed 
+    second. If you order them correctly in your TARGETLIBS macro, that should 
+    not be a problem, except when you are building a DLL.<br>
+    <br>
+    When you are building a DLL, you could be using objects that you have built 
+    in combination with libraries from which you would like to export certain 
+    features. For example, perhaps you compile a number of objects into a 
+    library in subdirectory one. In subdirectory two, you compile other objects 
+    into a library. And in subdirectory three, you build the DLL. However, this 
+    DLL must export functions that are defined in library one or library two. In 
+    such a case, you must put those libraries in your LINKLIBS macro.<br>
+    <br>
+    This operation must be carefully done. The LINKLIBS macro requires that the 
+    library must be located in pass one of the build, because the build utility 
+    builds the import libraries during pass one. You must structure your build 
+    in such a manner that the libraries are guaranteed to exist during pass one. 
+    You should never specify an import library in your LINKLIBS macro, primarily 
+    because you could end up exporting something that you imported from somebody 
+    else instead of what you actually had intended (perhaps with syntax errors or other 
+    problems). Problems resulting from such a mishap can be undetectable for 
+    some time.<br>
+    <br>
+    As a result, it is almost always better to use TARGETLIBS. Use LINKLIBS only 
+    for cases that meet the following conditions:<ul>
+      <li>
+    <p class="MsoNormal">You are building a dynamic link. </li>
+      <li>
+    <p class="MsoNormal">You are exporting something that is defined in some 
+    other component library that you also build. </li>
+      <li>
+    <p class="MsoNormal">In your dirs file in the previous subdirectory, you 
+    have ordered it so that the component libraries are built before you build 
+    the dynamic link. </li>
+    </ul>
+    <p class="MsoNormal">There is a similar macro called UMLIBS that you can use 
+    if you are building UMAPPLs.<br>
+&nbsp;</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">MAKEDLL</td>
+    <td width="67%" valign="top">Use this macro to control whether any actual linking 
+    occurs.<br>
+    <br>
+    Normally, the build process is a two-pass build. In the first pass, the 
+    build utility compiles all the source files, and creates import libraries 
+    and component libraries. In the second pass, it links everything against 
+    those libraries. The default, which directs the build utility to make the 
+    second pass, is as follows:<blockquote>
+      <p>MAKEDLL=1</p>
+    </blockquote>
+    <p>Typically, you do not set this value. You might do a test in your make 
+    file to instruct the build utility:</p>
+    <blockquote>
+      <p>IF MAKEDLL=1<br>
+      <i>do things that you want to do on the second pass of the build</i></p>
+    </blockquote>
+    <p>A more frequent use of this macro is to run NMAKE from the command line 
+    to run the compile and to link without running the build utility:</p>
+    <blockquote>
+      <p>nmake MAKEDLL=1</p>
+    </blockquote>
+    <p>The build utility will complete the compile operation and the link in one 
+    step without running the build utility. This works because the build utility 
+    is only required to determine the dependencies and call NMAKE. This method 
+    works when:</p>
+    <ul>
+      <li>You know the dependencies.</li>
+      <li>The source file has changed and you do not care about the header file 
+      dependency generation.</li>
+      <li>You are in a leaf node subdirectory. </li>
+    </ul>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">MASTER_VERSION_FILE</td>
+    <td width="67%" valign="top">Use this macro to specify the file name 
+    of a master version file.
+    <p>Every binary file created by the build utility has a version number on it. 
+    These are usually based on version resources created by Microsoft when 
+    products built for Windows&reg; NT-based operating systems are created. </p>
+    <p>You can use Windows Explorer or filever.exe to view properties and see 
+    which version resource the Setup program uses when it copies that image onto 
+    a new system. The system checks whether or not the version resource is newer 
+    than the one already on the system. If the resource is newer it is copied onto 
+    the system, otherwise it is not copied. </p>
+    <p>There is a master version file for Windows  operating systems, from which 
+    all version resources are built. The master version file for Windows  operating systems is called ntverp and it is located in %ddkroot%\inc\wxp.
+    </p>
+    <p>If you do not wish to use the version specified in ntverp, you can 
+    specify a different master version file by setting MASTER_VERSION_FILE to 
+    the correct file name. </p>
+    <p>If you look at the very last line of makefile.def, you will see the one 
+    place where MASTER_VERSION_FILE is used as a dependency for the resources. 
+    The TARGET_DIRECTORY macro is always dependent on the master version file to 
+    determine the name of the resource for your image. </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">MISCFILES</td>
+    <td width="67%" valign="top">Use this macro to list items that you want to put 
+    into the appropriate installation point when the build utility runs 
+    binplace.exe. </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">MSC_OPTIMIZATION</td>
+    <td width="67%" valign="top">Use this macro to override the default optimization the 
+    build utility uses on the compiler. By default, everything is optimized. If 
+    you want to turn off optimization to step through your code, you can set 
+    MSC_OPTIMIZATION to whatever is appropriate for your compiler.</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">MSC_WARNING_LEVEL</td>
+    <td width="67%" valign="top">Use this macro to set the warning level to use on the 
+    compiler. The default is W3</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">NOLINK</td>
+    <td width="67%" valign="top">The NOLINK and MAKEDLL macros are primarily used in the 
+    master make file (makefile.def) to indicate which rules to enable or disable 
+    when the build utility goes through two tools.
+    <p>NOLINK=1 indicates that a link is not supposed to occur, most likely 
+    because this is pass one and the build utility cannot guarantee that the 
+    libraries needed are built yet. </p>
+    <p>MAKEDLL=1 indicates that a link should occur and is used in pass two 
+    after the libraries are built. If you run a one-pass build (by specifying -z 
+    on the command line to the build utility), only MAKEDLL=1 is specified. </p>
+    <p>You can test for this macro in your make file. For example, if NOLINK=1, 
+    you are in pass one; if MAKEDLL=1, you are in pass two. </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">NT_UP</td>
+    <td width="67%" valign="top">Use this macro to indicate whether your driver will run on a 
+    uniprocessor computer or multiprocessor computer. The default is uniprocessor, 
+    as follows:<blockquote>
+      <p>NT_UP=1</p>
+    </blockquote>
+    <p>To specify multiprocessor, set:</p>
+    <blockquote>
+      <p>NT_UP=0</p>
+    </blockquote>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">NTNOPCH</td>
+    <td width="67%" valign="top">Use this macro to turn off the precompiled headers 
+    option for a single source file.
+    <p>If you have precompiled headers on a subdirectory, the build utility 
+    expects you to build that subdirectory and to make subsequent changes as you 
+    go along. Whenever you change one of the source files, you must rebuild that 
+    file. The build utility detects the use of precompiled headers and compiles 
+    that single source file without them. </p>
+    <p>If you set:</p>
+    <blockquote>
+      <p>NTNOPCH=1</p>
+    </blockquote>
+    <p>it enables you to build everything, and then to change a definition in 
+    a header file (for example, a #define something to something else). Then you 
+    can change the source file to use that new definition. Of course, you do not 
+    want to regenerate the precompiled header and rebuild everything else; it is 
+    preferable to rebuild that one source file, without using the old 
+    precompiled header. This macro tells the build utility to turn off 
+    precompiled headers for this source file. </p>
+    <p>The build utility will reread all the headers and use the new header 
+    information. This also requires using the -Z or -z command-line options, so 
+    that the build utility will not scan dependencies and therefore will not 
+    regenerate the precompiled header. </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">NTTARGETFILE0</td>
+    <td width="67%" valign="top">You can define the NTTARGETFILE0 and NTTARGETFILES macros 
+    to cause makefile.def to include makefile.inc immediately after it specifies 
+    the top-level targets (all, clean and loc) and their dependencies.
+    <p>The makefile.def file expands NTTARGETFILE0 as the first dependent for 
+    the all target, and NTTARGETFILES as the last dependent for the all target. 
+    Use this macro to specify additional targets and dependencies that do not 
+    fit the general case covered by makefile.def. </p>
+    <blockquote>
+      <p>NTTARGETFILE0= </p>
+    </blockquote>
+    <p>The fact that NTTARGETFILE0 exists, even if it is defined and empty, 
+    causes the build utility to open makefile.inc in the same subdirectory as 
+    the sources file. </p>
+    <p>If you set NTTARGETFILE0 to equal a file name, the build utility will not 
+    only include makefile.inc, but will also build the executable that the macro 
+    defines. Thus, if you set: </p>
+    <blockquote>
+      <p>NTTARGETFILE0=myfile.a </p>
+    </blockquote>
+    <p>then the build utility builds myfile.a as part of pass zero. </p>
+    <p>If you do not set NTTARGETFILE0, the build utility locates the specified 
+    subdirectory on pass zero, includes the makefile.inc in that subdirectory, 
+    and follows any default rules that this file contains. </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">NTTARGETFILE1</td>
+    <td width="67%" valign="top">This macro is exactly like NTTARGETFILE0, 
+    except that it occurs later in the build process. NTTARGETFILE0 occurs on 
+    pass zero; NTTARGETFILE1 occurs on pass two.
+    <p>Both of these macros cause the build utility to change directories to a 
+    specified subdirectory and to run nmake.exe on pass zero or pass two in a case 
+    where it ordinarily would not do so. </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">NTTARGETFILES</td>
+    <td width="67%" valign="top">If you have unique rules in your subdirectory, you can use 
+    the NTTARGETFILES macro to signal to the build utility that you have a 
+    makefile.inc file in addition to the sources file in the subdirectory.
+    <p>The makefile.inc file will provide additional information about the build 
+    process, including dependencies, command line rules, and other build rules. </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">O </td>
+    <td width="67%" valign="top">Use this macro to specify the final objects subdirectory. 
+    Define this macro in your sources file or in makefile.inc to ensure something goes into the object subdirectory. The benefit of using $(O) is 
+    that any files that you have built and placed in the objects subdirectory 
+    will be deleted on the next clean build. This guarantees that no collisions 
+    will occur between two builds running on the same computer at the same time. 
+    The builds will never override each other's files if you follow the convention 
+    that everything you build goes in $(O).</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">PASS0_CLIENTDIR</td>
+    <td width="67%" valign="top">Use the PASS0_CLIENTDIR, PASS0_HEADERDIR, and PASS0_SERVERDIR 
+    macros  when you have a SOURCES macro in your sources file. That 
+    macro can contain the following types of files:
+    <ul>
+      <li>C </li>
+      <li>C++ </li>
+      <li>RC </li>
+      <li>MC </li>
+      <li>IDL </li>
+    </ul>
+    <p>Use the PASS0_CLIENTDIR, PASS0_HEADERDIR, and PASS0_SERVERDIR macros to 
+    specify a directory location for the output from the MC and the Microsoft&reg; 
+    IDL Compiler (MIDL). </p>
+    <p>If you run MIDL over sources that include interface description language 
+    (IDL) files, the build utility generates a server part, a client part, a 
+    header, and a default source. Use the PASS0_SERVERDIR and PASS0_CLIENTDIR 
+    macros to specify their output location. </p>
+    <p>Running MC causes the generation of a header file and a source file.. Use 
+    the PASS0_HEADERDIR and PASS0_SOURCEDIR macros to specify their output 
+    location. </p>
+    <p>When you are building a MIDL stub, the protocol is remote procedure call 
+    (RPC), so you have both what runs on the client side and what runs on the 
+    server side. There are stub programs that communicate through RPC to each other. You can override those by default.</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">PASS0_HEADERDIR</td>
+    <td width="67%" valign="top">Use this macro to specify the output location 
+    of the headers generated by MC and the Microsoft IDL Compiler (MIDL). By 
+    default, everything built in pass zero is output to the TARGETPATH 
+    subdirectory. Use this macro to change that default.
+    <p>To create the headers in the current subdirectory, set PASS0_HEADERDIR to 
+    dot (&quot;.&quot;): </p>
+    <blockquote>
+      <p>PASS0_HEADERDIR=. </p>
+    </blockquote>
+    <p>Headers can be output to any location. If your #include directives do not 
+    specify the correct location, however, the tools later used by the build 
+    utility will not be able to find the headers. </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">PASS0_SERVERDIR</td>
+    <td width="67%" valign="top">Use this macro to specify an output location 
+    for the server part that the Microsoft IDL Compiler (MIDL) generates. By 
+    default, the results of pass zero are output to the TARGETPATH subdirectory. 
+    Use this macro to change that default.
+    <p>To create the server part in the current subdirectory, set 
+    PASS0_SERVERDIR to dot (&quot;.&quot;): </p>
+    <blockquote>
+      <p>PASS0_SERVERDIR=. </p>
+    </blockquote>
+    <p>Headers can be sent to any location. If your #include directives do not 
+    specify the correct location, however, the tools later used by the build 
+    utility will not be able to find the headers. </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">PASS0_SOURCEDIR</td>
+    <td width="67%" valign="top">Use this macro to specify the sent location 
+    for the source code generated by the Microsoft IDL Compiler (MIDL) and 
+    maketype.lib file. By default, the results of pass zero are sent to the 
+    TARGETPATH subdirectory. Use this macro to change that default.
+    <p>To create the source code generated by MIDL and maketype.lib in the 
+    current subdirectory, set PASS0_SOURCEDIR to dot (&quot;.&quot;): </p>
+    <blockquote>
+      <p>PASS0_SOURCEDIR=. </p>
+    </blockquote>
+    <p>Your source code and maketype.lib file can be sent to any location. If 
+    your #include directives do not specify the correct location, however, the 
+    tools later used by the build utility will not be able to find the correct 
+    files. </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">PRECOMPILED_CXX</td>
+    <td width="67%" valign="top">Use this macro to indicate whether the 
+    precompiled header you are building will be used with files written in C or 
+    C++.
+    <p>The default is to use precompiled headers with files written in C. 
+    Therefore, you should not set PRECOMPILED_CXX if your project will use the 
+    precompiled header with files written in C. </p>
+    <p>To use the precompiled header with C++ files, specify </p>
+    <blockquote>
+      <p>PRECOMPILED_CXX=1 </p>
+    </blockquote>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">PRECOMPILED_INCLUDE</td>
+    <td width="67%" valign="top">Use this macro to specify the name of the 
+    precompiled header. For example, if you have precompiled headers that are 
+    a.c, b.c, and c.c as your source files, and all of them include precomp.h, 
+    specify:
+    <blockquote>
+      <p>PRECOMPILED_INCLUDE=precomp.h </p>
+    </blockquote>
+    <p>If you omit this instruction, you will not be able to use precompiled 
+    headers. PRECOMPILED_INCLUDE sets the build process to use precompiled headers. </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">PRECOMPILED_OBJ</td>
+    <td width="67%" valign="top">Use this macro to override the default name 
+    given to the precompiled object.
+    <p>By default, the build utility takes the precompiled header with the 
+    precompiled #include directive that you specify (for example, precomp.h). 
+    The build utility generates precomp.obj for the precompiled object and 
+    precomp.pch for the precompiled target. </p>
+    <p>You can override those names by setting the PRECOMPILED_OBJ and 
+    PRECOMPILED_TARGET macros. </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">PRECOMPILED_TARGET</td>
+    <td width="67%" valign="top">Use this macro to override the default name 
+    given to the precompiled target.
+    <p>By default, the build utility uses the precompiled header with the 
+    precompiled #include setting that you specify (for example, precomp.h). The 
+    build utility uses the precompiled header to create precomp.obj for the 
+    precompiled object and precomp.pch for the precompiled target. </p>
+    <p>You can override those names by setting the PRECOMPILED_OBJ and 
+    PRECOMPILED_TARGET macros. </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">SDK_INC_PATH</td>
+    <td width="67%" valign="top">Use this macro to specify the path to the SDK headers. The 
+    default is:<blockquote>
+      <p>$(BASEDIR)\public\sdk\inc</p>
+    </blockquote>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">SDK_LIB_PATH</td>
+    <td width="67%" valign="top">Use this macro to specify the path to the platform SDK libraries. The 
+    default is:<blockquote>
+      <p>$(BASEDIR)\public\sdk\lib\*</p>
+    </blockquote>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">SOURCES_USED</td>
+    <td width="67%" valign="top">Use this macro to indicate that there is another 
+    sources file or make file elsewhere in the tree. Use this macro if that 
+    additional file contains build dependencies.
+    <p>When you specify: </p>
+    <blockquote>
+      <p>SOURCES_USED=filename_someplace_else </p>
+    </blockquote>
+    <p>Nmake.exe regenerates the objects file when changes occur in the sources file 
+    that resides in the specified directory. Nmake.exe will also regenerate the 
+    objects file when changes occur in any sources file or make file that you 
+    specified in the SOURCES_USED macro. </p>
+    <p>For example, a sources file typically includes some other file. Just 
+    beneath that directive you could specify: </p>
+    <blockquote>
+      <p>SOURCES_USED=that_filename </p>
+    </blockquote>
+    <p>This instruction establishes a link between that file and the sources 
+    file. When that other file changes, NMAKE regenerates the _objects.mac file. </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">TARGET_CPP</td>
+    <td width="67%" valign="top">Use this macro to specify the name of the compiler.&nbsp; 
+    <p>For example, instead of having to specify that on x86 the compiler is 
+    CL386, on MIPS it is CLMIPS, and on PowerPC it is CLPPC, you can specify:</p>
+    <blockquote>
+      <p>TARGET_CPP=name_of_compiler</p>
+    </blockquote>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">TARGET_DIRECTORY</td>
+    <td width="67%" valign="top">Use this macro as follows to specify the 
+    target directory, if you want some dependency file to always end up in the 
+    obj subdirectory:
+    <blockquote>
+      <p>TARGET_DIRECTORY=some_sourcefile:some_dependency_file </p>
+    </blockquote>
+    <p>This instruction enables you to draw upon resources contained in a single 
+    source tree to complete multiple platform-specific builds without conflicts. 
+    You do not have to hard-code the name of the platform. </p>
+    <p>For example, if you have a special build utility rule for some feature in 
+    your code, or if you want to build a particular object from a particular C 
+    file, you can use the following line in a sources file: </p>
+    <blockquote>
+      <p>obj\$(TARGET_DIRECTORY)\filename.obj; filename.c </p>
+    </blockquote>
+    <p>Using the TARGET_DIRECTORY macro ensures that the specified file will be 
+    placed in the appropriate subdirectory. For example, 
+    \obj\i386subdirectory\obj\. </p>
+    <p>There are some default targets. One of them is .cod. If you issue the 
+    following instruction from a subdirectory containing source files: </p>
+    <blockquote>
+      <p>nmake SOURCE_FILE_NAME=.cod </p>
+    </blockquote>
+    <p>it will create an assembler listing that you can review to determine 
+    the location of the compiler error. </p>
+    <p>There is another default target called .pp file, a preprocessed listing. 
+    Preprocessing adds line numbers. You can use these line numbers to determine 
+    whether the build utility retrieved headers from the correct location, and 
+    which #define directives and structures it added. </p>
+    <p>If you issue the following instruction from a subdirectory containing 
+    source files: </p>
+    <blockquote>
+      <p>nmake SOURCE_FILE_NAME=.pp </p>
+    </blockquote>
+    <p>the build utility will preprocess the file. </p>
+    <p>The .cod and .pp files are very useful for tracking bugs in the build 
+    process. </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">TARGETPATHLIB</td>
+    <td width="67%" valign="top">Use this macro to specify where to put the 
+    import library when you are building a DLL.<p>When you are building a 
+    DLL, you create the DLL itself and you create an import library that other 
+    images can use that need to use your DLL. For example, a Windows NT 
+    developer built kernel32.dll and also kernel32.lib which users of 
+    kernel32.dll would link against. In the past you would handle all that by 
+    specifying:</p>
+    <blockquote>
+      <p>TARGETPATH=publicsdk.lib</p>
+    </blockquote>
+    <p>and it would put both the DLL and the import library in the public tree. 
+    By specifying TARGETPATHLIB, you can say, "Put the library in the public 
+    tree." Then set TARGETPATH=obj and build uses the DLL in the obj 
+    subdirectory in the source tree and put the import library in the public 
+    tree.</td>
+  </tr>
+  <tr>
+<TD width=30% valign="top">UMAPPL</TD>
+<TD width=70% valign="top">This macro enables you to build multiple targets from a 
+single subdirectory. If you use UMAPPL, the build utility will automatically 
+build executable files. Listing the names of executables in the build utility 
+command line is unnecessary.<p>To use this macro, specify a list of source filenames containing a main 
+function. Specify these filenames without filename extensions and separate them 
+with an asterisk. For example:</p>
+<blockquote>
+  <p>UMAPPL=a*b*c*d</p>
+</blockquote>
+<p>The build utility will compile and link each file in this list after the main 
+target in the sources file is built. The only restriction is that there can only 
+be one source file and you must specify what it links to using the UMLIBS 
+macro. </p>
+<p>The build utility links against whatever things you list in the UMLIBS macro. 
+These could be a .res file if you have a common resource, a library that 
+you just built in a subdirectory, or a library or object from another subdirectory. 
+There is no limit to what can be listed in UMLIBS. </p>
+    </TD>
+  </tr>
+  <tr>
+<TD width=30% valign="top">UMAPPLEXT</TD>
+<TD width=70% valign="top">Use this macro to specify the file extensions for image 
+files built from a single source file. The default is .exe. Use UMAPPLEXT when 
+you want the extension to be something other than .exe. (for example, .com or 
+.scr). If you want the file extension to be .exe, use UMAPPL.</TD>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">UMBASE</td>
+    <td width="67%" valign="top">Use this macro when you are building a 
+    dynamic link library. Use it to set the base address for the image you are 
+    creating. If you do not specify an address, the build utility will assume 
+    that the target name in coffbase.txt is the name of your image. You can 
+    override this default target name by specifying a target name with the 
+    DLLBASE macro. You can set DLLBASE to be the hard-coded base address or a hexadecimal 
+    address, or you can leave it blank. If you leave it blank, the build utility 
+    will always look up the target name specified in coffbase.txt. 
+    <p>For example, if you are building kernel32.dll, the build utility will look up 
+    kernel32 in coffbase.txt to find that base address.</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">UMENTRY</td>
+    <td width="67%" valign="top">Use this macro to override the default entry point 
+    (mainCRTStartup) and specify the entry point depending on the UM Type. You 
+    can set this name to be anything you choose. If the UM Type is Windows or 
+    Console, the default entry point is main and you can override it with 
+    winmain, wmain, or wwinmain.</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">UMENTRYABS</td>
+    <td width="67%" valign="top">Use this macro to specify an absolute entry point. For 
+    example, you might specify:<blockquote>
+      <p>UMENTRY=main</p>
+    </blockquote>
+    <p>However the real entry point is mainCRTStartup. If you do not want 
+    mainCRTStartup to be the entry point, specify UMENTRYABS to make main the 
+    absolute entry point. This prevents the build utility from going through the 
+    translation table.</td>
+  </tr>
+  <tr>
+<TD width=30% valign="top">UMLIBS</TD>
+<TD width=70% valign="top">Use this macro to specify a list of library path names to be 
+linked to the files that are specified in UMTEST or in UMAPPL. Include the 
+library that is generated by the sources file.
+<p>The specified paths must be absolute. Separate the entries in this list with 
+spaces or tabs.</p>
+<p>The UMLIBS path names must be defined in a special way. Because the build 
+utility can create build products for several hardware platforms, the 
+destination path for build products is constructed as follows:</p>
+<blockquote>
+  <p>%TARGETPATH%\&lt;cpu_type&gt;\</p>
+</blockquote>
+<p>where TARGETPATH is defined in the sources file, and cpu_type specifies the 
+platform for which the products were built. </p>
+<p>For example, if TARGETPATH is defined as LIB and a build request is made for 
+an x86 processor, the build products will be directed to the following 
+subdirectory:</p>
+<blockquote>
+  <p>lib\i386\</p>
+</blockquote>
+<p>Because of this convention, UMLIBS entries must specify library names in the 
+following form:</p>
+<blockquote>
+  <p>&lt;targetpath&gt;\*\&lt;library_name&gt;</p>
+</blockquote>
+<p>where targetpath is identical to the value assigned to TARGETPATH in the 
+sources file, and library_name is the full file name of the library to be linked 
+to the executable file. The build utility replaces the asterisk (*) with the 
+target platform type.</TD>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">UMTEST</td>
+    <td width="67%" valign="top">Use this macro to list source filenames containing a main 
+    function. Type these filenames without filename extensions and separate them 
+    with an asterisk. 
+    <blockquote>
+      <p>UMTEST=a*b*c*d</p>
+    </blockquote>
+    <p>The build utility compiles and links each file in this list.</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">UMTYPE</td>
+    <td width="67%" valign="top">Use this macro to specify the type of product being built</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">USE_CRTDLL</td>
+    <td width="67%" valign="top">The USE_CRTDLL, USE_MSVCRT, USE_LIBCMT, USE_LIBCNTPR, 
+    USE_NTDLL, and USE_NOLIBS macros indicate which run-time libraries the build 
+    utility should use.
+    <p>You should define exactly one of these macros equal to one in your 
+    sources file. The other ones should not be defined at all (you cannot 
+    define them equal to zero or equal to &quot;&quot;). </p>
+    <p>The different libraries specified by these macros are as follows: </p>
+    <ul>
+      <li>USE_CRTDLL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <ul>
+        <li>Use the multi-threaded run-time libraries in a DLL. In the free 
+        build environment, this means msvcrt.lib. In the checked build 
+        environment, this means msvcrtd.lib. </li>
+      </ul>
+      </li>
+      <li>USE_MSVCRT
+      <ul>
+        <li>Same as USE_CRTDLL.</li>
+      </ul>
+      </li>
+      <li>USE_LIBCMT
+      <ul>
+        <li>Use the multithreaded static libraries. </li>
+      </ul>
+      </li>
+      <li>USE_LIBCNTPR
+      <ul>
+        <li>Use the kernel run-time libraries. </li>
+      </ul>
+      </li>
+      <li>USE_NTDLL
+      <ul>
+        <li>Use ntdll.dll (the DLL for Windows NT-based operating systems). </li>
+      </ul>
+      </li>
+      <li>USE_NOLIBS
+      <ul>
+        <li>Do not use any run-time libraries.</li>
+      </ul>
+      </li>
+    </ul>
+    <p>If none of these macros are defined, the default behavior is to 
+    statically link to the single-threaded run-time libraries. In the free build 
+    environment, this means libc.lib. In the checked build environment, this 
+    means libcd.lib.
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">USE_INCREMENTAL_LINKING</td>
+    <td width="67%" valign="top">Use this macro to direct the build 
+    utility to use incremental linking.
+    <blockquote>
+      <p>USE_INCREMENTAL_LINKING=1 </p>
+    </blockquote>
+    <p>Using incremental linking can speed up builds on slower hardware. </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">USE_NATIVE_EH</td>
+    <td width="67%" valign="top">Use this macro if you are using standard C++ 
+    exception handling (try, catch, and throw). Specify the following in your 
+    sources file:
+    <blockquote>
+      <p>USE_NATIVE_EH=1 </p>
+    </blockquote>
+    <p>This instruction directs the build utility to turn on some required 
+    compiler switches.</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">USECXX_FLAG</td>
+    <td width="67%" valign="top">This macro enables you to go to a subdirectory 
+    that has all C files and compile them with the C++ compiler rather than the 
+    C compiler. (You might want to do this if you have decided to switch to 
+    C++.)
+    <p>Rather than manually change all your file names to a.cpp, b.cpp, you can 
+    specify: </p>
+    <blockquote>
+      <p>USECXX_FLAG=/Tp </p>
+    </blockquote>
+    <p>This switch directs the compiler to use the C++ compiler rather than the 
+    C compiler to compile the specified subdirectory.</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">USER_C_FLAGS</td>
+    <td width="67%" valign="top">Use the USER_C_FLAGS macro to specify flags that should only 
+    be sent to the C/C++ compiler.
+    <p>Unlike C_DEFINES, USER_C_FLAGS is not sent to the RC compiler. </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top">USER_INCLUDES</td>
+    <td width="67%" valign="top">Use the USER_INCLUDES macro to specify header files that are 
+    created during the build process.
+    <p>Normally, you use the INCLUDES macro in your sources file to indicate the 
+    location of your build headers. </p>
+    <p>There are times, however, when this macro will not be useful because some 
+    header files might not exist. For example, some header files are built as 
+    part of the build process. </p>
+    <p>Use the USER_INCLUDES macro to specify header files that are created 
+    during the build process. The build utility will search for these header 
+    files, will not consider it an error if the files are not found and will not 
+    perform dependency checking on them. </td>
+  </tr>
+</table>
+<h4><a name="Multi-processorBuildIssues"></a>Multiprocessor Build Issues</h4>
+
+ 
+<p>When the build utility is run on a multiprocessor computer, different build 
+utility threads might be running on different processors. Therefore, you should be 
+careful that your products are built in the correct order. </p>
+<p>The following macros can be used in your sources files to control the order 
+of the build: </p>
+<ul>
+  <li>SYNCHRONIZE_BLOCK instructs the build utility to build a certain 
+  subdirectory first. When the build utility finds this macro in a sources file, 
+  will stop building all other directories until this directory is built. </li>
+  <li>SYNCHRONIZE_DRAIN instructs the build utility to build a certain 
+  subdirectory last. A directory whose sources file contains this macro will not 
+  be built until all other subdirectories have been built. </li>
+</ul>
+<p>Use SYNCHRONIZE_BLOCK when you have a subdirectory that other subdirectories 
+require the results from in order to build (for example, a global precompiled 
+header). List the precompiled directory first in the dirs file, and add 
+SYNCHRONIZE_BLOCK=1 to the sources file. This assures that the subsequent 
+directories that use the precompiled header will not be built until the header 
+is created. </p>
+<p>Use SYNCHRONIZE_DRAIN when you have a subdirectory that needs the results 
+from a prior subdirectory on the same pass. For example, when building a DLL, 
+you might have several subdirectories with TARGETTYPE=LIBRARY, where each builds 
+some component. You might have another subdirectory with TARGETTYPE=DYNLINK, where 
+the build utility will build a DLL that exports functions from the component 
+libraries. In such a case, you should set LINKLIBS to the component libraries, 
+make sure the DLL subdirectory is the last in the parent dirs file, and add 
+SYNCHRONIZE_DRAIN=1 to the sources file for the DLL. </p>
+<p><b>Misuse of These Macros</b><br>
+You should use these macros very sparingly, because they completely stall a 
+multiprocessor build when they are encountered. In most cases, the problem is 
+not with the multiprocessor nature of the build, but rather the macros used in 
+the sources file. </p>
+<p>A common mistake is using LINKLIBS to specify import libraries when building 
+a DLL. You rarely need to do this. LINKLIBS must exist during pass 1 
+because the libraries it specifies are used to build the import library for the 
+DLL. However, TARGETLIBS does not need to exist until pass 2, because the 
+libraries it specifies are only used to link the image. </p>
+<p>Therefore, you should use LINKLIBS for component libraries only, and use 
+TARGETLIBS for import libraries. </p>
+
+ 
+<h4><a name="SpecifyingLibraries"></a>Specifying Libraries</h4>
+
+ 
+<p>Unlike some other environments that use the LIB environment variable, the 
+build utility always requires the full path. The purpose of this is to eliminate 
+any ambiguities in the build process. </p>
+<p>For instance, some build processes rely on the linker to determine the 
+correct libraries by using paths stored in the LIB environment variable in 
+combination with a list of default libraries stored in the objects. However, 
+this approach has the inherent (and undesirable) side effect of making it 
+difficult to either know, or control, which libraries are used in your build 
+process. </p>
+<p>On the other hand, the build utility requires that you specify the full path 
+to each library you use. It will disable any default library lookup that the 
+linker might attempt to use. Additionally, when specifying the libraries, you 
+should try to abstract any absolute dependencies that might exist in the path. 
+The build process provides an asterisk to take the place of the platform. You 
+can use the BASEDIR macro to take the place of the root of the source tree. You 
+can use DDK_LIB_PATH to refer to libraries that ship as part of the Windows DDK.
+</p>
+<p>Additionally, you should use an asterisk to indicate the target platform in 
+the path.&nbsp; For example, assume you are building a typical Windows .exe 
+file. Normally, this would require you to link against kernel32.lib, user32.lib, 
+gdi32.lib, and maybe your own component library, mylib.lib. The 
+TARGETLIBS macro would look like this: </p>
+<blockquote>
+  <p>TARGETLIBS = \<br>
+  # Note: SDK_LIB_PATH already ends in &quot;\*&quot; so you should no include it when 
+  using the macro.<br>
+  $(SDK_LIB_PATH)\kernel32.lib \<br>
+  $(SDK_LIB_PATH)\user32.lib \<br>
+  $(SDK_LIB_PATH)\gdi32.lib \<br>
+  ..\mylib\obj\*\mylib.lib </p>
+</blockquote>
+<p>When building on x86, this would be equivalent to:</p>
+<blockquote>
+  <p>TARGETLIBS = \<br>
+  $(BASEDIR)\lib\i386\kernel32.lib \<br>
+  $(BASEDIR)\lib\i386\user32.lib \<br>
+  $(BASEDIR)\lib\i386\gdi32.lib \<br>
+  ..\mylib\obj\i386\mylib.lib </p>
+</blockquote>
+<p>To build a particular set of build products, switch to a directory that 
+contains either a dirs file or a sources file. Run the build utility. The 
+utility will automatically build the products specified in the sources file of 
+each subdirectory. </p>
+<p>For example, if a sources file describes a library called &quot;mylib&quot;, using the 
+following command line will build the library: </p>
+<blockquote>
+  <p>build -386 </p>
+</blockquote>
+<p>If the sources file contains a UMAPPL macro that identifies an executable 
+named &quot;myexe&quot;, this command line will also build &quot;myexe&quot;. On the other hand, if 
+&quot;myexe&quot; is identified using a UMTEST macro instead of a UMAPPL macro, the 
+following command line must be used to include &quot;myexe&quot; in the build operation:
+</p>
+<blockquote>
+  <p>build -386 myexe </p>
+</blockquote>
+<p>Library creation is not required for programs that consist of a single source 
+file. In such a situation, define the sources file as follows: </p>
+<ol>
+  <li>Set TARGETNAME and TARGETPATH as if you were going to generate a library.
+  </li>
+  <li>Set TARGETTYPE to UMAPPL_NOLIB. </li>
+  <li>Set SOURCES to nothing. </li>
+  <li>Do not include the TARGETNAME library in UMLIBS. </li>
+  <li>Specify the source file name using UMAPPL or UMTEST. </li>
+  <li>Invoke the build utility (specifying the file name, if listed using 
+  UMTEST). </li>
+</ol>
+<p>The build utility will generate the executable file. </p>
+<h4><a name="PrecompiledHeaders"></a>Precompiled Headers</h4>
+
+ 
+<p>The easiest way to use precompiled headers is to include the following statement 
+in your sources file: </p>
+<blockquote>
+  <p>PRECOMPILED_INCLUDE=some_header_file_that_every_source_file_includes </p>
+</blockquote>
+<p>If you are building C++ code, include the statement: </p>
+<blockquote>
+  <p>PRECOMPILED_CXX=1 </p>
+</blockquote>
+<p>Nothing else is required. </p>
+<p>Precompiled headers are put into the directory specified by the O macro. 
+Their default location will be the obj\platform subdirectory. Therefore, they 
+should not collide during simultaneous compilations. </p>
+
+<hr>
+
+<p><i>Copyright (c) 2006 Microsoft Corporation. All rights reserved.</i></p>
+</body> 
+</html>

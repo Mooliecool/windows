@@ -1,0 +1,465 @@
+# ==++==
+# 
+#   
+#    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+#   
+#    The use and distribution terms for this software are contained in the file
+#    named license.txt, which can be found in the root of this distribution.
+#    By using this software in any fashion, you are agreeing to be bound by the
+#    terms of this license.
+#   
+#    You must not remove this notice, or any other, from this software.
+#   
+# 
+# ==--==
+
+TARGETNAME=System.Xml
+TARGETTYPE=NOTARGET
+TARGETPATH=obj
+CLR_TARGETTYPE=DLL
+CLR_ENABLE_ASMMETA=1
+ASSEMBLY_KEY_TYPE=ECMA
+
+INCLUDE_ASSEMBLY_REFS=1
+
+ALLOW_PARTIALTRUSTCALLS=1
+
+CSC_TREAT_WARNINGS_AS_ERRORS=1
+
+
+CSC_WARNING_DISABLE=649
+#
+# We don't produce any browse info
+#
+NO_BROWSER_FILE=1
+
+!ifdef HIDE_XSL
+CSC_DEFINES=$(CSC_DEFINES) /D:HIDE_XSL
+!endif
+
+# ------------------------------------------------------------------------------
+#                         .Net Framewok Classes Specific build information
+# ------------------------------------------------------------------------------
+
+SECURITY_LEVEL     = SYSTEM_COMPONENT
+
+SOURCES=native.rc
+
+CSHARP_ALLOW_UNSAFE=1
+CLR_REFERENCES = $(SDK_REF_PATH)\System.dll  \
+    $(SDK_REF_PATH)\System.Configuration.dll \
+    $(SDK_REF_PATH)\System.Data.SqlXml.dll   
+
+
+RESGEN_SOURCE=System.Xml.txt
+RESGEN_CLASS=$(TARGETNAME).Res
+
+CSC_DEFINES  = $(CSC_DEFINES) /D:XMLCHARTYPE_USE_RESOURCE
+
+RESOURCE_FILES=\
+    system\xml\xmlchartype.bin,XmlCharType.bin
+
+# Maintain this lowercased please
+CSHARP_SOURCES = \
+		$(NDPFX_ROOT)\src\misc\hresults.cs \
+		$(NDPFX_ROOT)\src\misc\invariantcomparer.cs \
+                $(NDPFX_ROOT)\src\misc\PrivilegedConfigurationManager.cs \
+		system\xml\assembly.cs \
+		system\xml\base64decoder.cs \
+		system\xml\base64encoder.cs \
+		system\xml\binhexdecoder.cs \
+		system\xml\binhexencoder.cs \
+		system\xml\bits.cs \
+		system\xml\bitstack.cs \
+		system\xml\bufferbuilder.cs \
+		system\xml\bytestack.cs \
+		system\xml\diagnosticsswitches.cs \
+		system\xml\emptyenumerator.cs \
+		system\xml\hwstack.cs \
+		system\xml\ihasxmlnode.cs \
+		system\xml\ixmllineinfo.cs \
+		system\xml\ixmlnamespaceresolver.cs \
+		system\xml\lineinfo.cs \
+		system\xml\listbase.cs \
+		system\xml\nametable.cs \
+		system\xml\ref.cs \
+		system\xml\validatenames.cs \
+		system\xml\xmlchartype.cs \
+		system\xml\xmlcomplianceutil.cs \
+		system\xml\xmlconvert.cs \
+		system\xml\xmldownloadmanager.cs \
+		system\xml\xmlencoding.cs \
+		system\xml\xmlexception.cs \
+		system\xml\xmlnamespacemanager.cs \
+		system\xml\xmlnamespacescope.cs \
+		system\xml\xmlnametable.cs \
+		system\xml\xmlnodeorder.cs \
+		system\xml\xmlnodetype.cs \
+		system\xml\xmlnullresolver.cs \
+		system\xml\xmlqualifiedname.cs \
+		system\xml\xmlreservedns.cs \
+		system\xml\xmlresolver.cs \
+		system\xml\xmlsecureresolver.cs \
+		system\xml\xmlurlresolver.cs \
+		system\xml\core\charentityencoderfallback.cs \
+		system\xml\core\conformancelevel.cs \
+		system\xml\core\entityhandling.cs \
+		system\xml\core\htmlencodedrawtextwriter.cs \
+		system\xml\core\htmlternarytree.cs \
+		system\xml\core\htmlutf8rawtextwriter.cs \
+		system\xml\core\incrementalreaddecoders.cs \
+		system\xml\core\newlinehandling.cs \
+		system\xml\core\iremovablewriter.cs \
+		system\xml\core\queryoutputwriter.cs \
+		system\xml\core\readcontentasbinaryhelper.cs \
+		system\xml\core\readonlyternarytree.cs \
+		system\xml\core\readstate.cs \
+                system\xml\core\securestringhasher.cs \
+		system\xml\core\textencodedrawtextwriter.cs \
+		system\xml\core\textutf8rawtextwriter.cs \
+		system\xml\core\validatingreadernodedata.cs \
+		system\xml\core\validationtype.cs \
+		system\xml\core\whitespacehandling.cs \
+		system\xml\core\xmlautodetectwriter.cs \
+		system\xml\core\xmlcharcheckingreader.cs \
+		system\xml\core\xmlcharcheckingwriter.cs \
+		system\xml\core\xmlencodedrawtextwriter.cs \
+		system\xml\core\xmleventcache.cs \
+		system\xml\core\xmlparsercontext.cs \
+		system\xml\core\xmlrawwriter.cs \
+		system\xml\core\xmlreader.cs \
+		system\xml\core\xmlreadersettings.cs \
+		system\xml\core\xmlspace.cs \
+		system\xml\core\xmlsubtreereader.cs \
+		system\xml\core\xmltextencoder.cs \
+		system\xml\core\xmltextreader.cs \
+		system\xml\core\xmltextreaderimpl.cs \
+		system\xml\core\xmltextreaderimplhelpers.cs \
+		system\xml\core\xmltextwriter.cs \
+		system\xml\core\xmlutf8rawtextwriter.cs \
+		system\xml\core\xmlvalidatingreader.cs \
+		system\xml\core\xmlvalidatingreaderimpl.cs \
+		system\xml\core\xmlwellformedwriter.cs \
+		system\xml\core\xmlwrappingreader.cs \
+		system\xml\core\xmlwrappingwriter.cs \
+		system\xml\core\xmlwriter.cs \
+		system\xml\core\xmlwritersettings.cs \
+		system\xml\core\xsdvalidatingreader.cs \
+		system\xml\core\xsdcachingreader.cs \
+		system\xml\dom\documentxmlwriter.cs \
+		system\xml\dom\documentxpathnavigator.cs \
+		system\xml\dom\domnametable.cs \
+		system\xml\dom\xmlattribute.cs \
+		system\xml\dom\xmlattributecollection.cs \
+		system\xml\dom\xmlcdatasection.cs \
+		system\xml\dom\xmlcharacterdata.cs \
+		system\xml\dom\xmlchildenumerator.cs \
+		system\xml\dom\xmlchildnodes.cs \
+		system\xml\dom\xmlcomment.cs \
+		system\xml\dom\xmldeclaration.cs \
+		system\xml\dom\xmldocument.cs \
+		system\xml\dom\xmldocumentfragment.cs \
+		system\xml\dom\xmldocumenttype.cs \
+		system\xml\dom\documentschemavalidator.cs \
+		system\xml\dom\xmldomtextwriter.cs \
+		system\xml\dom\xmlelement.cs \
+		system\xml\dom\xmlelementlist.cs \
+		system\xml\dom\xmlentity.cs \
+		system\xml\dom\xmlentityreference.cs \
+		system\xml\dom\xmleventchangedaction.cs \
+		system\xml\dom\xmlimplementation.cs \
+		system\xml\dom\xmllinkednode.cs \
+		system\xml\dom\xmlloader.cs \
+		system\xml\dom\xmlname.cs \
+		system\xml\dom\xmlnamednodemap.cs \
+		system\xml\dom\xmlnode.cs \
+		system\xml\dom\xmlnodechangedeventargs.cs \
+		system\xml\dom\xmlnodechangedeventhandler.cs \
+		system\xml\dom\xmlnodelist.cs \
+		system\xml\dom\xmlnodereader.cs \
+		system\xml\dom\xmlnotation.cs \
+		system\xml\dom\xmlprocessinginstruction.cs \
+		system\xml\dom\xmlsignificantwhitespace.cs \
+		system\xml\dom\xmltext.cs \
+		system\xml\dom\xmlunspecifiedattribute.cs \
+		system\xml\dom\xmlwhitespace.cs \
+		system\xml\dom\xpathnodelist.cs \
+		system\xml\cache\xpathdocumentbuilder.cs \
+		system\xml\cache\xpathdocumentiterator.cs \
+		system\xml\cache\xpathdocumentnavigator.cs \
+		system\xml\cache\xpathnode.cs \
+		system\xml\cache\xpathnodehelper.cs \
+		system\xml\cache\xpathnodeinfoatom.cs \
+		system\xml\cache\shape.cs \
+		system\xml\cache\shapegenerator.cs \
+		system\xml\cache\xpathdocumentview.cs \
+		system\xml\cache\xpathnodeview.cs \
+		system\xml\cache\xpathnodeviewpropertydescriptor.cs \
+		system\xml\xpath\ixpathnavigable.cs \
+		system\xml\xpath\xpathdocument.cs \
+		system\xml\xpath\xpathexception.cs \
+		system\xml\xpath\xpathexpr.cs \
+		system\xml\xpath\xpathitem.cs \
+		system\xml\xpath\xpathnamespacescope.cs \
+		system\xml\xpath\xpathnavigator.cs \
+		system\xml\xpath\xpathnavigatorkeycomparer.cs \
+		system\xml\xpath\xpathnavigatorreader.cs \
+		system\xml\xpath\xpathnodeiterator.cs \
+		system\xml\xpath\xpathnodetype.cs \
+		system\xml\xpath\internal\absolutequery.cs \
+		system\xml\xpath\internal\astnode.cs \
+		system\xml\xpath\internal\attributequery.cs \
+		system\xml\xpath\internal\axis.cs \
+		system\xml\xpath\internal\baseaxisquery.cs \
+		system\xml\xpath\internal\booleanexpr.cs \
+		system\xml\xpath\internal\booleanfunctions.cs \
+		system\xml\xpath\internal\cacheaxisquery.cs \
+		system\xml\xpath\internal\cachechildrenquery.cs \
+		system\xml\xpath\internal\cacheoutputquery.cs \
+		system\xml\xpath\internal\childrenquery.cs \
+		system\xml\xpath\internal\clonablestack.cs \
+		system\xml\xpath\internal\compiledxpathexpr.cs \
+		system\xml\xpath\internal\contextquery.cs \
+		system\xml\xpath\internal\descendantbasequery.cs \
+		system\xml\xpath\internal\descendantquery.cs \
+		system\xml\xpath\internal\descendantoverdescendantquery.cs \
+		system\xml\xpath\internal\documentorderquery.cs \
+		system\xml\xpath\internal\emptyquery.cs \
+		system\xml\xpath\internal\extensionquery.cs \
+		system\xml\xpath\internal\functionquery.cs \
+		system\xml\xpath\internal\filter.cs \
+		system\xml\xpath\internal\filterquery.cs \
+		system\xml\xpath\internal\followingquery.cs \
+		system\xml\xpath\internal\followingsibling.cs \
+		system\xml\xpath\internal\forwardpositionquery.cs \
+		system\xml\xpath\internal\function.cs \
+		system\xml\xpath\internal\group.cs \
+		system\xml\xpath\internal\groupquery.cs \
+		system\xml\xpath\internal\idquery.cs \
+		system\xml\xpath\internal\iteratorfilter.cs \
+		system\xml\xpath\internal\query.cs \
+		system\xml\xpath\internal\logicalexpr.cs \
+		system\xml\xpath\internal\mergefilterquery.cs \
+		system\xml\xpath\internal\namespacequery.cs \
+		system\xml\xpath\internal\nodefunctions.cs \
+		system\xml\xpath\internal\numberfunctions.cs \
+		system\xml\xpath\internal\numericexpr.cs \
+		system\xml\xpath\internal\operand.cs \
+		system\xml\xpath\internal\operandquery.cs \
+		system\xml\xpath\internal\operator.cs \
+		system\xml\xpath\internal\parentquery.cs \
+		system\xml\xpath\internal\precedingquery.cs \
+		system\xml\xpath\internal\precedingsibling.cs \
+		system\xml\xpath\internal\querybuilder.cs \
+		system\xml\xpath\internal\unionexpr.cs \
+		system\xml\xpath\internal\resetableiterator.cs \
+		system\xml\xpath\internal\reversepositionquery.cs \
+		system\xml\xpath\internal\root.cs \
+		system\xml\xpath\internal\sortquery.cs \
+		system\xml\xpath\internal\stringfunctions.cs \
+		system\xml\xpath\internal\valuequery.cs \
+		system\xml\xpath\internal\variable.cs \
+		system\xml\xpath\internal\variablequery.cs \
+		system\xml\xpath\internal\xpathancestoriterator.cs \
+		system\xml\xpath\internal\xpathancestorquery.cs \
+		system\xml\xpath\internal\xpatharrayiterator.cs \
+		system\xml\xpath\internal\xpathaxisiterator.cs \
+		system\xml\xpath\internal\xpathchilditerator.cs \
+		system\xml\xpath\internal\xpathdescendantiterator.cs \
+		system\xml\xpath\internal\xpathemptyiterator.cs \
+		system\xml\xpath\internal\xpathmultyiterator.cs \
+		system\xml\xpath\internal\xpathparser.cs \
+		system\xml\xpath\internal\xpathscanner.cs \
+		system\xml\xpath\internal\xpathselectioniterator.cs \
+		system\xml\xpath\internal\xpathselfquery.cs \
+		system\xml\xpath\internal\xpathsingletoniterator.cs \
+		system\xml\xslt\xslcompiledtransform.cs \
+		system\xml\xslt\xsltargumentlist.cs \
+		system\xml\xslt\xsltcontext.cs \
+		system\xml\xslt\xsltexception.cs \
+		system\xml\xslt\xsltransform.cs \
+		system\xml\xslt\xsltsettings.cs \
+		system\xml\schema\asttree.cs \
+		system\xml\schema\autovalidator.cs \
+		system\xml\schema\baseprocessor.cs \
+		system\xml\schema\basevalidator.cs \
+		system\xml\schema\bitset.cs \
+		system\xml\schema\chameleonkey.cs \
+		system\xml\schema\compiledidentityconstraint.cs \
+		system\xml\schema\schemasetcompiler.cs \
+		system\xml\schema\constraintstruct.cs \
+		system\xml\schema\contentvalidator.cs \
+		system\xml\schema\datatypeimplementation.cs \
+		system\xml\schema\dtdparser.cs \
+		system\xml\schema\dtdvalidator.cs \
+		system\xml\schema\facetchecker.cs \
+		system\xml\schema\idtdparseradapter.cs \
+		system\xml\schema\ixmlschemainfo.cs \
+		system\xml\schema\namespacelist.cs \
+		system\xml\schema\parser.cs \
+		system\xml\schema\preprocessor.cs \
+		system\xml\schema\schemaattdef.cs \
+		system\xml\schema\schemabuilder.cs \
+		system\xml\schema\schemacollectioncompiler.cs \
+		system\xml\schema\schemacollectionpreprocessor.cs \
+		system\xml\schema\schemadeclbase.cs \
+		system\xml\schema\schemaelementdecl.cs \
+		system\xml\schema\schemaentity.cs \
+		system\xml\schema\schemainfo.cs \
+		system\xml\schema\schemanames.cs \
+		system\xml\schema\schemanamespacemanager.cs \
+		system\xml\schema\schemanotation.cs \
+		system\xml\schema\schematype.cs \
+		system\xml\schema\validationeventargs.cs \
+		system\xml\schema\validationeventhandler.cs \
+		system\xml\schema\validationstate.cs \
+		system\xml\schema\xdrbuilder.cs \
+		system\xml\schema\xdrvalidator.cs \
+		system\xml\schema\xmlatomicvalue.cs \
+		system\xml\schema\xmlschema.cs \
+		system\xml\schema\xmlschemaall.cs \
+		system\xml\schema\xmlschemaannotated.cs \
+		system\xml\schema\xmlschemaannotation.cs \
+		system\xml\schema\xmlschemaany.cs \
+		system\xml\schema\xmlschemaanyattribute.cs \
+		system\xml\schema\xmlschemaappinfo.cs \
+		system\xml\schema\xmlschemaattribute.cs \
+		system\xml\schema\xmlschemaattributegroup.cs \
+		system\xml\schema\xmlschemaattributegroupref.cs \
+		system\xml\schema\xmlschemachoice.cs \
+		system\xml\schema\xmlschemacollection.cs \
+		system\xml\schema\xmlschemacomplexcontent.cs \
+		system\xml\schema\xmlschemacomplexcontentextension.cs \
+		system\xml\schema\xmlschemacomplexcontentrestriction.cs \
+		system\xml\schema\xmlschemacomplextype.cs \
+		system\xml\schema\xmlschemacontent.cs \
+		system\xml\schema\xmlschemacontentmodel.cs \
+		system\xml\schema\xmlschemacontentprocessing.cs \
+		system\xml\schema\xmlschemacontenttype.cs \
+		system\xml\schema\xmlschemadatatype.cs \
+		system\xml\schema\xmlschemaderivationmethod.cs \
+		system\xml\schema\xmlschemadocumentation.cs \
+		system\xml\schema\xmlschemaelement.cs \
+		system\xml\schema\xmlschemaexception.cs \
+		system\xml\schema\xmlschemaexternal.cs \
+		system\xml\schema\xmlschemafacet.cs \
+		system\xml\schema\xmlschemaform.cs \
+		system\xml\schema\xmlschemagroup.cs \
+		system\xml\schema\xmlschemagroupbase.cs \
+		system\xml\schema\xmlschemagroupref.cs \
+		system\xml\schema\xmlschemaidentityconstraint.cs \
+		system\xml\schema\xmlschemaimport.cs \
+		system\xml\schema\xmlschemainclude.cs \
+		system\xml\schema\xmlschemainfo.cs \
+		system\xml\schema\xmlschemanotation.cs \
+		system\xml\schema\xmlschemaobject.cs \
+		system\xml\schema\xmlschemaobjectcollection.cs \
+		system\xml\schema\xmlschemaobjecttable.cs \
+		system\xml\schema\xmlschemaparticle.cs \
+		system\xml\schema\xmlschemaredefine.cs \
+		system\xml\schema\xmlschemasequence.cs \
+		system\xml\schema\xmlschemaset.cs \
+		system\xml\schema\xmlschemacompilationsettings.cs \
+		system\xml\schema\xmlschemasimplecontent.cs \
+		system\xml\schema\xmlschemasimplecontentextension.cs \
+		system\xml\schema\xmlschemasimplecontentrestriction.cs \
+		system\xml\schema\xmlschemasimpletype.cs \
+		system\xml\schema\xmlschemasimpletypecontent.cs \
+		system\xml\schema\xmlschemasimpletypelist.cs \
+		system\xml\schema\xmlschemasimpletyperestriction.cs \
+		system\xml\schema\xmlschemasimpletypeunion.cs \
+		system\xml\schema\xmlschemasubstitutiongroup.cs \
+		system\xml\schema\xmlschematype.cs \
+		system\xml\schema\xmlschemause.cs \
+		system\xml\schema\xmlschemavalidationexception.cs \
+		system\xml\schema\xmlschemavalidator.cs \
+		system\xml\schema\xmlschemavalidity.cs \
+		system\xml\schema\xmlseveritytype.cs \
+		system\xml\schema\xmltokenizedtype.cs \
+		system\xml\schema\xmltypecode.cs \
+		system\xml\schema\xmlvalueconverter.cs \
+		system\xml\schema\xsdbuilder.cs \
+		system\xml\schema\xsddatetime.cs \
+		system\xml\schema\xsdduration.cs \
+		system\xml\schema\xsdvalidator.cs \
+		system\xml\schema\inference\infer.cs \
+		system\xml\schema\inference\xmlschemainferenceexception.cs \
+		system\xml\serialization\codeexporter.cs \
+		system\xml\serialization\codegenerationoptions.cs \
+		system\xml\serialization\codeidentifier.cs \
+		system\xml\serialization\codeidentifiers.cs \
+		system\xml\serialization\compilation.cs \
+		system\xml\serialization\compiler.cs \
+		system\xml\serialization\importcontext.cs \
+		system\xml\serialization\indentedwriter.cs \
+		system\xml\serialization\ixmlserializable.cs \
+		system\xml\serialization\ixmltextparser.cs \
+		system\xml\serialization\mappings.cs \
+		system\xml\serialization\models.cs \
+		system\xml\serialization\nametable.cs \
+		system\xml\serialization\schemaimporter.cs \
+		system\xml\serialization\schemaobjectwriter.cs \
+		system\xml\serialization\soapattributeattribute.cs \
+		system\xml\serialization\soapattributeoverrides.cs \
+		system\xml\serialization\soapattributes.cs \
+		system\xml\serialization\soapcodeexporter.cs \
+		system\xml\serialization\soapelementattribute.cs \
+		system\xml\serialization\soapenumattribute.cs \
+		system\xml\serialization\soapignoreattribute.cs \
+		system\xml\serialization\soapincludeattribute.cs \
+		system\xml\serialization\soapreflectionimporter.cs \
+		system\xml\serialization\soapschemaexporter.cs \
+		system\xml\serialization\soapschemaimporter.cs \
+		system\xml\serialization\soapschemamember.cs \
+		system\xml\serialization\soaptypeattribute.cs \
+		system\xml\serialization\types.cs \
+		system\xml\serialization\xmlanyattributeattribute.cs \
+		system\xml\serialization\xmlanyelementattribute.cs \
+		system\xml\serialization\xmlanyelementattributes.cs \
+		system\xml\serialization\xmlarrayattribute.cs \
+		system\xml\serialization\xmlarrayitemattribute.cs \
+		system\xml\serialization\xmlarrayitemattributes.cs \
+		system\xml\serialization\xmlattributeattribute.cs \
+		system\xml\serialization\xmlattributeoverrides.cs \
+		system\xml\serialization\xmlattributes.cs \
+		system\xml\serialization\xmlchoiceidentifierattribute.cs \
+		system\xml\serialization\xmlcodeexporter.cs \
+		system\xml\serialization\XmlCountingReader.cs \
+		system\xml\serialization\xmlcustomformatter.cs \
+		system\xml\serialization\xmlelementattribute.cs \
+		system\xml\serialization\xmlelementattributes.cs \
+		system\xml\serialization\xmlenumattribute.cs \
+		system\xml\serialization\xmlignoreattribute.cs \
+		system\xml\serialization\xmlincludeattribute.cs \
+		system\xml\serialization\xmlmapping.cs \
+		system\xml\serialization\xmlmembermapping.cs \
+		system\xml\serialization\xmlmembersmapping.cs \
+		system\xml\serialization\xmlnamespacedeclarationsattribute.cs \
+		system\xml\serialization\xmlreflectionimporter.cs \
+		system\xml\serialization\xmlreflectionmember.cs \
+		system\xml\serialization\xmlrootattribute.cs \
+		system\xml\serialization\xmlschemaexporter.cs \
+		system\xml\serialization\xmlschemaimporter.cs \
+		system\xml\serialization\xmlschemaproviderattribute.cs \
+		system\xml\serialization\xmlschemas.cs \
+		system\xml\serialization\xmlserializationgeneratedcode.cs \
+		system\xml\serialization\xmlserializationreader.cs \
+		system\xml\serialization\xmlserializationwriter.cs \
+		system\xml\serialization\xmlserializerassemblyattribute.cs \
+		system\xml\serialization\xmlserializer.cs \
+		system\xml\serialization\xmlserializerfactory.cs \
+		system\xml\serialization\xmlserializernamespaces.cs \
+		system\xml\serialization\xmlserializerversionattribute.cs \
+		system\xml\serialization\xmltextattribute.cs \
+		system\xml\serialization\xmltypeattribute.cs \
+		system\xml\serialization\xmltypemapping.cs \
+		system\xml\serialization\_events.cs \
+		system\xml\serialization\Advanced\schemaimporterextension.cs \
+		system\xml\serialization\PrimitiveXmlSerializers.cs \
+		system\xml\serialization\configuration\ConfigurationStrings.cs \
+		system\xml\serialization\configuration\DateTimeSerializationSection.cs \
+		system\xml\serialization\configuration\SchemaImporterExtensionElement.cs \
+		system\xml\serialization\configuration\SchemaImporterExtensionElementCollection.cs \
+		system\xml\serialization\configuration\SchemaImporterExtensionsSection.cs \
+		system\xml\serialization\configuration\SerializationSectionGroup.cs \
+		system\xml\serialization\configuration\XmlSerializerSection.cs \

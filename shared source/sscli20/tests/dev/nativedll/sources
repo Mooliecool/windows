@@ -1,0 +1,35 @@
+#
+# 
+#  Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+# 
+#  The use and distribution terms for this software are contained in the file
+#  named license.txt, which can be found in the root of this distribution.
+#  By using this software in any fashion, you are agreeing to be bound by the
+#  terms of this license.
+# 
+#  You must not remove this notice, or any other, from this software.
+# 
+#
+
+USE_NOLIBS                          = 1
+NO_NTDLL                            = 1
+
+INCLUDES		  =$(INCLUDES);$(_NTTREE)\sdk\include
+
+TARGETPRIORPATH=..\..\$(_OBJ_DIR)^\
+TARGETLIBNAME=nativedll
+TARGETNAME=$(TARGETPRIORPATH)$(TARGETLIBNAME)
+TARGETTYPE=DYNLINK
+UMTYPE=windows
+DLLENTRY=DllMain
+TARGETPATH=.
+C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE
+COFFBASE=usermode
+
+!IF "$(FEATURE_PAL)" == "1" && "$(ROTOR_TOOLSET)" == "MSVC"
+# USER_C_FLAGS = $(USER_C_FLAGS) /EHs  /EHa- /EHc-
+USE_NATIVE_EH=0
+!ENDIF
+
+SOURCES=nativedll.cpp \
+    smallstructs.cpp

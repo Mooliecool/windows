@@ -1,0 +1,58 @@
+#
+# 
+#  Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+# 
+#  The use and distribution terms for this software are contained in the file
+#  named license.txt, which can be found in the root of this distribution.
+#  By using this software in any fashion, you are agreeing to be bound by the
+#  terms of this license.
+# 
+#  You must not remove this notice, or any other, from this software.
+# 
+#
+
+INCLUDES        = $(INCLUDES);.;..\inc;..\..\inc;..\shell;$(VCTOOLS_INC_PATH)
+
+USER_C_FLAGS    = $(USER_C_FLAGS) -DUNICODE -D_UNICODE -D_INTERNAL_DEBUG_SUPPORT_ -DFEATURE_NO_HOST
+
+# MDbg replaces cordbg.  We keep the old cordbg around as NativeTestDbg for existing tests that need it.
+# Rotor doesn't yet have Mdbg, so we leave cordbg in place there.
+TARGETNAME      = cordbg
+
+TARGETPATH      = $(_OBJ_DIR)
+TARGETTYPE      =PROGRAM
+UMTYPE          =console
+UMENTRY         =wmain
+
+PRECOMPILED_INCLUDE     = stdafx.h
+PRECOMPILED_CXX         = 1
+PRECOMPILED_SOURCEFILE  = stdafx.cpp
+
+CONDITIONAL_INCLUDES = $(CONDITIONAL_INCLUDES) \
+    strstream
+
+TARGETLIBS =  \
+    $(CLR_LIB_PATH)\dbgshell.lib \
+
+#--------------------------------------------------------------------
+# Interop-debugging is only supported on x86, non-pal platforms.
+# We need a latest version of dbghelp.dll to read symbols from the latest compilers.
+# If we don't copy over our own version, then it will just pick up a stale version
+# from the OS.
+# So the raw binaries for dbghelp.dll are checked in, and then they get copied over.
+#--------------------------------------------------------------------
+
+
+!if ("$(_BUILDARCH)"=="x86" && "$(FEATURE_PAL)"!="1") \
+        || ("$(_BUILDARCH)"=="amd64") \
+        || ("$(_BUILDARCH)"=="AMD64") \
+        || ("$(_BUILDARCH)"=="ia64")
+TARGETLIBS = $(TARGETLIBS) \
+    $(VCTOOLS_LIB_PATH)\msdis150.lib \
+!endif
+
+SOURCES= \
+    cordbg.cpp \
+    Native.rc
+
+#NO_AUTOMATIC_MANIFEST=1

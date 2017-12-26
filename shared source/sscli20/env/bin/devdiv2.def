@@ -1,0 +1,2124 @@
+# ==++==
+#
+#   Copyright (c) Microsoft Corporation.  All rights reserved.
+#
+# ==--==
+
+
+#
+# Enforce use of DEVDIV2_SECTION 
+#
+!if     "$(DEVDIV2_SECTION)" == "BEFORE_MAKEFILE_DEF"
+!elseif "$(DEVDIV2_SECTION)" == "0"
+!elseif "$(DEVDIV2_SECTION)" == "1"
+!elseif "$(DEVDIV2_SECTION)" == "2"
+!elseif "$(DEVDIV2_SECTION)" == "3"
+!elseif "$(DEVDIV2_SECTION)" == "AFTER_MAKEFILE_DEF"
+!elseif "$(DEVDIV2_SECTION)" == ""
+! error DEVDIV2_SECTION must be defined before devdiv2.def is included.
+!else
+! error Bad DEVDIV2_SECTION.  See list at top of devdiv2.def.
+!endif
+
+
+
+# BEFORE_MAKEFILE_DEF
+!if "$(DEVDIV2_SECTION)" == "BEFORE_MAKEFILE_DEF"
+
+# includes should know if in devdiv.def 
+USING_DEVDIV_DEFS=1
+
+CLRBASE=$(NDPDIR)\clr
+
+#
+# kept from fx makefile.def
+# Build.exe gives us some somewhat screwy environment variables
+# to play with.  Resolve these into decent targets.
+#
+CURRENT_PASS=
+PASS0=0
+PASS1=0
+PASS2=0
+!if "$(NOPASS0)" != "1"
+CURRENT_PASS=Pass0
+PASS0=1
+!endif
+!if "$(PASS0ONLY)" != "1" && "$(LINKONLY)" != "1"
+CURRENT_PASS=Pass1
+PASS1=1
+!endif
+!if "$(NOLINK)" != "1"
+CURRENT_PASS=Pass2
+PASS2=1
+!endif
+
+DEVDIV_TOOLS=$(ROTOR_DIR)\env\bin
+DEVDIV_TOOLS_BIN=.\
+DEVDIV_TOOLS_MANAGED_BIN=.\
+
+#
+# Important build files
+#
+
+DEFAULT_EXE_ADDRESS=0x00400000
+DEFAULT_DLL_ADDRESS=0x10000000
+START_DLL_ADDRESS=0x7C000000
+
+#
+# Assembly references live in a versioned directory (so we can support
+# side-by-side builds of incompatible runtime versions). You can override the
+# default version in SOURCES/project.mk etc.
+#
+SDK_REF_PATH=$(_NTTREE)\ref\$(MANAGED_REFS_VERSION)
+
+# Deprecated.
+NDPSDK_PATH_REF=$(SDK_REF_PATH)
+
+
+#
+# Tool paths
+#
+
+# <STRIP>
+
+#
+# Can override MANAGED_TOOLS_VERSION in SOURCES/project.mk etc. to use a
+# specific toolset.
+# If we end up using something different from the default, we need to update
+# COMPLUS_InstallRoot and COMPLUS_Version env vars. But we need to wait until
+# after any potential modifications to MANAGED_TOOLS_VERSION. Wait till section
+# 0 processing below.
+#
+MANAGED_TOOLS_PATH=$(MANAGED_TOOLS_ROOT)\$(MANAGED_TOOLS_VERSION)
+
+
+VC_TOOLS_PATH=$(LKGVC_DIR)\Tools\$(_BUILDARCHEX)\vc\bin
+# </STRIP>
+
+# VC=vc7\x86
+ASMMETA=$(MANAGED_TOOLS_PATH)\asmmeta.exe
+COMPMETA=$(NTMAKEENV)\compmeta.bat
+VBC=$(MANAGED_TOOLS_PATH)\vbc.exe
+CERT2SPC=$(MANAGED_TOOLS_PATH)\cert2spc.exe
+!if "$(MANAGED_TOOLS_ROOT)" != ""
+CSC_NAME=$(MANAGED_TOOLS_PATH)\csc
+!else
+CSC_NAME=$(_NTTREE)\csc
+!endif
+MSBUILD_NAME=$(MANAGED_TOOLS_PATH)\MSBuild.exe
+TOUCH=$(NTMAKEENV)\$(PROCESSOR_ARCHITECTURE)\touch.exe
+VJC_NAME=$(MANAGED_TOOLS_PATH)\vjc.exe
+CTC_NAME=$(DEVDIV_TOOLS_BIN)\ctc.exe -nologo
+CVTRES=$(VC_TOOLS_PATH)\cvtres.exe
+IDHEADER=idheader.exe
+IDRBYHLP=idrbyhlp.exe
+IDRES=idres.exe
+!if "$(MANAGED_TOOLS_ROOT)" != ""
+ILASM=$(MANAGED_TOOLS_PATH)\ilasm.exe
+ILDASM=$(MANAGED_TOOLS_PATH)\ildasm.exe
+MERGEATTRIBUTES=$(MANAGED_TOOLS_PATH)\mergeattributes.exe
+!else
+ILASM=$(_NTTREE)\sdk\bin\ilasm
+ILDASM=$(_NTTREE)\sdk\bin\ildasm
+MERGEATTRIBUTES=$(_NTTREE)\int_tools\mergeattributes.exe
+!endif
+MODIFYCONFIG=$(_NTTREE)\int_tools\modifyconfig.exe
+ILASMBASE=$(DEVDIV_TOOLS)\ilasmbase.bat
+IMPORT_CHECK=impchk.exe
+INTLTOOL=intltool.exe
+JDATE_CMD=jdate.exe
+MCPP=$(VC_TOOLS_PATH)\cl.exe
+MLINK=$(VC_TOOLS_PATH)\link.exe
+NAMESGEN=$(MANAGED_TOOLS_PATH)\NamesGen.exe
+PERL=perl -I$(DEVDIV_TOOLS)
+AWK=$(DEVDIV_TOOLS_BIN)\awk.exe
+REGASM=$(MANAGED_TOOLS_PATH)\RegAsm.exe
+!if "$(MANAGED_TOOLS_ROOT)" != ""
+RESGEN=$(MANAGED_TOOLS_PATH)\Resgen.exe
+!else
+RESGEN=$(_NTTREE)\int_tools\internalresgen
+!endif
+!ifndef PLATFORM_UNIX
+SPP=call $(DEVDIV_TOOLS)\spp.bat
+!else
+SPP=$(PERL) -x $(DEVDIV_TOOLS)\spp.bat
+!endif
+TLBEXP=$(MANAGED_TOOLS_PATH)\tlbexp.exe
+TLBIMP=$(MANAGED_TOOLS_PATH)\tlbimp.exe
+TOK_NAME=tok.exe
+UNZIP_CMD=unzip.exe
+VSAUTODOC=vsautodoc.exe
+YACC=$(DEVDIV_TOOLS_BIN)\yacc_ms.exe
+ZIP_CMD=zip.exe
+
+!ifdef CTC_INCLUDES
+CTC_INCLUDES=$(CTC_INCLUDES);.
+!else
+CTC_INCLUDES=.
+!endif
+
+# PPD@30717: A J# complier dev may choose to build all classlibs with the just built
+# non-ship compiler - in that case he simply sets the env var
+!if "$(VJC_I_NAME)" == ""
+VJC_I_NAME=$(MANAGED_TOOLS_PATH)\vjc_i.exe
+!endif
+
+!endif # DEVDIV2_SECTION BEFORE_MAKEFILE_DEF
+
+!if "$(DEVDIV2_SECTION)" == "0"
+
+!ifdef COMPLUSTARGET
+!error COMPLUSTARGET is depreciated, use CLR_TARGETTYPE
+!endif
+
+!ifdef COMPLUSIMPORTS
+!error COMPLUSIMPORTS is depreciated, use CLR_REFERENCES
+!endif
+
+!ifdef COOLC_FLAGS
+!error COOLC_* are depreciated, use CSC_*
+!endif
+
+#
+# Fix up environment variables pointing to managed toolset.
+#
+!if [-set COMPLUS_InstallRoot=$(MANAGED_TOOLS_ROOT)]
+!endif
+!if [-set COMPLUS_Version=$(MANAGED_TOOLS_VERSION)]
+!endif
+
+!ifdef TARGETPATHLIB
+! if "$(CLR_TARGETTYPE)" == "DLL"
+!  if "$(MAKEDLL)" == ""
+
+!   if "$(TARGETNAME)"!="System" && "$(TARGETNAME)"!="System.Design"
+!    error LOGTHIS -- limit use of TARGETPATHLIB by managed dlls
+!   endif
+
+# Pass 1 of a two pass build.  Make sure TargetPath is the same as targetpathlib.
+NO_BROWSER_FILE=1
+TARGETPATH=$(TARGETPATHLIB)
+
+!  endif
+! endif
+!endif
+
+!if "$(PRECOMPILED_SHARED_INCLUDE)" != "" && "$(PRECOMPILED_SHARED_PCH)" != ""
+PRECOMPILED_OPTION=/Yu$(PRECOMPILED_SHARED_INCLUDE) /Fp$(PRECOMPILED_SHARED_PCH)
+! if "$(PRECOMPILED_SHARED_PDB)" == "" 
+PRECOMPILED_SHARED_PDB=$(PRECOMPILED_SHARED_PCH:.pch=.pdb)
+! endif
+!endif
+
+!endif # DEVDIV2_SECTION 0
+
+
+!if "$(DEVDIV2_SECTION)" == "1"
+
+#
+# define CLR_TARGET
+#
+!ifdef CLR_TARGETTYPE
+NO_BROWSER_FILE=1
+! if "$(CLR_TARGETTYPE)" == "EXE" || "$(CLR_TARGETTYPE)" == "WINEXE"
+TARGETEXT=exe
+! elseif "$(CLR_TARGETTYPE)" == "DLL"
+TARGETEXT=dll
+! elseif "$(CLR_TARGETTYPE)" == "NETMODULE"
+TARGETEXT=netmodule
+! else
+!  error Your .\sources. contains an unrecognized value for CLR_TARGETTYPE.  Use EXE, WINEXE, DLL or NETMODULE
+! endif
+!endif
+
+CLR_TARGET=
+CLR_LIB=
+
+!if $(PASS2) && "$(CLR_TARGETTYPE)" == "DLL" && defined(CLR_TLB)
+TARGETLIBFILES=$(TARGETLIBFILES) $(CLR_TLB)
+!endif
+
+!if $(PASS2) && defined(CLR_TARGETTYPE)
+!ifndef NO_APPEND_ARCHITECTURE_ON_PATHS
+CLR_TARGET=$(TARGETPATH)\$(TARGET_DIRECTORY)\$(TARGETNAME).$(TARGETEXT)
+!else
+CLR_TARGET=$(TARGETPATH)\$(TARGETNAME).$(TARGETEXT)
+!endif
+TARGETEXEFILES=$(CLR_TARGET)
+!endif
+
+!if "$(BUILD_CLR_TARGET_PASS0)" == "1"
+!ifndef NO_APPEND_ARCHITECTURE_ON_PATHS
+CLR_TARGET=$(TARGETPATH)\$(TARGET_DIRECTORY)\$(TARGETNAME).$(TARGETEXT)
+!else
+CLR_TARGET=$(TARGETPATH)\$(TARGETNAME).$(TARGETEXT)
+!endif
+NTTARGETFILE0=$(CLR_TARGET) $(NTTARGETFILE0)
+!endif
+
+!if $(PASS1) && "$(MSBUILD_PROJECT)" != "" && "$(MSBUILD_TLB_TARGET)" != ""
+NTTARGETFILE1=$(MSBUILD_TLB_TARGET) $(NTTARGETFILE1)
+!endif
+
+
+##########################################
+# Managed "header" and "lib" file support
+##########################################
+
+!ifndef PLATFORM_UNIX
+NORMALIZED_TARGETNAME=$(TARGETNAME)
+!else
+NORMALIZED_TARGETNAME=$(TARGETNAME:A=a)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:B=b)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:C=c)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:D=d)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:E=e)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:F=f)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:G=g)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:H=h)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:I=i)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:J=j)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:K=k)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:L=l)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:M=m)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:N=n)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:O=o)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:P=p)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:Q=q)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:R=r)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:S=s)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:T=t)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:U=u)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:V=v)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:W=w)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:X=x)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:Y=y)
+NORMALIZED_TARGETNAME=$(NORMALIZED_TARGETNAME:Z=z)
+!endif
+
+ASMMETA_DIR=$(ROTOR_DIR)\prebuilt\asmmeta
+
+{$(ASMMETA_DIR)\}.asmmeta{$O\}.meta:
+    $(ILASM) /nologo /quiet /dll $< /out=$@
+
+# PPD@30712: Disable the asmmeta auto-rules from getting kicked in even when we have $(TARGETNAME).asmmeta
+# But let the .asmmeta -> .meta transform remain
+!if "$(ASMMETA_AUTORULES_DISABLED)" != "1"
+!if $(PASS1) && "$(CLR_TARGETTYPE)" != "" && exist($(ASMMETA_DIR)\$(NORMALIZED_TARGETNAME).asmmeta) && (!defined(FEATURE_PAL) || !defined(BUILDING_MSCORLIB))
+
+CLR_ASMMETA_FILE=$(O)\$(NORMALIZED_TARGETNAME).meta
+
+all: $(CLR_ASMMETA_FILE)
+
+!  if "$(CLR_ASMMETA_PUBLISH_DIR)"==""
+CLR_ASMMETA_PUBLISH_DIR=$(SDK_REF_PATH)
+!  endif
+
+PASS1_PUBLISH=$(PASS1_PUBLISH) {$(CLR_ASMMETA_FILE)=$(CLR_ASMMETA_PUBLISH_DIR)\$(TARGETNAME).$(TARGETEXT)}
+
+!elseif $(PASS2) && "$(CLR_TARGETTYPE)" != "" && exist($(ASMMETA_DIR)\$(NORMALIZED_TARGETNAME).asmmeta) && defined(FEATURE_PAL) && defined(BUILDING_MSCORLIB) 
+
+CLR_ASMMETA_FILE=$(O)\$(NORMALIZED_TARGETNAME).meta
+
+all: $(CLR_ASMMETA_FILE)
+
+! if "$(CLR_ASMMETA_PUBLISH_DIR)"==""
+CLR_ASMMETA_PUBLISH_DIR=$(SDK_REF_PATH)
+! endif
+
+PASS2_PUBLISH=$(PASS2_PUBLISH) {$(CLR_ASMMETA_FILE)=$(CLR_ASMMETA_PUBLISH_DIR)\$(TARGETNAME).$(TARGETEXT)}
+
+!endif
+!endif
+
+!endif # DEVDIV2_SECTION 1
+
+
+
+!if "$(DEVDIV2_SECTION)" == "2"
+
+# Section 2 is no longer used (it used to implement a BINARY_PUBLISH hack until
+# we got PASS2_PUBLISH support).
+
+!endif # DEVDIV2_SECTION 2
+
+
+!if "$(DEVDIV2_SECTION)" == "3"
+
+
+# NT's default MAKE_PLACEFILE_CMD doesn't work for CLR_TARGETTYPE targets
+# CONSIDER: fix BINPLACE_ADDITIONAL_PLACEFILES for CLR_TARGETTYPE targets
+# CONSIDER: how does this work for MISCFILES?
+
+!if !defined(NO_BINPLACE)
+! if defined(BINPLACE_GENERATE_PLACEFILE) && defined(CLR_TARGET)
+MAKE_PLACEFILE_CMD=( $(MAKE_PLACEFILE_CMD) ) & echo $(CLR_TARGET) $(BINPLACE_DESTINATIONS) >> $(BINPLACE_PLACEFILE)
+! endif
+!endif
+
+
+
+##########################################
+# Managed "header" and "lib" verification
+##########################################
+
+# PPD@30712: Disable the asmmeta auto-rules from getting kicked in even when we have $(TARGETNAME).asmmeta
+!if "$(ASMMETA_AUTORULES_DISABLED)" != "1"
+!endif
+
+# 
+# To echo warnings and errors to the build console, the
+# "description block" must be recognized by build. To do this,
+# add a $(ECHO_COMPILING_COMMAND) or $(ECHO_PROCESSING_COMMAND)
+# to the first line of the description block, e.g.
+# 
+#     $(ECHO_COMPILING_CMD) Resgen_$<
+#     
+# Errors must have the format:
+# 
+#     <text> : error [num]: <msg>
+# 
+# Warnings must have the format:
+# 
+#     <text> : warning [num]: <msg>
+# 
+ECHO_COMPILING_CMD=@echo cl $(O) 
+ECHO_ASSEMBLING_CMD=@echo masm $(O) 
+ECHO_PROCESSING_CMD=@echo bison 
+
+#
+# Define platform variables based on URTBLDENV
+#
+
+#
+# Allow define to control keeping of temporary inline files
+#
+!if defined(KEEPTMPINLINEFILES) || defined(KEEP_MK_DEF_TEMPS)
+KEEPFILES=KEEP
+!else
+KEEPFILES=NOKEEP
+!endif
+
+!ifdef KEEPTMPINLINEFILES
+!message KEEPTMPINLINEFILES depreciated, use KEEP_MK_DEF_TEMPS
+!endif
+
+
+#let makefile.def control NTDEBUG, MSC_OPT, etc.
+#default to chk
+#todo: remove all references to URTBLDENV from fx scripts and managed build rules
+!if "$(URTBLDENV)" == ""
+! if "$(_BUILDTYPE)" == "dbg"
+URTBLDENV=chk
+URTBLDENV_FRIENDLY=Debug
+! elseif "$(_BUILDTYPE)" == "chk"
+URTBLDENV=chk
+URTBLDENV_FRIENDLY=Checked
+! elseif "$(_BUILDTYPE)" == "fre"
+URTBLDENV=ret
+URTBLDENV_FRIENDLY=Free
+# <STRIP>
+! elseif "$(_BUILDTYPE)" == "prf"
+URTBLDENV=ret
+URTBLDENV_FRIENDLY=Perfmance
+
+# <STRIP>  
+! elseif "$(_BUILDTYPE)" == "cov"
+URTBLDENV=chk
+URTBLDENV_FRIENDLY=Coverage
+# </STRIP>  
+
+#<STRIP>
+! elseif "$(_BUILDTYPE)" == "tmp"
+URTBLDENV=ret
+URTBLDENV_FRIENDLY=Free
+#</STRIP>
+
+! elseif "$(_BUILDTYPE)" == "ret"
+URTBLDENV=ret
+URTBLDENV_FRIENDLY=Retail
+
+! elseif "$(_BUILDTYPE)" == "dat"
+URTBLDENV=ret
+URTBLDENV_FRIENDLY=Data
+! endif
+# </STRIP>
+!endif
+
+!if "$(_BUILDOPT)" == "no opt"
+USE_COMPILER_OPTIMIZATIONS=0
+!else
+USE_COMPILER_OPTIMIZATIONS=1
+!endif
+ENABLE_JIT_TRACKING=0
+
+!if "$(_BUILDTYPE)" == "dbg"
+USE_COMPILER_OPTIMIZATIONS=0
+ENABLE_JIT_TRACKING=1
+!elseif "$(_BUILDTYPE)" == "chk"
+ENABLE_JIT_TRACKING=1
+# <STRIP>  
+!elseif "$(_BUILDTYPE)" ==  "cov"
+ENABLE_JIT_TRACKING=1
+# </STRIP>  
+!endif
+
+!if "$(DISABLE_COMPILER_OPTIMIZATIONS)" != ""
+USE_COMPILER_OPTIMIZATIONS=0
+ENABLE_JIT_TRACKING=1
+!endif
+
+# define various optimizations
+!ifndef OPT_LDO
+OPT_LDO=$(FREEBUILD)
+!endif
+
+!ifndef OPT_PREJIT
+OPT_PREJIT=1
+!endif
+
+!ifndef OPT_GACINSTALL
+OPT_GACINSTALL=1
+!endif
+
+!ifndef OPT_CREATEPOLICY
+OPT_CREATEPOLICY=0
+#OPT_CREATEPOLICY=1 TODO: restore createpolicy (parsefiles & genfiles issues)
+!endif
+
+!ifndef OPT_INSTALLPOLICY
+OPT_INSTALLPOLICY=0
+#OPT_INSTALLPOLICY=1 TODO: restore installpolicy (parsefiles & genfiles issues)
+!endif
+
+!if !$(OPT_GACINSTALL)
+OPT_INSTALLPOLICY=0
+!endif
+
+
+#
+# CSharp stuff
+#
+
+#
+# Assume assembly is CLS compliant unless otherwise indicated in sources
+#
+!ifndef CLS_COMPLIANT
+CLS_COMPLIANT=1
+!endif
+
+OFFICIAL_BUILD=0
+
+OFFICIAL_BUILD=0
+
+BETA=0
+
+BETA=0
+
+!if "$(FX_BRANCH_SYNC_COUNTER_VALUE)" == ""
+FX_BRANCH_SYNC_COUNTER_VALUE=0
+!endif
+
+
+#
+# Determine type of target link we are doing
+#
+
+#
+# Calculate menu dependencies before including processor-specific definitions
+#
+
+!if "$(MENU_SOURCES)" != ""
+# replace extension
+MENU_DEPS=$(MENU_SOURCES:.ctc=.cto)
+# replace each space with identifiable marker
+MENU_DEPS=$(MENU_DEPS: =^#^%)
+# remove middle and ending space, leaving only beginning space
+MENU_DEPS=$(MENU_DEPS:^%^#=)
+# replace beginning marker with single space
+MENU_DEPS=$(MENU_DEPS:^#^%= )
+# tag beginning and end of macro
+MENU_DEPS=+++$(MENU_DEPS)+++
+# remove space at beginning of macro
+MENU_DEPS=$(MENU_DEPS:+++ =)
+# remove space at end of macro
+MENU_DEPS=$(MENU_DEPS: +++=)
+# remove tags
+MENU_DEPS=$(MENU_DEPS:+++=)
+
+#
+# MENU_DEPS now has no leading or trailing spaces, and has a single space
+# between each file
+#
+# now add subdir info
+#
+
+MENU_DEPS=%\*\$(MENU_DEPS: = %\*\)
+!endif
+
+#
+# Calculate resx dependencies before including processor-specific definitions
+#
+
+!if "$(RESX_SOURCES)" != ""
+# replace extension
+RESX_DEPS=$(RESX_SOURCES:.resx=.resources)
+# replace each space with identifiable marker
+RESX_DEPS=$(RESX_DEPS: =^#^%)
+# remove middle and ending space, leaving only beginning space
+RESX_DEPS=$(RESX_DEPS:^%^#=)
+# replace beginning marker with single space
+RESX_DEPS=$(RESX_DEPS:^#^%= )
+# tag beginning and end of macro
+RESX_DEPS=+++$(RESX_DEPS)+++
+# remove space at beginning of macro
+RESX_DEPS=$(RESX_DEPS:+++ =)
+# remove space at end of macro
+RESX_DEPS=$(RESX_DEPS: +++=)
+# remove tags
+RESX_DEPS=$(RESX_DEPS:+++=)
+
+#
+# RESX_DEPS now has no leading or trailing spaces, and has a single space
+# between each file
+#
+# now add subdir info
+#
+
+RESX_DEPS=%\*\$(RESX_DEPS: = %\*\)
+!endif
+
+#
+# Build environment specific control and options.
+#
+
+!if     "$(_OBJ_DIR)" == "obj"
+MENU_DEPS=$(MENU_DEPS:%=obj)
+RESX_DEPS=$(RESX_DEPS:%=obj)
+!elseif "$(_OBJ_DIR)" == "objc"
+MENU_DEPS=$(MENU_DEPS:%=objc)
+RESX_DEPS=$(RESX_DEPS:%=objc)
+!elseif "$(_OBJ_DIR)" == "objd"
+MENU_DEPS=$(MENU_DEPS:%=objd)
+RESX_DEPS=$(RESX_DEPS:%=objd)
+!elseif "$(_OBJ_DIR)" == "objr"
+MENU_DEPS=$(MENU_DEPS:%=objr)
+RESX_DEPS=$(RESX_DEPS:%=objr)
+!elseif  "$(_OBJ_DIR)" == "obj0"
+MENU_DEPS=$(MENU_DEPS:%=obj0)
+RESX_DEPS=$(RESX_DEPS:%=obj0)
+!elseif "$(_OBJ_DIR)" == "obj0c"
+MENU_DEPS=$(MENU_DEPS:%=obj0c)
+RESX_DEPS=$(RESX_DEPS:%=obj0c)
+!elseif "$(_OBJ_DIR)" == "obj0d"
+MENU_DEPS=$(MENU_DEPS:%=obj0d)
+RESX_DEPS=$(RESX_DEPS:%=obj0d)
+!elseif "$(_OBJ_DIR)" == "obj0r"
+MENU_DEPS=$(MENU_DEPS:%=obj0r)
+RESX_DEPS=$(RESX_DEPS:%=obj0r)
+!elseif  "$(_OBJ_DIR)" == "obj1"
+MENU_DEPS=$(MENU_DEPS:%=obj1)
+RESX_DEPS=$(RESX_DEPS:%=obj1)
+!elseif "$(_OBJ_DIR)" == "obj1c"
+MENU_DEPS=$(MENU_DEPS:%=obj1c)
+RESX_DEPS=$(RESX_DEPS:%=obj1c)
+!elseif "$(_OBJ_DIR)" == "obj1d"
+MENU_DEPS=$(MENU_DEPS:%=obj1d)
+RESX_DEPS=$(RESX_DEPS:%=obj1d)
+!elseif "$(_OBJ_DIR)" == "obj1r"
+MENU_DEPS=$(MENU_DEPS:%=obj1r)
+RESX_DEPS=$(RESX_DEPS:%=obj1r)
+!elseif  "$(_OBJ_DIR)" == "obj2"
+MENU_DEPS=$(MENU_DEPS:%=obj2)
+RESX_DEPS=$(RESX_DEPS:%=obj2)
+!elseif  "$(_OBJ_DIR)" == "obj2c"
+MENU_DEPS=$(MENU_DEPS:%=obj2c)
+RESX_DEPS=$(RESX_DEPS:%=obj2c)
+!elseif "$(_OBJ_DIR)" == "obj2d"
+MENU_DEPS=$(MENU_DEPS:%=obj2d)
+RESX_DEPS=$(RESX_DEPS:%=obj2d)
+!elseif "$(_OBJ_DIR)" == "obj2r"
+MENU_DEPS=$(MENU_DEPS:%=obj2r)
+RESX_DEPS=$(RESX_DEPS:%=obj2r)
+!elseif "$(_OBJ_DIR)" == "objp"
+MENU_DEPS=$(MENU_DEPS:%=objp)
+RESX_DEPS=$(RESX_DEPS:%=objp)
+!elseif "$(_OBJ_DIR)" == "obj2p"
+MENU_DEPS=$(MENU_DEPS:%=obj2p)
+RESX_DEPS=$(RESX_DEPS:%=obj2p)
+!elseif "$(_OBJ_DIR)" == "objm"
+MENU_DEPS=$(MENU_DEPS:%=objm)
+RESX_DEPS=$(RESX_DEPS:%=objm)
+!elseif "$(_OBJ_DIR)" == "obj0m"
+MENU_DEPS=$(MENU_DEPS:%=obj0m)
+RESX_DEPS=$(RESX_DEPS:%=obj0m)
+!elseif "$(_OBJ_DIR)" == "obj1m"
+MENU_DEPS=$(MENU_DEPS:%=obj1m)
+RESX_DEPS=$(RESX_DEPS:%=obj1m)
+!elseif "$(_OBJ_DIR)" == "obj2m"
+MENU_DEPS=$(MENU_DEPS:%=obj2m)
+RESX_DEPS=$(RESX_DEPS:%=obj2m)
+!elseif "$(_OBJ_DIR)" == "objv"
+MENU_DEPS=$(MENU_DEPS:%=objv)
+RESX_DEPS=$(RESX_DEPS:%=objv)
+!elseif "$(_OBJ_DIR)" == "obj0v"
+MENU_DEPS=$(MENU_DEPS:%=obj0v)
+RESX_DEPS=$(RESX_DEPS:%=obj0v)
+!elseif "$(_OBJ_DIR)" == "obj1v"
+MENU_DEPS=$(MENU_DEPS:%=obj1v)
+RESX_DEPS=$(RESX_DEPS:%=obj1v)
+!elseif "$(_OBJ_DIR)" == "obj2v"
+MENU_DEPS=$(MENU_DEPS:%=obj2v)
+RESX_DEPS=$(RESX_DEPS:%=obj2v)
+!else
+! error Invalid _OBJ_DIR "$(_OBJ_DIR)".  Add to devdiv2.def.
+!endif
+
+!IF $(386)
+MENU_DEPS=$(MENU_DEPS:*=i386)
+RESX_DEPS=$(RESX_DEPS:*=i386)
+!ELSEIF $(MPPC)
+MENU_DEPS=$(MENU_DEPS:*=mppc)
+RESX_DEPS=$(RESX_DEPS:*=mppc)
+!ENDIF
+
+
+
+!if "$(CLR_TARGETTYPE)" == "EXE" || "$(CLR_TARGETTYPE)" == "WINEXE"
+URTVFT=VFT_APP
+!elseif "$(CLR_TARGETTYPE)" == "DLL"
+URTVFT=VFT_DLL
+!elseif "$(TARGETTYPE)" == "PROGRAM" || "$(TARGETTYPE)" == "PROGLIB"
+URTVFT=VFT_APP
+!elseif "$(TARGETTYPE)" == "DYNLINK" 
+URTVFT=VFT_DLL
+!else
+URTVFT=VFT_UNKNOWN
+!endif
+
+!if "$(URTVFT)" != "VFT_UNKNOWN"
+C_DEFINES = $(C_DEFINES) -DFX_VFT=$(URTVFT)
+!endif
+
+!if "$(URTVFT)" == "VFT_DLL" || "$(URTVFT)" == "VFT_APP"
+!if "$(URTVFT)" == "VFT_DLL"
+REAL_TARGETEXT=dll
+!else
+REAL_TARGETEXT=$(TARGETEXT)
+!endif
+C_DEFINES = $(C_DEFINES) -DFX_VER_INTERNALNAME_STR=$(TARGETNAME).$(REAL_TARGETEXT)
+!endif
+
+C_DEFINES = $(C_DEFINES) -DOFFICIAL_BUILD=$(OFFICIAL_BUILD) -DBETA=$(BETA) 
+C_DEFINES = $(C_DEFINES) -DFX_VER_PRIVATEBUILD_STR=$(COMPUTERNAME)
+C_DEFINES = $(C_DEFINES) -DURTBLDENV_FRIENDLY=$(URTBLDENV_FRIENDLY)
+C_DEFINES = $(C_DEFINES) -DFX_BRANCH_SYNC_COUNTER_VALUE=$(FX_BRANCH_SYNC_COUNTER_VALUE)
+
+#
+# Rules for building menu resources
+#
+
+{}.ctc{$O\}.cto:
+    $(CTC_NAME) $< $@ -C$(TARGET_CPP) -I$(CTC_INCLUDES:;= -I)
+
+{}.h{$O\}.cto:
+    $(CTC_NAME) $< $@ -C$(TARGET_CPP) -I$(CTC_INCLUDES:;= -I)
+
+{}.cmd{$O\}.cto:
+    $(CTC_NAME) $< $@ -C$(TARGET_CPP) -I$(CTC_INCLUDES:;= -I)
+
+{..\}.ctc{$O\}.cto:
+    $(CTC_NAME) $< $@ -C$(TARGET_CPP) -I$(CTC_INCLUDES:;= -I)
+
+{..\}.h{$O\}.cto:
+    $(CTC_NAME) $< $@ -C$(TARGET_CPP) -I$(CTC_INCLUDES:;= -I)
+
+{..\}.cmd{$O\}.cto:
+    $(CTC_NAME) $< $@ -C$(TARGET_CPP) -I$(CTC_INCLUDES:;= -I)
+
+{$O\}.ctc{$O\}.cto:
+    $(CTC_NAME) $< $@ -C$(TARGET_CPP) -I$(CTC_INCLUDES:;= -I)
+
+{$O\}.h{$O\}.cto:
+    $(CTC_NAME) $< $@ -C$(TARGET_CPP) -I$(CTC_INCLUDES:;= -I)
+
+{$O\}.cmd{$O\}.cto:
+    $(CTC_NAME) $< $@ -C$(TARGET_CPP) -I$(CTC_INCLUDES:;= -I)
+
+
+# TODO: Are snk files platform specific?  (they are binary)
+SECDIRECTORY=$(DEVDIV_TOOLS)
+
+ASSEMBLY_KEY_TYPE_ECMA = 0
+ASSEMBLY_KEY_TYPE_MICROSOFT = 0
+!ifndef ASSEMBLY_KEY_FILE
+! if "$(ASSEMBLY_KEY_TYPE)"=="ECMA"
+
+ASSEMBLY_KEY_FILE    = $(SECDIRECTORY)\ecmapublickey.snk
+ASSEMBLY_KEY_TYPE_ECMA = 1
+
+! else
+
+ASSEMBLY_KEY_FILE    = $(SECDIRECTORY)\finalpublickey.snk
+ASSEMBLY_KEY_TYPE_MICROSOFT = 1
+
+! endif
+!endif
+
+!ifndef PLATFORM_UNIX
+ASSEMBLY_KEY_FILE    = $(ASSEMBLY_KEY_FILE:\=\\)
+!endif
+
+SIGNCODE_ARGS = $(SIGNCODE_ARGS) -t http://timestamp.verisign.com/scripts/timstamp.dll
+SIGNCODE_ARGS = $(SIGNCODE_ARGS) -i "www.microsoft.com/urt"
+
+!if "$(SECURITY_LEVEL)"=="SYSTEM_COMPONENT"
+CERT_NAME = DNASYS
+!else
+! if "$(SECURITY_LEVEL)"=="USER_COMPONENT"
+CERT_NAME = DNAUser
+! endif
+!endif
+
+VJC_FLAGS=$(VJC_FLAGS) \
+    /nowarn:1500 \
+    /nologo \
+    /warn:4
+
+# PPD@30712: These are the special flags passed to the non-ship J# compiler
+!if "$(USE_NONSHIP_VJC)" == "1"
+VJC_FLAGS=$(VJC_FLAGS) \
+   /03bd6321-2af2-4b90-971e-ebd9f8d29764 
+!endif
+
+CSC_FLAGS=$(CSC_FLAGS)                      \
+            /nowarn:1595                        \
+            /nologo                             \
+            /fullpaths                          \
+            /checked-
+
+!if "$(CSHARP_ENABLE_WARNINGS)"!="1"
+CSC_FLAGS=$(CSC_FLAGS) \
+            /warn:0
+!endif
+
+!if "$(CSHARP_ALLOW_UNSAFE)"=="1"
+CSC_FLAGS=$(CSC_FLAGS) /unsafe+
+!endif
+
+#
+# Managed C++ flags. For now we only support compiling and linking in a single
+# step, so the link flags are actually passed through the MC++ compiler after
+# the /link option.
+#
+MCPP_FLAGS=$(MCPP_FLAGS) /nologo
+MLINK_FLAGS=$(MLINK_FLAGS) /nologo /nodefaultlib
+
+#
+# TODO: better control when findstr gets called for managed code 
+#       (revisit when file generation is re-enabled)
+#
+!if "$(CLR_TARGETTYPE)" != ""
+#
+# Policy files
+#
+
+!ifndef PLATFORM_UNIX
+FINDSTR_COMMAND=perl $(ROTOR_DIR)\env\bin\findline.pl
+FINDSTR_ARG=
+NULL_DEVICE=nul
+!else
+FINDSTR_COMMAND=grep -i -x
+FINDSTR_ARG=
+NULL_DEVICE=/dev/null
+!endif
+
+! ifndef GAC_ASSEMBLY
+GAC_ASSEMBLY=0
+!  ifdef GAC_TXT_FILE
+!   if [$(FINDSTR_COMMAND) $(FINDSTR_ARG)"$(TARGETNAME).$(TARGETEXT)" "$(GAC_TXT_FILE)" >$(NULL_DEVICE) 2>&1] == 0
+GAC_ASSEMBLY=1
+!   endif
+!  endif
+! endif
+
+! if $(OPT_CREATEPOLICY) && $(GAC_ASSEMBLY)
+POLICY_DEPS=$(O)\CreatePolicyMarker
+! else
+POLICY_DEPS=
+! endif
+
+#
+# Prejiting
+#
+
+! ifndef PREJIT_ASSEMBLY
+PREJIT_ASSEMBLY=0
+!  ifdef PREJIT_TXT_FILE
+!   if [$(FINDSTR_COMMAND) $(FINDSTR_ARG)"$(TARGETNAME).$(TARGETEXT)" "$(PREJIT_TXT_FILE)" >$(NULL_DEVICE) 2>&1] == 0
+PREJIT_ASSEMBLY=1
+!   endif
+!  endif
+! endif
+
+! if $(PREJIT_ASSEMBLY) && $(OPT_PREJIT)
+DO_PREJIT=1
+! else
+DO_PREJIT=0
+! endif
+
+! if $(GAC_ASSEMBLY) && $(OPT_GACINSTALL)
+DO_GACINSTALL=1
+! else
+DO_GACINSTALL=0
+! endif
+
+! if ! $(DO_PREJIT) && !$(DO_GACINSTALL)
+INSTALL_CMD=
+! endif
+
+#
+# Assembly Strong Signing
+#
+
+! ifndef SIGN_ASSEMBLY
+SIGN_ASSEMBLY=0
+!  ifdef SIGN_TXT_FILE
+!   if [$(FINDSTR_COMMAND) $(FINDSTR_ARG)"$(TARGETNAME).$(TARGETEXT)" "$(SIGN_TXT_FILE)" >$(NULL_DEVICE) 2>&1] == 0
+SIGN_ASSEMBLY=1
+!   endif
+!  endif
+! endif
+
+!if "$(SIGN_ASSEMBLY)" == "1"
+CSC_FLAGS=$(CSC_FLAGS) \
+          /delaysign   \
+          /keyfile:$(ASSEMBLY_KEY_FILE)
+!endif
+
+ASSEMBLY_PP_FLAGS = $(ASSEMBLY_PP_FLAGS) -DSIGN_ASSEMBLY=$(SIGN_ASSEMBLY)
+
+! ifndef ALLOW_PARTIALTRUSTCALLS
+ALLOW_PARTIALTRUSTCALLS=0
+! endif
+
+ASSEMBLY_PP_FLAGS = $(ASSEMBLY_PP_FLAGS) -DALLOW_PARTIALTRUSTCALLS=$(ALLOW_PARTIALTRUSTCALLS)
+
+!ifndef COM_COMPATIBLE_SIDEBYSIDE
+COM_COMPATIBLE_SIDEBYSIDE=0
+!endif
+
+ASSEMBLY_PP_FLAGS = $(ASSEMBLY_PP_FLAGS) -DCOM_COMPATIBLE_SIDEBYSIDE=$(COM_COMPATIBLE_SIDEBYSIDE)
+
+! if "$(CLS_COMPLIANT)" == "1"
+ASSEMBLY_PP_FLAGS      = $(ASSEMBLY_PP_FLAGS) -DASSEMBLY_ATTRIBUTE_CLS_COMPLIANT=1
+! else
+ASSEMBLY_PP_FLAGS      = $(ASSEMBLY_PP_FLAGS) -DASSEMBLY_ATTRIBUTE_CLS_COMPLIANT=0
+! endif
+
+! if "$(COM_VISIBLE)" == "1"
+ASSEMBLY_PP_FLAGS      = $(ASSEMBLY_PP_FLAGS) -DASSEMBLY_ATTRIBUTE_COM_VISIBLE=true
+! else
+ASSEMBLY_PP_FLAGS      = $(ASSEMBLY_PP_FLAGS) -DASSEMBLY_ATTRIBUTE_COM_VISIBLE=false
+! endif
+
+! if "$(GUID_ATTRIBUTE)" != ""
+ASSEMBLY_PP_FLAGS      = $(ASSEMBLY_PP_FLAGS) -DASSEMBLY_ATTRIBUTE_INTEROP_GUID=$(GUID_ATTRIBUTE)
+! endif
+
+ASSEMBLY_PP_FLAGS = $(ASSEMBLY_PP_FLAGS) -DASSEMBLY_KEY_FILE=$(ASSEMBLY_KEY_FILE)
+ASSEMBLY_PP_FLAGS = $(ASSEMBLY_PP_FLAGS) -DASSEMBLY_KEY_TYPE_ECMA=$(ASSEMBLY_KEY_TYPE_ECMA)
+ASSEMBLY_PP_FLAGS = $(ASSEMBLY_PP_FLAGS) -DASSEMBLY_KEY_TYPE_MICROSOFT=$(ASSEMBLY_KEY_TYPE_MICROSOFT)
+
+# HACK ALERT! This is a hack until we straighten out what we are going to do with 
+# versioning stuff.
+# PPD@30712: USE_VSVERSION works pretty well... as long as you can gaurantee $(NDP_INC_PATH) is before 
+# $(VSCOMMON_INC_PATH) in your $(INCLUDES)
+!if "$(USE_VSVERSION)"!=""
+ASSEMBLY_PP_FLAGS = $(ASSEMBLY_PP_FLAGS) -DUSE_VSVERSION=1
+# Need to have in CDEFINES as well in order for RC.EXE to pick it up.
+CDEFINES = $(CDEFINES) -DUSE_VSVERSION=1
+!endif
+
+GLOBAL_C_FLAGS = $(GLOBAL_C_FLAGS) $(ASSEMBLY_PP_FLAGS)
+
+!endif # CLR_TARGETTYPE (starts at policy file section)
+
+!if "$(CSC_DONT_TREAT_WARNINGS_AS_ERRORS)" == "1"
+CSC_TREAT_WARNINGS_AS_ERRORS=0
+!endif
+
+!if ! defined(COMPONENT_NO_DOC)
+! if defined(OFFICIAL_BUILD_MACHINE)  || defined(CSC_BUILD_DOCS)
+CSC_FLAGS         =$(CSC_FLAGS) /doc:$(_NTTREE)\$(TARGETNAME).csx
+CSC_TREAT_WARNINGS_AS_ERRORS=0
+!  ifndef CSC_SHOW_DOC_WARNINGS
+CSC_FLAGS         =$(CSC_FLAGS) /nowarn:1570,1571,1572,1573,1574,1584,1591
+!  endif
+! endif
+!endif
+
+
+# Non-ndp source files use CSC_WARNINGS_AS_ERRORS
+# Prevent silent dismissal of the option
+!if "$(CSC_WARNINGS_AS_ERRORS)" == "" && "$(CSC_TREAT_WARNINGS_AS_ERRORS)" == ""
+CSC_TREAT_WARNINGS_AS_ERRORS=$(CSC_WARNINGS_AS_ERRORS)
+!endif
+
+!if "$(CSC_TREAT_WARNINGS_AS_ERRORS)" == "1"
+CSC_FLAGS         =$(CSC_FLAGS) /warnaserror+
+!else
+CSC_FLAGS         =$(CSC_FLAGS) /warnaserror-
+!endif
+
+#make C# fix warning 649 (see chadr) then remove this!
+CSC_FLAGS=$(CSC_FLAGS) /nowarn:649
+
+#
+# Debugging information
+#
+
+!if $(PASS1)
+VBC_FLAGS         =$(VBC_FLAGS) /debug-
+CSC_FLAGS         =$(CSC_FLAGS) /debug-
+VJC_FLAGS         =$(VJC_FLAGS) /debug-
+!else
+VBC_FLAGS         =$(VBC_FLAGS) /debug+
+CSC_FLAGS         =$(CSC_FLAGS) /debug+
+VJC_FLAGS         =$(VJC_FLAGS) /debug+
+MCPP_FLAGS        =$(MCPP_FLAGS) /Zi
+MLINK_FLAGS       =$(MLINK_FLAGS) /debug
+! if "$(ENABLE_JIT_TRACKING)" == "1"
+VBC_FLAGS         =$(VBC_FLAGS) /debug:full
+CSC_FLAGS         =$(CSC_FLAGS) /debug:full
+VJC_FLAGS         =$(VJC_FLAGS) /debug:full
+! else
+VBC_FLAGS         =$(VBC_FLAGS) /debug:pdbonly
+CSC_FLAGS         =$(CSC_FLAGS) /debug:pdbonly
+VJC_FLAGS         =$(VJC_FLAGS) /debug:pdbonly
+! endif
+!endif
+
+!if "$(USE_COMPILER_OPTIMIZATIONS)" == "1"
+VBC_FLAGS         =$(VBC_FLAGS) /optimize+
+CSC_FLAGS         =$(CSC_FLAGS) /optimize+
+VJC_FLAGS         =$(VJC_FLAGS) /optimize+
+MCPP_FLAGS        =$(MCPP_FLAGS) /Ox
+!else
+VBC_FLAGS         =$(VBC_FLAGS) /optimize-
+CSC_FLAGS         =$(CSC_FLAGS) /optimize-
+VJC_FLAGS         =$(VJC_FLAGS) /optimize-
+MCPP_FLAGS        =$(MCPP_FLAGS) /Od
+!endif
+
+!if "$(CSHARP_INCREMENTAL_COMPILE)" == "1"
+CSC_FLAGS         =$(CSC_FLAGS) /incremental+
+!else
+CSC_FLAGS         =$(CSC_FLAGS) /incremental-
+!endif
+
+#
+# Gacinstall
+#
+
+GACUTIL_FLAGS=/nologo /silent
+
+#
+# Prejit
+#
+
+PREJIT_FLAGS=/nologo /silent
+!if "$(URTBLDENV)" == "ice"  && "$(NO_ICECAP)" != "1"
+PREJIT_FLAGS=$(PREJIT_FLAGS) /prof
+!endif
+
+#
+# Resources
+#
+
+CLR_RESDEPS=
+
+#
+# Native resources are present in the OBJECTS macro defined in obj?\_objects.mac
+#
+
+WIN32RES=
+!if "$(OBJECTS)" != ""
+WIN32RES=$(OBJECTS)
+!elseif "$(CLR_RES)" != ""
+WIN32RES=$(CLR_RES)
+!endif
+
+
+# Menu resources - build before native resources
+!if "$(MENU_DEPS)" != ""
+USER_INCLUDES=$(O)
+!endif
+
+# resx resources
+!if "$(RESX_DEPS)" != ""
+CLR_RESDEPS=$(CLR_RESDEPS) $(RESX_DEPS)
+!endif
+
+CLR_RESDEPS=$(CLR_RESDEPS) $(OBJECTS)
+
+#
+# Managed resources
+#
+
+!if "$(RESGEN_SOURCE)" != ""
+
+!ifdef PLATFORM_UNIX
+# lowercase the name of the resource file - the name 
+# can not be lowercased in the makefile since it is causing problems 
+# for the localization databases
+RESGEN_SOURCE=$(RESGEN_SOURCE:A=a)
+RESGEN_SOURCE=$(RESGEN_SOURCE:B=b)
+RESGEN_SOURCE=$(RESGEN_SOURCE:C=c)
+RESGEN_SOURCE=$(RESGEN_SOURCE:D=d)
+RESGEN_SOURCE=$(RESGEN_SOURCE:E=e)
+RESGEN_SOURCE=$(RESGEN_SOURCE:F=f)
+RESGEN_SOURCE=$(RESGEN_SOURCE:G=g)
+RESGEN_SOURCE=$(RESGEN_SOURCE:H=h)
+RESGEN_SOURCE=$(RESGEN_SOURCE:I=i)
+RESGEN_SOURCE=$(RESGEN_SOURCE:J=j)
+RESGEN_SOURCE=$(RESGEN_SOURCE:K=k)
+RESGEN_SOURCE=$(RESGEN_SOURCE:L=l)
+RESGEN_SOURCE=$(RESGEN_SOURCE:M=m)
+RESGEN_SOURCE=$(RESGEN_SOURCE:N=n)
+RESGEN_SOURCE=$(RESGEN_SOURCE:O=o)
+RESGEN_SOURCE=$(RESGEN_SOURCE:P=p)
+RESGEN_SOURCE=$(RESGEN_SOURCE:Q=q)
+RESGEN_SOURCE=$(RESGEN_SOURCE:R=r)
+RESGEN_SOURCE=$(RESGEN_SOURCE:S=s)
+RESGEN_SOURCE=$(RESGEN_SOURCE:T=t)
+RESGEN_SOURCE=$(RESGEN_SOURCE:U=u)
+RESGEN_SOURCE=$(RESGEN_SOURCE:V=v)
+RESGEN_SOURCE=$(RESGEN_SOURCE:W=w)
+RESGEN_SOURCE=$(RESGEN_SOURCE:X=x)
+RESGEN_SOURCE=$(RESGEN_SOURCE:Y=y)
+RESGEN_SOURCE=$(RESGEN_SOURCE:Z=z)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:A=a)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:B=b)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:C=c)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:D=d)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:E=e)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:F=f)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:G=g)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:H=h)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:I=i)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:J=j)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:K=k)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:L=l)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:M=m)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:N=n)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:O=o)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:P=p)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:Q=q)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:R=r)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:S=s)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:T=t)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:U=u)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:V=v)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:W=w)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:X=x)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:Y=y)
+RESGEN_SOURCE_OVERRIDE=$(RESGEN_SOURCE_OVERRIDE:Z=z)
+!endif
+
+! if "$(RESGEN_SOURCE_OVERRIDE)" != ""
+RESGEN_SOURCE_NOPATH=$(RESGEN_SOURCE_OVERRIDE)
+! else
+RESGEN_SOURCE_NOPATH=$(RESGEN_SOURCE:..\=)
+! endif
+
+RESGEN_BASENAME=$(RESGEN_SOURCE_NOPATH:.txt=)
+RESGEN_BASENAME=$(RESGEN_BASENAME:.resx=)
+RESGEN_RESOUTPUT=$(RESGEN_BASENAME).resources
+CLR_RESDEPS=$(CLR_RESDEPS) $(O)\$(RESGEN_RESOUTPUT)
+
+! if "$(RESGEN_CLASS)" != "" && "$(CSHARP_SOURCES)" != "" 
+RESGEN_CSOUTPUT=$(RESGEN_SOURCE_NOPATH:.txt=.cs)
+CSHARP_SOURCES      = $(O)\$(RESGEN_CSOUTPUT) \
+                      $(CSHARP_SOURCES)
+! endif
+
+! if "$(RESGEN_CLASS)" != "" && "$(VBC_SOURCES)" != "" 
+RESGEN_VBCOUTPUT=$(RESGEN_SOURCE_NOPATH:.txt=.vb)
+VBC_SOURCES      = $(O)\$(RESGEN_VBCOUTPUT) \
+                      $(VBC_SOURCES)
+! endif
+
+! if "$(RESGEN_CLASS)" != "" && "$(JSHARP_SOURCES)" != "" 
+RESGEN_JSLOUTPUT=$(RESGEN_SOURCE_NOPATH:.txt=.jsl)
+JSHARP_SOURCES      = $(O)\$(RESGEN_JSLOUTPUT) \
+                      $(JSHARP_SOURCES)
+! endif
+
+! if "$(RESGEN_CLASS)" != "" && "$(MCPP_SOURCES)" != ""
+RESGEN_CPPOUTPUT=$(RESGEN_SOURCE_NOPATH:.txt=.h)
+CLR_RESDEPS=$(CLR_RESDEPS) $(O)\$(RESGEN_CPPOUTPUT)
+# Since we generate a header file, add the output path to the include path
+# (to make it easier to include).
+INCLUDES=$(INCLUDES);$(O)
+! endif
+
+! if "$(USE_US_ENGLISH_SATELLITE)" != ""
+# Produce a US English satellite
+# TODO: Not done yet...
+# Tweak C preprocessor flags as well...
+CSPP_FLAGS = $(CSPP_FLAGS) /DUSE_US_ENGLISH_SATELLITE=1
+! else
+# Link resources into the main assembly
+! if "$(RESGEN_SOURCE_NAMESPACE)" != ""
+CSC_FLAGS         =$(CSC_FLAGS) /res:$(O)\$(RESGEN_RESOUTPUT),$(RESGEN_SOURCE_NAMESPACE)
+VJC_FLAGS         =$(VJC_FLAGS) /res:$(O)\$(RESGEN_RESOUTPUT),$(RESGEN_SOURCE_NAMESPACE)
+! else
+CSC_FLAGS         =$(CSC_FLAGS) /res:$(O)\$(RESGEN_RESOUTPUT),$(RESGEN_RESOUTPUT)
+VJC_FLAGS         =$(VJC_FLAGS) /res:$(O)\$(RESGEN_RESOUTPUT),$(RESGEN_RESOUTPUT)
+! endif
+! endif
+
+MLINK_FLAGS       =$(MLINK_FLAGS) /assemblyresource:$(O)\$(RESGEN_RESOUTPUT)
+
+! if "$(RESGEN_SOURCE_NAMESPACE)" != ""
+!  if "$(RESGEN_SOURCE_OPT)" != ""
+VBC_FLAGS          =$(VBC_FLAGS) /res:$(O)\$(RESGEN_RESOUTPUT),$(RESGEN_SOURCE_NAMESPACE),$(RESGEN_SOURCE_OPT)
+!  else
+VBC_FLAGS          =$(VBC_FLAGS) /res:$(O)\$(RESGEN_RESOUTPUT),$(RESGEN_SOURCE_NAMESPACE)
+!  endif
+! else
+!  if "$(RESGEN_SOURCE_OPT)" != ""
+VBC_FLAGS          =$(VBC_FLAGS) /res:$(O)\$(RESGEN_RESOUTPUT),$(RESGEN_RESOUTPUT),$(RESGEN_SOURCE_OPT)
+!  else
+VBC_FLAGS          =$(VBC_FLAGS) /res:$(O)\$(RESGEN_RESOUTPUT),$(RESGEN_RESOUTPUT)
+!  endif
+! endif
+
+!endif
+
+!if "$(RESGEN_SOURCE2)" != ""
+RESGEN_SOURCE2_NOPATH=$(RESGEN_SOURCE2:..\=)
+RESGEN_BASENAME2=$(RESGEN_SOURCE2_NOPATH:.txt=)
+RESGEN_BASENAME2=$(RESGEN_BASENAME2:.resx=)
+RESGEN_RESOUTPUT2=$(RESGEN_BASENAME2).resources
+CLR_RESDEPS=$(CLR_RESDEPS) $(O)\$(RESGEN_RESOUTPUT2)
+
+! if "$(RESGEN_CLASS2)" != "" && "$(CSHARP_SOURCES)" != "" 
+RESGEN_CSOUTPUT2=$(RESGEN_SOURCE2_NOPATH:.txt=.cs)
+CSHARP_SOURCES      = $(O)\$(RESGEN_CSOUTPUT2) \
+                      $(CSHARP_SOURCES)
+! endif
+
+! if "$(RESGEN_CLASS2)" != "" && "$(JSHARP_SOURCES)" != "" 
+RESGEN_JSLOUTPUT2=$(RESGEN_SOURCE2_NOPATH:.txt=.jsl)
+JSHARP_SOURCES      = $(O)\$(RESGEN_JSLOUTPUT2) \
+                      $(JSHARP_SOURCES)
+! endif
+
+! if "$(RESGEN_SOURCE2_NAMESPACE)" != ""
+CSC_FLAGS         =$(CSC_FLAGS) /res:$(O)\$(RESGEN_RESOUTPUT2),$(RESGEN_SOURCE2_NAMESPACE)
+VJC_FLAGS         =$(VJC_FLAGS) /res:$(O)\$(RESGEN_RESOUTPUT2),$(RESGEN_SOURCE2_NAMESPACE)
+! else
+CSC_FLAGS         =$(CSC_FLAGS) /res:$(O)\$(RESGEN_RESOUTPUT2),$(RESGEN_RESOUTPUT2)
+VJC_FLAGS         =$(VJC_FLAGS) /res:$(O)\$(RESGEN_RESOUTPUT2),$(RESGEN_RESOUTPUT2)
+! endif
+MLINK_FLAGS       =$(MLINK_FLAGS) /assemblyresource:$(O)\$(RESGEN_RESOUTPUT2)
+
+!endif
+
+!if "$(RESOURCE_FILES)" != ""
+#
+# remove extraneous, leading, and trailing spaces
+#
+RESOURCE_FILES=$(RESOURCE_FILES: =^#^%)
+RESOURCE_FILES=$(RESOURCE_FILES:^%^#=)
+RESOURCE_FILES=$(RESOURCE_FILES:^#^%= )
+RESOURCE_FILES=+++$(RESOURCE_FILES)+++
+RESOURCE_FILES=$(RESOURCE_FILES:+++ =)
+RESOURCE_FILES=$(RESOURCE_FILES: +++=)
+RESOURCE_FILES=$(RESOURCE_FILES:+++=)
+!endif
+
+!if "$(RESOURCE_FILES)" != ""
+CSC_FLAGS         =$(CSC_FLAGS) /res:$(RESOURCE_FILES: = /res:)
+VJC_FLAGS         =$(VJC_FLAGS) /res:$(RESOURCE_FILES: = /res:)
+MLINK_FLAGS       =$(MLINK_FLAGS) /assemblyresource:$(RESOURCE_FILES: = /assemblyresource:)
+VBC_FLAGS         =$(VBC_FLAGS) /res:$(RESOURCE_FILES: = /res:)
+!endif
+
+!if "$(LINKRESOURCE_FILES)" != ""
+#
+# remove extraneous, leading, and trailing spaces
+#
+LINKRESOURCE_FILES=$(LINKRESOURCE_FILES: =^#^%)
+LINKRESOURCE_FILES=$(LINKRESOURCE_FILES:^%^#=)
+LINKRESOURCE_FILES=$(LINKRESOURCE_FILES:^#^%= )
+LINKRESOURCE_FILES=+++$(LINKRESOURCE_FILES)+++
+LINKRESOURCE_FILES=$(LINKRESOURCE_FILES:+++ =)
+LINKRESOURCE_FILES=$(LINKRESOURCE_FILES: +++=)
+LINKRESOURCE_FILES=$(LINKRESOURCE_FILES:+++=)
+!endif
+
+!if "$(LINKRESOURCE_FILES)" != ""
+CSC_FLAGS         =$(CSC_FLAGS) /linkres:$(LINKRESOURCE_FILES: = /linkres:)
+VJC_FLAGS         =$(VJC_FLAGS) /linkres:$(LINKRESOURCE_FILES: = /linkres:)
+#MLINK_FLAGS       =$(MLINK_FLAGS) /assemblyresource:$(LINKRESOURCE_FILES: = /assemblyresource:)
+!endif
+
+!if "$(CLR_TARGETTYPE)" == "EXE"
+CSC_FLAGS         =$(CSC_FLAGS) /target:exe
+VJC_FLAGS         =$(VJC_FLAGS) /target:exe
+DEFAULT_ADDRESS     =$(DEFAULT_EXE_ADDRESS)
+!elseif "$(CLR_TARGETTYPE)" == "WINEXE"
+CSC_FLAGS         =$(CSC_FLAGS) /target:winexe
+VJC_FLAGS         =$(VJC_FLAGS) /target:winexe
+DEFAULT_ADDRESS     =$(DEFAULT_EXE_ADDRESS)
+MLINK_FLAGS=$(MLINK_FLAGS) /subsystem:windows
+!elseif "$(CLR_TARGETTYPE)" == "DLL"
+CSC_FLAGS         =$(CSC_FLAGS) /target:library
+VJC_FLAGS         =$(VJC_FLAGS) /target:library
+DEFAULT_ADDRESS     =$(DEFAULT_DLL_ADDRESS)
+MLINK_FLAGS=$(MLINK_FLAGS) /dll /noentry
+!elseif "$(CLR_TARGETTYPE)" == "NETMODULE"
+# PPD@30712: For a .netmodule, not sure if the other compilers need the support
+#          Also we should allow for the default load address for the module
+CSC_FLAGS         =$(CSC_FLAGS) /target:module
+VJC_FLAGS         =$(VJC_FLAGS) /target:module
+DEFAULT_ADDRESS     =$(DEFAULT_DLL_ADDRESS)
+!endif
+
+#
+# build CLR_REFERENCES_DEPS and CLR_REFERENCES macro
+#
+
+!if $(PASS1) && defined(CLR_LIB_REFS)
+CLR_REFERENCES=$(CLR_LIB_REFS)
+!endif
+
+#
+# Convert semi-delimited list to space-delimited
+#
+
+CLR_REFERENCES=$(CLR_REFERENCES:;= )
+
+#
+# remove extraneous, leading, and trailing spaces
+#
+
+CLR_REFERENCES=$(CLR_REFERENCES: =^#^%)
+CLR_REFERENCES=$(CLR_REFERENCES:^%^#=)
+CLR_REFERENCES=$(CLR_REFERENCES:^#^%= )
+CLR_REFERENCES=+++$(CLR_REFERENCES)+++
+CLR_REFERENCES=$(CLR_REFERENCES:+++ =)
+CLR_REFERENCES=$(CLR_REFERENCES: +++=)
+CLR_REFERENCES=$(CLR_REFERENCES:+++=)
+
+#
+# This is the list of import dependencies
+#
+
+CLR_REFERENCES_DEPS=$(CLR_REFERENCES)
+
+!if "$(CLR_REFERENCES)" != ""
+CSC_INCLUDE=/R:$(CLR_REFERENCES: = /R:)
+VJC_INCLUDE=/R:$(CLR_REFERENCES: = /R:)
+!endif
+
+!ifndef BUILDING_MSCORLIB
+CSC_INCLUDE=/nostdlib+ /R:$(SDK_REF_PATH)\mscorlib.dll $(CSC_INCLUDE)
+!else
+CSC_INCLUDE=/nostdlib+ $(CSC_INCLUDE)
+!endif
+
+#
+# we always want TRACE defined
+#
+CSC_DEFINES       = $(CSC_DEFINES) /D:TRACE
+VJC_DEFINES       = $(VJC_DEFINES) /D:TRACE
+VBC_DEFINES       = $(VBC_DEFINES) /D:TRACE=True
+
+!if "$(TEST_TOOLSET_DEFINES)" != ""
+CSC_DEFINES       = $(CSC_DEFINES) /D:$(TEST_TOOLSET_DEFINES)
+VJC_DEFINES       = $(VJC_DEFINES) /D:$(TEST_TOOLSET_DEFINES)
+!endif
+
+!if $(PASS1)
+CSC_DEFINES       = $(CSC_DEFINES) /D:LIB
+VJC_DEFINES       = $(VJC_DEFINES) /D:LIB
+VBC_DEFINES       = $(VBC_DEFINES) /D:LIB=True
+!endif
+
+!if !$(FREEBUILD)
+CSC_DEFINES       =$(CSC_DEFINES) /D:DEBUG /D:DBG /D:_DEBUG /D:_LOGGING
+VJC_DEFINES       =$(VJC_DEFINES) /D:DEBUG /D:DBG /D:_DEBUG /D:_LOGGING
+VBC_DEFINES       =$(VBC_DEFINES) /D:DEBUG=True /D:DBG=True /D:_DEBUG=True /D:_LOGGING=True
+!endif
+
+!if "$(URTBLDENV)" == "ice" && "$(NO_ICECAP)" != "1"
+CSC_DEFINES       =$(CSC_DEFINES) /D:ICECAP
+VJC_DEFINES       =$(VJC_DEFINES) /D:ICECAP
+VBC_DEFINES       =$(VBC_DEFINES) /D:ICECAP=True
+!endif
+
+!if "$(URTBLDENV)" == "ret"
+CSC_DEFINES       =$(CSC_DEFINES) /D:RETAIL
+VJC_DEFINES       =$(VJC_DEFINES) /D:RETAIL
+VBC_DEFINES       =$(VBC_DEFINES) /D:RETAIL=True
+!endif
+
+CSC_DEFINES=$(CSC_DEFINES) /d:WIN32
+VJC_DEFINES=$(VJC_DEFINES) /d:WIN32
+VBC_DEFINES=$(VBC_DEFINES) /d:WIN32=True
+
+
+
+CSC_FLAGS         =$(CSC_FLAGS) $(CSC_INCLUDE) $(CSC_DEFINES)
+VJC_FLAGS         =$(VJC_FLAGS) $(VJC_INCLUDE) $(VJC_DEFINES)
+
+#
+# remove extraneous spaces
+#
+CSC_FLAGS         =$(CSC_FLAGS: =^#^%)
+CSC_FLAGS         =$(CSC_FLAGS:^%^#=)
+CSC_FLAGS         =$(CSC_FLAGS:^#^%= )
+
+VJC_FLAGS         =$(VJC_FLAGS: =^#^%)
+VJC_FLAGS         =$(VJC_FLAGS:^%^#=)
+VJC_FLAGS         =$(VJC_FLAGS:^#^%= )
+
+####################################
+# ILASM 
+####################################
+
+# Set CSC resource file flags
+!if "$(WIN32RES)" != ""
+ILASM_FLAGS=$(ILASM_FLAGS) /res=$(WIN32RES)
+!endif
+
+!if $(FREEBUILD)
+ILASM_FLAGS=$(ILASM_FLAGS) /pdb
+!else
+ILASM_FLAGS=$(ILASM_FLAGS) /debug
+!endif
+
+
+# CLR_TARGETTYPE can be EXE, WINEXE, DLL, or NETMODULE but ilasm.exe only accepts EXE and DLL
+! if "$(CLR_TARGETTYPE)" == "EXE" || "$(CLR_TARGETTYPE)" == "WINEXE"
+ILASM_FLAGS=$(ILASM_FLAGS) /EXE
+!else
+ILASM_FLAGS=$(ILASM_FLAGS) /DLL
+!endif
+
+ILASM_FLAGS=$(ILASM_FLAGS) /quiet
+
+ILASM_COMMAND=$(ILASMBASE) $(ILASM) $(COFFBASE_TXT_FILE) $(DEFAULT_EXE_ADDRESS) $(DEFAULT_DLL_ADDRESS) $(ILASM_FLAGS)
+
+####################################
+# ILDASM 
+####################################
+
+             
+
+#
+# Managed code dependency rules
+#
+
+#
+# Build a managed resource from a txt file
+#
+
+.SUFFIXES: .txt .resources
+
+.txt.resources:
+    $(ECHO_COMPILING_CMD) $<_with_resgen
+    $(RESGEN) $< $@
+
+{}.txt{$O\}.resources:
+    $(ECHO_COMPILING_CMD) $<_with_resgen
+    $(RESGEN) $< $@
+
+{..\}.txt{$O\}.resources:
+    $(ECHO_COMPILING_CMD) $<_with_resgen
+    $(RESGEN) $< $@
+
+{$O\}.txt{$O\}.resources:
+    $(ECHO_COMPILING_CMD) $<_with_resgen
+    $(RESGEN) $< $@
+
+{$(RESGEN_SOURCE_DIR)\}.txt{$O\}.resources:
+    $(ECHO_COMPILING_CMD) $<_with_resgen
+    $(RESGEN) $< $@
+
+# <STRIP>
+# We cannot read/write .resx files (yet)
+# </STRIP>
+
+# We check for CLR_TLBIMPORTSRC here as well as CSHARP_SOURCES because
+# we add assembly attributes into the TLB wrappers too, and this process
+# invokes the CSharp compiler.
+
+!if "$(CSHARP_SOURCES)" != "" || "$(CLR_TLBIMPORTSRC)" != ""
+GLOBAL_C_FLAGS=$(GLOBAL_C_FLAGS) -DCSC_INVOKED=1
+!endif
+
+{$O\}.mod{$O\}.il:
+    $(ECHO_COMPILING_CMD) idasm_$<
+    $(ILDASM) $(ILDASM_FLAGS) /out=$@ $<
+
+# Note that for the preprocessing of .cspp files with gcc, the -ansi 
+# flag is used. The -ansi flag suppresses system specific macros
+# that are outside the reserved namespace. This is necessary to
+# avoid situations where the preprocessor accidentally replaces
+# entries with macro values.
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+{..\}.cspp{}.cs:
+    $(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) -E -P -ansi -DCSC_INVOKED=1 -x c++ $(OUTPUT_FLAG) $@ $<
+!else
+{..\}.cspp{}.cs:
+     $(CXX_COMPILER_NAME) @<<$(CL_RSP) /E $(USE_FC) $(CSPP_FLAGS) -DCSC_INVOKED=1 $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+{}.cspp{}.cs:
+    $(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) -E -P -ansi -DCSC_INVOKED=1 -x c++ $(OUTPUT_FLAG) $@ $<
+!else
+{}.cspp{}.cs:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /E $(USE_FC) $(CSPP_FLAGS) -DCSC_INVOKED=1 $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+{$O\}.cspp{$O\}.cs:
+    $(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) -E -P -ansi -DCSC_INVOKED=1 -x c++ $(OUTPUT_FLAG) $@ $<
+!else
+{$O\}.cspp{$O\}.cs:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /E $(USE_FC) $(CSPP_FLAGS) -DCSC_INVOKED=1 $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+{$O\}.cpp_unprocessed{$O\}.cpp:
+    $(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) -E -P -D__cplusplus -x c++ $(OUTPUT_FLAG) $@ $<
+!else
+{$O\}.cpp_unprocessed{$O\}.cpp:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /E $(USE_FC) -D__cplusplus $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+{}.cspp{$O\}.cs:
+    $(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) -E -P -ansi -DCSC_INVOKED=1 -x c++ $(OUTPUT_FLAG) $@ $<
+!else
+{}.cspp{$O\}.cs:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /E $(USE_FC) $(CSPP_FLAGS) -DCSC_INVOKED=1 $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+{..\}.cspp{$O\}.cs:
+    $(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) -E -P -ansi -DCSC_INVOKED=1 -x c++ $(OUTPUT_FLAG) $@ $<
+!else
+{..\}.cspp{$O\}.cs:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /E $(USE_FC) $(CSPP_FLAGS) -DCSC_INVOKED=1 $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+{$(TARGET_DIRECTORY)\}.cspp{$O\}.cs:
+    $(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) -E -P -ansi -DCSC_INVOKED=1 -x c++ $(OUTPUT_FLAG) $@ $<
+!else
+{$(TARGET_DIRECTORY)\}.cspp{$O\}.cs:
+   $(CXX_COMPILER_NAME) @<<$(CL_RSP) /E $(USE_FC) $(CSPP_FLAGS) -DCSC_INVOKED=1 $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+!endif
+
+{..\}.jslpp{}.jsl:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /E $(USE_FC) $(CSPP_FLAGS) -DCSC_INVOKED=1 $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+
+{}.jslpp{}.jsl:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /E $(USE_FC) $(CSPP_FLAGS) -DCSC_INVOKED=1 $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+
+{$O\}.jslpp{$O\}.jsl:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /E $(USE_FC) $(CSPP_FLAGS) -DCSC_INVOKED=1 $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+
+{}.jslpp{$O\}.jsl:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /E $(USE_FC) $(CSPP_FLAGS) -DCSC_INVOKED=1 $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+
+{..\}.jslpp{$O\}.jsl:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /E $(USE_FC) $(CSPP_FLAGS) -DCSC_INVOKED=1 $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+
+{$(TARGET_DIRECTORY)\}.jslpp{$O\}.jsl:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /E $(USE_FC) $(CSPP_FLAGS) -DCSC_INVOKED=1 $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+
+{..\}.vbpp{}.vb:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /EP $(USE_FC) $(CSPP_FLAGS) -DCSC_INVOKED=1 $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+
+{}.vbpp{}.vb:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /EP $(USE_FC) $(CSPP_FLAGS) -DCSC_INVOKED=1 $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+
+{$O\}.vbpp{$O\}.vb:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /EP $(USE_FC) $(CSPP_FLAGS) -DCSC_INVOKED=1 $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+
+{}.vbpp{$O\}.vb:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /EP $(USE_FC) $(CSPP_FLAGS) -DCSC_INVOKED=1 $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+
+{..\}.vbpp{$O\}.vb:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /EP $(USE_FC) $(CSPP_FLAGS) -DCSC_INVOKED=1 $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+
+{$(TARGET_DIRECTORY)\}.vbpp{$O\}.vb:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /EP $(USE_FC) $(CSPP_FLAGS) -DCSC_INVOKED=1 $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+
+{..\}.plpp{}.pl:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /EP /C /Tc $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+
+{}.plpp{}.pl:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /EP /C /Tc $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+
+{$O\}.plpp{$O\}.pl:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /EP /C /Tc $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+
+{}.plpp{$O\}.pl:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /EP /C /Tc $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+
+{..\}.plpp{$O\}.pl:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /EP /C /Tc $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+
+{$(TARGET_DIRECTORY)\}.plpp{$O\}.pl:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /EP /C /Tc $< > $@
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+
+
+#
+# END CSC
+#-----------------------------------------------------------------------------
+
+!endif # DEVDIV2_SECTION 3
+
+
+
+# AFTER_MAKEFILE_DEF
+!if "$(DEVDIV2_SECTION)" == "AFTER_MAKEFILE_DEF"
+#
+# Standard inference rules for C files that produce object files.
+#
+# nt makefile.def uses
+#.SUFFIXES: .cs .cxx .cpp .mcpp .c .f .rc .s .asm .obj .exe .res .p .tdl .odl .rcpp .thk .java .class .asmx .sdl
+# Fx notes: support for .rcpp removed, .cto still used in src\VSDesigner
+.SUFFIXES: .cxx .cpp .mcpp .c .f .rc .s .asm .obj .exe .res .p .tdl .odl .thk .ctc .cmd .h .cto .cspp .jslpp .vbpp .cool .cs .jsl .resx .resources .asn .mof .mc .idl .mod .plpp .pl .cpp_unprocessed .asmmeta .meta
+
+#
+# Managed code build rules
+#
+
+!if "$(SIGN_COMMAND_ACTUALLY_WORKED)" != ""
+! if "$(NO_SIGN_CODE)"=="" && "$(SECURITY_LEVEL)"!=""
+SIGN_COMMAND=-(($(ECHO_COMPILING_CMD) Signing_$@_with_"$(CERT_NAME)"_signature) & \
+             ($(CERT2SPC) $(SECDIRECTORY)\$(CERT_NAME).cer $(O)\$(CERT_NAME).spc) & \
+             ($(SIGNCODE) -spc $(O)\$(CERT_NAME).spc -k $(CERT_NAME) -n "$(CERT_NAME)" $(SIGNCODE_ARGS) $@) & \
+             (del $(O)\$(CERT_NAME).spc))
+! else
+SIGN_COMMAND=
+! endif
+!else
+SIGN_COMMAND=
+!endif
+
+!if "$(MENU_DEPS)" != ""
+! ifndef PASS0ONLY
+$(WIN32RES) : $(MENU_DEPS)
+! endif
+!endif
+
+#
+# Build the SR file from a txt file
+#
+
+!if "$(RESGEN_CLASS)" != ""
+
+! if "$(RESGEN_SOURCE_FILENAME)" != ""
+RESFILE=$(RESGEN_SOURCE_FILENAME)
+! else
+RESFILE=$(RESGEN_SOURCE:..\=)
+! endif
+
+RESFILE=$(RESFILE:.txt=)
+
+!if "$(RESGEN_VISIBILITY)" == ""
+RESGEN_VISIBILITY=internal
+!endif
+
+!if "$(RESGEN_SEALED)" == ""
+RESGEN_SEALED=1
+!endif
+
+$(O)\$(RESGEN_CSOUTPUT) : $(RESGEN_SOURCE)
+    $(ECHO_COMPILING_CMD) $**_with_gensr
+	$(PERL) -w $(DEVDIV_TOOLS)\gensr.pl $(RESGEN_SOURCE) $(O)\$(RESGEN_CSOUTPUT:..\=) $(RESGEN_CLASS) $(RESFILE) $(RESGEN_VISIBILITY) $(RESGEN_SEALED)
+
+$(O)\$(RESGEN_VBCOUTPUT) : $(RESGEN_SOURCE)
+    $(ECHO_COMPILING_CMD) $**_with_gensr
+	$(PERL) -w $(DEVDIV_TOOLS)\gensrvb.pl $(RESGEN_SOURCE) $(O)\$(RESGEN_VBCOUTPUT:..\=) $(RESGEN_CLASS) $(RESFILE) $(RESGEN_VISIBILITY) $(RESGEN_SEALED)
+
+$(O)\$(RESGEN_CPPOUTPUT) : $(RESGEN_SOURCE)
+	$(ECHO_COMPILING_CMD) $**_with_gensr
+	$(PERL) -w $(DEVDIV_TOOLS)\gensrcpp.pl $(RESGEN_SOURCE) $(O)\$(RESGEN_CPPOUTPUT:..\=) $(RESGEN_CLASS) $(RESFILE) $(RESGEN_VISIBILITY) $(RESGEN_SEALED)
+
+!endif
+
+# RESGEN_CLASS2 only used by ndp\fx\src\MIT, so moving there
+
+# VSWhidbey #495749
+# Compile and bind to standard resource strings
+#
+# Note: This enables centrally defining common strings shared by many assemblies.
+#       For example, the Microsoft copyright displayed by command-line applications
+#       can be defined centrally, and if the wording or format of the copyright 
+#       ever changes, the change can be made in one place.
+#
+
+!if "$(USE_COMMONRESSTRINGS)" != ""
+
+CLR_RESDEPS=$(CLR_RESDEPS) $(O)\CommonResStrings.resources
+
+$(O)\CommonResStrings.txt : $(DEVDIV_TOOLS)\CommonResStrings.txt
+    copy $(DEVDIV_TOOLS)\CommonResStrings.txt $(O)\CommonResStrings.txt
+
+
+!if "$(CSHARP_SOURCES)" != ""
+
+$(O)\CommonResStrings.cspp: $(DEVDIV_TOOLS)\CommonResStrings.cspp
+        copy $** $@
+
+CSC_FLAGS=$(CSC_FLAGS) /res:$(O)\CommonResStrings.resources,CommonResStrings.resources
+
+CSHARP_SOURCES=$(O)\CommonResStrings.cs \
+                $(CSHARP_SOURCES)
+!endif
+
+#TODO: Create Managed C++, VB, J# versions of CommonResStrings.XXpp along with 
+#      build rules (same as C# rule above) to compile & link CommonResStrings.xx
+
+!endif
+
+
+
+!ifndef PLATFORM_UNIX
+COPY=copy
+ECHO_LINE=echo.
+TYPE=type
+!else
+COPY=cp -f
+ECHO_LINE=echo
+TYPE=cat
+!endif
+
+
+####################################
+# CSC COMPILER SPECIFIC
+####################################
+	        
+
+$(O)\assemblylibattributes.cspp: $(DEVDIV_TOOLS)\assemblyattributes.cspp
+        $(COPY) $** $@
+
+$(O)\assemblyattributes.cspp: $(DEVDIV_TOOLS)\assemblyattributes.cspp
+        $(COPY) $** $@
+
+$(O)\assemblyattributes.vbpp: $(DEVDIV_TOOLS)\assemblyattributes.vbpp
+        $(COPY) $** $@
+
+$(O)\assemblyattributes.cpp_unprocessed: $(DEVDIV_TOOLS)\assemblyattributes.cpp
+        $(COPY) $** $@
+
+$(O)\assemblyattributes.mcpp_unprocessed: $(DEVDIV_TOOLS)\assemblyattributes.mcpp
+        $(COPY) $** $@
+
+$(O)\assemblylibrefs.cspp: $(DEVDIV_TOOLS)\assemblyrefs.cspp
+        $(COPY) $** $@
+
+$(O)\assemblyrefs.cspp: $(DEVDIV_TOOLS)\assemblyrefs.cspp
+        $(COPY) $** $@
+
+$(O)\assemblyrefs.vbpp: $(DEVDIV_TOOLS)\assemblyrefs.vbpp
+        $(COPY) $** $@
+
+$(O)\assemblyrefs.cpp_unprocessed: $(DEVDIV_TOOLS)\assemblyrefs.cpp
+        $(COPY) $** $@
+
+$(O)\assemblyrefs.mcpp_unprocessed: $(DEVDIV_TOOLS)\assemblyrefs.mcpp
+        $(COPY) $** $@
+
+!if "$(EXCLUDE_ASSEMBLY_ATTRIBUTES)" == "" 
+! if "$(CSHARP_SOURCES)" != "" 
+!  if "$(CLR_TLB)" != ""
+CSHARP_SOURCES      = $(O)\assemblylibattributes.cs \
+                      $(CSHARP_SOURCES)
+!  else if "$(CLR_TARGETTYPE)" == "NETMODULE"
+## PPD@30712: We dont want to add attributes to .netmodules
+#CSHARP_SOURCES      = $(CSHARP_SOURCES)
+!  else
+CSHARP_SOURCES      = $(O)\assemblyattributes.cs \
+                      $(CSHARP_SOURCES)
+!  endif
+! endif
+! if "$(MCPP_SOURCES)" != "" && "$(MCPP_NO_ASSEMBLY)" == ""
+MCPP_SOURCES        = $(O)\assemblyattributes.cpp \
+                      $(MCPP_SOURCES)
+! endif
+
+! if "$(SOURCES)" != "" && "$(USE_MCPP_ASSEMBLY)" == "1" && "$(MCPP_NO_ASSEMBLY)" == ""
+# SOURCES        = $(O)\assemblyattributes.mcpp \
+#                  $(SOURCES)
+! endif
+
+! if "$(VBC_SOURCES)" != ""
+VBC_SOURCES      = $(O)\assemblyattributes.vb \
+                   $(VBC_SOURCES)
+! endif
+!endif
+
+!if "$(INCLUDE_ASSEMBLY_REFS)" != "" 
+! if "$(CSHARP_SOURCES)" != "" 
+!  if "$(CLR_TLB)" != ""
+CSHARP_SOURCES      = $(O)\assemblylibrefs.cs \
+                      $(CSHARP_SOURCES)
+!  else if "$(CLR_TARGETTYPE)" == "NETMODULE"
+## PPD@30808: We dont want to add attributes to .netmodules
+#CSHARP_SOURCES      = $(CSHARP_SOURCES)
+!  else
+CSHARP_SOURCES      = $(O)\assemblyrefs.cs \
+                      $(CSHARP_SOURCES)
+!  endif
+! endif
+! if "$(MCPP_SOURCES)" != "" && "$(MCPP_NO_ASSEMBLY)" == ""
+MCPP_SOURCES        = $(O)\assemblyrefs.cpp \
+                      $(MCPP_SOURCES)
+! endif
+
+! if "$(SOURCES)" != "" && "$(USE_MCPP_ASSEMBLY)" == "1" && "$(MCPP_NO_ASSEMBLY)" == ""
+# SOURCES        = $(O)\assemblyrefs.mcpp \
+#                  $(SOURCES)
+! endif
+
+! if "$(VBC_SOURCES)" != ""
+VBC_SOURCES      = $(O)\assemblyrefs.vb \
+                   $(VBC_SOURCES)
+! endif
+!endif
+
+!if "$(MCPP_NO_ASSEMBLY)" != ""
+MLINK_FLAGS=$(MLINK_FLAGS) /NOASSEMBLY
+!endif
+
+# remove extraneous spaces
+CSHARP_SOURCES=$(CSHARP_SOURCES: =^#^%)
+CSHARP_SOURCES=$(CSHARP_SOURCES:^%^#=)
+CSHARP_SOURCES=$(CSHARP_SOURCES:^#^%= )
+
+CSC_RSP=$(O)\csc.rsp
+GET_BASE_ADDRESS=$(PERL) $(NTMAKEENV)\getbaseaddress.pl
+
+#
+# Build a COM+ CSharp binary
+#
+!if "$(CSHARP_SOURCES)" != "" && "$(CLR_TARGET)" != ""
+# PPD@30712: $(O)\assemblyrefs.cspp is added as an explicit dependency otherwise .netmodules will not 
+# rebuild on build -c -Z, esp. when none of the other dependencies are outdated
+$(CLR_TARGET) : $(CSHARP_SOURCES) $(CLR_RESDEPS) $(CLR_REFERENCES_DEPS) $(POLICY_DEPS) $(O)\assemblyrefs.cspp
+    $(ECHO_COMPILING_CMD) $@_with_C#_into_binary
+
+#
+# open the response file as a response file before get base address
+#      
+    @$(ECHO_LINE) <<$(CSC_RSP)
+<<$(KEEPFILES)
+
+#
+# get the base address
+#
+
+    $(GET_BASE_ADDRESS) $(TARGETNAME) $(TARGETEXT) $(COFFBASE_TXT_FILE) $(DEFAULT_ADDRESS) $(CSC_RSP)
+
+
+#
+# add the rest of the flags
+# 
+    $(TYPE) << >>$(CSC_RSP)
+/out:$@ $(CSC_FLAGS: =
+)
+$(CSHARP_SOURCES: =
+)
+<<$(KEEPFILES)
+
+    $(TYPE) $(CSC_RSP)
+#
+# now compile
+#
+    $(CSC_NAME) /noconfig @$(CSC_RSP)
+    $(POST_MANAGED_BUILD_CMD)
+    $(BIND_CMD)
+    $(SIGN_COMMAND)
+    $(MAKE_PLACEFILE_CMD)
+    $(BINPLACE_CMD)
+    $(INSTALL_CMD)
+!endif
+
+MSBUILD_RSP=$(O)\msbuild.rsp
+MSBUILD_FORCEBUILD_SEMAPHORE=$(O)\ForceBuild.Semaphore
+
+$(MSBUILD_FORCEBUILD_SEMAPHORE) :
+
+#
+# Build a COM+ CSharp binary using an MSBuild project in Pass 2
+#
+# NOTE: we always want the build to start, regardless of whether build.exe is
+# doing a clean or an incremental build, because we want to let MSBuild do its
+# own dependency analysis
+#
+!if "$(MSBUILD_PROJECT)" != "" && "$(CLR_TARGET)" != ""
+
+$(CLR_TARGET) : $(MSBUILD_FORCEBUILD_SEMAPHORE)
+    @echo:
+    @echo Generating <<$(CL_RSP) inline i.e. as a temporary file, from GLOBAL_C_FLAGS...
+$(GLOBAL_C_FLAGS: =
+)
+<<$(KEEPFILES)
+    @echo Created $(CL_RSP)
+
+    @echo:
+    @echo Generating <<$(MSBUILD_RSP) inline i.e. as a temporary file, with the following contents:
+/p:O=$(O)
+/p:FREEBUILD=$(FREEBUILD)
+/p:SDK_REF_PATH="$(SDK_REF_PATH)"
+/p:VSEXTERNAL_REF_PATH="$(VSEXTERNAL_REF_PATH)"
+/p:PUBLIC_INTERNAL_PATH="$(PUBLIC_INTERNAL_PATH)"
+/p:CLR_TARGETTYPE=$(CLR_TARGETTYPE)
+/p:TARGETNAME=$(TARGETNAME)
+/p:TARGETEXT=$(TARGETEXT)
+/p:TARGETPATH="$(TARGETPATH)"
+/p:DEVDIV_TOOLS="$(DEVDIV_TOOLS)"
+/p:MANAGED_TOOLS_PATH="$(MANAGED_TOOLS_PATH)"
+/p:TOUCH="$(TOUCH)"
+/p:PERL="$(PERL)"
+/p:COFFBASE_TXT_FILE="$(COFFBASE_TXT_FILE)"
+/p:GET_BASE_ADDRESS="$(GET_BASE_ADDRESS)"
+/p:DEFAULT_ADDRESS=$(DEFAULT_ADDRESS)
+/p:CXX_COMPILER_NAME="$(CXX_COMPILER_NAME)"
+/p:CL_RSP=$(CL_RSP)
+/p:USE_FC=$(USE_FC)
+/p:RESGEN="$(RESGEN)"
+/p:REGASM="$(REGASM)"
+<<$(KEEPFILES)
+
+    @type $(MSBUILD_RSP)
+    @echo Created $(MSBUILD_RSP)
+
+    @echo:
+    @echo Building MSBuild project - $(MSBUILD_PROJECT)... > con
+    $(MSBUILD_NAME) /v $(MSBUILD_PROJECT) @$(MSBUILD_RSP) $(MSBUILD_FLAGS) $(MSBUILD_GLOBAL_FLAGS)
+    @echo Finished building - $(MSBUILD_PROJECT) > con
+
+    @echo:
+    @echo Dropping semaphore to force rebuild...
+    $(TOUCH) /c /t 2037 12 31 23 59 59 $(MSBUILD_FORCEBUILD_SEMAPHORE)
+    @echo Rebuild semaphore dropped
+
+!endif
+
+#
+# Build a COM+ type library using an MSBuild project in Pass 1
+#
+# NOTE: we always want the build to start, regardless of whether build.exe is
+# doing a clean or an incremental build, because we want to let MSBuild do its
+# own dependency analysis
+#
+!if $(PASS1) && "$(MSBUILD_PROJECT)" != "" && "$(MSBUILD_TLB_TARGET)" != ""
+
+$(MSBUILD_TLB_TARGET) :
+    @echo:
+    @echo Generating <<$(MSBUILD_RSP) inline i.e. as a temporary file, with the following contents:
+/p:O=$(O)
+/p:FREEBUILD=$(FREEBUILD)
+/p:SDK_REF_PATH="$(SDK_REF_PATH)"
+/p:VSEXTERNAL_REF_PATH="$(VSEXTERNAL_REF_PATH)"
+/p:PUBLIC_INTERNAL_PATH="$(PUBLIC_INTERNAL_PATH)"
+/p:CLR_TARGETTYPE=$(CLR_TARGETTYPE)
+/p:TARGETNAME=$(TARGETNAME)
+/p:TARGETEXT=$(TARGETEXT)
+/p:TARGETPATH="$(TARGETPATH)"
+/p:DEVDIV_TOOLS="$(DEVDIV_TOOLS)"
+/p:MANAGED_TOOLS_PATH="$(MANAGED_TOOLS_PATH)"
+/p:TOUCH="$(TOUCH)"
+/p:PERL="$(PERL)"
+/p:TLBEXP="$(TLBEXP)"
+/p:SDK_LIB_PATH="$(SDK_LIB_PATH)"
+/p:CLR_ASMMETA_FILE=$(CLR_ASMMETA_FILE)
+/p:RC_COMPILER="$(RC_COMPILER)"
+/p:CDEFINES="$(CDEFINES)"
+/p:INCPATH0="$(INCPATH0)"
+/p:LINKER="$(LINKER)"
+<<$(KEEPFILES)
+
+    @type $(MSBUILD_RSP)
+    @echo Created $(MSBUILD_RSP)
+
+    @echo:
+    @echo Building type library - $(MSBUILD_PROJECT)... > con
+    $(MSBUILD_NAME) /v $(MSBUILD_PROJECT) /t:$(MSBUILD_TLB_TARGET) @$(MSBUILD_RSP) $(MSBUILD_TLB_FLAGS) $(MSBUILD_GLOBAL_FLAGS)
+    @echo Finished building type library - $(MSBUILD_PROJECT) > con
+
+!endif
+
+####################################
+# ILASM COMPILER SPECIFIC
+####################################
+
+#
+# Build a COM+ ilasm binary
+#
+!if "$(ILASMSOURCES)" != "" && "$(CLR_TARGET)" != ""
+
+! if "$(EXCLUDE_ASSEMBLY_ATTRIBUTES)" == "" 
+ILASMSOURCES=$(O)\assemblyattributes.il $(ILASMSOURCES)
+! endif
+
+$(CLR_TARGET) : $(ILASMSOURCES) $(CLR_RESDEPS) $(POLICY_DEPS)
+    $(ECHO_ASSEMBLING_CMD) Assembling_IL_into_$@
+    $(ILASM_COMMAND) /out=$@ $(ILASMSOURCES)
+    $(POST_MANAGED_BUILD_CMD)
+    $(BIND_CMD)
+    $(SIGN_COMMAND)
+    $(MAKE_PLACEFILE_CMD)    
+    $(BINPLACE_CMD)
+    $(INSTALL_CMD)
+!endif
+
+######################################
+# END OF COMPILER SPECIFIC
+######################################
+
+# CLR message banner
+
+!ifdef DEVDIV_DEF_DUMP
+!message %%%%% Dump of common vars:
+!message %%%%%   DYNLINK_LIB=$(DYNLINK_LIB)
+!message %%%%%   DYNLINK_LIBP=$(DYNLINK_LIBP)
+!message %%%%%   DYNLINK_LIBDIR=$(DYNLINK_LIBDIR)
+!message %%%%%   DYNLINK_LIBPDIR=$(DYNLINK_LIBPDIR)
+!message %%%%%   O=$(O)
+!message %%%%%   TARGETNAME=$(TARGETNAME)
+!message %%%%%   TARGETPATH=$(TARGETPATH)
+!message %%%%%   USER_C_FLAGS=$(USER_C_FLAGS)
+!message %%%%%   C_FLAGS=$(C_FLAGS)
+!message %%%%%   C_DEFINES=$(C_DEFINES)
+!message %%%%%   INCLUDES=$(INCLUDES)
+!message %%%%%   BATCH_NMAKE=$(BATCH_NMAKE)
+!message %%%%%   PRECOMPILED_OPTION=$(PRECOMPILED_OPTION)
+!message %%%%%   PRECOMPILED_PCH=$(PRECOMPILED_PCH)
+!message %%%%%   PRECOMPILED_CXX=$(PRECOMPILED_CXX)
+!message %%%%%   PRECOMPILED_OBJ=$(PRECOMPILED_OBJ)
+!message %%%%%   PRECOMPILED_INCLUDE=$(PRECOMPILED_INCLUDE)
+!message %%%%%   HEADERFILE=$(HEADERFILE)
+!message %%%%%   CURRENT_PASS=$(CURRENT_PASS)
+!message %%%%%   SDK_LIB_PATH=$(SDK_LIB_PATH)
+!message %%%%%   SDK_LIB_DEST=$(SDK_LIB_DEST)
+!message %%%%%   WINDOWS_LIB_DEST=$(WINDOWS_LIB_DEST)
+!message %%%%%   ALT_PROJECT_TARGET=$(ALT_PROJECT_TARGET)
+!message %%%%%   BUILD_ALT_DIR=$(BUILD_ALT_DIR)
+!message %%%%%   _OBJ_DIR=$(_OBJ_DIR)
+!message %%%%%   ALT_PROJECT=$(ALT_PROJECT)
+!message %%%%%   NTMAKEENV=$(NTMAKEENV)
+!message %%%%%   TARGETPDB=$(TARGETPDB)
+!message %%%%%   PROJECT_INC_PATH=$(PROJECT_INC_PATH)
+!message %%%%%   DDK_LIB_PATH=$(DDK_LIB_PATH)
+!message %%%%%   CPUTYPE=$(CPUTYPE)
+!message %%%%%   BINARY_PUBLISH_ROOT=$(BINARY_PUBLISH_ROOT)
+!message %%%%%   BINPLACE_PLACEFILE=$(BINPLACE_PLACEFILE)
+!message %%%%%   DEVDIV_INTERNAL_PATH=$(DEVDIV_INTERNAL_PATH)
+!message %%%%%   DEVDIV_INC_PATH=$(DEVDIV_INC_PATH)
+!message %%%%%   DEVDIV_LIB_DEST=$(DEVDIV_LIB_DEST)
+!message %%%%%   DEVDIV_LIB_PATH=$(DEVDIV_LIB_PATH)
+!message %%%%%   DEVDIV_BINPLACE_PLACEFILE=$(DEVDIV_BINPLACE_PLACEFILE)
+
+! if exists (dump.inc)
+! include dump.inc
+! endif
+
+!endif # DEVDIV_DEF_DUMP
+
+!endif # DEVDIV2_SECTION AFTER_MAKEFILE_DEF
+
+
+
+# done with DEVDIV2_SECTION
+!undef DEVDIV2_SECTION

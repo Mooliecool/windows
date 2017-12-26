@@ -1,0 +1,31 @@
+// Patch up the conflicting defines to allow building with VS9
+#undef MAKEWORD
+#undef MAKELONG
+#undef LOWORD
+#undef HIWORD
+#undef LOBYTE
+#undef HIBYTE
+#undef IPPROTO_IP
+#undef IPPROTO_ICMP
+#undef IPPROTO_IGMP
+#undef IPPROTO_GGP
+#undef IPPROTO_TCP
+#undef IPPROTO_PUP
+#undef IPPROTO_UDP
+#undef IPPROTO_IDP
+#undef IPPROTO_ND
+#undef IPPROTO_RAW
+#undef INADDR_ANY
+#undef INADDR_BROADCAST
+#undef INADDR_NONE
+ 
+#pragma warning (disable :4985)
+ 
+#define IMAGE_SIZEOF_NT_OPTIONAL32_HEADER    224
+#define IMAGE_SIZEOF_NT_OPTIONAL64_HEADER    240
+ 
+#ifdef _WIN64
+#define IMAGE_SIZEOF_NT_OPTIONAL_HEADER     IMAGE_SIZEOF_NT_OPTIONAL64_HEADER
+#else
+#define IMAGE_SIZEOF_NT_OPTIONAL_HEADER     IMAGE_SIZEOF_NT_OPTIONAL32_HEADER
+#endif

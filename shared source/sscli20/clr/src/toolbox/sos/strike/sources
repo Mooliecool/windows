@@ -1,0 +1,96 @@
+# ==++==
+#
+#   
+#    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+#   
+#    The use and distribution terms for this software are contained in the file
+#    named license.txt, which can be found in the root of this distribution.
+#    By using this software in any fashion, you are agreeing to be bound by the
+#    terms of this license.
+#   
+#    You must not remove this notice, or any other, from this software.
+#   
+#
+# ==--==
+
+!if "$(FEATURE_PAL)" != "1" || "$(ROTOR_TOOLSET)" == "MSVC"
+COMPILER_WARNINGS       =
+MSC_WARNING_LEVEL   =/W4
+!else
+MSC_WARNING_LEVEL=-Wall -Werror
+COMPILER_WARNINGS=-Wall -Werror
+!endif
+
+INCLUDES            = inc;$(INCLUDES);$(CLRBASE)\src\vm;$(CLRBASE)\src\gcdump
+
+TARGETNAME          = SOS
+TARGETPATH          = $(_OBJ_DIR)
+TARGETTYPE  =DYNLINK
+UMTYPE      =windows
+
+# Need everything to have built.
+SYNCHRONIZE_PASS2_DRAIN = 1
+
+
+DLLDEF              = $(O)\SOS.def
+
+DLLENTRY            = _DllMainCRTStartup
+
+USE_NOLIBS=1  
+!undef USE_MSVCRT
+NO_NTDLL            = 1
+LTCG                = 0
+
+USE_LIBCMT=1
+
+WIN32DLL_LIBS = 
+
+TARGETLIBS= \
+    $(SDK_LIB_PATH)\kernel32.lib\
+    $(SDK_LIB_PATH)\user32.lib\
+    $(SDK_LIB_PATH)\ole32.lib\
+    $(CLR_LIB_PATH)\corguids.lib    \
+    $(SDK_LIB_PATH)\dbghelp.lib \
+    $(SDK_LIB_PATH)\uuid.lib \
+    $(SDK_LIB_PATH)\version.lib \
+    $(SDK_LIB_PATH)\dbgeng.lib  
+
+
+!if !$(FREEBUILD)
+USER_C_FLAGS        = $(USER_C_FLAGS) -DDEBUG
+!else
+USER_C_FLAGS        = $(USER_C_FLAGS) -DFAST=1 -Ox
+MSC_OPTIMIZATION =
+!endif
+
+USER_C_FLAGS        = $(USER_C_FLAGS) -DSTRIKE
+
+USE_NATIVE_EH=1
+
+SOURCES         =          \
+        dllsext.cpp     \
+        util.cpp        \
+        stressLogDump.cpp \
+        disasm.cpp      \
+        strike.cpp      \
+        Native.rc       \
+        exts.cpp        \
+        gcroot.cpp      \
+        eeheap.cpp      \
+	sildasm.cpp     \
+        vm.cpp          \
+        metadata.cpp    
+
+I386_SOURCES = \
+        disasmX86.cpp \
+        utilX86.cpp \
+
+ROTOR_X86_SOURCES = \
+        disasmX86.cpp \
+        utilX86.cpp \
+
+MISCFILES = sosdocs.txt sos_stacktrace.h
+
+        
+
+

@@ -1,0 +1,6 @@
+C<D`1[System.Int32]>.m in object of type D`1[System.Int32]
+List<T> = List`1[D`1[System.Int32]]
+C<D`1[System.String]>.m in object of type D`1[System.String]
+List<T> = List`1[D`1[System.String]]
+C<D`1[System.Object]>.m in object of type D`1[System.Object]
+List<T> = List`1[D`1[System.Object]]

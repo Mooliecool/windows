@@ -1,0 +1,238 @@
+# ==++==
+#
+#   
+#    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+#   
+#    The use and distribution terms for this software are contained in the file
+#    named license.txt, which can be found in the root of this distribution.
+#    By using this software in any fashion, you are agreeing to be bound by the
+#    terms of this license.
+#   
+#    You must not remove this notice, or any other, from this software.
+#   
+#
+# ==--==
+
+TARGETNAME=System.Configuration
+TARGETTYPE=NOTARGET
+TARGETPATH=obj
+
+CLR_TARGETTYPE=DLL
+CLR_ENABLE_ASMMETA=1
+# auto publish when TARGETNAME.asmmeta exists  BINARY_PUBLISH=$(NDP_REF_PUBLISH_PUBLIC)
+
+ALLOW_PARTIALTRUSTCALLS=1
+
+
+INCLUDE_ASSEMBLY_REFS=1
+
+SECURITY_LEVEL     = SYSTEM_COMPONENT
+
+CLR_REFERENCES=\
+    $(SDK_REF_PATH)\System.dll                 \
+    $(SDK_REF_PATH)\System.Xml.dll             \
+
+
+RESGEN_SOURCE      = $(TARGETNAME).txt
+RESGEN_CLASS       = $(TARGETNAME).SR
+
+CSHARP_ALLOW_UNSAFE=1
+
+!if "$(WEBNET_TREAT_WARNINGS_AS_ERRORS)" == "1"
+CSC_TREAT_WARNINGS_AS_ERRORS=1
+!endif
+
+SOURCES=native.rc
+
+# ComNativeDescriptor obsolete causes a lot of warnings
+CSC_FLAGS=$(CSC_FLAGS) /nowarn:618 /nowarn:649 
+
+# uncomment to get System.Configuration perf work.
+#CSC_DEFINES=$(CSC_DEFINES) /d:PERF
+
+# Enable in-source FxCop violation suppression
+!if "$(_BUILDTYPE)" != "fre" && "$(_BUILDTYPE)" != "ret"
+CSC_DEFINES=$(CSC_DEFINES) /D:CODE_ANALYSIS
+!endif
+
+CSHARP_SOURCES=\
+    $(NDPFX_ROOT)\src\misc\externdll.cs                            \
+    $(NDPFX_ROOT)\src\misc\hresults.cs                             \
+    $(NDPFX_ROOT)\src\misc\ConfigPathUtility.cs                    \
+    $(NDPFX_ROOT)\src\misc\PrivilegedConfigurationManager.cs       \
+    microsoft\win32\safenativemethods.cs \
+    microsoft\win32\unsafenativemethods.cs \
+    system\configuration\appsettingssection.cs \
+    system\configuration\baseconfigurationrecord.cs \
+    system\configuration\callbackvalidator.cs \
+    system\configuration\callbackvalidatorattribute.cs \
+    system\configuration\clientconfigpaths.cs \
+    system\configuration\clientconfigperf.cs \
+    system\configuration\clientconfigurationhost.cs \
+    system\configuration\clientconfigurationsystem.cs \
+    system\configuration\commadelimitedstringattributecollectionconverter.cs \
+    system\configuration\configdefinitionupdates.cs \
+    system\configuration\configuration.cs \
+    system\configuration\configurationallowdefinition.cs \
+    system\configuration\configurationallowexedefinition.cs \
+    system\configuration\configurationcollectionattribute.cs \
+    system\configuration\configurationconverterbase.cs \
+    system\configuration\configurationelement.cs \
+    system\configuration\configurationelementcollection.cs \
+    system\configuration\configurationelementcollectiontype.cs \
+    system\configuration\configurationelementproperty.cs \
+    system\configuration\configurationerrorsexception.cs \
+    system\configuration\configurationfilemap.cs \
+    system\configuration\configurationlocation.cs \
+    system\configuration\configurationlocationcollection.cs \
+    system\configuration\configurationlockcollection.cs \
+    system\configuration\configurationlockcollectiontype.cs \
+    system\configuration\configurationmanager.cs \
+    system\configuration\configurationmanagerhelperfactory.cs \
+    system\configuration\configurationpermission.cs \
+    system\configuration\configurationproperty.cs \
+    system\configuration\configurationpropertyattribute.cs \
+    system\configuration\configurationpropertycollection.cs \
+    system\configuration\configurationpropertyoptions.cs \
+    system\configuration\configurationsavemode.cs \
+    system\configuration\configurationschemaerrors.cs \
+    system\configuration\configurationsection.cs \
+    system\configuration\configurationsectioncollection.cs \
+    system\configuration\configurationsectiongroup.cs \
+    system\configuration\configurationsectiongroupcollection.cs \
+    system\configuration\configurationuserlevel.cs \
+    system\configuration\configurationvalidatorattribute.cs \
+    system\configuration\configurationvalidatorbase.cs \
+    system\configuration\configurationvalue.cs \
+    system\configuration\configurationvalueflags.cs \
+    system\configuration\configurationvalues.cs \
+    system\configuration\configxmlattribute.cs \
+    system\configuration\configxmlcdatasection.cs \
+    system\configuration\configxmlcomment.cs \
+    system\configuration\configxmlelement.cs \
+    system\configuration\configxmlreader.cs \
+    system\configuration\configxmlsignificantwhitespace.cs \
+    system\configuration\configxmltext.cs \
+    system\configuration\configxmlwhitespace.cs \
+    system\configuration\connectionstringsettings.cs \
+    system\configuration\connectionstringsettingscollection.cs \
+    system\configuration\connectionstringssection.cs \
+    system\configuration\contextinformation.cs \
+    system\configuration\cryptprotect_promptstruct.cs \
+    system\configuration\data_blob.cs \
+    system\configuration\datetimeconfigurationcollection.cs \
+    system\configuration\datetimeconfigurationelement.cs \
+    system\configuration\debug.cs \
+    system\configuration\declarationupdate.cs \
+    system\configuration\defaultsection.cs \
+    system\configuration\defaultvalidator.cs \
+    system\configuration\definitionupdate.cs \
+    system\configuration\elementinformation.cs \
+    system\configuration\emptyimpersonationcontext.cs \
+    system\configuration\errorinfoxmldocument.cs \
+    system\configuration\errorshelper.cs \
+    system\configuration\exceptionaction.cs \
+    system\configuration\exceptionutil.cs \
+    system\configuration\execonfigurationfilemap.cs \
+    system\configuration\execontext.cs \
+    system\configuration\factoryid.cs \
+    system\configuration\factoryrecord.cs \
+    system\configuration\fileutil.cs \
+    system\configuration\genericenumconverter.cs \
+    system\configuration\ignoresection.cs \
+    system\configuration\infiniteintconverter.cs \
+    system\configuration\infinitetimespanconverter.cs \
+    system\configuration\integervalidator.cs \
+    system\configuration\integervalidatorattribute.cs \
+    system\configuration\invalidpropvalue.cs \
+    system\configuration\keyvalueconfigurationcollection.cs \
+    system\configuration\keyvalueconfigurationelement.cs \
+    system\configuration\keyvalueinternalcollection.cs \
+    system\configuration\locationsectionrecord.cs \
+    system\configuration\locationupdates.cs \
+    system\configuration\longvalidator.cs \
+    system\configuration\longvalidatorattribute.cs \
+    system\configuration\mgmtconfigurationrecord.cs \
+    system\configuration\namespacechange.cs \
+    system\configuration\namevalueconfigurationcollection.cs \
+    system\configuration\namevalueconfigurationelement.cs \
+    system\configuration\positivetimespanvalidator.cs \
+    system\configuration\positivetimespanvalidatorattribute.cs \
+    system\configuration\propertyinformation.cs \
+    system\configuration\propertyinformationcollection.cs \
+    system\configuration\propertysourceinfo.cs \
+    system\configuration\propertyvalueorigin.cs \
+    system\configuration\protectedconfiguration.cs \
+    system\configuration\protectedconfigurationprovider.cs \
+    system\configuration\protectedconfigurationprovidercollection.cs \
+    system\configuration\protectedconfigurationsection.cs \
+    system\configuration\protectedprovidersettings.cs \
+    system\configuration\providerbase.cs \
+    system\configuration\providercollection.cs \
+    system\configuration\providerexception.cs \
+    system\configuration\providersettings.cs \
+    system\configuration\providersettingscollection.cs \
+    system\configuration\providersettings.cs \
+    system\configuration\providersettingscollection.cs \
+    system\configuration\regexstringvalidator.cs \
+    system\configuration\regexstringvalidatorattribute.cs \
+    system\configuration\runtimeconfigurationrecord.cs \
+    system\configuration\safebitvector32.cs \
+    system\configuration\sectioninformation.cs \
+    system\configuration\sectioninput.cs \
+    system\configuration\sectionrecord.cs \
+    system\configuration\sectionupdates.cs \
+    system\configuration\sectionxmlinfo.cs \
+    system\configuration\simplebitvector32.cs \
+    system\configuration\streaminfo.cs \
+    system\configuration\streamupdate.cs \
+    system\configuration\stringattributecollection.cs \
+    system\configuration\stringconfigurationcollection.cs \
+    system\configuration\stringconfigurationelement.cs \
+    system\configuration\stringutil.cs \
+    system\configuration\stringvalidator.cs \
+    system\configuration\stringvalidatorattribute.cs \
+    system\configuration\subclasstypevalidator.cs \
+    system\configuration\subclasstypevalidatorattribute.cs \
+    system\configuration\timespanconfigurationcollection.cs \
+    system\configuration\timespanconfigurationelement.cs \
+    system\configuration\timespanminutesconverter.cs \
+    system\configuration\timespanminutesorinfiniteconverter.cs \
+    system\configuration\timespansecondsconverter.cs \
+    system\configuration\timespansecondsorinfiniteconverter.cs \
+    system\configuration\timespanvalidator.cs \
+    system\configuration\timespanvalidatorattribute.cs \
+    system\configuration\typenameconverter.cs \
+    system\configuration\typeutil.cs \
+    system\configuration\update.cs \
+    system\configuration\updateconfighost.cs \
+    system\configuration\urlpath.cs \
+    system\configuration\validatorcallback.cs \
+    system\configuration\validatorutils.cs \
+    system\configuration\whitespacetrimstringconverter.cs \
+    system\configuration\xmlutil.cs \
+    system\configuration\xmlutilwriter.cs \
+    system\configuration\internal\configsystem.cs \
+    system\configuration\internal\configurationmanagerinternal.cs \
+    system\configuration\internal\delegatingconfighost.cs \
+    system\configuration\internal\fileversion.cs \
+    system\configuration\internal\iconfigerrorinfo.cs \
+    system\configuration\internal\iconfigsystem.cs \
+    system\configuration\internal\iconfigurationmanagerhelper.cs \
+    system\configuration\internal\iconfigurationmanagerinternal.cs \
+    system\configuration\internal\iinternalconfigclienthost.cs \
+    system\configuration\internal\iinternalconfigconfigurationfactory.cs \
+    system\configuration\internal\iinternalconfighost.cs \
+    system\configuration\internal\iinternalconfigrecord.cs \
+    system\configuration\internal\iinternalconfigroot.cs \
+    system\configuration\internal\iinternalconfigsettingsfactory.cs \
+    system\configuration\internal\iinternalconfigsystem.cs \
+    system\configuration\internal\internalconfigconfigurationfactory.cs \
+    system\configuration\internal\internalconfigeventargs.cs \
+    system\configuration\internal\internalconfigeventhandler.cs \
+    system\configuration\internal\internalconfighost.cs \
+    system\configuration\internal\internalconfigroot.cs \
+    system\configuration\internal\internalconfigsettingsfactory.cs \
+    system\configuration\internal\streamchangecallback.cs \
+    system\configuration\internal\writefilecontext.cs \
+

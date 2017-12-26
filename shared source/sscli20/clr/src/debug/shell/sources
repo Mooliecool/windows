@@ -1,0 +1,44 @@
+#
+# 
+#  Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+# 
+#  The use and distribution terms for this software are contained in the file
+#  named license.txt, which can be found in the root of this distribution.
+#  By using this software in any fashion, you are agreeing to be bound by the
+#  terms of this license.
+# 
+#  You must not remove this notice, or any other, from this software.
+# 
+#
+
+INCLUDES        =$(INCLUDES);..\cordbg;$(VCTOOLS_INC_PATH)
+
+USER_C_FLAGS    =$(USER_C_FLAGS) -DUNICODE -D_UNICODE -DFEATURE_NO_HOST -D_INTERNAL_DEBUG_SUPPORT_
+
+TARGETNAME      =$(CORBUILDENV)dbgshell
+TARGETPATH      =$(CLR_LIB_DEST)
+TARGETTYPE      =LIBRARY
+
+# The pre-compiled header stuff doesn't work for mixed C/C++ in a single directory.
+PRECOMPILED_INCLUDE     = stdafx.h
+PRECOMPILED_CXX         = 1
+PRECOMPILED_SOURCEFILE  = stdafx.cpp
+
+CONDITIONAL_INCLUDES=$(CONDITIONAL_INCLUDES) strstream
+
+SOURCES= \
+  commands.cpp \
+  debuggerUtil.cpp \
+  dshell.cpp \
+  shell.cpp \
+  source.cpp \
+  internalonly.cpp \
+  disassem.cpp \
+  utf.cpp
+
+# For some reaons using $(_TGTCPU) doesn't work.  Need to revisit why.
+I386_SOURCES=i386\RegsDbgrCommand.cpp
+
+ROTOR_X86_SOURCES=rotor_x86\RegsDbgrCommand.cpp
+
+PPC_SOURCES=ppc\RegsDbgrCommand.cpp

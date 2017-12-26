@@ -1,0 +1,300 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> 
+<head>
+<title>Release Notes for Shared Source CLI (SSCLI) 2.0</title>
+<link rel="stylesheet" type="text/css" href="rotor.css">
+
+</head>
+
+<body>
+
+<h1>Release Notes for Shared Source CLI (SSCLI) 2.0</h1>
+<h2>Contents</h2>
+<ul>
+  <li><a href="#SSCLIAssemblyKeys">SSCLI 2.0 Assembly Keys</a></li>
+  <li><a href="#MinimumVisualStudio.NETRequirements">Minimum Microsoft&reg; Visual 
+  Studio&reg; Requirements</a></li>
+  <li><a href="#PerlonWindowsXP">Perl on Windows&reg; XP</a></li>
+  <li><a href="#LimitationsofSecurityZonesinSharedSourceCLI">Limitations of 
+  Security Zones in SSCLI</a></li>
+  <li><a href="#RuntimeVersionValue">Runtime Version Value</a></li>
+  <li><a href="#PlatformRequirementsforPOSIXThreadsSupport">Platform 
+  Requirements for POSIX Threads Support</a></li>
+  <li><a href="#KnownIssues">Known Issues</a><ul>
+    <li><a href="#Pathand.NETFramework">Path and the .NET Framework</a></li>
+  </ul>
+</li>
+</ul>
+<p>
+    &nbsp;
+</p>
+    <h2>
+        SSCLI 2.0 Assembly Keys</h2>
+<p>The Shared Source CLI 2.0 (SSCLI 2.0) runtime is not intended for use as a secure 
+environment, although its source code does provide a good example of how a 
+secure execution environment can be implemented. By default, strong name 
+verification is turned off for several important public keys. </p>
+<p>The implementation of the global assembly cache and strong name verification 
+system in the SSCLI is completely separate from the implementation used by the 
+commercial Microsoft&reg; .NET Framework, and because of this, there should be no 
+interaction between the two. Turning off strong name verification in the SSCLI 
+will not impact the .NET Framework on Microsoft&reg; Windows&reg; in any way. </p>
+<h3>What is Strong Name Verification?</h3>
+<p>Strong name verification is a mechanism that requires a developer or 
+publisher of an assembly to have access to both the public and private elements 
+of a cryptographic key pair at build time. The public key becomes part of the 
+assembly name and a cryptographic hash of the metadata of the assembly is 
+calculated using the private key and inserted into the assembly. At load time, 
+strong name verification uses the public key to derive the metadata checksum 
+that can be checked against the actual metadata thus proving that the producer 
+of the assembly had access to the private key. More information on this process 
+can be obtained from <a href="http://msdn.microsoft.com">msdn.microsoft.com</a>. The implementation of strong 
+name verification can be seen in the SSCLI source tree in <a href="../clr/src/vm/strongname.cpp">
+    sscli20\clr\src\vm\strongname.cpp</a>. </p>
+<h3>The ECMA Special Key</h3>
+<p>There is an additional distinction among strong names. All assemblies 
+released in the .NET Framework that include classes specified in the ECMA-335 
+CLI standard are name with a special public key. This public key is 
+cryptographically invalid and is treated as a special case by both the SSCLI and 
+the .NET Framework strong name verification code. </p>
+<p>In Microsoft's commercial .NET Framework implementation, when an assembly 
+using this special public key is loaded, the strong name verification code  assumes that the assembly is signed using the private Microsoft key. If it is not 
+signed with the Microsoft key then the assembly will not load unless strong name 
+verification for the public key in that assembly is turned off. </p>
+<p>In the SSCLI, when an assembly contains the special public key designated by 
+ECMA, the strong name verification code  assumes that the assembly is signed 
+with the SSCLI private key, which can be found in 
+<a href="..\env\bin\finalpublickey.snk">sscli20\env\bin\finalpublickey.snk</a>. If it is not signed with the SSCLI private key, 
+the assembly will not load unless strong name verification for the public key of 
+that assembly is turned off. By default, the build process delay-signs all 
+assemblies.</p>
+<p>Note that the SSCLI private key is not in any sense a &quot;private&quot; key because 
+it is published in the source distribution. Anyone can use it to sign any 
+assembly and it signifies nothing with respect to security and ownership of the 
+resulting binary. </p>
+<h3>Source-code Distribution Implies Delayed Signing</h3>
+<p>Because the SSCLI distribution is a source distribution with a build process 
+and because the private key used to sign the .NET Framework implementation of 
+system assemblies can be used only for signing binary files published by 
+Microsoft,  assemblies built during the SSCLI build process on your computer 
+are  delay-signed. </p>
+<p>Delay signing (also called &quot;partial signing&quot;) means that the public key is 
+stored in the assembly metadata but the assembly file is not signed using the 
+private key. In order for a delay-signed assembly to load, strong name 
+verification must be turned off. This is done using the Strong Name tool during 
+the SSCLI build process (see <a href="tools/sn.html">sn.html</a>). The default 
+configuration for the SSCLI build environment is that verification is turned off 
+for both the ECMA public key and the Microsoft public key. </p>
+<p>All assemblies that can be found in both the SSCLI and in Microsoft's 
+commercial .NET Framework use identical public keys: some contain the ECMA key 
+and some contain the Microsoft public key. Note that no assembly built with 
+the SSCLI key can be trusted with respect to origin, including assemblies built 
+during the SSCLI build process. (Of course, you have control of the SSCLI source code 
+on your computer, so you understand the level of trust to impart to your own build output.) </p>
+<p>When an assembly B references an assembly A, compilers  store the full 
+assembly identity, including the public key, in the assembly reference in 
+assembly B. When either the SSCLI or the commercial .NET Framework load assembly 
+B and attempt to resolve the types that reside in assembly A, the 
+assembly-loading infrastructure will only look for assemblies with the same 
+public key as assembly A. Note that no information with respect to the 
+cryptographic signature of assembly A is stored in assembly B - only the public 
+key (usually a size-reduced hash of the public key). Cryptographic verification 
+occurs when an assembly is loaded into the CLI execution environment. Thus, 
+assemblies built against delay-signed assemblies are no different than 
+assemblies built against fully signed assemblies, only the public key is 
+transferred to the new assembly. </p>
+<p>The SSCLI&nbsp; implementation is designed to facilitate sharing code and 
+experimentation. Code built against one SSCLI installation should run against 
+another SSCLI installation. It should also run against other ECMA 335-compliant 
+CLI implementations, assuming only classes in the ECMA standard are used. No 
+assumptions should be made, however, about the security of the SSCLI 
+installation or of assembly code signed with the SSCLI key pair. </p>
+<h3>Strong Names and SSCLI Tools</h3>
+<p>Some tools in the SSCLI are managed applications that must be run inside the 
+SSCLI execution environment. This means they must be executed using the
+<a href="./tools/clix.html">clix</a> application launching utility.&nbsp; Managed 
+applications are assemblies and in the SSCLI, these assemblies are delay signed.&nbsp; 
+Failure to use the clix launcher to execute an SSCLI managed tool on Windows 
+will cause the tool to be executed under the .NET Framework.&nbsp; This will 
+cause an error dialog box that states that the utility might have been tampered 
+with or was partially signed.&nbsp; This error is correct: the SSCLI utilities 
+are partially signed and will not execute under the .NET Framework.</p>
+<p>For example, if you forget to run <code>clix caspol</code> on Windows and instead just 
+run <code>caspol</code> you could see the resulting error dialog box content:</p>
+<blockquote>
+  <pre>caspol.exe - Strong name validation failed.<br>
+Strong name validation failed for assembly 
+'C:\sscli20\binaries.x86chk.rotor\caspol.exe'. The file may have been 
+tampered with or it was partially signed but not fully signed with the correct 
+private key.&nbsp;</pre>
+</blockquote>
+<p>If you see a similar error, make sure to use the clix launcher when 
+executing that tool.</p>
+<h3>Changing the Default Key Value Using the Keyconfig Tool</h3>
+<p>You can use the sample tool, keyconfig, to change the key used by the SSCLI 
+when it builds.&nbsp; See 
+<a href="../samples/utilities/keyconfig/keyconfig.html">keyconfig.html</a> for 
+more information on using this tool.</p>
+<p>When you use this tool, you will be providing a custom assembly key pair or 
+just a custom assembly public key. If you provide the key pair, then all SSCLI 
+assemblies will be signed with this full key pair. This can be convenient if you 
+wish to attempt to load the assembly under the .NET Framework for debugging. For 
+example, jsc.exe will be fully signed so it will load under the .NET Framework 
+with no errors.</p>
+<p>What will happen when you use the keyconfig tool is the new custom key values 
+you provide will be used as a replacement for all keys for building assemblies. </p>
+<p>Assemblies such as mscorlib.dll and System.dll will be built with the ECMA 
+public key (see description above) but will be signed with the private key that 
+you provided. This will continue to work because the SSCLI assembly verification 
+code will now treat the new custom public key as a special case when loading 
+these assemblies. </p>
+<p>However, assemblies that do not normally have the ECMA public key (for 
+example, Microsoft.JScript.dll) will now be built with a new public key and 
+signed with a new private key. Any code that you develop that references these 
+assemblies will not run under the .NET Framework because the public key stored 
+in the assembly reference will not match any installed assemblies.</p>
+<p>If you choose the <b>delaysign</b> option with the keyconfig tool, then all&nbsp; 
+SSCLI assemblies will be built as delay-signed. The assemblies that would 
+normally be signed with the ECMA public key will continue to be signed with that 
+public key and other assemblies contain the new custom public key.</p>
+<h2><a name="MinimumVisualStudio.NETRequirements"></a>Minimum Visual Studio 
+Requirements</h2>
+<p>To build the SSCLI implementation on Microsoft® Windows® XP requires Visual
+    Studio 2005, as stated in the <a href="../readfirst.html">readfirst.html</a>.&nbsp;
+</p>
+<p>The minimum installation of Visual Studio 2005 required to support the SSCLI 
+is to install Visual C++&reg; 2005.&nbsp; Within the options for installing Visual 
+C++ 2005, the C runtime libraries must be selected because the runtime header 
+files are required by the SSCLI build process.</p>
+<h2><a name="PerlonWindowsXP"></a>Perl on Windows&reg; XP</h2>
+<p>A Perl distribution must be installed on Windows XP in order to build the 
+SSCLI source tree.&nbsp; You can go to <a href="http://www.activestate.com">
+www.activestate.com</a> and install the free download of Perl (preferably 
+version 5.8.7,
+    builds 813 and later).&nbsp; </p>
+<p>The Perl installation must correctly modify your environment variables so 
+that Perl is in your path.&nbsp; The env.bat file will search your path and will 
+set the PERLLIB environment variable assuming there is a LIB directory that is a 
+peer of the location where perl.exe is installed. </p>
+<p>You must install Perl with administrator-level privileges.&nbsp; If you 
+install the ActiveState Perl distribution while you are logged in with only 
+user-level privileges, the installer will not be able to modify your environment 
+variables and the SSCLI build process will not work correctly.</p>
+<h2><a name="LimitationsofSecurityZonesinSharedSourceCLI"></a>Limitations of 
+Security Zones in SSCLI</h2>
+<p>Due to portability modifications to the security implementation, support for 
+mapping URLs to security zones is limited in the SSCLI security implementation. 
+All file URLs will map to the zone of the local computer (LocalMachine) and all 
+other URLs will map to the Internet zone. Ensure that you understand 
+this limitation if you run code that relies on security zones generated from 
+URLs.</p>
+<h2><a name="ChangestoPer-UserConfigurationDirectoryLocation"></a><a name="RuntimeVersionValue"></a>Runtime Version Value</h2>
+<p>All assemblies created by using either the SSCLI or .NET Framework compilers 
+contain a entry in the metadata root (see ECMA-335 specification, Partition II, 
+section 23.2.1) that specifies which version of the .NET Framework should be 
+loaded to run the assembly.&nbsp;This is a different version value than the assembly 
+version and is utilized by the .NET Framework on Windows but it ignored by the 
+SSCLI. The .NET Framework relies on the Windows loader to first load an 
+executable assembly and because there can be multiple, side-by-side versions of 
+the .NET Framework installed, the runtime version value is needed to indicate 
+which version of the .NET Framework should be given the assembly to load and 
+execute.&nbsp; Although the runtime version value is included in all assemblies, 
+it is only normally relevant to executable assemblies.</p>
+<p>The SSCLI does not utilize platform loaders to run assemblies, instead it 
+relies on the clix launcher application. The clix launcher loads SSCLI core 
+files based on the directory from which it was loaded so the SSCLI has no need 
+to use the runtime version value and the value is ignored.</p>
+<p>When an assembly is built using the .NET Framework compilers, the default 
+behavior is to store the current version of the .NET Framework as the runtime 
+version value.&nbsp; For example, with version 2.0 of the .NET Framework the runtime version value would
+    be "v2.0.50727".&nbsp; This allows the .NET Framework 
+pre-loader to find and load the version v2.0.50727 core implementation files.</p>
+<p>If you intend to develop assemblies using the SSCLI and run them on the .NET 
+Frameworks you might need to modify the runtime version value in order for them 
+to load.&nbsp; By default the compilers in the SSCLI will generate assemblies 
+with the value of "v2.0.0".&nbsp; This value does allow executable assemblies to load in version 2.0
+    of the .NET Framework and was chosen because it represents a 
+generic version number that still works with version 2.0. However, future 
+versions of the .NET Framework might not recognize this version value. Instead 
+the value that should be used by an assembly that does not have a strict version 
+requirement is the string &quot;Standard CLI 2005&quot; (corresponding to the ECMA CLI version 3.0).</p>
+    <p>
+        To summarize, the following are a set of runtime version values and the 
+version of the .NET Framework on Windows into which the executable assembly 
+containing the value will be loaded:</p>
+<table border="1" width="90%">
+  <tr>
+    <th width="23%">Version value</th>
+    <th width="77%">Loaded version of .NET Framework</th>
+  </tr>
+  <tr>
+    <td width="23%">
+        Standard CLI 2005</td>
+    <td width="77%">Version 2.n.nnnn of the .NET Framework, where n is any digit.</td>
+  </tr>
+  <tr>
+    <td width="23%">Standard CLI 2002</td>
+    <td width="77%">Version 1.n.nnnn (of greater) of the .NET Framework, where n is any 
+    digit.</td>
+  </tr>
+  <tr>
+    <td width="23%">
+        v2.0.0</td>
+    <td width="77%">Version 2.0 of the .NET Framework.</td>
+  </tr>
+  <tr>
+    <td width="23%">
+        v2.n.nnnn</td>
+    <td width="77%">Version 2.n.nnnn of the .NET Framework, where n is any digit.</td>
+  </tr>
+  <tr>
+    <td width="23%">
+        v1.1.4322</td>
+    <td width="77%">Version 1.0 of the .NET Framework.</td>
+  </tr>
+</table>
+<p>To change the runtime version value that will be built into assemblies 
+created by SSCLI compilers, open the <a href="../clr/src/dlls/mscoree/mscoree.cpp">
+sscli20\clr\src\dlls\mscoree\mscoree.cpp</a> file.&nbsp; Search for the string:&nbsp; 
+ROTOR_VERSION_NUMBER.&nbsp; You will see the following code:</p>
+<blockquote>
+  <pre>#ifndef ROTOR_VERSION_NUMBER<br />#define ROTOR_VERSION_NUMBER (L"v2.0.0") <br />#endif
+
+Changing the value of the #define ROTOR_VERSION_NUMBER will change the runtime version value in assemblies that are subsequently built with SSCLI compilers. You will need to rebuild the SSCLI after changing this value in order to have the change applied.</pre>
+</blockquote>
+<p>See the <a href="../samples/utilities/getcliversion/getcliversion.html">
+GetCliVersion sample</a> for more information on how to inspect and modify the 
+runtime version value in an existing assembly.</p>
+<h2><a name="PlatformRequirementsforPOSIXThreadsSupport"></a>Platform 
+Requirements for POSIX Threads Support</h2>
+<p>The SSCLI requires specific functionality in the POSIX threads (Pthreads) 
+implementation on any platform to which it might be ported.&nbsp; Specifically, 
+exception handling in the SSCLI is dependent on several extra parameters sent to 
+SA_SIGINFO signal handlers which provide details about the signal and the 
+context in which it occurred. </p>
+<p>An example of a UNIX system-based platform which does not currently provide 
+this required functionality is OpenBSD 3.1.&nbsp; It would be very difficult to 
+port the SSCLI to such a platform and maintain exception handling functionality.&nbsp; 
+Future versions of OpenBSD might provide this functionality and would then 
+be available as a porting target for the SSCLI.</p>
+<h2><a name="KnownIssues"></a>Known Issues</h2>
+<h3><a name="ProblemswithtarUtilityExpandingSSCLIArchiveonMacOSX"></a><a name="Pathand.NETFramework"></a>Path and the .NET Framework</h3>
+<p>
+    When you run one of the SSCLI implementations of a tool or utility on 
+Windows you must make sure that the SSCLI build output directory is in your path 
+before the .NET Framework or Visual Studio bin directories or errors will occur. For example, if you change into the .NET Framework directory which contains 
+files like mscorwks.dll and mscorlib.dll, and then attempt to run the SSCLI 
+version of metainfo.exe you will see an error like the following: </p>
+<blockquote>
+  <pre>metainfo.exe - Entry Point Not Found
+The procedure entry point SetFusionShutdownCallback could not be located in the dynamic link library fusion.dll.
+
+</pre>
+</blockquote>
+<hr>
+<p><i>Copyright (c) 2006 Microsoft Corporation. All rights reserved.</i><br>
+&nbsp;</p>
+
+</body>
+
+</html>

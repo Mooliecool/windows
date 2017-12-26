@@ -1,0 +1,816 @@
+# ==++==
+#
+#   
+#    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+#   
+#    The use and distribution terms for this software are contained in the file
+#    named license.txt, which can be found in the root of this distribution.
+#    By using this software in any fashion, you are agreeing to be bound by the
+#    terms of this license.
+#   
+#    You must not remove this notice, or any other, from this software.
+#   
+#
+# ==--==
+
+TARGETNAME=System
+TARGETTYPE=NOTARGET
+TARGETPATH=obj
+
+CLR_TARGETTYPE=DLL
+#CLR_ENABLE_ASMMETA=1
+ASSEMBLY_KEY_TYPE=ECMA
+
+
+
+ALLOW_PARTIALTRUSTCALLS=1
+
+
+INCLUDE_ASSEMBLY_REFS=1
+
+SECURITY_LEVEL     = SYSTEM_COMPONENT
+
+RESGEN_SOURCE      = System.txt
+RESGEN_CLASS       = System.SR
+
+# warning settings
+CSC_TREAT_WARNINGS_AS_ERRORS=1
+CSC_OBSOLETE_WARNINGS_ARE_NOT_ERRORS=1
+CSC_WARNING_DISABLE=649
+
+SOURCES=native.rc
+
+CLR_REFERENCES=\
+                $(SDK_REF_PATH)\System.Xml.dll             \
+                $(SDK_REF_PATH)\System.Configuration.dll   \
+
+PUBLISH_SOURCES=1
+
+CSHARP_ALLOW_UNSAFE=1
+
+C_DEFINES=$(C_DEFINES) /DINCLUDE_VSREFS
+
+CSC_DEFINES=$(CSC_DEFINES) /D:SYSTEM_NAMESPACE
+
+# Needed for compiling _autowebproxyscriptwrapper.cs
+CSC_FLAGS=$(CSC_FLAGS) /D:AUTOPROXY_MANAGED_JSCRIPT
+CLR_REFERENCES=$(CLR_REFERENCES) \
+                $(SDK_REF_PATH)\Microsoft.Vsa.dll          \
+                $(SDK_REF_PATH)\Microsoft.JScript.dll
+
+# uncomment to get System.Configuration perf work.
+#CSC_DEFINES=$(CSC_DEFINES) /d:PERF
+
+# uncomment to get System.Net perf work
+#CSC_DEFINES=$(CSC_DEFINES) /d:NET_PERF
+
+# Enable in-source FxCop violation suppression
+!if "$(_BUILDTYPE)" != "fre" && "$(_BUILDTYPE)" != "ret"
+CSC_DEFINES=$(CSC_DEFINES) /D:CODE_ANALYSIS
+!endif
+
+REGEX=$(NDPFX_ROOT)\src\regex
+COMPMOD=$(NDPFX_ROOT)\src\compmod
+NET=$(NDPFX_ROOT)\src\net
+IO=$(NDPFX_ROOT)\src\services\io
+MISC=$(NDPFX_ROOT)\src\misc
+TIMERS=$(NDPFX_ROOT)\src\services\timers
+DIAGNOSTICS=$(NDPFX_ROOT)\src\services\monitoring
+EVENTLOGMESSAGES=
+PERFCOUNTER=$(NDPFX_ROOT)\src\servicesunmanaged\perfcounterlib
+SECURITY=$(NDPFX_ROOT)\src\security
+SYSTEM=$(NDPFX_ROOT)\src\sys
+
+COMPONENTMODEL_SOURCES=\
+                $(COMPMOD)\system\componentmodel\addingneweventargs.cs \
+                $(COMPMOD)\system\componentmodel\addingneweventhandler.cs \
+                $(COMPMOD)\system\componentmodel\ambientvalueattribute.cs \
+                $(COMPMOD)\system\componentmodel\arrayconverter.cs \
+                $(COMPMOD)\system\componentmodel\arraysubsetenumerator.cs \
+                $(COMPMOD)\system\componentmodel\asynccompletedeventargs.cs \
+                $(COMPMOD)\system\componentmodel\asynccompletedeventhandler.cs \
+                $(COMPMOD)\system\componentmodel\asyncoperation.cs \
+                $(COMPMOD)\system\componentmodel\asyncoperationmanager.cs \
+                $(COMPMOD)\system\componentmodel\attributecollection.cs \
+                $(COMPMOD)\system\componentmodel\attributeproviderattribute.cs \
+                $(COMPMOD)\system\componentmodel\backgroundworker.cs \
+                $(COMPMOD)\system\componentmodel\basecomponenteditor.cs \
+                $(COMPMOD)\system\componentmodel\basenumberconverter.cs \
+                $(COMPMOD)\system\componentmodel\bindableattribute.cs \
+                $(COMPMOD)\system\componentmodel\bindablesupport.cs \
+                $(COMPMOD)\system\componentmodel\bindingdirection.cs \
+                $(COMPMOD)\system\componentmodel\booleanconverter.cs \
+                $(COMPMOD)\system\componentmodel\browsableattribute.cs \
+                $(COMPMOD)\system\componentmodel\byteconverter.cs \
+                $(COMPMOD)\system\componentmodel\canceleventargs.cs \
+                $(COMPMOD)\system\componentmodel\canceleventhandler.cs \
+                $(COMPMOD)\system\componentmodel\categoryattribute.cs \
+                $(COMPMOD)\system\componentmodel\charconverter.cs \
+                $(COMPMOD)\system\componentmodel\collectionchangeaction.cs \
+                $(COMPMOD)\system\componentmodel\collectionchangeeventargs.cs \
+                $(COMPMOD)\system\componentmodel\collectionchangeeventhandler.cs \
+                $(COMPMOD)\system\componentmodel\collectionconverter.cs \
+                $(COMPMOD)\system\componentmodel\complexbindingpropertiesattribute.cs \
+                $(COMPMOD)\system\componentmodel\compmodswitches.cs \
+                $(COMPMOD)\system\componentmodel\component.cs \
+                $(COMPMOD)\system\componentmodel\componentcollection.cs \
+                $(COMPMOD)\system\componentmodel\componentconverter.cs \
+                $(COMPMOD)\system\componentmodel\componentresourcemanager.cs \
+                $(COMPMOD)\system\componentmodel\container.cs \
+                $(COMPMOD)\system\componentmodel\containerfilterservice.cs \
+                $(COMPMOD)\system\componentmodel\cultureinfoconverter.cs \
+                $(COMPMOD)\system\componentmodel\customtypedescriptor.cs \
+                $(COMPMOD)\system\componentmodel\dataobjectattribute.cs \
+                $(COMPMOD)\system\componentmodel\dataobjectmethodattribute.cs \
+                $(COMPMOD)\system\componentmodel\dataobjectmethodtype.cs \
+                $(COMPMOD)\system\componentmodel\datetimeconverter.cs \
+                $(COMPMOD)\system\componentmodel\debugextendedpropertydescriptor.cs \
+                $(COMPMOD)\system\componentmodel\debugreflecteventdescriptor.cs \
+                $(COMPMOD)\system\componentmodel\debugreflectpropertydescriptor.cs \
+                $(COMPMOD)\system\componentmodel\debugtypedescriptor.cs \
+                $(COMPMOD)\system\componentmodel\decimalconverter.cs \
+                $(COMPMOD)\system\componentmodel\defaultbindingpropertyattribute.cs \
+                $(COMPMOD)\system\componentmodel\defaulteventattribute.cs \
+                $(COMPMOD)\system\componentmodel\defaultpropertyattribute.cs \
+                $(COMPMOD)\system\componentmodel\defaultvalueattribute.cs \
+                $(COMPMOD)\system\componentmodel\delegatingtypedescriptionprovider.cs \
+                $(COMPMOD)\system\componentmodel\descriptionattribute.cs \
+                $(COMPMOD)\system\componentmodel\designerattribute.cs \
+                $(COMPMOD)\system\componentmodel\designercategoryattribute.cs \
+                $(COMPMOD)\system\componentmodel\designerserializationvisibility.cs \
+                $(COMPMOD)\system\componentmodel\designerserializationvisibilityattribute.cs \
+                $(COMPMOD)\system\componentmodel\designonlyattribute.cs \
+                $(COMPMOD)\system\componentmodel\designtimevisibleattribute.cs \
+                $(COMPMOD)\system\componentmodel\displaynameattribute.cs \
+                $(COMPMOD)\system\componentmodel\doubleconverter.cs \
+                $(COMPMOD)\system\componentmodel\doworkeventargs.cs \
+                $(COMPMOD)\system\componentmodel\doworkeventhandler.cs \
+                $(COMPMOD)\system\componentmodel\editorattribute.cs \
+                $(COMPMOD)\system\componentmodel\editorbrowsableattribute.cs \
+                $(COMPMOD)\system\componentmodel\enumconverter.cs \
+                $(COMPMOD)\system\componentmodel\eventdescriptor.cs \
+                $(COMPMOD)\system\componentmodel\eventdescriptorcollection.cs \
+                $(COMPMOD)\system\componentmodel\eventhandlerlist.cs \
+                $(COMPMOD)\system\componentmodel\expandableobjectconverter.cs \
+                $(COMPMOD)\system\componentmodel\extendedpropertydescriptor.cs \
+                $(COMPMOD)\system\componentmodel\extenderprovidedpropertyattribute.cs \
+                $(COMPMOD)\system\componentmodel\guidconverter.cs \
+                $(COMPMOD)\system\componentmodel\handledeventargs.cs \
+                $(COMPMOD)\system\componentmodel\handledeventhandler.cs \
+                $(COMPMOD)\system\componentmodel\ibindinglist.cs \
+                $(COMPMOD)\system\componentmodel\ibindinglistview.cs \
+                $(COMPMOD)\system\componentmodel\icanceladdnew.cs \
+                $(COMPMOD)\system\componentmodel\ichangetracking.cs \
+                $(COMPMOD)\system\componentmodel\icomnativedescriptorhandler.cs \
+                $(COMPMOD)\system\componentmodel\icomponent.cs \
+                $(COMPMOD)\system\componentmodel\icontainer.cs \
+                $(COMPMOD)\system\componentmodel\icustomtypedescriptor.cs \
+                $(COMPMOD)\system\componentmodel\idataerrorinfo.cs \
+                $(COMPMOD)\system\componentmodel\ieditableobject.cs \
+                $(COMPMOD)\system\componentmodel\iextenderprovider.cs \
+                $(COMPMOD)\system\componentmodel\iintellisensebuilder.cs \
+                $(COMPMOD)\system\componentmodel\ilistsource.cs \
+                $(COMPMOD)\system\componentmodel\immutableobjectattribute.cs \
+                $(COMPMOD)\system\componentmodel\inestedcontainer.cs \
+                $(COMPMOD)\system\componentmodel\inestedsite.cs \
+                $(COMPMOD)\system\componentmodel\initializationeventattribute.cs \
+                $(COMPMOD)\system\componentmodel\installertypeattribute.cs \
+                $(COMPMOD)\system\componentmodel\instancecreationeditor.cs \
+                $(COMPMOD)\system\componentmodel\int16converter.cs \
+                $(COMPMOD)\system\componentmodel\int32converter.cs \
+                $(COMPMOD)\system\componentmodel\int64converter.cs \
+                $(COMPMOD)\system\componentmodel\intsecurity.cs \
+                $(COMPMOD)\system\componentmodel\invalidenumargumentexception.cs \
+                $(COMPMOD)\system\componentmodel\InvalidAsynchronousStateException.cs \
+                $(COMPMOD)\system\componentmodel\inotifypropertychanged.cs \
+                $(COMPMOD)\system\componentmodel\iraiseitemchangedevents.cs \
+                $(COMPMOD)\system\componentmodel\irevertiblechangetracking.cs \
+                $(COMPMOD)\system\componentmodel\isite.cs \
+                $(COMPMOD)\system\componentmodel\isupportinitialize.cs \
+                $(COMPMOD)\system\componentmodel\isynchronizeinvoke.cs \
+                $(COMPMOD)\system\componentmodel\itypedescriptorcontext.cs \
+                $(COMPMOD)\system\componentmodel\itypedlist.cs \
+                $(COMPMOD)\system\componentmodel\listbindableattribute.cs \
+                $(COMPMOD)\system\componentmodel\listchangedeventargs.cs \
+                $(COMPMOD)\system\componentmodel\listchangedeventhandler.cs \
+                $(COMPMOD)\system\componentmodel\listchangedtype.cs \
+                $(COMPMOD)\system\componentmodel\listsortdescription.cs \
+                $(COMPMOD)\system\componentmodel\listsortdescriptioncollection.cs \
+                $(COMPMOD)\system\componentmodel\listsortdirection.cs \
+                $(COMPMOD)\system\componentmodel\localizableattribute.cs \
+                $(COMPMOD)\system\componentmodel\lookupbindingpropertiesattribute.cs \
+                $(COMPMOD)\system\componentmodel\marshalbyvaluecomponent.cs \
+                $(COMPMOD)\system\componentmodel\maskedtextprovider.cs \
+                $(COMPMOD)\system\componentmodel\maskedtextresulthint.cs \
+                $(COMPMOD)\system\componentmodel\memberdescriptor.cs \
+                $(COMPMOD)\system\componentmodel\mergablepropertyattribute.cs \
+                $(COMPMOD)\system\componentmodel\multilinestringconverter.cs \
+                $(COMPMOD)\system\componentmodel\nestedcontainer.cs \
+                $(COMPMOD)\system\componentmodel\nullableconverter.cs \
+                $(COMPMOD)\system\componentmodel\passwordpropertytextattribute.cs \
+                $(COMPMOD)\system\componentmodel\progresschangedeventargs.cs \
+                $(COMPMOD)\system\componentmodel\progresschangedeventhandler.cs \
+                $(COMPMOD)\system\componentmodel\propertychangedeventargs.cs \
+                $(COMPMOD)\system\componentmodel\propertychangedeventhandler.cs \
+                $(COMPMOD)\system\componentmodel\propertydescriptor.cs \
+                $(COMPMOD)\system\componentmodel\propertydescriptorcollection.cs \
+                $(COMPMOD)\system\componentmodel\providepropertyattribute.cs \
+                $(COMPMOD)\system\componentmodel\readonlyattribute.cs \
+                $(COMPMOD)\system\componentmodel\recommendedasconfigurableattribute.cs \
+                $(COMPMOD)\system\componentmodel\referenceconverter.cs \
+                $(COMPMOD)\system\componentmodel\reflecteventdescriptor.cs \
+                $(COMPMOD)\system\componentmodel\reflectpropertydescriptor.cs \
+                $(COMPMOD)\system\componentmodel\reflecttypedescriptionprovider.cs \
+                $(COMPMOD)\system\componentmodel\refresheventargs.cs \
+                $(COMPMOD)\system\componentmodel\refresheventhandler.cs \
+                $(COMPMOD)\system\componentmodel\runworkercompletedeventhandler.cs \
+                $(COMPMOD)\system\componentmodel\runworkercompletedeventargs.cs \
+                $(COMPMOD)\system\componentmodel\sbyteconverter.cs \
+	            $(COMPMOD)\system\componentmodel\settingsbindableattribute.cs \
+                $(COMPMOD)\system\componentmodel\singleconverter.cs \
+                $(COMPMOD)\system\componentmodel\stringconverter.cs \
+                $(COMPMOD)\system\componentmodel\syntaxcheck.cs \
+                $(COMPMOD)\system\componentmodel\timespanconverter.cs \
+                $(COMPMOD)\system\componentmodel\toolboxitemfilterattribute.cs \
+                $(COMPMOD)\system\componentmodel\toolboxitemfiltertype.cs \
+                $(COMPMOD)\system\componentmodel\typeconverter.cs \
+                $(COMPMOD)\system\componentmodel\typeconverterattribute.cs \
+                $(COMPMOD)\system\componentmodel\typedescriptor.cs \
+                $(COMPMOD)\system\componentmodel\typedescriptionprovider.cs \
+                $(COMPMOD)\system\componentmodel\typedescriptionproviderattribute.cs \
+                $(COMPMOD)\system\componentmodel\typelistconverter.cs \
+                $(COMPMOD)\system\componentmodel\uint16converter.cs \
+                $(COMPMOD)\system\componentmodel\uint32converter.cs \
+                $(COMPMOD)\system\componentmodel\uint64converter.cs \
+                $(COMPMOD)\system\componentmodel\warningexception.cs \
+                $(COMPMOD)\system\componentmodel\win32exception.cs \
+                $(COMPMOD)\system\componentmodel\design\activedocumentevent.cs \
+                $(COMPMOD)\system\componentmodel\design\activedocumenteventhandler.cs \
+                $(COMPMOD)\system\componentmodel\design\checkoutexception.cs \
+                $(COMPMOD)\system\componentmodel\design\commandid.cs \
+                $(COMPMOD)\system\componentmodel\design\componentchangedevent.cs \
+                $(COMPMOD)\system\componentmodel\design\componentchangedeventhandler.cs \
+                $(COMPMOD)\system\componentmodel\design\componentchangingevent.cs \
+                $(COMPMOD)\system\componentmodel\design\componentchangingeventhandler.cs \
+                $(COMPMOD)\system\componentmodel\design\componentevent.cs \
+                $(COMPMOD)\system\componentmodel\design\componenteventhandler.cs \
+                $(COMPMOD)\system\componentmodel\design\componentrenameevent.cs \
+                $(COMPMOD)\system\componentmodel\design\componentrenameeventhandler.cs \
+                $(COMPMOD)\system\componentmodel\design\designeroptionservice.cs \
+                $(COMPMOD)\system\componentmodel\design\designertransaction.cs \
+                $(COMPMOD)\system\componentmodel\design\designertransactioncloseevent.cs \
+                $(COMPMOD)\system\componentmodel\design\designertransactioncloseeventhandler.cs \
+                $(COMPMOD)\system\componentmodel\design\designerverb.cs \
+                $(COMPMOD)\system\componentmodel\design\designerverbcollection.cs \
+                $(COMPMOD)\system\componentmodel\design\documentcollection.cs \
+                $(COMPMOD)\system\componentmodel\design\documenteventargs.cs \
+                $(COMPMOD)\system\componentmodel\design\documenteventhandler.cs \
+                $(COMPMOD)\system\componentmodel\design\helpcontexttype.cs \
+                $(COMPMOD)\system\componentmodel\design\helpkeywordattribute.cs \
+                $(COMPMOD)\system\componentmodel\design\helpkeywordtype.cs \
+                $(COMPMOD)\system\componentmodel\design\icomponentchangeservice.cs \
+                $(COMPMOD)\system\componentmodel\design\icomponentdiscoveryservice.cs \
+                $(COMPMOD)\system\componentmodel\design\icomponentinitializer.cs \
+                $(COMPMOD)\system\componentmodel\design\idesigner.cs \
+                $(COMPMOD)\system\componentmodel\design\idesignereventservice.cs \
+                $(COMPMOD)\system\componentmodel\design\idesignerfilter.cs \
+                $(COMPMOD)\system\componentmodel\design\idesignerhost.cs \
+                $(COMPMOD)\system\componentmodel\design\idesigneroptionservice.cs \
+                $(COMPMOD)\system\componentmodel\design\idictionaryservice.cs \
+                $(COMPMOD)\system\componentmodel\design\ieventpropertyservice.cs \
+                $(COMPMOD)\system\componentmodel\design\iextenderlistservice.cs \
+                $(COMPMOD)\system\componentmodel\design\iextenderproviderservice.cs \
+                $(COMPMOD)\system\componentmodel\design\ihelpservice.cs \
+                $(COMPMOD)\system\componentmodel\design\iinheritanceservice.cs \
+                $(COMPMOD)\system\componentmodel\design\imenucommandservice.cs \
+                $(COMPMOD)\system\componentmodel\design\inheritanceattribute.cs \
+                $(COMPMOD)\system\componentmodel\design\inheritancelevel.cs \
+                $(COMPMOD)\system\componentmodel\design\ireferenceservice.cs \
+                $(COMPMOD)\system\componentmodel\design\iresourceservice.cs \
+                $(COMPMOD)\system\componentmodel\design\irootdesigner.cs \
+                $(COMPMOD)\system\componentmodel\design\iselectionservice.cs \
+                $(COMPMOD)\system\componentmodel\design\iserviceobjectcontainer.cs \
+                $(COMPMOD)\system\componentmodel\design\itreedesigner.cs \
+                $(COMPMOD)\system\componentmodel\design\itypedescriptorfilterservice.cs \
+                $(COMPMOD)\system\componentmodel\design\itypediscoveryservice.cs \
+                $(COMPMOD)\system\componentmodel\design\ityperesolutionservice.cs \
+                $(COMPMOD)\system\componentmodel\design\menucommand.cs \
+                $(COMPMOD)\system\componentmodel\design\notifyparentpropertyattribute.cs \
+                $(COMPMOD)\system\componentmodel\design\parenthesizepropertynameattribute.cs \
+                $(COMPMOD)\system\componentmodel\design\propertytabattribute.cs \
+                $(COMPMOD)\system\componentmodel\design\propertytabscope.cs \
+                $(COMPMOD)\system\componentmodel\design\refreshproperties.cs \
+                $(COMPMOD)\system\componentmodel\design\refreshpropertiesattribute.cs \
+                $(COMPMOD)\system\componentmodel\design\selectiontypes.cs \
+                $(COMPMOD)\system\componentmodel\design\servicecreatorcallback.cs \
+                $(COMPMOD)\system\componentmodel\design\serviceobjectcontainer.cs \
+                $(COMPMOD)\system\componentmodel\design\standardcommands.cs \
+                $(COMPMOD)\system\componentmodel\design\standardtoolwindows.cs \
+                $(COMPMOD)\system\componentmodel\design\toolboxitemattribute.cs \
+                $(COMPMOD)\system\componentmodel\design\viewtechnology.cs \
+                $(COMPMOD)\system\componentmodel\design\serialization\componentserializationservice.cs \
+                $(COMPMOD)\system\componentmodel\design\serialization\contextstack.cs \
+                $(COMPMOD)\system\componentmodel\design\serialization\defaultserializationproviderattribute.cs \
+                $(COMPMOD)\system\componentmodel\design\serialization\designerloader.cs \
+                $(COMPMOD)\system\componentmodel\design\serialization\designerserializerattribute.cs \
+                $(COMPMOD)\system\componentmodel\design\serialization\idesignerloaderhost.cs \
+                $(COMPMOD)\system\componentmodel\design\serialization\idesignerloaderservice.cs \
+                $(COMPMOD)\system\componentmodel\design\serialization\idesignerserializationmanager.cs \
+                $(COMPMOD)\system\componentmodel\design\serialization\idesignerserializationprovider.cs \
+                $(COMPMOD)\system\componentmodel\design\serialization\idesignerserializationservice.cs \
+                $(COMPMOD)\system\componentmodel\design\serialization\inamecreationservice.cs \
+                $(COMPMOD)\system\componentmodel\design\serialization\instancedescriptor.cs \
+                $(COMPMOD)\system\componentmodel\design\serialization\memberrelationshipservice.cs \
+                $(COMPMOD)\system\componentmodel\design\serialization\resolvenameeventargs.cs \
+                $(COMPMOD)\system\componentmodel\design\serialization\resolvenameeventhandler.cs \
+                $(COMPMOD)\system\componentmodel\design\serialization\rootdesignerserializerattribute.cs \
+                $(COMPMOD)\system\componentmodel\design\serialization\serializationstore.cs \
+
+WIN32_SOURCES=\
+                $(COMPMOD)\microsoft\win32\nativemethods.cs                    \
+                $(COMPMOD)\microsoft\win32\safenativemethods.cs                \
+                $(COMPMOD)\microsoft\win32\unsafenativemethods.cs              \
+                $(COMPMOD)\microsoft\win32\safehandles\safeeventhandle.cs      \
+                $(COMPMOD)\microsoft\win32\safehandles\safefilemappinghandle.cs \
+                $(COMPMOD)\microsoft\win32\safehandles\safefilemapviewhandle.cs \
+                $(COMPMOD)\microsoft\win32\safehandles\safelocalmemhandle.cs   \
+                $(COMPMOD)\microsoft\win32\safehandles\safeprocesshandle.cs    \
+                $(COMPMOD)\microsoft\win32\safehandles\safethreadhandle.cs    \
+                $(COMPMOD)\microsoft\win32\safehandles\safeusertokenhandle.cs  \
+
+SECURITY_SOURCES=\
+
+NET_SOURCES=\
+                $(NET)\system\urischeme.cs \
+                $(NET)\system\uri.cs \
+                $(NET)\system\uribuilder.cs \
+                $(NET)\system\uriformatexception.cs \
+                $(NET)\system\urihostnametype.cs \
+                $(NET)\system\uripartial.cs \
+                $(NET)\system\_domainname.cs \
+                $(NET)\system\_ipv4address.cs \
+                $(NET)\system\_ipv6address.cs \
+                $(NET)\system\_uncname.cs \
+                $(NET)\system\_urisyntax.cs \
+                $(NET)\system\_uritypeconverter.cs \
+                $(NET)\system\urienumtypes.cs \
+                $(NET)\system\uriext.cs \
+                $(NET)\system\genericuriparser.cs \
+                $(NET)\system\uriparsertemplates.cs \
+                $(NET)\system\net\authenticationmanager.cs \
+                $(NET)\system\net\authorization.cs \
+                $(NET)\system\net\connectionmodes.cs \
+                $(NET)\system\net\connectionpool.cs \
+                $(NET)\system\net\connectionpoolmanager.cs \
+                $(NET)\system\net\cookie.cs \
+                $(NET)\system\net\cookiecollection.cs \
+                $(NET)\system\net\cookiecontainer.cs \
+                $(NET)\system\net\cookieexception.cs \
+                $(NET)\system\net\credentialcache.cs \
+                $(NET)\system\net\dns.cs \
+                $(NET)\system\net\dnspermission.cs \
+                $(NET)\system\net\endpoint.cs \
+                $(NET)\system\net\filewebrequest.cs \
+                $(NET)\system\net\filewebresponse.cs \
+                $(NET)\system\net\ftpstatuscode.cs \
+                $(NET)\system\net\webrequestmethods.cs \
+                $(NET)\system\net\ftpwebrequest.cs \
+                $(NET)\system\net\ftpwebresponse.cs \
+                $(NET)\system\net\globalproxyselection.cs \
+                $(NET)\system\net\httpextension.cs \
+                $(NET)\system\net\httprequestheader.cs \
+                $(NET)\system\net\httpresponseheader.cs \
+                $(NET)\system\net\httpstatuscode.cs \
+                $(NET)\system\net\httpversion.cs \
+                $(NET)\system\net\httpwebrequest.cs \
+                $(NET)\system\net\httpwebresponse.cs \
+                $(NET)\system\net\iauthenticationmodule.cs \
+                $(NET)\system\net\icredentials.cs \
+                $(NET)\system\net\icredentialsbyhost.cs \
+                $(NET)\system\net\internal.cs \
+                $(NET)\system\net\ipaddress.cs \
+                $(NET)\system\net\ipendpoint.cs \
+                $(NET)\system\net\iphostentry.cs \
+                $(NET)\system\net\iwebproxy.cs \
+                $(NET)\system\net\iwebrequestcreate.cs \
+                $(NET)\system\net\logging.cs \
+                $(NET)\system\net\networkaccess.cs \
+                $(NET)\system\net\networkcredential.cs \
+                $(NET)\system\net\protocolviolationexception.cs \
+                $(NET)\system\net\servicepoint.cs \
+                $(NET)\system\net\servicepointmanager.cs \
+                $(NET)\system\net\socketaddress.cs \
+                $(NET)\system\net\socketexception.cs \
+                $(NET)\system\net\socketpermission.cs \
+                $(NET)\system\net\transporttype.cs \
+                $(NET)\system\net\unsafenativemethods.cs \
+                $(NET)\system\net\webclient.cs \
+                $(NET)\system\net\webexception.cs \
+                $(NET)\system\net\webexceptionstatus.cs \
+                $(NET)\system\net\webheadercollection.cs \
+                $(NET)\system\net\webpermission.cs \
+                $(NET)\system\net\webproxy.cs \
+                $(NET)\system\net\webrequest.cs \
+                $(NET)\system\net\webresponse.cs \
+                $(NET)\system\net\_authenticationstate.cs \
+                $(NET)\system\net\_autowebproxyscriptengine.cs \
+                $(NET)\system\net\_autowebproxyscripthelper.cs \
+                $(NET)\system\net\_autowebproxyscriptwrapper.cs \
+                $(NET)\system\net\_basicclient.cs \
+                $(NET)\system\net\_bufferoffsetsize.cs \
+                $(NET)\system\net\_chunkparse.cs \
+                $(NET)\system\net\_commandstream.cs \
+                $(NET)\system\net\_connection.cs \
+                $(NET)\system\net\_connectiongroup.cs \
+                $(NET)\system\net\_connectstream.cs \
+                $(NET)\system\net\_contextawareresult.cs \
+                $(NET)\system\net\_cookiemodule.cs \
+                $(NET)\system\net\_emptywebproxy.cs \
+                $(NET)\system\net\_ftpcontrolstream.cs \
+                $(NET)\system\net\_ftpdatastream.cs \
+                $(NET)\system\net\_headerinfo.cs \
+                $(NET)\system\net\_headerinfotable.cs \
+                $(NET)\system\net\_httpdateparse.cs \
+                $(NET)\system\net\_isessionauthenticationmodule.cs \
+                $(NET)\system\net\_istreams.cs \
+                $(NET)\system\net\_lazyasyncresult.cs \
+                $(NET)\system\net\_loggingobject.cs \
+                $(NET)\system\net\_nestedmultipleasyncresult.cs \
+                $(NET)\system\net\_nestedsingleasyncresult.cs \
+                $(NET)\system\net\_netres.cs \
+                $(NET)\system\net\_ossock.cs \
+                $(NET)\system\net\_pooledstream.cs \
+                $(NET)\system\net\_proxychain.cs \
+                $(NET)\system\net\_proxyregblob.cs \
+                $(NET)\system\net\_safenethandles.cs \
+                $(NET)\system\net\_semaphore.cs \
+                $(NET)\system\net\_shellexpression.cs \
+                $(NET)\system\net\_spndictionary.cs \
+                $(NET)\system\net\_scattergatherbuffers.cs \
+                $(NET)\system\net\_timerthread.cs \
+                $(NET)\system\net\_win32.cs \
+                $(NET)\system\net\cache\httprequestcachevalidator.cs \
+                $(NET)\system\net\cache\ftprequestcachevalidator.cs \
+                $(NET)\system\net\cache\requestcache.cs \
+                $(NET)\system\net\cache\requestcacheentry.cs \
+                $(NET)\system\net\cache\requestcachemanager.cs \
+                $(NET)\system\net\cache\requestcachepolicy.cs \
+                $(NET)\system\net\cache\requestcachevalidator.cs \
+                $(NET)\system\net\cache\_cachestreams.cs \
+                $(NET)\system\net\cache\_requestcacheprotocol.cs \
+                $(NET)\system\net\cache\_rfc2616cachevalidators.cs \
+                $(NET)\system\net\cache\_singleitemrequestcache.cs \
+                $(NET)\system\net\secureprotocols\negotiateenumtypes.cs \
+                $(NET)\system\net\sockets\addressfamily.cs \
+                $(NET)\system\net\sockets\internal.cs \
+                $(NET)\system\net\sockets\iocontrolcode.cs \
+                $(NET)\system\net\sockets\lingeroption.cs \
+                $(NET)\system\net\sockets\multicastoption.cs \
+                $(NET)\system\net\sockets\networkstream.cs \
+                $(NET)\system\net\sockets\protocolfamily.cs \
+                $(NET)\system\net\sockets\protocoltype.cs \
+                $(NET)\system\net\sockets\selectmode.cs \
+                $(NET)\System\net\sockets\socketinformationoptions.cs \
+                $(NET)\System\net\sockets\socketinformation.cs \
+                $(NET)\system\net\sockets\socket.cs \
+                $(NET)\system\net\sockets\socketerrors.cs \
+                $(NET)\system\net\sockets\socketflags.cs \
+                $(NET)\system\net\sockets\socketoptionlevel.cs \
+                $(NET)\system\net\sockets\socketoptionname.cs \
+                $(NET)\system\net\sockets\socketshutdown.cs \
+                $(NET)\system\net\sockets\sockettype.cs \
+                $(NET)\system\net\sockets\tcpclient.cs \
+                $(NET)\system\net\sockets\tcplistener.cs \
+                $(NET)\system\net\sockets\transmitfileflags.cs \
+                $(NET)\system\net\sockets\udpclient.cs \
+                $(NET)\system\net\sockets\_acceptoverlappedasyncresult.cs \
+                $(NET)\system\net\sockets\_baseoverlappedasyncresult.cs \
+                $(NET)\system\net\sockets\_connectoverlappedasyncresult.cs \
+                $(NET)\system\net\sockets\_disconnectoverlappedasyncresult.cs \
+                $(NET)\system\net\sockets\_overlappedasyncresult.cs \
+                $(NET)\system\net\sockets\_transmitfileoverlappedasyncresult.cs \
+                $(NET)\system\net\sockets\_receivemessageoverlappedasyncresult.cs \
+                $(NET)\system\net\sockets\ippacketinformation.cs \
+                $(NET)\system\net\configuration\authenticationmoduleelement.cs \
+                $(NET)\system\net\configuration\authenticationmoduleelementcollection.cs \
+                $(NET)\system\net\configuration\authenticationmodulessection.cs \
+                $(NET)\system\net\configuration\bypasselement.cs \
+                $(NET)\system\net\configuration\bypasselementcollection.cs \
+                $(NET)\system\net\configuration\configurationstrings.cs \
+                $(NET)\system\net\configuration\connectionmanagementelement.cs \
+                $(NET)\system\net\configuration\connectionmanagementelementcollection.cs \
+                $(NET)\system\net\configuration\connectionmanagementsection.cs \
+                $(NET)\system\net\configuration\defaultproxysection.cs \
+                $(NET)\system\net\configuration\httpwebrequestelement.cs \
+                $(NET)\system\net\configuration\httpcachepolicyelement.cs \
+                $(NET)\system\net\configuration\ftpcachepolicyelement.cs \
+                $(NET)\system\net\configuration\ipv6element.cs \
+                $(NET)\system\net\configuration\moduleelement.cs \
+                $(NET)\system\net\configuration\netsectiongroup.cs \
+                $(NET)\system\net\configuration\performancecounterselement.cs \
+                $(NET)\system\net\configuration\proxyelement.cs \
+                $(NET)\system\net\configuration\requestcachingsection.cs \
+                $(NET)\system\net\configuration\settingssection.cs \
+                $(NET)\system\net\configuration\servicepointmanagerelement.cs \
+                $(NET)\system\net\configuration\timeoutvalidationattribute.cs \
+                $(NET)\system\net\configuration\socketelement.cs \
+                $(NET)\system\net\configuration\webproxyscriptelement.cs \
+                $(NET)\system\net\configuration\webrequestmoduleelement.cs \
+                $(NET)\system\net\configuration\webrequestmoduleelementcollection.cs \
+                $(NET)\system\net\configuration\webrequestmodulessection.cs \
+                $(NET)\system\net\stubs.cs \
+
+CONFIGURATION_SOURCES=\
+		$(SYSTEM)\system\configuration\clientsettingsstore.cs \
+                $(SYSTEM)\system\configuration\configurationexception.cs \
+                $(SYSTEM)\system\configuration\configurationmanagerinternalfactory.cs \
+                $(SYSTEM)\system\configuration\configurationsettings.cs \
+                $(SYSTEM)\system\configuration\configxmlattribute.cs \
+                $(SYSTEM)\system\configuration\configxmlcdatasection.cs \
+                $(SYSTEM)\system\configuration\configxmlcomment.cs \
+                $(SYSTEM)\system\configuration\configxmldocument.cs \
+                $(SYSTEM)\system\configuration\configxmlelement.cs \
+                $(SYSTEM)\system\configuration\configxmlsignificantwhitespace.cs \
+                $(SYSTEM)\system\configuration\configxmltext.cs \
+                $(SYSTEM)\system\configuration\configxmlwhitespace.cs \
+                $(SYSTEM)\system\configuration\dictionarysectionhandler.cs \
+                $(SYSTEM)\system\configuration\handlerbase.cs \
+                $(SYSTEM)\system\configuration\iapplicationsettingsprovider.cs \
+                $(SYSTEM)\system\configuration\iconfigurationsectionhandler.cs \
+                $(SYSTEM)\system\configuration\iconfigurationsystem.cs \
+                $(SYSTEM)\system\configuration\ignoresectionhandler.cs \
+                $(SYSTEM)\system\configuration\ipersistsettings.cs \
+                $(SYSTEM)\system\configuration\isettingsproviderservice.cs \
+                $(SYSTEM)\system\configuration\localfilesettingsprovider.cs \
+                $(SYSTEM)\system\configuration\namevaluefilesectionhandler.cs \
+                $(SYSTEM)\system\configuration\namevaluesectionhandler.cs \
+                $(SYSTEM)\system\configuration\readonlynamevaluecollection.cs \
+                $(SYSTEM)\system\configuration\settingsattributedictionary.cs \
+                $(SYSTEM)\system\configuration\settingsattributes.cs \
+                $(SYSTEM)\system\configuration\settingsbase.cs \
+                $(SYSTEM)\system\configuration\settingscontext.cs \
+                $(SYSTEM)\system\configuration\settingsproperty.cs \
+                $(SYSTEM)\system\configuration\settingspropertycollection.cs \
+                $(SYSTEM)\system\configuration\settingspropertyisreadonlyexception.cs \
+                $(SYSTEM)\system\configuration\settingspropertynotfoundexception.cs \
+                $(SYSTEM)\system\configuration\settingspropertyvalue.cs \
+                $(SYSTEM)\system\configuration\settingspropertyvaluecollection.cs \
+                $(SYSTEM)\system\configuration\settingspropertywrongtypeexception.cs \
+                $(SYSTEM)\system\configuration\settingsprovider.cs \
+                $(SYSTEM)\system\configuration\settingsprovidercollection.cs \
+                $(SYSTEM)\system\configuration\settingsserializeas.cs \
+                $(SYSTEM)\system\configuration\singletagsectionhandler.cs \
+                $(SYSTEM)\system\configuration\typeutil.cs \
+                $(SYSTEM)\system\configuration\internal\configurationmanagerhelper.cs \
+                $(SYSTEM)\system\configuration\sections\clientSettingsGroups.cs \
+                $(SYSTEM)\system\configuration\sections\clientSettingsSection.cs \
+
+
+DIAGNOSTICS_SOURCES=\
+                $(DIAGNOSTICS)\system\diagnosticts\asyncstreamreader.cs        \
+                $(DIAGNOSTICS)\system\diagnosticts\datareceivedeventargs.cs    \
+                $(DIAGNOSTICS)\system\diagnosticts\diagnosticsconfigurationhandler.cs \
+                $(DIAGNOSTICS)\system\diagnosticts\monitoringdescriptionattribute.cs \
+                $(DIAGNOSTICS)\system\diagnosticts\process.cs                  \
+                $(DIAGNOSTICS)\system\diagnosticts\processpriorityclass.cs     \
+                $(DIAGNOSTICS)\system\diagnosticts\processstartinfo.cs         \
+                $(DIAGNOSTICS)\system\diagnosticts\processwaithandle.cs        \
+                $(DIAGNOSTICS)\system\diagnosticts\processwindowstyle.cs       \
+                $(DIAGNOSTICS)\system\diagnosticts\stopwatch.cs                \
+
+PERMISSION_SOURCES=\
+                $(COMPMOD)\system\security\permissions\aspnethostingpermission.cs \
+                $(COMPMOD)\system\security\permissions\resourcepermissionbase.cs \
+                $(COMPMOD)\system\security\permissions\resourcepermissionbaseentry.cs \
+
+CSHARP_SOURCES=\
+                $(REGEX)\system\text\regularexpressions\regex.cs                   \
+                $(REGEX)\system\text\regularexpressions\regexboyermoore.cs                   \
+                $(REGEX)\system\text\regularexpressions\regexcapture.cs                   \
+                $(REGEX)\system\text\regularexpressions\regexcapturecollection.cs                   \
+                $(REGEX)\system\text\regularexpressions\regexcharclass.cs                   \
+                $(REGEX)\system\text\regularexpressions\regexcode.cs                   \
+                $(REGEX)\system\text\regularexpressions\regexcompilationinfo.cs                   \
+                $(REGEX)\system\text\regularexpressions\regexcompiler.cs                   \
+                $(REGEX)\system\text\regularexpressions\regexfcd.cs                   \
+                $(REGEX)\system\text\regularexpressions\regexgroup.cs                   \
+                $(REGEX)\system\text\regularexpressions\regexgroupcollection.cs                   \
+                $(REGEX)\system\text\regularexpressions\regexinterpreter.cs                   \
+                $(REGEX)\system\text\regularexpressions\regexmatch.cs                   \
+                $(REGEX)\system\text\regularexpressions\regexmatchcollection.cs                   \
+                $(REGEX)\system\text\regularexpressions\regexnode.cs                   \
+                $(REGEX)\system\text\regularexpressions\regexoptions.cs                   \
+                $(REGEX)\system\text\regularexpressions\regexparser.cs                   \
+                $(REGEX)\system\text\regularexpressions\regexreplacement.cs                   \
+                $(REGEX)\system\text\regularexpressions\regexrunner.cs                   \
+                $(REGEX)\system\text\regularexpressions\regexrunnerfactory.cs                   \
+                $(REGEX)\system\text\regularexpressions\regextree.cs                   \
+                $(REGEX)\system\text\regularexpressions\regexwriter.cs                   \
+                $(REGEX)\system\text\regularexpressions\compiledregexrunner.cs     \
+                $(REGEX)\system\text\regularexpressions\compiledregexrunnerfactory.cs \
+                $(COMPMOD)\system\codedom\codeargumentreferenceExpression.cs                                 \
+                $(COMPMOD)\system\codedom\codearraycreateexpression.cs                                 \
+                $(COMPMOD)\system\codedom\codearrayindexerexpression.cs                                 \
+                $(COMPMOD)\system\codedom\codeassignstatement.cs                                 \
+                $(COMPMOD)\system\codedom\codeattacheventstatement.cs                                 \
+                $(COMPMOD)\system\codedom\codeattributeargument.cs                                 \
+                $(COMPMOD)\system\codedom\codeattributeargumentCollection.cs                                 \
+                $(COMPMOD)\system\codedom\codeattributedeclaration.cs                                 \
+                $(COMPMOD)\system\codedom\codeattributedeclarationCollection.cs                                 \
+                $(COMPMOD)\system\codedom\codebasereferenceexpression.cs                                 \
+                $(COMPMOD)\system\codedom\codebinaryoperatorExpression.cs                                 \
+                $(COMPMOD)\system\codedom\codebinaryoperatorType.cs                                 \
+                $(COMPMOD)\system\codedom\codecastexpression.cs                                 \
+                $(COMPMOD)\system\codedom\codecatchclause.cs                                 \
+                $(COMPMOD)\system\codedom\codecatchclausecollection.cs                                 \
+                $(COMPMOD)\system\codedom\codechecksumpragma.cs                                 \
+                $(COMPMOD)\system\codedom\codecomment.cs                                 \
+                $(COMPMOD)\system\codedom\codecommentstatement.cs                                 \
+                $(COMPMOD)\system\codedom\codecommentstatementCollection.cs                                 \
+                $(COMPMOD)\system\codedom\codecompileunit.cs                                 \
+                $(COMPMOD)\system\codedom\codeconditionstatement.cs                                 \
+                $(COMPMOD)\system\codedom\codeconstructor.cs                                 \
+                $(COMPMOD)\system\codedom\codedefaultvalueexpression.cs                                 \
+                $(COMPMOD)\system\codedom\codedelegatecreateExpression.cs                                 \
+                $(COMPMOD)\system\codedom\codedelegateinvokeExpression.cs                                 \
+                $(COMPMOD)\system\codedom\codedirectionexpression.cs                                 \
+                $(COMPMOD)\system\codedom\codedirective.cs                                 \
+                $(COMPMOD)\system\codedom\codedirectivecollection.cs                                 \
+                $(COMPMOD)\system\codedom\codeentrypointmethod.cs                                 \
+                $(COMPMOD)\system\codedom\codeeventreferenceExpression.cs                                 \
+                $(COMPMOD)\system\codedom\codeexpression.cs                                 \
+                $(COMPMOD)\system\codedom\codeexpressioncollection.cs                                 \
+                $(COMPMOD)\system\codedom\codeexpressionstatement.cs                                 \
+                $(COMPMOD)\system\codedom\codefieldreferenceExpression.cs                                 \
+                $(COMPMOD)\system\codedom\codegotostatement.cs                                 \
+                $(COMPMOD)\system\codedom\codeindexerexpression.cs                                 \
+                $(COMPMOD)\system\codedom\codeiterationstatement.cs                                 \
+                $(COMPMOD)\system\codedom\codelabeledstatement.cs                                 \
+                $(COMPMOD)\system\codedom\codelinepragma.cs                                 \
+                $(COMPMOD)\system\codedom\codememberevent.cs                                 \
+                $(COMPMOD)\system\codedom\codememberfield.cs                                 \
+                $(COMPMOD)\system\codedom\codemembermethod.cs                                 \
+                $(COMPMOD)\system\codedom\codememberproperty.cs                                 \
+                $(COMPMOD)\system\codedom\codemethodinvokeexpression.cs                                 \
+                $(COMPMOD)\system\codedom\codemethodreferenceexpression.cs                                 \
+                $(COMPMOD)\system\codedom\codemethodreturnstatement.cs                                 \
+                $(COMPMOD)\system\codedom\codenamespace.cs                                 \
+                $(COMPMOD)\system\codedom\codenamespacecollection.cs                                 \
+                $(COMPMOD)\system\codedom\codenamespaceimport.cs                                 \
+                $(COMPMOD)\system\codedom\codenamespaceimportCollection.cs                                 \
+                $(COMPMOD)\system\codedom\codeobject.cs                                 \
+                $(COMPMOD)\system\codedom\codeobjectcreateexpression.cs                                 \
+                $(COMPMOD)\system\codedom\codeparameterdeclarationExpression.cs                                 \
+                $(COMPMOD)\system\codedom\codeparameterdeclarationExpressionCollection.cs                                 \
+                $(COMPMOD)\system\codedom\codeprimitiveexpression.cs                                 \
+                $(COMPMOD)\system\codedom\codepropertyreferenceExpression.cs                                 \
+                $(COMPMOD)\system\codedom\codepropertysetvalueReferenceExpression.cs                                 \
+                $(COMPMOD)\system\codedom\coderegiondirective.cs                                 \
+                $(COMPMOD)\system\codedom\coderegionmode.cs                                 \
+                $(COMPMOD)\system\codedom\coderemoveeventstatement.cs                                 \
+                $(COMPMOD)\system\codedom\codesnippetcompileUnit.cs                                 \
+                $(COMPMOD)\system\codedom\codesnippetexpression.cs                                 \
+                $(COMPMOD)\system\codedom\codesnippetstatement.cs                                 \
+                $(COMPMOD)\system\codedom\codesnippettypemember.cs                                 \
+                $(COMPMOD)\system\codedom\codestatement.cs                                 \
+                $(COMPMOD)\system\codedom\codestatementcollection.cs                                 \
+                $(COMPMOD)\system\codedom\codethisreferenceexpression.cs                                 \
+                $(COMPMOD)\system\codedom\codethrowexceptionStatement.cs                                 \
+                $(COMPMOD)\system\codedom\codetrycatchfinallyStatement.cs                                 \
+                $(COMPMOD)\system\codedom\codetypeconstructor.cs                                 \
+                $(COMPMOD)\system\codedom\codetypedeclaration.cs                                 \
+                $(COMPMOD)\system\codedom\codetypedeclarationCollection.cs                                 \
+                $(COMPMOD)\system\codedom\codetypedelegate.cs                                 \
+                $(COMPMOD)\system\codedom\codetypemember.cs                                 \
+                $(COMPMOD)\system\codedom\codetypemembercollection.cs                                 \
+                $(COMPMOD)\system\codedom\codetypeofexpression.cs                                 \
+                $(COMPMOD)\system\codedom\codetypeparameter.cs                                 \
+                $(COMPMOD)\system\codedom\codetypeparametercollection.cs                                 \
+                $(COMPMOD)\system\codedom\codetypereference.cs                                 \
+                $(COMPMOD)\system\codedom\codetypereferencecollection.cs                                 \
+                $(COMPMOD)\system\codedom\codetypereferenceexpression.cs                                 \
+                $(COMPMOD)\system\codedom\codevariabledeclarationStatement.cs                                 \
+                $(COMPMOD)\system\codedom\codevariablereferenceExpression.cs                                 \
+                $(COMPMOD)\system\codedom\fielddirection.cs                                 \
+                $(COMPMOD)\system\codedom\memberattributes.cs                                 \
+                $(COMPONENTMODEL_SOURCES)                                      \
+                $(COMPMOD)\system\diagnostics\assertsection.cs                             \
+                $(COMPMOD)\system\diagnostics\assertwrapper.cs                             \
+                $(COMPMOD)\system\diagnostics\booleanswitch.cs                             \
+                $(COMPMOD)\system\diagnostics\consoletracelistener.cs                             \
+                $(COMPMOD)\system\diagnostics\correlationmanager.cs                             \
+                $(COMPMOD)\system\diagnostics\debug.cs                             \
+                $(COMPMOD)\system\diagnostics\defaulttracelistener.cs                             \
+                $(COMPMOD)\system\diagnostics\delimitedlisttraceListener.cs                             \
+                $(COMPMOD)\system\diagnostics\diagnosticsconfiguration.cs                             \
+                $(COMPMOD)\system\diagnostics\filterelement.cs                             \
+                $(COMPMOD)\system\diagnostics\listenerelementscollection.cs                             \
+                $(COMPMOD)\system\diagnostics\perfcountersection.cs                             \
+                $(COMPMOD)\system\diagnostics\severityfilter.cs                             \
+                $(COMPMOD)\system\diagnostics\sourceelementscollection.cs                             \
+                $(COMPMOD)\system\diagnostics\sourcefilter.cs                             \
+                $(COMPMOD)\system\diagnostics\sourcelevels.cs                             \
+                $(COMPMOD)\system\diagnostics\sourceswitch.cs                             \
+                $(COMPMOD)\system\diagnostics\switch.cs                             \
+                $(COMPMOD)\system\diagnostics\switchattribute.cs                             \
+                $(COMPMOD)\system\diagnostics\switchelementscollection.cs                             \
+                $(COMPMOD)\system\diagnostics\switchlevelattribute.cs                             \
+                $(COMPMOD)\system\diagnostics\systemdiagnosticssection.cs                             \
+                $(COMPMOD)\system\diagnostics\textwritertracelistener.cs                             \
+                $(COMPMOD)\system\diagnostics\trace.cs                             \
+                $(COMPMOD)\system\diagnostics\traceeventcache.cs                             \
+                $(COMPMOD)\system\diagnostics\traceeventtype.cs                             \
+                $(COMPMOD)\system\diagnostics\tracefilter.cs                             \
+                $(COMPMOD)\system\diagnostics\traceinternal.cs                             \
+                $(COMPMOD)\system\diagnostics\tracelevel.cs                             \
+                $(COMPMOD)\system\diagnostics\tracelistener.cs                             \
+                $(COMPMOD)\system\diagnostics\tracelisteners.cs                             \
+                $(COMPMOD)\system\diagnostics\traceoptions.cs                             \
+                $(COMPMOD)\system\diagnostics\tracesection.cs                             \
+                $(COMPMOD)\system\diagnostics\tracesource.cs                             \
+                $(COMPMOD)\system\diagnostics\traceswitch.cs                             \
+                $(COMPMOD)\system\diagnostics\traceutils.cs                        \
+                $(COMPMOD)\system\diagnostics\typedelement.cs                             \
+                $(COMPMOD)\system\diagnostics\xmlwritertracelistener.cs                             \
+                $(COMPMOD)\system\codedom\compiler\codecompiler.cs                        \
+                $(COMPMOD)\system\codedom\compiler\codedomconfigurationHandler.cs                        \
+                $(COMPMOD)\system\codedom\compiler\codedomprovider.cs                        \
+                $(COMPMOD)\system\codedom\compiler\codegenerator.cs                        \
+                $(COMPMOD)\system\codedom\compiler\codegeneratoroptions.cs                        \
+                $(COMPMOD)\system\codedom\compiler\codeparser.cs                        \
+                $(COMPMOD)\system\codedom\compiler\codevalidator.cs                        \
+                $(COMPMOD)\system\codedom\compiler\compilererror.cs                        \
+                $(COMPMOD)\system\codedom\compiler\compilererrorcollection.cs                        \
+                $(COMPMOD)\system\codedom\compiler\compilerinfo.cs                        \
+                $(COMPMOD)\system\codedom\compiler\compilerparameters.cs                        \
+                $(COMPMOD)\system\codedom\compiler\compilerresults.cs                        \
+                $(COMPMOD)\system\codedom\compiler\executor.cs                        \
+                $(COMPMOD)\system\codedom\compiler\generatedcodeattribute.cs                        \
+                $(COMPMOD)\system\codedom\compiler\generatorsupport.cs                        \
+                $(COMPMOD)\system\codedom\compiler\icodecompiler.cs                        \
+                $(COMPMOD)\system\codedom\compiler\icodegenerator.cs                        \
+                $(COMPMOD)\system\codedom\compiler\icodeparser.cs                        \
+                $(COMPMOD)\system\codedom\compiler\indenttextwriter.cs                        \
+                $(COMPMOD)\system\codedom\compiler\languageoptions.cs                        \
+                $(COMPMOD)\system\codedom\compiler\tempfiles.cs                        \
+                $(SYSTEM)\misc\assemblyattributes.cs                                  \
+                $(SYSTEM)\system\io\compression\compressionmode.cs                           \
+                $(SYSTEM)\system\io\compression\decodehelper.cs                           \
+                $(SYSTEM)\system\io\compression\deflater.cs                           \
+                $(SYSTEM)\system\io\compression\deflatestream.cs                           \
+                $(SYSTEM)\system\io\compression\fastencoder.cs                           \
+                $(SYSTEM)\system\io\compression\fastencoderwindow.cs                           \
+                $(SYSTEM)\system\io\compression\gzipdecoder.cs                           \
+                $(SYSTEM)\system\io\compression\gzipstream.cs                           \
+                $(SYSTEM)\system\io\compression\huffmantree.cs                           \
+                $(SYSTEM)\system\io\compression\inflater.cs                           \
+                $(SYSTEM)\system\io\compression\inputbuffer.cs                           \
+                $(SYSTEM)\system\io\compression\invaliddataexception.cs                           \
+                $(SYSTEM)\system\io\compression\outputwindow.cs                           \
+                $(SYSTEM)\system\runtime\interopservices\handlecollector.cs        \
+                $(SYSTEM)\system\runtime\interopservices\DefaultParameterValueAttribute.cs        \
+                $(SYSTEM)\system\threading\semaphore.cs                            \
+                $(SYSTEM)\system\threading\semaphorefullexception.cs               \
+                $(COMPMOD)\system\collections\generic\debugview.cs                 \
+                $(COMPMOD)\system\collections\generic\linkedlist.cs                \
+                $(COMPMOD)\system\collections\generic\queue.cs     \
+                $(COMPMOD)\system\collections\generic\sortedlist.cs       \
+                $(COMPMOD)\system\collections\generic\stack.cs     \
+                $(COMPMOD)\system\collections\generic\throwhelper.cs                \
+                $(COMPMOD)\system\collections\generic\sorteddictionary.cs                \
+                $(COMPMOD)\system\collections\generic\treeset.cs                \
+                $(COMPMOD)\system\collections\specialized\bitvector32.cs           \
+                $(COMPMOD)\system\collections\specialized\casesensitivestringdictionary.cs \
+                $(COMPMOD)\system\collections\specialized\collectionsutil.cs       \
+                $(COMPMOD)\system\collections\specialized\fixedstringlookup.cs     \
+                $(COMPMOD)\system\collections\specialized\hybriddictionary.cs      \
+                $(COMPMOD)\system\collections\specialized\iordereddictionary.cs    \
+                $(COMPMOD)\system\collections\specialized\listdictionary.cs        \
+                $(COMPMOD)\system\collections\specialized\nameobjectcollectionbase.cs \
+                $(COMPMOD)\system\collections\specialized\namevaluecollection.cs   \
+                $(COMPMOD)\system\collections\specialized\ordereddictionary.cs     \
+                $(COMPMOD)\system\collections\specialized\stringcollection.cs      \
+                $(COMPMOD)\system\collections\specialized\stringdictionary.cs      \
+                $(WIN32_SOURCES)                                               \
+                $(COMPMOD)\microsoft\csharp\csharpcodeprovider.cs              \
+                $(SECURITY_SOURCES)                                            \
+                $(NET_SOURCES)                                                 \
+                $(CONFIGURATION_SOURCES)                                       \
+                $(PERMISSION_SOURCES)                                          \
+                $(DIAGNOSTICS_SOURCES)                                         \
+                $(COMPMOD)\system\configuration\appsettingsreader.cs           \
+                $(MISC)\externdll.cs                                           \
+		$(MISC)\SecurityUtils.cs                                       \
+                $(MISC)\hresults.cs                                            \
+                $(MISC)\invariantcomparer.cs                                   \
+                $(MISC)\CompatibleIComparer.cs                                 \
+                $(MISC)\PrivilegedConfigurationManager.cs                      \
+                $(MISC)\WeakHashtable.cs                      \
+                $(SYSTEM)\system\io\ports\internalresources.cs                 \
+                misc\AssemblyAttributes.cs                                     \
+
+
+
+!if "$(NCL_TRAVE)"!=""
+CSC_DEFINES=$(CSC_DEFINES) /D:TRAVE
+!endif

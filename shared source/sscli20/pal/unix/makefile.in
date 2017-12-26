@@ -1,0 +1,171 @@
+# /*++
+# 
+#  Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+# 
+#  The use and distribution terms for this software are contained in the file
+#  named license.txt, which can be found in the root of this distribution.
+#  By using this software in any fashion, you are agreeing to be bound by the
+#  terms of this license.
+# 
+#  You must not remove this notice, or any other, from this software.
+# 
+#
+# Module Name : makefile.in
+#
+# process this file with configure to create a makefile
+# --*/
+
+############################
+# constant parts of makefile
+
+SHELL = @SHELL@
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+top_srcdir = @top_srcdir@
+srcdir = @top_srcdir@
+
+TOOL_SUBDIR = $(srcdir)/build_tools/obj$(BUILD_ALT_DIR)/$(_BUILDARCH)
+INCLUDE_DIRs = -I$(srcdir)/../inc -I$(srcdir)/include -I$(srcdir)/obj$(BUILD_ALT_DIR)/$(_BUILDARCH)
+
+CC = @CC@
+CXX = @CXX@
+LDPARTIAL = @LDPARTIAL@
+PTHREAD_OPTIONS = @PTHREAD_OPTIONS@
+CC_SONAME = @CC_SONAME@
+C_RUNTIME = @C_RUNTIME@
+SHARED_LIB = @SHARED_LIB@
+SHARED_LIB_EXTENSION = @SHARED_LIB_EXTENSION@
+FRAMEWORKS = @FRAMEWORKS@
+EXTRA_LIBS = @EXTRA_LIBS@
+LDFLAGS = @LDFLAGS@
+
+.SUFFIXES:
+
+###########################
+# variable part of makefile
+
+TOP_BUILD_DIR = .
+
+MODULE_NAME = librotor_pal$(SHARED_LIB_EXTENSION)
+
+MODULE_PATH = $(_NTTREE)
+
+# object files that make up librotor_pal
+OBJS = cruntimeobjs.o \
+       debugobjs.o \
+       @DLCOMPAT_OBJ@ \
+       exceptionobjs.o \
+       fileobjs.o \
+       handlemgrobjs.o \
+       loaderobjs.o \
+       localeobjs.o \
+       mapobjs.o \
+       memoryobjs.o \
+       miscobjs.o \
+       initobjs.o \
+       @POLL_OBJ@ \
+       socketobjs.o \
+       syncobjs.o \
+       threadobjs.o \
+       archobjs.o \
+       shmemoryobjs.o
+
+# subdirectories containing makefile.in files
+OBJDIRS = cruntime \
+	debug \
+	@DLCOMPAT_DIR@ \
+	exception \
+	file \
+	handlemgr \
+	loader \
+	locale \
+	map \
+	memory \
+	misc \
+	init \
+	@POLL_DIR@ \
+	socket \
+	sync \
+	thread \
+	arch \
+	shmemory
+
+# subdirectories to recurse into
+SUBDIRS = build_tools $(OBJDIRS)
+ALLSUBDIRS = $(SUBDIRS) examples
+
+#################
+# targets
+
+all: check_env makefile librotor_pal pal_examples pal_header
+	@echo "PAL build complete."
+
+check_env:
+	@if test ! "$(BUILD_ALT_DIR)" ; then \
+	    echo "Environment not set. Run '. env.sh' before building the PAL"; \
+	    exit 1; \
+	 fi    
+
+pal_examples:
+	cd ../../examples/obj$(BUILD_ALT_DIR)/$(_BUILDARCH) && $(MAKE) && cd ../../../obj$(BUILD_ALT_DIR)/$(_BUILDARCH)
+
+pal_header:
+	mkdir -p "$(_NTTREE)/sdk/pal/inc"
+	cp -f "$(ROTOR_DIR)/pal/inc/rotor_pal.h" "$(_NTTREE)/sdk/pal/inc"
+    
+librotor_pal: makefile
+#run make in subdirs, link into library
+	@dir_list='$(SUBDIRS)'; for subdir in $$dir_list; do \
+	  cd ../../$$subdir/obj$(BUILD_ALT_DIR)/$(_BUILDARCH) && $(MAKE) && cd ../../../obj$(BUILD_ALT_DIR)/$(_BUILDARCH) || exit 1; \
+	done;
+#re-invoke make so librotor_pal only gets re-linked if objects have changed
+	$(MAKE) "$(MODULE_PATH)/$(MODULE_NAME)"
+
+#we don't provide rules to build the individual object files;
+#the recursive librotor_pal target does that
+$(MODULE_PATH)/$(MODULE_NAME): $(OBJS)
+	mkdir -p "$(MODULE_PATH)"
+	# -G flag for the Visual Age Compiler doesn't export symbols starting with a "."
+	# and all the symbols in arch/aixpcc/interlock.s end with a "."
+	# So, explicitly export the symbols.
+	if test X"$(USE_VAC_CC)" = "X1"; then \
+	    /usr/vac/bin/CreateExportList obj$(BUILD_ALT_DIR)/$(_BUILDARCH)/librotor_pal.exports -X 32  $(OBJS); \
+	    /usr/bin/echo "InterlockedIncrement \n InterlockedDecrement \n InterlockedExchange \n " \
+	        "InterlockedCompareExchange\nMemoryBarrier\nYieldProcessor">>obj$(BUILD_ALT_DIR)/$(_BUILDARCH)/librotor_pal.exports;\
+	    $(CXX) $(LDFLAGS) $(PTHREAD_OPTIONS) $(SHARED_LIB) $(CC_SONAME) $(FRAMEWORKS) \
+	        $(OBJS) -o "$(MODULE_PATH)/$(MODULE_NAME)" -l$(C_RUNTIME) \
+	        -lm $(EXTRA_LIBS) -bE:obj$(BUILD_ALT_DIR)/$(_BUILDARCH)/librotor_pal.exports ;\
+	else \
+	    $(CXX) $(LDFLAGS) $(PTHREAD_OPTIONS) $(SHARED_LIB) $(CC_SONAME) $(FRAMEWORKS) \
+	        $(OBJS) -o "$(MODULE_PATH)/$(MODULE_NAME)" -l$(C_RUNTIME) -lm $(EXTRA_LIBS);\
+	fi
+	# remove permissions for others to avoid AIX shared library cache getting confused
+	if test X"${PLATFORM_OS}" = X"aix" ; then chmod 0750 "$(MODULE_PATH)/$(MODULE_NAME)"; fi
+
+makefile : ../../makefile.in
+	@echo $? is newer than $@, please rerun $(srcdir)/obj$(BUILD_ALT_DIR)/$(_BUILDARCH)/configure.
+	@exit 1
+
+depend: check_env $(TOOL_SUBDIR)/mdtool
+#run make depend in subdirs
+	@dir_list='$(ALLSUBDIRS)'; for subdir in $$dir_list; do \
+	  cd ../../$$subdir/obj$(BUILD_ALT_DIR)/$(_BUILDARCH) && $(MAKE) depend && cd ../../../obj$(BUILD_ALT_DIR)/$(_BUILDARCH) || exit 1; \
+	done;
+
+$(TOOL_SUBDIR)/mdtool:
+	cd $(TOOL_SUBDIR) && $(MAKE) mdtool
+
+clean:  check_env
+#run make clean in subdirs, remove output files (makefile, etc)
+	@dir_list='$(ALLSUBDIRS)'; for subdir in $$dir_list; do \
+	  cd ../../$$subdir/obj$(BUILD_ALT_DIR)/$(_BUILDARCH) && $(MAKE) clean && cd ../../../obj$(BUILD_ALT_DIR)/$(_BUILDARCH) || exit 1; \
+	done;
+	rm -f "$(MODULE_PATH)/$(MODULE_NAME)"
+
+
+check:
+	echo "The tests to run are in xport/tests/*"
+
+.PHONY: check clean
+

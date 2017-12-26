@@ -1,0 +1,26 @@
+#
+# Copyright (c) Microsoft Corporation. All rights reserved.
+#
+
+!include $(DEVDIV_TOOLS)\sources.inc
+
+TARGETNAME                          = rotor_debug
+
+USE_NOLIBS                          = 1
+ROTOR_USE_NOLIBS                    = 1
+
+TARGETPATH                          = $(_OBJ_DIR)
+TARGETPATHLIB                       = $(PAL_LIB_DEST)
+TARGETTYPE                          = DYNLINK
+UMTYPE                              = windows
+
+DLLDEF                              = rotor_debug.def
+
+!ifndef PLATFORM_UNIX
+LINKLIBS=$(LINKLIBS)                   \
+        $(PAL_LIB_PATH)\rotor_pal.lib   
+!endif
+# mingw build needs -lrotor_pal:
+UNIX_DLL_LIBS=-lrotor_pal
+
+SOURCES                             = method.c

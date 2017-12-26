@@ -1,0 +1,310 @@
+# ==++==
+#
+#   
+#    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+#   
+#    The use and distribution terms for this software are contained in the file
+#    named license.txt, which can be found in the root of this distribution.
+#    By using this software in any fashion, you are agreeing to be bound by the
+#    terms of this license.
+#   
+#    You must not remove this notice, or any other, from this software.
+#   
+#
+# ==--==
+
+!include $(DEVDIV_TOOLS)\sources.inc
+!include ..\jscript.inc
+
+# Required definitions for empty no classical targets.
+TARGETNAME=Microsoft.JScript
+TARGETPATH=$(_NTTREE)\bin\$(TARGET_DIRECTORY)
+TARGETTYPE=NOTARGET
+CLR_TARGETTYPE=DLL
+CLR_ENABLE_ASMMETA=1
+
+SOURCES=
+
+# Other projects require the output of this project. For multiproc builds, we 
+# force build to wait for this project to finish building before continuing.
+SYNCHRONIZE_DRAIN=1
+SYNCHRONIZE_BLOCK=1
+
+# for the csharp build
+USE_VSVERSION=1
+CSC_OUTPUTDIR    = $(TARGET_DIR)
+CSC_MAKE_DLL=Microsoft.JScript.dll
+CSC_DLLBASE=Microsoft.JScript
+CSC_RES=Microsoft.JScript.res
+GEN_PUB_POL=1
+
+
+# This assembly is not CLS-compliant.
+CLS_COMPLIANT=0
+
+!if !$(FREEBUILD)
+CSC_FLAGS=$(CSC_FLAGS) /D:ASSERTION /D:LOGGING /NOWARN:0618
+!endif
+
+RESGEN_SOURCE=microsoft.jscript.txt
+
+CLR_REFERENCES = \
+  $(SDK_REF_PATH)\Microsoft.Vsa.dll \
+  $(SDK_REF_PATH)\System.dll \
+  $(SDK_REF_PATH)\System.Xml.dll \
+
+# Our build uses these to generate the AssemblyAttributes file.
+CSC_ASSEMBLY_TITLE="Microsoft.JScript"
+CSC_ASSEMBLY_DESCRIPTION="Engine that compiles and runs JScript source."
+
+# Force build to run PASS0. Generate the tlb needed by the main library
+NTTARGETFILE0=\
+$(O)\BuildVersionInfo.cs\
+
+CSHARP_SOURCES = \
+$(O)\BuildVersionInfo.cs            \
+activationobject.cs                 \
+activexobjectconstructor.cs         \
+addressof.cs                        \
+argumentsobject.cs                  \
+arrayconstructor.cs                 \
+arrayenumerator.cs                  \
+arrayliteral.cs                     \
+arrayobject.cs                      \
+arrayprototype.cs                   \
+arraywrapper.cs                     \
+assemblyattributes.cs               \
+assemblycustomattributelist.cs      \
+assign.cs                           \
+ast.cs                              \
+astlist.cs                          \
+basevsa.cs                          \
+binaryop.cs                         \
+binding.cs                          \
+bitwisebinary.cs                    \
+bitwisebinaryassign.cs              \
+block.cs                            \
+blockscope.cs                       \
+booleanconstructor.cs               \
+booleanobject.cs                    \
+booleanprototype.cs                 \
+break.cs                            \
+breakoutoffinally.cs                \
+builtinfunction.cs                  \
+call.cs                             \
+callableexpression.cs               \
+callcontext.cs                      \
+class.cs                            \
+classscope.cs                       \
+closure.cs                          \
+clscompliancespec.cs                \
+cmdlineerror.cs                     \
+cmdlineexception.cs                 \
+cmdlineoptionparser.cs              \
+comma.cs                            \
+compilerglobals.cs                  \
+completion.cs                       \
+concatstring.cs                     \
+conditional.cs                      \
+constant.cs                         \
+constantlistitem.cs                 \
+constantwrapper.cs                  \
+constructorcall.cs                  \
+context.cs                          \
+continue.cs                         \
+continueoutoffinally.cs             \
+convert.cs                          \
+customattribute.cs                  \
+customattributelist.cs              \
+dateconstructor.cs                  \
+dateobject.cs                       \
+dateprototype.cs                    \
+debug.cs                            \
+debugbreak.cs                       \
+delete.cs                           \
+documentcontext.cs                  \
+dowhile.cs                          \
+empty.cs                            \
+emptyliteral.cs                     \
+enumdeclaration.cs                  \
+enumeratorconstructor.cs            \
+enumeratorobject.cs                 \
+enumeratorprototype.cs              \
+enumwrapper.cs                      \
+equality.cs                         \
+errorconstructor.cs                 \
+errorobject.cs                      \
+errorprototype.cs                   \
+eval.cs                             \
+evalerrorobject.cs                  \
+expando.cs                          \
+expression.cs                       \
+fieldaccessor.cs                    \
+for.cs                              \
+forin.cs                            \
+functionconstructor.cs              \
+functiondeclaration.cs              \
+functionexpression.cs               \
+functionobject.cs                   \
+functionprototype.cs                \
+functionscope.cs                    \
+functionwrapper.cs                  \
+globalobject.cs                     \
+globals.cs                          \
+globalscope.cs                      \
+iactivationobject.cs                \
+identifierliteral.cs                \
+if.cs                               \
+import.cs                           \
+in.cs                               \
+ineedengine.cs                      \
+instanceof.cs                       \
+iwrappedmember.cs                   \
+jsbinder.cs                         \
+jsclosurefield.cs                   \
+jsclosuremethod.cs                  \
+jsclosureproperty.cs                \
+jscodegenerator.cs                  \
+jsconstructor.cs                    \
+jscriptexception.cs                 \
+jserror.cs                          \
+jsexpandofield.cs                   \
+jsexpandoindexermethod.cs           \
+jsfield.cs                          \
+jsfieldinfo.cs                      \
+jsfieldmethod.cs                    \
+jsfunctionattribute.cs              \
+jsglobalfield.cs                    \
+jsinproccompiler.cs                 \
+jskeyword.cs                        \
+jslocalfield.cs                     \
+jsmemberfield.cs                    \
+jsmethod.cs                         \
+jsmethodinfo.cs                     \
+jsnativemethod.cs                   \
+jsobject.cs                         \
+jsparameterinfo.cs                  \
+jsparser.cs                         \
+jsproperty.cs                       \
+jspropertyfield.cs                  \
+jspropertyinfo.cs                   \
+jsprototypefield.cs                 \
+jsprototypeobject.cs                \
+jsscanner.cs                        \
+jstoken.cs                          \
+jsvariablefield.cs                  \
+jswrappedfield.cs                   \
+jswrappedmethod.cs                  \
+jswrappedproperty.cs                \
+jswrappedpropertyandmethod.cs       \
+latebinding.cs                      \
+lenientarrayprototype.cs            \
+lenientbooleanprototype.cs          \
+lenientdateconstructor.cs           \
+lenientdateprototype.cs             \
+lenientenumeratorprototype.cs       \
+lenienterrorprototype.cs            \
+lenientfunctionprototype.cs         \
+lenientglobalobject.cs              \
+lenientmathobject.cs                \
+lenientnumberprototype.cs           \
+lenientobjectprototype.cs           \
+lenientregexpprototype.cs           \
+lenientstringconstructor.cs         \
+lenientstringprototype.cs           \
+lenientvbarrayprototype.cs          \
+listenumerator.cs                   \
+logical_and.cs                      \
+logical_or.cs                       \
+lookup.cs                           \
+mathobject.cs                       \
+member.cs                           \
+memberinfolist.cs                   \
+methodinvoker.cs                    \
+missing.cs                          \
+namespace.cs                        \
+notrecommended.cs                   \
+nullliteral.cs                      \
+numberconstructor.cs                \
+numberobject.cs                     \
+numberprototype.cs                  \
+numericbinary.cs                    \
+numericbinaryassign.cs              \
+numericunary.cs                     \
+objectconstructor.cs                \
+objectliteral.cs                    \
+objectprototype.cs                  \
+obsolete.cs                         \
+opprec.cs                           \
+package.cs                          \
+packagescope.cs                     \
+parameterdeclaration.cs             \
+plus.cs                             \
+plusassign.cs                       \
+postorprefixoperator.cs             \
+print.cs                            \
+rangeenumerator.cs                  \
+rangeerrorobject.cs                 \
+redirectoutput.cs                   \
+referenceerrorobject.cs             \
+referenceattribute.cs               \
+regexpconstructor.cs                \
+regexpliteral.cs                    \
+regexpmatch.cs                      \
+regexpobject.cs                     \
+regexpprototype.cs                  \
+regexpreplace.cs                    \
+relational.cs                       \
+resinfo.cs                          \
+return.cs                           \
+returnoutoffinally.cs               \
+runtime.cs                          \
+scannerexception.cs                 \
+scriptblock.cs                      \
+scriptfunction.cs                   \
+scriptobject.cs                     \
+scriptobjectpropertyenumerator.cs   \
+scriptstream.cs                     \
+simplehashtable.cs                  \
+stack.cs                            \
+stackframe.cs                       \
+staticinitializer.cs                \
+strictequality.cs                   \
+stringconstructor.cs                \
+stringobject.cs                     \
+stringprototype.cs                  \
+supertypememberssorter.cs           \
+switch.cs                           \
+switchcase.cs                       \
+syntaxerrorobject.cs                \
+thisliteral.cs                      \
+throw.cs                            \
+try.cs                              \
+typedarray.cs                       \
+typeerrorobject.cs                  \
+typeexpression.cs                   \
+typeob.cs                           \
+typeof.cs                           \
+typereflector.cs                    \
+typereferences.cs                   \
+unaryop.cs                          \
+urierrorobject.cs                   \
+variabledeclaration.cs              \
+vbarrayconstructor.cs               \
+vbarrayobject.cs                    \
+vbarrayprototype.cs                 \
+versionableattribute.cs             \
+voidop.cs                           \
+vsa2.cs                             \
+vsaengine.cs                        \
+vsahostobject.cs                    \
+vsaitem.cs                          \
+vsaitems.cs                         \
+vsanameditemscope.cs                \
+vsareference.cs                     \
+vsascriptscope.cs                   \
+vsastaticcode.cs                    \
+while.cs                            \
+with.cs                             \
+withobject.cs                       \
+wrappednamespace.cs

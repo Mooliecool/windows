@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> 
+<head>
+<title>Build Output Manager</title>
+<link rel="stylesheet" type="text/css" href="../rotor.css">
+</head>
+
+<body>		
+
+
+<h1>Build Output Manager (binplace.exe)</h1>
+
+
+<p>
+The Build Output Manager is a tool used during the Shared Source CLI 2.0 (SSCLI) build process in conjunction with build.exe and nmake.exe 
+to manage the temporary locations of built 
+output files within the source tree and the final location of the build output.&nbsp; 
+Each file produced by the build is stored in a directory (there is a global 
+default and any <code>sources </code>file can override it), and then each file is &quot;binplaced&quot;&nbsp;(copied) to the final build output directory.&nbsp; For the SSCLI, the root of this 
+directory is specified by the %_NTTREE%
+    environment variable.&nbsp; 
+</p>
+    <p>
+The location that Build Output Manager copies the file in the final build output tree is 
+determined from a dictionary keyed on the base name of the file being binplaced.&nbsp; 
+The location of the dictionary file is specified using the %BINPLACE_PLACEFILE% 
+environment variable.</p>
+
+
+<p>
+On  Windows, BINPLACE_PLACEFILE is set to sscli20\env\bin\placefil.txt.</p>
+    <p>
+In placefil.txt the target location &quot;retail&quot; indicates that the tool will 
+copy the file in the root of 
+the %_NTTREE% directory.&nbsp; Other 
+destinations are specified as paths relative to the root of the %_NTTREE% directory.
+    </p>
+
+
+<h4>Usage</h4>
+
+
+<blockquote>
+
+
+<PRE class="syntax"><b>binplace</b> <i>[options] filename</i></PRE>
+
+ 
+</blockquote>
+
+ 
+<table border=1 width=100%>
+
+<TR VALIGN="top" width="100%">
+<TH width=33%>Argument</TH>
+<TH width=67%>Description</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><i>filename</i></TD>
+<TD width=67%>The name of a file or files to be copied.</TD>
+</TR>
+</table>
+
+
+<h4>Options</h4>
+
+ 
+<p>Options must be specified with a dash (-).</p>
+
+ 
+<table border=1 width=100%>
+
+<TR VALIGN="top" width=100%>
+<TH width=33%>Option</TH>
+<TH width=67%>Description</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><b>-?</b></TD>
+<TD width=67%>Displays usage message.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><b>-b</b> <i>subdir</i></TD>
+<TD width=67%>Puts file in subdirectory of default location.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><b>-d</b></TD>
+<TD width=67%>Overrides dump location.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><b>-e</b></TD>
+<TD width=67%>Disregards item if a file in list could not be binplaced.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><b>-k</b></TD>
+<TD width=67%>Keeps attributes (don't turn off archive file attribute).</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><b>-o</b> <i>place-root-subdir</i></TD>
+<TD width=67%>Specifies alternate project subdirectory in <i>place-root-subdir.</i></TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><b>-p</b> <i>place-file</i></TD>
+<TD width=67%>Specifies location of the placefil.txt dictionary file.&nbsp;This overrides 
+the value set in the BINPLACE_PLACEFILE environment variable.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><b>-q</b></TD>
+<TD width=67%>Suppresses writing to log file %BINPLACE_LOG%.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><b>-r</b> <i>place-root</i></TD>
+<TD width=67%>Specifies the root of the target directory where the tool will copy files.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><b>-t</b></TD>
+<TD width=67%>Specifies test mode.</TD>
+</TR>
+    <tr valign="top">
+        <td width="33%">
+            <strong>-s</strong></td>
+        <td width="67%">
+            Split symbols from image files.</td>
+    </tr>
+
+<TR VALIGN="top">
+<TD width=33%><b>-v</b></TD>
+<TD width=67%>Specifies verbose output</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><b>-y</b></TD>
+<TD width=67%>Prevents creation of class subdirectories in the symbols tree. 
+Used with -s. </TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><b>-ci</b>&nbsp; <i>| rc | app | arg0 |-argv1..-argn</i></TD>
+<TD width=67%>Specifies additional options:<ul>
+  <li><i>rc = </i>Application error return code.</li>
+  <li>
+<i>app </i>= Application used to check images.</li>
+  <li>
+<i>-arg0..-argn </i>= Arguments to pass to application. </li>
+  </ul>
+  </TD>
+</TR>
+
+</table>
+
+ 
+<p><br>
+The Build Output Manager tool uses the following environment variables.</p>
+
+ 
+<table border=1 width=100%>
+
+<tr>
+<TH width=33%>Environment variable</TH>
+<TH width=67%>Description</TH>
+</tr>
+
+<TR VALIGN="top">
+<TD width=33%>BINPLACE_OVERRIDE_FLAGS</TD>
+<TD width=67%>Might contain additional switches.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%>BINPLACE_PLACEFILE</TD>
+<TD width=67%>Default value for -p flag.</TD>
+</TR>
+
+</table>
+
+ 
+<p>&nbsp;</p>
+<hr>
+
+ 
+<p><i>Copyright (c) 2006 Microsoft Corporation. All rights reserved.</i></p>
+</body> 
+</html>

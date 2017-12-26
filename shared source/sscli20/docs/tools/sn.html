@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> 
+<head>
+<TITLE>Strong Name Tool</TITLE>
+<link rel="stylesheet" type="text/css" href="../rotor.css">
+</head>
+<body>
+
+<H1>Strong Name Tool (sn.exe)</H1>
+
+<P>The Strong Name tool  helps sign assemblies with strong names. The Strong Name 
+tool provides options for key management, signature generation, and signature verification.</P>
+
+<P>The application file for the strong name tool is named sn.exe 
+in the Shared Source CLI (SSCLI)  on Microsoft&reg; Windows&reg;.</P>
+
+<h4>Usage</h4>
+
+<blockquote>
+
+<PRE>sn [<B>-quiet</B>][<I>option</I> [<I>parameter(s)</I>]]</PRE>
+
+</blockquote>
+
+<P>The SSCLI implementation of the Strong Name tool does not not support key container 
+functionality.&nbsp; Only reading and writing keys to files is supported.&nbsp; 
+Consequently, the following options in the .NET Framework implementation of the 
+tool are not supported on the SSCLI:</P>
+
+<ul>
+  <li><b>-c</b> [&lt;csp&gt;]<ul>
+  <li>Set/reset the name of the CSP to use for strong name operations.</li>
+</ul>
+
+  </li>
+  <li><b>-d </b>&lt;container&gt;<ul>
+  <li>Delete key container named &lt;container&gt;.</li>
+</ul>
+
+  </li>
+  <li>&nbsp;<b>-i </b>&lt;infile&gt; &lt;container&gt;<ul>
+  <li>Install key pair from &lt;infile&gt; into a key container named &lt;container&gt;.</li>
+</ul>
+
+  </li>
+  <li>&nbsp;<b>-m</b> [y|n]<ul>
+  <li>Enable (y), disable (n) or check (no parameter) whether key containers are 
+  machine specific (rather than user specific).</li>
+</ul>
+
+  </li>
+  <li>&nbsp;<b>-pc</b> &lt;container&gt; &lt;outfile&gt;<ul>
+  <li>Extract public key from key pair in &lt;container&gt; and export to &lt;outfile&gt;.</li>
+</ul>
+
+  </li>
+  <li>&nbsp;<b>-Rc</b> &lt;assembly&gt; &lt;container&gt;<ul>
+  <li>Re-sign signed or partially signed assembly with the key pair in the key 
+  container named &lt;container&gt;.</li>
+</ul>
+
+  </li>
+</ul>
+
+<p>Options can be specified using either a dash (-) or a slash (/). </p>
+
+<p>Note: All Strong Name tool options are case-sensitive and must be typed exactly as shown to be recognized by the tool.</p>
+
+<h4>Strong Name Tool Options</h4>
+
+<table border=1 width="90%">
+
+<TR VALIGN="top" width=100%>
+<TH width=30%>Option</TH>
+<TH width=70%>Description</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%><B>-D </B><I>assembly1 assembly2</I></TD>
+<TD width=70%>Verifies that two assemblies differ only by signature. This is often used as a check after an assembly has been re-signed with a different key pair.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%><B>-e </B><I>assembly outfile</I></TD>
+<TD width=70%>Extracts the public key from <I>assembly</I> and stores it in <I>outfile.</I></TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%><B>-h</B></TD>
+<TD width=70%>Displays command syntax and options for the tool.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%><B>-k</B> <I>outfile</I></TD>
+<TD width=70%>Generates a new key pair and writes it to the specified file.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%><B>-o </B><I>infile</I> [<I>outfile</I>]</TD>
+<TD width=70%>Extracts the public key from the <I>infile</I> and stores it in a .csv file. A comma separates each byte of the public key.  This format is useful for hard-coding references to keys as initialized arrays in source code. If you do not specify an <I>outfile</I>, this option places the output on the Clipboard.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%><B>-p</B> <I>infile outfile</I></TD>
+<TD width=70%>Extracts the public key from the key pair in <I>infile</I> and stores it in <I>outfile</I>. This public key can be used to delay sign an assembly using the <B>/delaysign+ </B>and<B> /keyfile</B> options of the
+<a href="al.html">Assembly Linker (Al.exe)</a>. When an assembly is delay-signed, only the public key is set at compile time and space is reserved in the file for the signature to be added later when the private key is known. </TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%><B>-q</B>[<B>uiet</B>]</TD>
+<TD width=70%>Specifies quiet mode; suppresses the display of success messages.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%><B>-R</B> <I>assembly</I> <I>infile</I></TD>
+<TD width=70%>Re-signs a previously signed or delay signed assembly with the key pair in <I>infile.</I></TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%><B>-t</B>[<B>p</B>] <I>infile</I></TD>
+<TD width=70%>Displays the token for the public key stored in <I>infile</I>. The contents of <I>infile</I> must be previously generated using <B>-p</B>.
+<P>The Strong Name Tool computes the token using a hash function from the public key. To save space, the common language runtime stores public key tokens in the manifest as part of a reference to another assembly when it records a dependency to an assembly that has a strong name. The <B>-tp</B> option displays the public key in addition to the token.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%><B>-T</B>[<B>p</B>] <I>assembly</I></TD>
+<TD width=70%>Displays the public key token for <I>assembly.  </I>The <I>assembly </I>must be the name of a file that contains an assembly manifest.
+<P>The Strong Name Tool computes the token using a hash function from the public key. To save space, the runtime stores public key tokens in the manifest as part of a reference to another assembly when it records a dependency to an assembly that has a strong name. The <B>-Tp</B> option displays the public key in addition to the token.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%><B>-v</B> <I>assembly</I></TD>
+<TD width=70%>Verifies the strong name in <I>assembly</I>, where <I>assembly</I> is the name of a file that contains an assembly manifest.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%><B>-vf </B><I>assembly</I></TD>
+<TD width=70%>Verifies the strong name in <I>assembly. </I>Unlike the <B>-v</B> option, <B>-vf</B> forces verification even if it is disabled using the <B>-Vr</B> option.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%><B>-Vl</B></TD>
+<TD width=70%>Lists current settings for strong name verification on this computer.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%><B>-Vr </B><I>assembly </I>[<I>userlist</I>]</TD>
+<TD width=70%>Registers <I>assembly</I> for skipping verification. Optionally, 
+you can specify a comma-separated list of user names. <I>Assembly</I> can be specified in the form <I>*, strongname </I>to register all assemblies with the specified strong name. <I>Strongname</I> should be specified as the string of hexadecimal digits representing the tokenized form of the public key. See the <B>-t</B> and <B>-T</B> options to display the public key token.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%><B>-Vu </B><I>assembly</I></TD>
+<TD width=70%>Unregisters <I>assembly</I> for verification skipping. The same rules for assembly naming that apply to <B>-Vr</B> apply to <B>-Vu</B>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%><B>-Vx</B></TD>
+<TD width=70%>Removes all verification-skipping entries.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=30%><B>-?</B></TD>
+<TD width=70%>Displays command syntax and options for the tool.</TD>
+</TR>
+</table>
+
+<H4>Remarks</H4>
+
+<P>The  <B>-R</B> option is useful with assemblies that have been delay-signed. In this scenario, only the public key has been set at compile time and signing is performed later when the private key is known.  </P>
+
+<H4>Examples</H4>
+
+<P>The following command creates a new, random key pair and stores it in <CODE>keyPair.snk</CODE>.</P>
+
+<PRE>sn -k keyPair.snk</PRE>
+
+<P>The following command extracts the public key from <CODE>keyPair.snk</CODE> and stores it in <CODE>publicKey.snk</CODE>.</P>
+
+<PRE>sn -p keyPair.snk publicKey.snk</PRE>
+
+<P>The following command verifies the assembly <CODE>MyAsm.dll</CODE>.</P>
+
+<PRE>sn -v MyAsm.dll</PRE>
+
+<h5>See Also</h5>
+
+<P><a href="tools_index.html">Tools Index</a></P>
+<hr>
+<p><i>Copyright (c) 2006 Microsoft Corporation. All rights reserved.</i></p>
+</BODY>
+</HTML>

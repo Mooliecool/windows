@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html> 
+<head>
+<title>The Shared Source CLI Testing Environment</title>
+<link rel="stylesheet" type="text/css" href="rotor.css" />
+</head>
+
+<body>
+
+<h1>The Shared Source CLI 2.0 Testing Environment</h1>
+<h3>Contents</h3>
+<ul>
+  <li><a href="#Changed">What's changed</a></li>
+    <li><a href="#Overview">Overview</a> </li>
+  <li><a href="#PALTestSuite">PAL Test Suite</a></li>
+  <li><a href="#SSCLIQualitySuites">SSCLI Quality Suites</a><ul>
+    <li><a href="#QualitySuitesTestDriver">Quality Suites Test Driver</a></li>
+    <li><a href="#QualitySuitesandBVTs">Quality Suites and BVTs</a></li>
+  </ul>
+  </li>
+  <li><a href="#BuildandLogging">Build and Logging</a></li>
+  <li><a href="#TestStrategy">Test Strategy</a></li>
+</ul>
+<h2>
+    <a href="#Changed"></a>What's changed</h2>
+    <p>
+        The Shared Source CLI 2.0 release adds very few new tests to the existing SSCLI
+        release codebase. Some tests have been removed as they are no longer required (usually
+        due to codebase changes).</p>
+    <h2>
+        <a href="#Overview"></a>Overview</h2>
+<p>
+The tests in the Shared Source CLI (SSCLI) are broken into two large sections, with each 
+section
+broken into several smaller subsections.  The large sections are:
+</p>
+<ul>
+  <li><a href="#PALTestSuite">PAL Test Suite</a> - This test suite and test driver 
+      were developed to act as a quality suite for the 
+      Platform Adaptation Layer (PAL) which is used to implement the SSCLI on 
+  multiple platforms.</li> 
+  <li><a href="#SSCLIQualitySuites">SSCLI Quality Suites</a> - These suites and 
+  the associated driver  test everything else in the system. </li>
+</ul>
+
+<h2><a name="PALTestSuite"></a>PAL Test Suite</h2>
+<p>The Platform Adaptation Layer (PAL) Test Suite is designed to validate the
+quality of the PAL.  You can run this suites of tests before anything else in the SSCLI is running; therefore, it has no
+dependencies on anything running other than the PAL itself.</p>
+
+<p>The driver script for the PAL Test Suite is called <a
+href="../tests/pvtrun.pl">pvtrun.pl</a>. After you build the PAL,
+you can execute the tests by running this script; it will execute around 1200 
+tests from the <a
+href="../tests/palsuite">palsuite</a> directory.
+</p>
+
+<p>The PAL test harness is located in the <a href="../tests/harness">test_harness directory</a>.  The
+test harness uses several environment variables that
+indicate where to find its test list, where to store results
+and where to find its helper driver <a
+href="../tests/harness/xrun">xrun</a>. These environment variables are 
+usually set in
+a wrapper script, such as <a href="../tests/pvtrun.pl">pvtrun.pl</a>,
+but they can also be set individually in the environment for manual execution.</p>
+
+<p>Additional tests  are not run by default from the driver 
+script. See the PAL test <a
+href="../tests/palsuite/readme.txt">readme.txt</a> for more details on running the remaining 
+suites.</p>
+
+<h2><a name="SSCLIQualitySuites"></a>SSCLI Quality Suites</h2>
+
+<p> The SSCLI Quality Suites  are the tests for everything other
+than the PAL.  The test inventory is not a complete breadth test bed but is 
+focused on  key areas of functionality. </p>
+
+<h3><a name="QualitySuitesTestDriver"></a>Quality Suites Test Driver</h3>
+
+<p>The main test driver is implemented in <code><a href="../tests/rrun.pl">
+rrun.pl</a></code>. The rrun driver assumes that tests are distributed in a directory tree,
+with their configuration information located in the directory with the
+tests.  Tests are required to be self-verifying (no baselines are
+used).&nbsp; The rrun driver traverses the directory tree starting with the working
+directory of the process that invoked the driver and working down the 
+directory structure collecting
+the test information.  All tests that match a simple set of
+criteria are executed and the results reported.</p>
+
+<p>The source comments at the top of the <code><a href="../tests/rrun.pl">
+rrun.pl</a> </code>file should be consulted for more
+complete details of driver operation.</p>
+
+<p>Running the rrun driver from the <a href="../tests">tests</a> directory  causes the entire test
+inventory to be run using the default criteria.  To run a subset
+of tests simply change the working directory to
+the one listed, and then run the rrun driver.</p>
+
+<h3><a name="QualitySuitesandBVTs"></a>Quality Suite Tests</h3>
+
+<h4>Base Verification Tests</h4>
+
+<p>The Base Verification Tests (BVTs) are a set of quick tests that can be run after 
+a source modification is made to ensure that basic functionality continues to work 
+correctly.&nbsp; These are 
+sometimes called &quot;smoke tests.&quot; These tests are
+located in <a href="../tests/bvt">tests/bvt</a>.</p>
+
+<h4>CIL Tests</h4>
+
+<p>The base common intermediate language (CIL) tests are located in <a
+href="../tests/il_bvt">tests/il_bvt</a>. These tests provide core
+coverage of the CIL instructions in the system.</p>
+
+<h4>Verifier Tests</h4>
+
+<p>Verifier tests  check the verifier in the JIT-compiler.
+These tests are located in <a
+href="../tests/security/verifier">tests/security/verifier</a>.  In
+addition to these tests,  many tests throughout the tree require verification to 
+be either off or on;&nbsp; these are marked with the attributes <code>&lt;VERIFIERMUSTBEOFF&gt;</code> and
+<code>&lt;VERIFIERMUSTBEOON&gt;</code> in the appropriate
+<code>rsources</code> file.</p>
+
+<h4>Base Class Library Tests</h4>
+
+<p>You can find tests for the base class libraries  in <a
+href="../tests/bcl">tests/bcl</a>.</p>
+
+<h4>Miscellaneous Tests and Support Infrastructure</h4>
+
+<p>The <a href="../tests/utilities">tests/utilities</a> directory
+contains support functions for other tests.    </p>
+
+<p>The <a
+href="../tests/dev">tests/dev</a> directory contains test that cover specific 
+cases not covered by other tests but discovered during the development process.</p>
+
+<h3><a name="BuildandLogging"></a>Build and Logging</h3>
+
+<p>The test driver rrun respects build type.&nbsp; 
+  Executables are built into the obj, objd, objdf subdirectory depending on 
+build type (see <a href="buildtools/building_sscli.html">
+buildtools\building_sscli.html</a>).</p>
+
+<p>Build log files are named rrun.log and rrun.err on the free build, rrundf.log and 
+rrundf.err on the fastchecked build, and rrund.log and rrund.err on the checked 
+build.</p>
+
+<h3><a name="TestStrategy"></a>Test Strategy</h3>
+
+<p>The following are some quick guidelines to help you plan your test usage:</p>
+
+<ul>
+  <li>To quickly verify that a build or change is working and didn't
+      break anything obvious, run the tests in the <a
+      href="../tests/bvt">tests/bvt</a> directory.  </li>
+  <li>To check extensive changes or to verify that you have built without 
+  problems, use full test run from the <a
+      href="../tests">tests</a> directory.</li>
+  <li>To run all the tests in the inventory, use the -l option when 
+  running the rrun driver. Note that this can
+      take a long time to complete.</li>
+</ul>
+
+
+<hr>
+
+<p><i>Copyright (c) 2006 Microsoft Corporation. All rights reserved.</i></p>
+</body> 
+</html>

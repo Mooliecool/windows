@@ -1,0 +1,847 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> 
+<head>
+<title>Assembly Linker (Al.exe)</title>
+<link rel="stylesheet" type="text/css" href="../rotor.css">
+</head>
+<BODY>
+<H1>Assembly Linker (al.exe)</H1>
+
+<P>The Assembly Linker generates a file with an assembly manifest from one or more files that are either modules or resource files. A module is a 
+common intermediate language (CIL) file that does not have an assembly manifest.</P>
+
+<P>The application file for the Assembly Linker is named al.exe in Shared Source 
+CLI (SSCLI) builds on 
+Microsoft Windows&reg;.</P>
+    <p>
+        Note: The SSCLI implementation does not support Microsoft Win32&reg; resources 
+or cryptographic key containers.&nbsp; The following options in the Microsoft .NET 
+Framework implementation of the Assembly Linker  are not supported by the 
+SSCLI implementation of the Assembly Linker.</p>
+
+<ul>
+  <li><B>/bugreport:</B><I>filename</I></li>
+  <li><B>/fileversion:</B><I>version</I></li>
+  <li><B>/keyn</B>[<B>ame</B>]<B>:</B><I>text</I></li>
+  <li><B>/win32icon:</B><I>filename</I></li>
+  <li><B>/win32res:</B><I>filename</I></li>
+</ul>
+
+<P>The following options are supported by the SSCLI implementation of the 
+Assembly Linker.</P>
+
+<h4>Usage</h4>
+
+<blockquote>
+
+<PRE class="syntax"><B>al</B> <I>sources</I> <I>options</I></PRE>
+
+</blockquote>
+
+<P>You can specify one or more of the following sources.</P>
+<table border=1>
+
+<TR VALIGN="top">
+<TH width=33%>Source</TH>
+<TH width=67%>Description</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><I>file</I>[,<I>target</I>]</TD>
+<TD width=67%>Copies the contents of <I>file</I> to the file name specified by <I>target</I>. After copying, 
+al.exe compiles <I>target</I> into an assembly.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>/embed</B>[<B>resource</B>]<B>:</B><I>file</I>[,<I>name</I>[,<B> private</B>]]</TD>
+<TD width=67%>Embeds the resource specified by <I>file</I> in the image that contains the assembly manifest; 
+al.exe copies the contents of <I>file</I> into the portable executable (PE) image.
+<P>The <I>name</I> parameter is an internal identifier for the resource. By default, resources are public in the assembly (visible to other assemblies). Specifying <B>private </B>makes the resource 
+invisible to other assemblies.</P>
+
+<P>If <I>file</I> is a .NET Framework resource file created, for example, by the <A HREF="resgen.html">Resource File Generator (Resgen.exe)</A> or in the development environment, it can be accessed with members in the 
+<b>System.Resources</b> namespace. For more information, see 
+the <b>System.Resources.ResourceManager</b> class. For all other resources, use the <B>GetManifestResource</B> methods in the 
+<b>System.Reflection.Assembly</b> class to access the resource at run time.</P>
+
+<P>If only resource files are passed to al.exe, the output file is a satellite resource assembly.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=33%><B>/link</B>[<B>resource</B>]<B>:</B><I>file</I>[,<I>name</I>[,<I>target</I>[,<B>private</B>]]]</TD>
+<TD width=67%>Links a resource file to an assembly. The resource specified by <I>file</I> becomes part of the assembly; the file is not copied.
+<P>The<I> name</I> parameter is an internal identifier for the resource. The <I>target </I>parameter specifies a path and file name into which 
+al.exe copies the <I>file.</I> After copying, al.exe compiles <I>target</I> into an assembly. By default, resources are public in the assembly (visible to other assemblies). Specifying <B>private </B>
+makes the resource invisible to other assemblies.</P>
+
+<P>If <I>file</I> is a .NET Framework resource file created, for example, by the Resource File Generator (Resgen.exe) or in the development environment, it can be accessed with members in the <B>System.Resources</B> namespace. For more information, see <B>System.Resources.ResourceManager</B>. For all other resources, use the <B>GetManifestResource</B> methods in the <B>System.Reflection.Assembly</B> class to access the resource at run time.</P>
+
+<P>If only resource files are passed to al.exe, the output file is a satellite resource assembly.</P>
+</TD>
+</TR>
+</table>
+
+<P>You can specify the following options; note that you must specify <B>/out</B>.</P>
+
+<P>Options can be specified using either a dash (-) or a slash (/).&nbsp; </P>
+<table border=1>
+
+<TR VALIGN="top">
+<TH width=31%>Option</TH>
+<TH width=69%>Description</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/algid:</B><I>id</I></TD>
+<TD width=69%>Specifies an algorithm to hash all files in a multifile assembly 
+except the file that contains the assembly manifest. The default algorithm is 
+CALG_SHA1. For other algorithms, see ALG_ID in the Platform SDK documentation. For the first release of the .NET Framework, only CALG_SHA1 and CALG_MD5 are valid.
+<P>The hash values are stored in the file table of the assembly manifest. At installation and load time, the assembly's files are checked against their hashes.</P>
+
+<P>You can also specify this option as a custom attribute (<b>System.Reflection.AssemblyAlgorithmIdAttribute</b>) in the source code for any module.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/base</B>[<B>address</B>]<B>:</B><I>addr</I></TD>
+<TD width=69%><p>Specifies the address at 
+which the assembly is loaded on the user's computer at run time. Applications 
+load faster if you specify the base address of the DLLs, rather than let the operating system relocate the DLLs in the process space.<p>
+Changes made to the assembly file as a result of this option are  used only by 
+the Windows file loader and have no effect when the file is loaded into the 
+SSCLI using the clix loader.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/comp</B>[<B>any</B>]<B>:</B><I>text</I></TD>
+<TD width=69%>Specifies a string for the <B>Company</B> field in the assembly. 
+Place the string in double quotation marks (&quot; &quot;) if <I>text</I> contains a 
+space. This string is a custom attribute on the assembly and is available for 
+viewing with reflection.
+
+<P>You can also specify this option as a custom attribute 
+(<b>System.Reflection.AssemblyCompanyAttribute</b>) in the source code for any CIL 
+module.</P>
+
+<P>In the SSCLI implementation of the Assembly Linker, this information is  written 
+only to the assembly metadata.&nbsp; No output is written to the Win32 
+resource data.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/config</B>[<B>uration</B>]<B>:</B><I>text</I></TD>
+<TD width=69%>Specifies a string for the <B>Configuration</B> field in the assembly. Place the string in double quotation marks (" ") if <I>text</I> contains a space. This string is a custom attribute on the assembly and is available for viewing with reflection.
+
+<P>You can also specify this option as a custom attribute (<b>System.Reflection.AssemblyConfigurationAttribute</b>) in the source code for any 
+CIL module.</P>
+
+<P>In the SSCLI implementation of the Assembly Linker, this information is  written 
+only to the assembly metadata.&nbsp; No output is written to the Win32 
+resource data.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/copy</B>[<B>right</B>]<B>:</B><I>text</I></TD>
+<TD width=69%>Specifies a string for the <B>Copyright</B> field in the assembly. 
+Place the string in double quotation marks (&quot; &quot;) if <I>text</I> contains a 
+space. This string is a custom attribute on the assembly and is available for 
+viewing with reflection.
+<P>You can also specify this option as a custom attribute 
+(<b>System.Reflection.AssemblyCopyrightAttribute</b>) in the source code for any CIL 
+module.</P>
+
+<P>In the SSCLI implementation of the Assembly Linker, this information is  written 
+only to the assembly metadata.&nbsp; No output is written to the Win32 
+resource data.</P>
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/c</B>[<B>ulture</B>]<B>:</B><I>text</I></TD>
+<TD width=69%>Specifies the culture string to associate with the assembly. Valid values for cultures are those defined by the Internet Requests for Comments (RFC) document 1766 titled "Tags for the Identification of Languages."
+<P>Place the string in double quotation marks (" ") if <I>text</I> contains a space. There is no default culture string. This string is available for viewing with reflection.</P>
+
+<P>For information on valid <I>text</I> strings, see the <b>CultureInfo</b> class.</P>
+
+<P>You can also specify this option as a custom attribute (<b>System.Reflection.AssemblyCultureAttribute</b>) in the source code for any 
+CIL module.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/delay</B>[<B>sign</B>][<B>+</B>|<B>-</B>]</TD>
+<TD width=69%>Specifies whether the assembly is fully or partially signed. Use <B>/delaysign-</B> if you want a fully signed assembly. Use <B>/delaysign+</B> if you  want 
+only to place the public key in the assembly.
+<P>When you request a fully signed assembly, al.exe hashes the file that contains the manifest (assembly metadata) and signs that hash with the private key. The resulting digital signature is stored in the file that contains the manifest. When an assembly is delay-signed, 
+al.exe does not compute and store the signature, but just reserves space in the file so the signature can be added later.</P>
+
+<P>The default is <B>/delaysign-</B>.</P>
+
+<P>The <B>/delaysign</B> option has no effect unless used with <B>/keyfile</B> or <B>/keyname</B>.</P>
+
+<P>For example, using <B>/delaysign+</B> allows a tester to put the assembly in the global cache. After testing, you can fully sign the assembly by placing the private key in the assembly.</P>
+
+<P>You can also specify this option as a custom attribute (<b>System.Reflection.AssemblyDelaySignAttribute</b>) in the source code for any 
+CIL module.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/descr</B>[<B>iption</B>]<B>:</B><I>text</I></TD>
+<TD width=69%>Specifies a string for the <B>Description</B> field in the assembly. Place the string in double quotation marks (" ") if <I>text</I> contains a space. This string is a custom attribute on the assembly and is available for viewing with reflection.
+
+<P>You can also specify this option as a custom attribute (<b>System.Reflection.AssemblyDescriptionAttribute</b>) in the source code for any 
+CIL module.</P>
+
+<P>In the SSCLI implementation of the Assembly Linker, this information is only 
+written to the assembly metadata.&nbsp; No output is written to the Win32 
+resource data.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/e</B>[<B>vidence</B>]<B>:</B><I>file</I></TD>
+<TD width=69%>Embeds <I>file </I>in the assembly with the resource name of <B>Security.Evidence</B>.
+<P>You cannot use <B>Security.Evidence</B> for regular resources.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/flags:</B><I>flags</I></TD>
+<TD width=69%>Specifies a value for the <B>Flags</B> field in the assembly. Possible values for <I>flags</I> are:
+<DL>
+<DT>0x0000</DT>
+
+<DD>The assembly is side-by-side compatible.</dd>
+
+<DT>0x0010</DT>
+
+<DD>The assembly cannot execute with other versions if the versions are executing in the same application domain.</dd>
+
+<DT>0x0020</DT>
+
+<DD>The assembly cannot execute with other versions if the versions are executing in the same process.</dd>
+
+<DT>0x0030</DT>
+
+<DD>The assembly cannot execute with other versions if the versions are executing on the same computer.</dd>
+</DL>
+
+<P>You can also specify this option as a custom attribute (<b>System.Reflection.AssemblyFlagsAttribute</b>) in the source code for any 
+CIL module.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/fullpaths</B></TD>
+<TD width=69%>Causes al.exe to use the absolute path for any files that are reported in an error message.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/help</B></TD>
+<TD width=69%>Displays command syntax and options for the tool.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/keyf</B>[<B>ile</B>]<B>:</B><I>filename</I></TD>
+<TD width=69%>Specifies a file (<I>filename</I>) that contains a key or key pair 
+to sign an assembly. The compiler inserts the public key in the assembly 
+manifest and then signs the final assembly with the private key. For information on generating key files and installing key pairs into key containers 
+see the <A HREF="sn.html">Strong Name Tool</A> documentation.
+<P>If you are using delay-signing, this file has the public key but not the private key.</P>
+
+<P>The key information appears in the <B>.publickey</B> field of the assembly.</P>
+
+<P>You can also specify this option as a custom attribute (<b>System.Reflection.AssemblyKeyFileAttribute</b>) in the source code for any 
+CIL module.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/main:</B><I>method</I></TD>
+<TD width=69%>Specifies the fully qualified name  of the method to use as an entry point when converting a module to an executable file.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/nologo</B></TD>
+<TD width=69%>Suppresses the banner, or logo, displayed at the command line when you invoke 
+al.exe.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/out:</B><I>filename</I></TD>
+<TD width=69%>Specifies the name of the file produced by al.exe. This is a required option.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/prod</B>[<B>uct</B>]<B>:</B><I>text</I></TD>
+<TD width=69%>Specifies a string for the <B>Product</B> field in the assembly. Place the string in double quotation marks (" ") if <I>text</I> contains a space. This string is a custom attribute on the assembly and is available for viewing with reflection.
+<P>You can also specify this option as a custom attribute (<b>System.Reflection.AssemblyProductAttribute</b>) in the source code for any 
+CIL module.</P>
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/productv</B>[<B>ersion</B>]<B>:</B><I>text</I></TD>
+<TD width=69%>Specifies a string for the <B>Product Version</B> field in the assembly. Place the string in double quotation marks (" ") if <I>text</I> contains a space. This string is a custom attribute on the assembly and is available for viewing with reflection.
+
+<P>You can also specify this option as a custom attribute (<b>System.Reflection.AssemblyInformationalVersionAttribute</b>) in the source code for any 
+CIL module.</P>
+
+<P>In the SSCLI implementation of the Assembly Linker, this information is  written 
+only to the assembly metadata.&nbsp; No output is written to the Win32 
+resource data.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/t</B>[<B>arget</B>]<B>:lib</B>|<B>exe</B>|<B>win</B></TD>
+<TD width=69%>Specifies the file format of the output file: <B>lib</B> (code library), <B>exe</B> (console application), or <B>win</B> (Windows-based application). The default is <B>lib</B>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/template:</B><I>filename</I></TD>
+<TD width=69%>Specifies the assembly, <I>filename</I>, from which to inherit all assembly metadata except the culture field. The specified <I>filename</I> must have a strong name.
+<P>An assembly that you create with <B>/template</B> is a satellite assembly.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/title:</B><I>text</I></TD>
+<TD width=69%>Specifies a string for the <B>Title</B> field in the assembly. Place the string in double quotation marks (" ") if <I>text</I> contains a space. This string is a custom attribute on the assembly and is available for viewing with reflection.
+
+<P>You can also specify this option as a custom attribute 
+(<b>System.Reflection.AssemblyTitleAttribute</b>) in the source code for any CIL module.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/trade</B>[<B>mark</B>]<B>:</B><I>text</I></TD>
+<TD width=69%>Specifies a string for the <B>Trademark</B> field in the assembly. Place the string in double quotation marks (" ") if <I>text</I> contains a space. This string is a custom attribute on the assembly and is available for viewing with reflection.
+
+<P>You can also specify this option as a custom attribute (System.Reflection.AssemblyTrademarkAttribute) in the source code for any 
+CIL module.</P>
+
+<P>In the SSCLI implementation of the Assembly Linker, this information is  written 
+only to the assembly metadata.&nbsp; No output is written to the Win32 
+resource data.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/v</B>[<B>ersion</B>]<B>:</B><I>version</I></TD>
+<TD width=69%>Specifies version information for this assembly. The format of the version string is <I>major</I>.<I>minor</I>.<I>build</I>.<I>revision</I>. The default value is 0.
+<P>If you do specify <B>/version</B>, you must specify <I>major</I>. If you specify <I>major</I> and <I>minor</I>, you can specify an asterisk (*)for <I>build</I>. This causes <I>build</I> to be equal to the number of days since January 1, 2000, local time, and <I>revision</I> to be equal to the number of seconds since midnight, January 1, 2000, local time, divided by 2.</P>
+
+<P>If you specify <I>major</I>, <I>minor</I>, and <I>build</I>, you can specify an asterisk for <I>revision</I>. This causes <I>revision</I> to be equal to the number of seconds since midnight, January 1, 2000, local time, divided by 2.</P>
+
+<P>To summarize, the valid version strings are:</P>
+
+<P>X</P>
+
+<P>X.X</P>
+
+<P>X.X.*</P>
+
+<P>X.X.X</P>
+
+<P>X.X.X.*</P>
+
+<P>X.X.X.X</P>
+
+<P>where X is any unsigned short constant except 65535 (0-65534).</P>
+
+<P>You can also specify this option as a custom attribute (<b>System.Reflection.AssemblyVersionAttribute</b>) in the source code for any 
+CIL module.</P>
+
+<P>In the SSCLI implementation of the Assembly Linker, this information is only 
+written to the assembly metadata.&nbsp; No output is written to the Win32 
+resource data.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>@</B><I>filename</I></TD>
+<TD width=69%>Specifies a response file that contains al.exe commands.
+<P>Commands in the response file can appear one per line or on the same line, separated by one or more spaces.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=31%><B>/?</B></TD>
+<TD width=69%>Displays command syntax and options for the tool.</TD>
+</TR>
+</table>
+
+<H4>Remarks</H4>
+
+<P>If you have one or more modules (metadata without a manifest), you can use 
+al.exe to create an assembly with the manifest in a separate file.</P>
+
+<P>To install assemblies in the cache, remove assemblies from the cache, or list the contents of the cache, use the <A HREF="gacutil.html">Global Assembly Cache 
+tool (Gacutil.exe)</A>.</P>
+
+<H4>Example</H4>
+
+<P>The following command creates an executable file <CODE>t2a.exe</CODE> with an assembly from the <CODE>t2.dll</CODE> module. The entry point is the <CODE>Main</CODE> method in <CODE>MyClass</CODE>.</P>
+
+<PRE>al t2.dll /target:exe /out:t2a.exe /main:MyClass.Main</PRE>
+
+<H1><A NAME="cpgrfalexetoolerrorswarnings"></A>al.exe Tool Errors and Warnings</H1>
+
+<P>The following table lists the errors generated by al.exe.</P>
+<table border=1>
+
+<TR VALIGN="top">
+<TH width=14%>Error</TH>
+<TH width=86%>Description</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1001</TD>
+<TD width=86%><B>Internal compiler error</B>
+<P>al.exe might be failing because of an inability to parse unexpected syntax.&nbsp; </P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1002</TD>
+<TD width=86%><B>Out of memory</B>
+<P>al.exe ran out of memory and halted. Increase the amount of available memory.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1003</TD>
+<TD width=86%><B>Compiler option '<I>option</I>' must be followed by an argument</B>
+<P>al.exe expected an argument to be passed to a command-line option. For example, if you specify <B>/algid:</B>, you must pass an algorithm identifier.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1004</TD>
+<TD width=86%><B>Unexpected common language runtime initialization error - '<I>reason</I>'</B>
+<P>al.exe reported an error with the Visual Studio or common language runtime installation for the specified reason.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1005</TD>
+<TD width=86%><B>File '<I>file</I>' too big to open</B>
+<P>All files opened by al.exe must be smaller than 4 gigabytes (GB).</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1006</TD>
+<TD width=86%><B>Response file '<I>file</I>' was already included</B>
+<P>The same response file was specified (<B>@</B><I>file</I>) more than once on the command line. The response file can  be included 
+only once.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1007</TD>
+<TD width=86%><B>Error opening response file '<I>file</I>' - '<I>reason</I>'</B>
+<P>al.exe cannot open the specified response file for the specified reason.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1008</TD>
+<TD width=86%><B>Missing file specification for '<I>option</I>' command-line option</B>
+<P>al.exe expected a file to be passed to a command-line option. For example, if you specify the <B>/out</B> option, you must specify a file.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1009</TD>
+<TD width=86%><B>Can't open '<I>file</I>' for writing</B>
+<P>al.exe was unable to write to a file, such as the output assembly file. The disk might be full, the file might be read-only, or you might not have access rights to the file.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1010</TD>
+<TD width=86%><B>Command-line syntax error: Missing ':<I>text</I>' for '<I>option</I>' option</B>
+<P>al.exe expected an argument to be passed to a command-line option. For example, if you specify the <B>/title</B> option, you must pass a string.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1011</TD>
+<TD width=86%><B>File '<I>file</I>' is an executable file and cannot be opened as a text file</B>
+<P>A binary file was specified where a text file was expected. For example, this error occurs if a binary file is passed on the command line as a response file.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1012</TD>
+<TD width=86%><B>'<I>value</I>' is not a valid setting for option '<I>option</I>'</B>
+<P>An unexpected value was passed to a command-line option. For example, this error occurs if you specify an invalid value to the <B>/target</B> option.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1013</TD>
+<TD width=86%><B>Unrecognized command-line option: '<I>option</I>'</B>
+<P>An invalid command-line option was specified.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1014</TD>
+<TD width=86%><B>Unexpected initialization error - '<I>reason</I>'</B>
+<P>al.exe detected an initialization failure. This might be caused by a lack of 
+memory, but a more likely cause is a problem with your system files. </P>
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1016</TD>
+<TD width=86%><B>No valid input files were specified</B>
+<P>al.exe requires one or more input files that do not have assembly information.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1017</TD>
+<TD width=86%><B>No target filename was specified</B>
+<P>A command-line option was specified without a file parameter. For example, this error occurs if you specify <B>/keyname:</B>.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1018</TD>
+<TD width=86%><B>Required file '<I>file</I>' could not be loaded</B>
+<P>Certain executable files cannot be loaded.&nbsp; Make sure the required file 
+is available on your path.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1019</TD>
+<TD width=86%><B>Metadata failure while creating assembly - <I>reason</I></B>
+<P>Generation of the assembly was interrupted for the specified reason. </P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1020</TD>
+<TD width=86%><B>Ignoring included assembly '<I>file</I>'</B>
+<P>An input file that contained an assembly was specified. al.exe input files cannot contain assemblies.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1021</TD>
+<TD width=86%><B>'<I>setting</I>' : overriding previous setting</B>
+<P>A module had a value for a particular setting, possibly assigned through custom attributes, 
+which was overridden with a value passed using an al.exe command-line option.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1022</TD>
+<TD width=86%><B>Error reading embedded resource '<I>file</I>' - <I>reason</I></B>
+<P>al.exe cannot read the file passed to the <B>/embedresource</B> option for the specified reason.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1023</TD>
+<TD width=86%><B>Error embedding resource '<I>file</I>' - <I>reason</I></B>
+<P>The operating system cannot embed the resource file in the assembly for the specified reason. </P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1025</TD>
+<TD width=86%><B>ComType record '<I>record</I>' points to an invalid file record '<I>record</I>'</B>
+<P>Metadata in the input module is invalid. The tool that produced the module must be fixed.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1026</TD>
+<TD width=86%><B>The version specified '<I>version</I>' is invalid</B>
+<P>See information on the <B>/version</B> option for valid formats.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1028</TD>
+<TD width=86%><B>Key file '<I>file</I>' is missing the private key needed for signing</B>
+<P>A key file that contains only the public key was passed to the <B>/keyfile</B> option. Use the <A HREF="sn.html">Strong Name Tool (Sn.exe)</A> to generate a file with both a public and private key, as shown in the following command.</P>
+
+<P><CODE>sn -k keypair.snk</CODE>.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1029</TD>
+<TD width=86%><B>The key container name '<I>container</I>' does not exist</B>
+<P>The value passed to the <B>/keyname</B> option is not a valid container. Use the <A HREF="sn.html">Strong Name Tool (Sn.exe)</A> to create a container.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1030</TD>
+<TD width=86%><B>The cryptographic service is not installed properly or does not have a suitable key provider</B>
+<P>You might need to either reinstall your operating system or install some cryptographic utility that was used in the creation of the key.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1031</TD>
+<TD width=86%><B>Error reading icon '<I>file</I>' - <I>reason</I></B>
+<P>al.exe cannot read the file that was passed to the <B>/win32icon</B> option for the specified reason.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1032</TD>
+<TD width=86%><B>Error generating resources for '<I>file</I>' - <I>reason</I></B>
+<P>al.exe cannot create a file due to insufficient disk space or some other error.  </P>
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1033</TD>
+<TD width=86%><B>Assembly custom attribute '<I>attribute</I>' was specified multiple times with different values</B>
+<P>Different values were passed to two occurrences of the same custom attribute in source modules that are specified as input to 
+al.exe.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1034</TD>
+<TD width=86%><B>Assembly '<I>file</I>' cannot be copied or renamed</B>
+<P>While using the al.exe syntax that allows you to both specify an input file and copy it, a name conflict arose that stopped the compiler. For example, this error occurs if you specify <CODE>input.dll,somename.dll /out:somename.dll</CODE>. </P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1035</TD>
+<TD width=86%><B>Libraries cannot have an entry point</B>
+<P>You cannot specify both the <B>/target:lib</B> option (the default) and the <B>/main</B> option.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1036</TD>
+<TD width=86%><B>Entry point required for executable applications</B>
+<P>When using the <B>/target:exe</B> or <B>/target:win</B> option, you must also specify the <B>/main</B> option.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1037</TD>
+<TD width=86%><B>Unable to find the entry point method '<I>main</I>'</B>
+<P>al.exe cannot find a <B>Main</B> method at the location specified by the <B>/main</B> option.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1039</TD>
+<TD width=86%><B>Initialization of global assembly cache manager failed - <I>reason</I></B>
+<P>Reinstall or rebuild the SSCLI.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1040</TD>
+<TD width=86%><B>Failed to install assembly into cache - <I>reason</I></B>
+<P>Only signed assemblies can be installed into the cache. </P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1041</TD>
+<TD width=86%><B>'<I>method</I>': cannot be the entry point because the signature or visibility is incorrect</B>
+<P>A method was specified with the <B>/main</B> option, but that method is not 
+<b>static</b>, does not return <B>int</B> or <B>void</B>, or has invalid arguments. </P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1042</TD>
+<TD width=86%><B>'<I>exe</I>': EXEs cannot be added modules</B>
+<P>An .exe file that does not have an assembly was specified as an input file to 
+al.exe. al.exe can only take .dll files without assemblies as input files.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1043</TD>
+<TD width=86%><B>Manifest file name '<I>name</I>' cannot be the same as any modules</B>
+<P>The name specified with the <B>/out</B> option cannot be the same as any of the file names that are specified as input to 
+al.exe.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1044</TD>
+<TD width=86%><B>Error reading key file '<I>file</I>' - <I>reason</I></B>
+<P>An error occurred while opening or reading from a file specified with <B>/keyfile</B> or the AssemblyKeyFileAttribute.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1045</TD>
+<TD width=86%><B>Filename '<I>file</I>' is too long or invalid</B>
+<P>A file name longer than 260 characters was passed to al.exe. Choose a file name with fewer characters or a shorter path, or rename the file.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1046</TD>
+<TD width=86%><B>Resource identifier '<I>ID</I>' has already been used in this assembly</B>
+<P>Two resources, embedded or linked, have the same identifier or name (the second argument). Remove or rename one of the conflicting resources.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1047</TD>
+<TD width=86%><B>Error importing file '<I>file</I>' - <I>reason</I></B>
+<P>A module file cannot be opened for the specified reason.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1048</TD>
+<TD width=86%><B>Error importing module '<I>module</I>' of assembly '<I>assembly</I>' 
+- <I>reason</I></B>
+<P>An error occurred when opening a non-manifest file of a multifile assembly. This error is not emitted directly by 
+al.exe, but can be passed programmatically to a process that uses al.exe.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1049</TD>
+<TD width=86%><B>Cannot auto-generate build and revision version numbers for dates previous to January 1, 2000</B>
+<P>The system clock on your computer is set to a date earlier than January 1, 2000.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1050</TD>
+<TD width=86%><B>The feature you are using '<I>old feature</I>' is no longer supported; please use '<I>new feature</I>' instead</B>
+<P>A feature previously supported by al.exe is now obsolete. Use the recommended feature instead.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1051</TD>
+<TD width=86%><B>Error emitting '<I>attribute</I>' attribute -'<I>reason</I>'</B>
+<P>An assembly custom attribute was not processed by al.exe for the specified reason.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1052</TD>
+<TD width=86%><B>File '<I>filename</I>' is not an assembly</B>
+<P>The file specified with <B>/template</B> must contain assembly metadata. This error indicates that the file specified by <B>/template</B> did not contain an assembly.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1053</TD>
+<TD width=86%><B>The version '<I>version</I>' specified for the '<I>option</I>' is not in the normal 'major.minor.build.revision' format</B>
+<P>al.exe detected ill-formed version information specified with the <B>/fileversion</B> or <B>/productversion</B> options. </P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1054</TD>
+<TD width=86%><B>The version '<I>version</I>' specified for the '<I>option</I>' is not in the normal 'major.minor.build.revision' format</B>
+<P>al.exe detected ill-formed version information specified with the SatelliteContractVersionAttribute.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1055</TD>
+<TD width=86%><B>Referenced assembly '<I>filename</I>' does not have a strong name</B>
+<P>This error is issued when you are building an assembly with a strong name and reference an assembly that does not have a strong name.</P>
+
+<P>If an assembly has a strong name, it can be installed in the global assembly cache. Consequently, referenced assemblies would also need to go into the global assembly cache. Only assemblies with strong names can go into the global assembly cache.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1056</TD>
+<TD width=86%><B>Referenced assembly '<I>filename</I>' is a localized satellite assembly</B>
+<P>An assembly created using the <b>AssemblyCultureAttribute</b> attribute was referenced in the creation of the current assembly. The <B>AssemblyCultureAttribute</B> attribute indicates the file is a localized satellite assembly and it is not normal to reference a satellite assembly. 
+Reference the main parent assembly instead.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1057</TD>
+<TD width=86%><B>Executables cannot be localized, Culture should always be empty</B>
+<P>An assembly is being created with <B>/target:exe,</B> but <B>/culture</B> was specified. Assemblies in the .exe 
+file cannot have information in the Culture field.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1058</TD>
+<TD width=86%><B>'<I>file</I>' is an assembly and cannot be added as a module</B>
+<P>In a C++ compilation, <B>/assemblymodule</B> (linker option) was passed a file that contained an assembly.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1059</TD>
+<TD width=86%><B>Unknown error (<I>code</I>)</B>
+<P>al.exe received an unknown error code (<I>code</I>).</P>
+
+<P>Possible solutions include:
+
+<UL>
+	<LI>Rebuild the SSCLI.</li>
+
+	<LI>Check for missing files.</li>
+
+	<LI>Check for adequate disk space.</li>
+
+	<LI>Check for adequate memory.</li>
+
+	<LI>Stop other processes that might be accessing the files.</li>
+
+	<LI>Reboot your computer.</li>
+</UL>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1060</TD>
+<TD width=86%><B>Cryptographic failure while creating hashes - <I>reason</I></B>
+<P>An error occurred while creating the file hashes for a multifile assembly.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=14%>al1061</TD>
+<TD width=86%><B>Cannot set option '<I>option</I>' because '<I>reason</I>'</B>
+<P>The value specified for this option is invalid for the specified reason.</P>
+</TD>
+</TR>
+</table>
+
+
+<h5>See Also</h5>
+
+<P><a href="Tools_Index.html">Tools Index</a> | <A HREF="sn.html">Strong Name Tool (Sn.exe)
+   </A> | <A HREF="gacutil.html">Global Assembly Cache Tool (Gacutil.exe)</A></P>
+<hr>
+<p><i>Copyright (c) 2006 Microsoft Corporation. All rights reserved.</i></p>
+</BODY>
+</HTML>

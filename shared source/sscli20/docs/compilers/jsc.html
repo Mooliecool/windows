@@ -1,0 +1,745 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> 
+<head>
+<title>Shared Source JScript Compiler</title>
+<link rel="stylesheet" type="text/css" href="../rotor.css">
+</head>
+<body>
+<H1>Shared Source JScript 8.0 Compiler</H1>
+
+<P>The Microsoft&reg; Shared Source implementation of the  JScript compiler is 
+very similar to the implementation in the Microsoft&reg; .NET Framework SDK and 
+Microsoft Visual 
+Studio&reg; 2005. Both implementations originated from the same source base but some 
+options and features that rely on functionality in Microsoft&reg; Windows&reg; have been 
+removed from the Shared Source implementation.<br>
+<br>
+To produce an executable JScript program,  use the command-line compiler, jsc.exe.&nbsp; 
+You must have your environment configured correctly.&nbsp; For more information 
+on the Shared Source CLI environment configuration, see <a href="../buildtools/env.html">
+env.html</a>.</P>
+    <p>
+        Please note, as the JScript compiler is a managed application, it needs to be run
+        under the clix launcher. Eg. "clix jsc.exe Program1.js".</p>
+
+<h3>Changes in the Shared Source JScript Implementation</h3>
+
+<P>The following option areas and related options were modified:</P>
+<ul>
+  <li>No features that use Windows resources are  supported.<ul>
+    <li>Option removed: <b>/win32res</b>.</li>
+    <li>No resource file is automatically generated and embedded in the output 
+    file.</li>
+  </ul>
+  </li>
+  <li>COM interop features are not supported.<ul>
+    <li>The <b>ActiveXObject</b> class is not supported.&nbsp; COM interop is not 
+    supported in general on the Shared Source CLI implementation.</li>
+    <li>The <b>GetObject</b> function is not supported.&nbsp; </li>
+  </ul>
+  </li>
+  <li>The Shared Source implementation of jsc.exe will not work correctly with  Visual Studio .NET. </li>
+</ul>
+<p>Complete documentation for the .NET Framework JScript compiler and tutorials 
+is available on
+<a href="http://msdn.microsoft.com">msdn.microsoft.com</a>. Other 
+than the changes mentioned above, the functionality in the Shared Source 
+implementation of the JScript compiler is the same as the .NET Framework 
+implementation.</p>
+<h2>JScript Compiler Options</h2>
+
+<p>The JScript compiler produces executable (.exe) files and dynamic-link 
+libraries (.dll files).</p>
+
+<p>JScript is a managed application.&nbsp; To execute managed 
+applications you must use the <a href="../tools/clix.html">clix</a> application launcher.<br>
+<br>
+Every compiler option is available in two forms: -option and /option.</p>
+<p>
+    &nbsp;</p>
+<table border=1 width="90%">
+
+<TR VALIGN="top">
+<TH width="28%">Option</TH>
+<TH width="72%" colspan="2">Description</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%"><b>@</b><I>response_file</I></TD>
+<TD width="72%" colspan="2">Specifies a <i>response_file</i> which is a file that lists compiler options or 
+source code files to compile.<P>The @ option lets you specify a file that contains compiler options and source code files to compile. 
+These compiler options and source code files will be processed by the compiler just as if set out on the command line.</P>
+
+<P>To specify more than one response file in a compilation, specify multiple response file options. For example:</P>
+
+<blockquote>
+
+<PRE><b>@</b>file1.rsp <b>@</b>file2.rsp</PRE>
+
+</blockquote>
+
+<P>In a response file, multiple compiler options and source code files can appear on one line. 
+A single compiler option specification must appear on one line (it cannot span multiple lines). </P>
+
+<P>Response files can have comments that begin with the # symbol.</P>
+
+<P>Specifying compiler options from within a response file is just like making 
+those commands on the command line. </P>
+
+<P>The compiler processes command options as they are encountered. 
+Therefore, the options in one response file might be incompatible with the options in another response file or the command line options. This can generate errors. </P>
+
+<P>Response files cannot be nested. You cannot place <b>@</b><I>response_file</I> inside a response file. 
+The JScript compiler reports an error for such cases.&nbsp;</P>
+
+<P>For example, the following are a few lines from a sample response file:</P>
+
+<blockquote>
+
+<PRE># build the first output file
+/target:exe /out:MyExe.exe source1.js source2.js</PRE>
+
+</blockquote>
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%"><b>/?</b></TD>
+<TD width="72%" colspan="2">Outputs compiler options to console. Equivalent to
+<b>/help</b>.<P>This option causes the compiler to display a list of compiler options along with a brief description of each option.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%"><b>/autoref[<I>+</I> | <I>-</I>]</b></TD>
+<TD width="72%" colspan="2">References assemblies automatically if they have the same name as an imported namespace or as a 
+type annotation when declaring a variable.<p><b>Option Values</b></p>
+
+<DL>
+<DT><b><I>+</I> | <I>-</I></b></DT>
+
+<DD><b>/autoref</b> is on by default, unless <b>/nostdlib+</b> is specified. Specifying <b>/autoref+</b>, or just 
+<b>/autoref</b>, causes the compiler to automatically reference assemblies based on imported namespaces and fully qualified names.</dd>
+</DL>
+
+<P>The <b>/autoref</b> option instructs the compiler to reference assemblies without having to pass the assembly to 
+<b>/reference</b>. When you use 
+<b>import</b> to import a namespace, or you use a fully qualified type name in your code, the JScript compiler searches for an assembly that contains the type. See 
+<b>/lib</b> for a discussion of how the JScript compiler searches for assemblies.</P>
+
+<P>The compiler does not try to reference an assembly if it has the same name as the output file of the program you are building.</P>
+
+<P>The following program will compile and run when <b>/autoref+</b> is in effect; the compiler will reference System.dll as a result of the type annotation when declaring a variable.</P>
+
+<blockquote>
+
+<PRE>var s: System.Collections.Specialized.StringCollection = 
+                   new System.Collections.Specialized.StringCollection();
+print(s);</PRE>
+
+</blockquote>
+
+<P>The following program will compile and run when <b>/autoref+</b> is in effect; the compiler will reference System.dll as a result of the <B>import</B> statement.</P>
+
+<blockquote>
+
+<PRE>import System;
+var s = new System.Collections.Specialized.StringCollection();
+print(s);</PRE>
+
+</blockquote>
+
+<P>These examples also show how the compiler looks for assembly names based on type annotation or <B>import</B> statements. When the compiler did not find an assembly called System.Collections.Specialized.dll that contained 
+<b>StringCollection</b>, it looked for System.Collections.dll. Failing to find that file, it looked for System.dll, which it did find to contain 
+<b>StringCollection</b>.</P>
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%"><b>/codepage:</b><I>id</I></TD>
+<TD width="72%" colspan="2">Specifies the code page to use for all source code files in the 
+compilation where <i>id</i> is the ID of that code page.<P>If you compile one or more source code files that when created did not designate use of the 
+default code page on your computer, you can use the <b>/codepage</b> option to specify which code page should be used. 
+<b>/codepage</b> applies to all source code files in your compilation.</P>
+
+<P>If the source code files were created with the same codepage that is in effect on your 
+computer or if the source code files were created with UNICODE or UTF-8, you need not use 
+<b>/codepage</b>.</P>
+
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%"><b>/debug[<I>+</I>|<I>-</I>]</b></TD>
+<TD width="72%" colspan="2">Emits debugging information.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%"><b>/define:</b><I>name1<br>
+</I>[=<I>value1</I>][,<I>name2</I>[=<I>value1</I>]]</TD>
+<TD width="72%" colspan="2">Defines preprocessor symbols where <I>name1</I> and <I>name2 </I>are 
+the name of one or more symbols that you want to define and <i>value1</i> and <I>value2 </I>
+are the values for the symbols to take. These can be Boolean values or numbers.<P>The 
+<b>/define</b> option defines names as symbols in your program.</P>
+
+<P>You can define multiple symbols with <b>/define</b> by using a comma to separate symbol names. For example:</P>
+
+<blockquote>
+
+<PRE>/define:DEBUG,trace=true,max_Num=100</PRE>
+
+</blockquote>
+
+<P><b>/d</b> is the short form of <b>/define</b>.</P>
+
+<P>Compile with <b>/define:</b>.</P>
+
+<blockquote>
+
+<PRE>print("testing")
+/*@cc_on @*/
+/*@if (@xx)
+print("xx defined")
+@else @*/
+print("xx not defined")
+/*@end @*/</PRE>
+
+</blockquote>
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%"><b>/fast[<I>+</I> | <I>-</I>]</b></TD>
+<TD width="72%" colspan="2">Produces an output file optimized for speed but that does not support certain language features from previous releases.&nbsp;JScript source code from versions before the .NET Framework might need to be 
+modified to compile with this option switched on.<p>Option values:</p>
+
+<DL>
+<DT><b><I>+</I> | <I>-</I></b></DT>
+
+<DD><b>/fast</b> is on by default. <b>/fast</b> or <b>/fast+</b> causes the compiler to generate an output file that is speed-optimized; however, if this option is used certain language features from previous versions will not be supported. Specifying 
+<b>/fast-</b>, on the other hand, will provide for backward language compatibility, but the compiler will produce an output file that is not optimized for speed.</dd>
+</DL>
+
+<P>When <b>/fast</b> is in effect:
+
+<UL>
+	<LI>All variables must be declared.</li>
+
+	<LI>Functions become constants and you cannot assign to them or redefine them. </li>
+
+	<LI>Predefined properties of built-in objects are marked <b>DontEnum</b>, <b>DontDelete</b>, 
+    and <b>ReadOnly</b>.</li>
+
+	<LI>Properties on the built-in objects cannot be expanded, other than the <b>Global</b> object (which is also the global scope).</li>
+
+	<LI>The <b>arguments</b> variable is not available within function calls.</li>
+
+	<LI>Assignments to read-only variables, fields, or methods generate errors.</li>
+</UL>
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%"><b>/help</b></TD>
+<TD width="72%" colspan="2">Outputs compiler options to the console. Equivalent to <b>/?</b>.<P>This option causes the compiler to display a list of compiler options along with a brief description of each option.</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%"><b>/lcid:</b><I>id</I></TD>
+<TD width="72%" colspan="2">Specifies acode page for compiler messages where <i>id </i>
+is the ID of the code page to use for printing out messages from the compiler.
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%"><b>/lib:</b><I>dir1</I>[, <I>dir2</I>]</TD>
+<TD width="72%" colspan="2">Specifies the location of assemblies referenced 
+through the /reference option.
+<p>Option values:</p>
+
+<DL>
+<DT><I>dir1</I></DT>
+
+<DD>A directory for the compiler to look in if a referenced assembly is not found in the current working directory 
+(the directory from which the compiler is invoked) or in the CLI implementation assembly directory.</dd>
+
+<DT><I>dir2</I></DT>
+
+<DD>One or more additional directories for searching for assembly references. 
+Separate additional directory names with a comma or semicolon.</dd>
+</DL>
+
+<P>The <b>/lib</b> option specifies the location of assemblies referenced through the 
+<b>/reference</b> option.</P>
+
+<P>The compiler searches for assembly references that are not fully qualified in the following order:
+
+<OL>
+	<LI>The current working directory. This is the directory from which the compiler is invoked.</li>
+
+	<LI>The common language runtime system directory.</li>
+
+	<LI>Directories specified by <b>/lib</b>.</li>
+
+	<LI>Directories specified by the LIB environment variable.</li>
+</OL>
+
+<P>Use <b>/reference</b> to specify an assembly reference.</P>
+
+<P><b>/lib </b>is additive; specifying it more than once appends to any prior values.</P>
+
+<p>For example, compile t2.js to create an .exe. The compiler will look in the working directory and in the root directory of the 
+C drive for assembly references.</p>
+
+<blockquote>
+
+<PRE>jsc /lib:c:\ /reference:t2.dll t2.js</PRE>
+
+</blockquote>
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%"><b>/linkresource:</b><I>filename<br>
+</I>[,<I>name</I>[,public|private]]</TD>
+<TD width="72%" colspan="2">Creates a link to a managed resource.
+<p>Option values:</p>
+
+<DL>
+<DT><I>filename</I></DT>
+
+<DD>The resource file to link to the assembly.</dd>
+
+<DT><I>name</I>[,public|private](optional)</DT>
+
+<DD>The logical name for the resource; the name used to load the resource. 
+The default is the name of the file. 
+Optionally, you can specify whether the file is public or private in the assembly manifest. 
+For example, <b>/linkres:</b>filename.res,myname.res,public. By default, <I>filename</I> is public in the assembly.</dd>
+</DL>
+
+<P>The <b>/linkresource </b>option does not embed the resource file in the output file. 
+Use the /resource option to embed a resource file in the output file.</P>
+
+<P>If <I>filename</I> is a managed resource created by the Resource File 
+Generator, for example, it can be accessed with members in the <b>System.Resources</b> namespace. </P>
+
+<P><b>/linkres</b> is the short form of <b>/linkresource</b>.</P>
+
+<p>For example, compile in.js and link to resource file rf.resource:</p>
+
+<blockquote>
+
+<PRE>jsc /linkresource:rf.resource in.js</PRE>
+
+</blockquote>
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%"><b>/nologo</b></TD>
+<TD width="72%" colspan="2">
+<P>The <b>/nologo</b> option suppresses display of the banner when the compiler starts.</P>
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%"><b>/nostdlib[<I>+</I> | <I>-</I>]</b></TD>
+<TD width="72%" colspan="2">Does not import standard library (mscorlib.dll).
+<p>Option values:</p>
+
+<DL>
+<DT><b><I>+</I> | <I>-</I></b></DT>
+
+<DD>The <b>/nostdlib</b> or <b>/nostdlib+</b> option causes the compiler to not import mscorlib.dll. 
+Use this option if you want to define or create your own System namespace and objects. If you do not specify
+<b>/nostdlib</b>, mscorlib.dll will be imported into your program (as 
+when you specify /nostdlib-).</dd>
+</DL>
+
+<P>Specifying <b>/nostdlib+</b> also specifies <b>/autoref-</b>.</P>
+
+<P>For example, if you have a component called <b>System.String</b> (or any 
+other name in mscorlib) could only access your component using</P>
+
+<blockquote>
+
+<PRE>/nostdlib /r:your_library,mscorlib </PRE>
+
+</blockquote>
+
+<P>to search your library before mscorlib. Typically, you would not  define a namespace in your application called 
+<b>System</b>.</P>
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%"><b>/out:</b><I>filename</I></TD>
+<TD width="72%" colspan="2">Specifies output file name where <i>filename</i> is the name of 
+the output file created by the compiler.<P>The <b>/out</b> option specifies the name of the output file. 
+The compiler expects to find one or more source code files following the /out option.</P>
+
+<P>If you do not specify the name of the output file:
+
+<UL>
+	<LI>An .exe file will take its name from the first source code file used to build the output file.</li>
+
+	<LI>A .dll file will take its name from the first source code file used to build the output file.</li>
+</UL>
+
+<P>On the command line, it is possible to specify multiple output files for a compilation. 
+All source code files specified after an <b>/out </b>option will be compiled into the output file specified by that /out option. </P>
+
+<P>Specify the full name and extension of the file you want to create. 
+The extension must be either .exe or .dll. It is possible to specify a .dll extension for 
+<b>/t:exe</b> projects.</P>
+
+<P>For example, compile t2.js, create output filet2.exe, and build t3.js 
+and create output file t3.exe:</P>
+
+<blockquote>
+
+<PRE>jsc t2.js /out:t3.exe t3.js</PRE>
+
+</blockquote>
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%"><b>/print[<I>+</I> | <I>-</I>]</b></TD>
+<TD width="72%" colspan="2">Specifies whether the print statement is available.
+<p>Option values:</p>
+
+<DL>
+<DT><b><I>+</I> | <I>-</I></b></DT>
+
+<DD>By default, <b>/print</b> or<b> /print+ </b>causes the compiler to enable the use of the print statement. An example of a print statement is,
+
+<PRE>print("hello world"); </PRE>
+
+
+<P class=tl>Specifying <b>/print-</b> will disable the print command.</P></dd>
+</DL>
+
+<P>You should use <b>/print-</b> if your DLL will be loaded into an environment that 
+does not have a console.</P>
+
+<P>You can set <b>Microsoft.JScript.ScriptStream.Out </b>to be an instance of a 
+<b>TextWriter</b> object to enable print to send output elsewhere.</P>
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%"><b>/reference:</b><I>file</I>[;<I>file2</I>]</TD>
+<TD width="72%" colspan="2">Imports the information in the metadata of the referenced 
+assembly for use in resolving external references where <I>file</I> and&nbsp; <I>file2</I> 
+are one or more files that contains an assembly manifest. 
+To import more than one file, separate file names with either a comma or a semicolon.<P>The 
+<b>/reference</b> option directs the compiler to make public type information in the specified files 
+available to the project you are currently compiling.</P>
+
+<P>The file or files you reference must be assemblies.</P>
+
+<P><b>/reference</b> cannot take a module as input.</P>
+
+<P>Although executable files can be referenced as assemblies it is not recommended 
+that shared, referenced code be stored in executable assemblies.&nbsp; Instead, 
+place the shared code in an assembly library.</P>
+
+<P>If you reference an assembly (Assembly A), which itself references another assembly (Assembly B), 
+you will need to reference Assembly B if:
+
+<UL>
+	<LI>A type you use from Assembly A inherits from a type or implements an interface from Assembly B.</li>
+
+	<LI>You invoke a field, property, event, or method that has a return type or parameter type from Assembly B.</li>
+</UL>
+
+<P>Use <b>/lib</b> to specify the directory in which one or more of your assembly references is located.</P>
+
+<P><b>/r</b> is the short form of <b>/reference</b>.</P>
+
+<P>For example, compile source file <CODE>input.js</CODE> and import metadata from <CODE>metad1.dll</CODE> and <CODE>metad2.dll</CODE> to produce <CODE>out.exe</CODE>:</P>
+
+<blockquote>
+
+<PRE>jsc /reference:metad1.dll;metad2.dll /out:out.exe input.js</PRE>
+
+</blockquote>
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%"><b>/resource:</b><I>filename<br>
+</I>[,<I>name</I>[,public|private]]</TD>
+<TD width="72%" colspan="2">Embeds a managed resource in an assembly.<p>Option values:</p>
+
+<DL>
+<DT><I>filename</I></DT>
+
+<DD>The resource file you want to embed in the output file.</dd>
+
+<DT><I>name</I>[,public|private](optional)</DT>
+
+<DD>The logical name for the resource; the name used to load the resource. The default is the name of the file.  </dd>
+
+<DD>Optionally, you can specify whether the file is public or private in the assembly manifest. For example, 
+<b>/res:</b>filename.res,myname.res,public. By default, <I>filename</I> is public in the assembly.</dd>
+</DL>
+
+<P>Use the <b>/resource</b> option to link a resource to an assembly and not place the resource file in the output file.</P>
+
+<P>If <I>filename</I> is a managed resource file created, for example, by 
+Resgen, it can be accessed with members in the System.Resources 
+namespace.&nbsp; For more information, see System.Resources.ResourceManager. </P>
+
+<P><b>/res </b>is the short form of <b>/resource</b>.</P>
+
+<P>For example, compile <CODE>in.js</CODE> and attach resource file <CODE>rf.resource</CODE>:</P>
+
+<blockquote>
+
+<PRE>jsc /res:rf.resource in.js</PRE>
+
+</blockquote>
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%" rowspan="4"><b>/target:</b><i>output_type</i></TD>
+<TD width="72%" colspan="2"><P>Causes a .NET Framework assembly manifest to be placed in a 
+specified type of binary output file.</P>
+
+<P>If you create an assembly, you can indicate that all or part of your code is CLS-compliant with the CLSCompliantAttribute 
+class attribute.</P>
+
+<PRE>import System;
+[assembly:System.CLSCompliant(true)]   // Specify assembly compliance.
+
+System.CLSCompliant(true) class TestClass   // Specify compliance for element.
+{
+   var i: int;
+}</PRE>
+
+<i>output_type </i>specifies the format of the output file using one of three options:
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="1%"><b>/target:exe</b></TD>
+<TD width="30%">Creates a console .exe file.
+<P>The <b>/target:</b><i>exe</i> option causes the compiler to create an executable (EXE), console application. 
+The <b>/target:</b><i>exe</i> option is in effect by default. The executable file will be created with the .exe extension.</P>
+
+<P>Unless otherwise specified with the <b>/out</b> option, 
+the output file name takes the name of the first source code file in the compilation for  each output file.</P>
+
+<P>When specified at the command line, all files up to the next <b>/out</b> 
+or <b>/target:</b><i>library</i> option are used to create the .exe. 
+The /target:exe option is in effect for all files following the previous <b>/out
+</b>or <b>/target:</b><i>library</i> option.</P>
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="1%"><b>/target:library</b></TD>
+<TD width="30%">Creates a  code library (DLL).<P>The <b>/target:</b><i>library</i> 
+option causes the compiler to create a DLL rather than an EXE. 
+The DLL will be created with the .dll extension.</P>
+
+<P>Unless otherwise specified with the <b>/out</b> 
+option, the output file name takes the name of the first input file.</P>
+
+<P>When specified at the command line, all source files up to the next <b>/out</b> or 
+<b>/target:</b><i>exe</i> option are used to create the DLL.</P>
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="1%"><b>/target:winexe</b></TD>
+<TD width="30%">Creates an 
+executable  Windows GUI application. The executable file will be created 
+with the .exe extension. This sets the subsystem information in the portable 
+executable (PE) file, 
+which is used by  Windows to determine some execution characteristics 
+of the application.<p>This information is ignored by the Shared Source implementation of 
+the CLI.&nbsp; However, if the application is executed under the  .NET 
+Framework, this option will have an effect on the Windows loader.&nbsp;  <p>For more information on the 
+console or Windows subsystem setting see <a href="http://msdn.microsoft.com">msdn.microsoft.com</a> and search for 
+&quot;console subsystem&quot;.<br>
+<br>
+Use <b>/target:</b><i>exe</i> to create a console application. </TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%"><b>/utf8output[<I>+</I> | <I>-</I>]</b></TD>
+<TD width="72%" colspan="2">Displays compiler output using UTF-8 encoding.<p>
+Option values:</p>
+
+<DL>
+<DT><b><I>+</I> | <I>-</I></b></DT>
+
+<DD>By default <b>/utf8output-</b> displays output directly to the console. Specifying 
+<b>/utf8output</b> or <b>/utf8output+</b> redirects compiler output to a file.</dd>
+</DL>
+
+<P>In some international configurations, compiler output cannot correctly be 
+displayed to the console. In these configurations, use <B>/utf8output</B> and redirect compiler output to a file.</P>
+
+<P>The default for this option is <b>/utf8output-</b>.</P>
+
+<P>Specifying /utf8output is equivalent to specifying <b>/utf8output+</b>.</P>
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%"><b>/versionsafe[<I>+</I> | <I>-</I>]</b></TD>
+<TD width="72%" colspan="2">Ensures that all overrides are explicit.<p>Option 
+values:</p>
+
+<DL>
+<DT><b><I>+</I> | <I>-</I></b></DT>
+
+<DD>By default, <b>/versionsafe-</b> is in effect and the compiler will not generate an error if it 
+finds an implicit method override. <b>/versionsafe+</b>, which is equivalent to 
+<b>/versionsafe</b>, 
+causes the compiler to generate errors for implicit method overrides.</dd>
+</DL>
+
+<P>Use the <b>hide</b> or <b>override</b> keywords to explicitly indicate the override status of a method. 
+For example, the following code will generate an error when compiled with <b>/versionsafe</b>:</P>
+
+<PRE>class c
+{
+function f()
+{
+}
+}
+class d extends c 
+{
+function f()
+{
+}
+}</PRE>
+
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%" rowspan="7"><b>/warn:</b><I>option</I></TD>
+<TD width="72%" colspan="2">Sets a warning level where <i>option </i>is the 
+minimum warning level you want displayed for the build.
+<p>The <b>/warn</b> option specifies the warning level for the compiler to display.<br>
+Use <b>/warnaserror</b> to treat all warnings as errors up to the warning level 
+specified. Higher-level warnings are ignored.&nbsp; </p>
+<p>The compiler always displays errors.&nbsp; </p>
+<p><b>/w</b> is the short form of <b>/warn</b>.</p>
+<p>Valid values are 0-4.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="1%" align="center"><b>Warning level</b></TD>
+<TD width="30%" align="center"><b>Meaning</b></TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="1%">0</TD>
+<TD width="30%">Turns off emission of all warning messages; displays errors only.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="1%">1</TD>
+<TD width="30%">Displays errors and severe warning messages.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="1%">2</TD>
+<TD width="30%">Displays all errors and level 1 warnings plus certain, 
+less-severe warnings, such as warnings about hiding class members.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="1%">3</TD>
+<TD width="30%">Displays errors and level 1 and 2 warnings, plus certain, 
+less-severe warnings, such as warnings about expressions that always evaluate to 
+<b>true</b> or <b>false</b>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="1%">4</TD>
+<TD width="30%">Displays all errors and level 1-3 warnings, plus informational 
+warnings. This is the default warning level at the command line.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="28%"><b>/warnaserror[<I>+</I> | <I>-</I>]</b></TD>
+<TD width="72%" colspan="2">Promotes warnings to errors.
+
+<P>Any messages that would ordinarily be reported as warnings are instead reported as errors. No output files are created. The build continues in order to identify as many errors 
+and warnings as possible.</P>
+
+<P>By default, <b>/warnaserror-</b> is in effect, which causes warnings to not prevent the generation of an output file. 
+<b>/warnaserror</b>, which is 
+equivalent to <b>/warnaserror+</b>, causes warnings to be treated as errors.</P>
+
+<P>Use <b>/warn</b> to specify the level of warnings that you want the compiler to display.</P>
+
+</TD>
+</TR>
+
+</table>
+
+
+<h2>Sample Command Lines</h2>
+
+<UL>
+	<LI>Compiles File.js producing File.exe:
+    <blockquote>
+<PRE>clix jsc File.js </PRE>
+    </blockquote>
+</li>
+
+	<LI>Compiles File.js, producing File.dll:
+    <blockquote>
+<PRE>clix jsc /target:library File.js</PRE>
+    </blockquote>
+</li>
+
+	<LI>Compiles File.js and creates My.exe:
+    <blockquote>
+<PRE>clix jsc /out:My.exe File.js</PRE>
+    </blockquote>
+</li>
+
+	<LI>Compiles <CODE>test.js</CODE> and creates a DLL:
+    <blockquote>
+<PRE>clix jsc /target:library test.js</PRE>
+    </blockquote>
+</li>
+</UL>
+
+
+<hr>
+
+
+<p><i>Copyright (c) 2006 Microsoft Corporation. All rights reserved.</i></p>
+</BODY>
+</HTML>

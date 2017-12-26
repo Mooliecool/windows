@@ -1,0 +1,56 @@
+#
+# 
+#  Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+# 
+#  The use and distribution terms for this software are contained in the file
+#  named license.txt, which can be found in the root of this distribution.
+#  By using this software in any fashion, you are agreeing to be bound by the
+#  terms of this license.
+# 
+#  You must not remove this notice, or any other, from this software.
+# 
+#
+
+
+TARGETNAME      = System.Runtime.Serialization.Formatters.Soap
+TARGETTYPE=NOTARGET
+TARGETPATH=$(_OBJ_DIR)
+
+CLR_TARGETTYPE=DLL
+CLR_ENABLE_ASMMETA=1
+
+
+SOURCES=Native.rc
+
+COM_VISIBLE=1
+
+# Turn all warnings into errors, except obsolete warnings.  Note that 
+# build lab machines have logic to turn this off - see VBL\Tools\devdiv2.def.
+# Also, make sure that obsolete methods aren't blocking errors.
+# During an integration, if treating warnings as errors ever becomes a serious
+# problem that can't be avoided, feel free to turn the problematic warnings
+# back into errors using CSC_FLAGS=$(CSC_FLAGS) /warnaserror-:<error num>
+# and file a bug to get the code cleaned up.
+CSC_TREAT_WARNINGS_AS_ERRORS=1
+CSC_OBSOLETE_WARNINGS_ARE_NOT_ERRORS=1
+
+SERIALIZATION_SOURCES = \
+        soapformatter.cs \
+        soapparser.cs \
+        soapcommonclasses.cs \
+        soapenums.cs \
+        soapconverter.cs \
+        soapwriter.cs \
+        soapobjectreader.cs \
+        soapobjectwriter.cs \
+        soapobjectinfo.cs \
+        isoapparser.cs 
+
+CSHARP_SOURCES=$(SERIALIZATION_SOURCES)
+
+CLR_REFERENCES=\
+    $(SDK_REF_PATH)\System.Xml.dll \
+    $(SDK_REF_PATH)\System.dll
+
+RESGEN_SOURCE=SoapFormatter.txt
+

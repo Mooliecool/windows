@@ -1,0 +1,40 @@
+#
+# 
+#  Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+# 
+#  The use and distribution terms for this software are contained in the file
+#  named license.txt, which can be found in the root of this distribution.
+#  By using this software in any fashion, you are agreeing to be bound by the
+#  terms of this license.
+# 
+#  You must not remove this notice, or any other, from this software.
+# 
+#
+
+!include $(DEVDIV_TOOLS)\sources.inc
+
+USE_NOLIBS                              = 1
+
+TARGETNAME=unilib
+TARGETPATH=$(_NTTREE)\sdk\pal\lib\$(_BUILDTYPE)
+
+TARGETTYPE=LIBRARY
+
+USER_INCLUDES=$(USER_INCLUDES);$(BASEDIR)\vscommon\unilib;$(BASEDIR)\csharp\inc
+USER_C_DEFINES=$(USER_C_DEFINES) -D_MBCS -D_WINDOWS -DSTRICT -DNT -D_ATL_STATIC_REGISTRY -D_ATL_NO_UUIDOF
+
+!if "$(ROTOR_TOOLSET_VERSION)" == "MSVC"
+USER_C_FLAGS=$(USER_C_FLAGS) -MT$(D) $(USER_C_DEFINES)
+!else
+USER_C_FLAGS=$(USER_C_FLAGS) $(USER_C_DEFINES)
+!endif
+
+
+# These files are listed in alphabetical order.  Keep them that way!
+SOURCES= \
+    ucase.cpp \
+    ucasemt.cpp \
+    ugentab.cpp \
+    uniapi.cpp \
+    utable.cpp \
+    utf.cpp

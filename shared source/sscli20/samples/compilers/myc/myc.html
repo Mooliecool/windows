@@ -1,0 +1,259 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> 
+<head>
+<title>MyC Compiler Sample</title>
+<link rel="stylesheet" type="text/css" href="../../../docs/rotor.css">
+</head>
+
+<body>		
+
+
+<h1>MyC Compiler Sample</h1>
+
+
+<h2>Sample Overview</h2>
+
+
+<p>The  goal of the MyC compiler is to show the implementation of various 
+features of the CLI. </p>
+
+
+<p>The following table shows the command-line options for this sample.</p>
+
+<table border="1" width="90%">
+  <tr>
+    <th>Option</th>
+    <th>Description</th>
+    <tr>
+    <td><b>/debug </b> 
+    <td>Generates debug information.<tr>
+    <td><b>/nodebug </b> 
+    <td>Prevents generation of debug information.<tr>
+    <td><b>/list </b> 
+    <td>Generates an assembly listing (.asm).<tr>
+    <td><b>/dll </b> 
+    <td>Creates a DLL assembly. 
+  <tr>
+    <td><b>/exe </b> 
+    <td>Creates an executable assembly. 
+  <tr>
+    <td><b>/outdir:path </b> 
+    <td>Creates output files in the current directory.</tr>
+</table>
+
+
+<h3>Architecture Diagram</h3>
+
+
+<p align="center"><img border="1" src="mycarch.gif" width="372" height="733"></p>
+
+
+<p align="left">&nbsp;</p>
+
+
+<h3>MyC Language Specification</h3>
+<h4>Goals</h4>
+<p>The goal of the MYC compiler is to show common intermediate language (CIL) 
+instructions and the CLI in action. </p>
+<h4>Overview </h4>
+<p>The compiler itself is a simple recursive descent parser with a single pass 
+code generator. It generates an assembler source file which is then used as 
+input to the IL Assembler. </p>
+<h4>Language Specification </h4>
+<p>The language is a subset of the C language with 
+simplified declarations, both external and local. </p>
+<h4>Data Types </h4>
+<p>The only supported data types are <b>int</b> and <b>void</b>. Limiting 
+these choices  allows a simpler sample compiler design. </p>
+<h4>Data Declaration </h4>
+<p>Variables can be declared  static or local. Implicit 
+ 
+static declarations occur outside of function declarations. Local declarations 
+can occur only at the beginnings of functions prior to statements. </p>
+<p>For example: </p>
+<PRE>int func1()
+  {
+  int y;
+  }
+int x;
+
+int func2()
+  {
+  static int z;
+  };
+</PRE>
+<P>
+In this example the variable  <i>x</i> is a static declaration (by default) and the 
+variable  <i>y</i> is a local variable in function <b>func1()</b>. The variable
+
+<i>z</i> is actually a static, even though it is declared within a function. 
+<h4>Flow Control </h4>
+<UL>
+  <LI><b>if-else</b> blocks 
+  <LI><b>while</b> loops 
+  <LI><b>for</b> loops </LI>
+</UL>
+<h4>Restrictions </h4>
+<UL>
+  <LI>Integer data 
+  <LI>Outer declarations only 
+  <LI>Static methods and function calls only </LI>
+</UL>
+<h3>Backus-Naur Definition</h3>
+
+
+<p>letter ::= &quot;A-Za-z&quot;;<br>
+digit ::= &quot;0-9&quot;;<br>
+<br>
+name ::= letter { letter | digit };<br>
+integer ::= digit { digit };<br>
+<br>
+ident ::= name | function_call;<br>
+function_call ::= name &quot;(&quot; [expr {, expr}] &quot;)&quot;;<br>
+<br>
+factor ::= (ident | integer | &quot;(&quot; expr &quot;)&quot; );<br>
+unary_factor ::= [&quot;+&quot;|&quot;-&quot;] factor;<br>
+<br>
+term1 ::= [&quot;*&quot;|&quot;/&quot;] factor;<br>
+term0 ::= factor { term1 };<br>
+first_term ::= unary_factor term1;<br>
+<br>
+math_expr ::= first_term { [&quot;+&quot;|&quot;-&quot;] term0 }<br>
+rel_expr ::= math_expr (&quot;==&quot;|&quot;!=&quot;|&quot;&lt;&quot;|&quot;&gt;&quot;|&quot;&gt;=&quot;|&quot;&lt;=&quot;) math_expr;<br>
+not_factor ::= [&quot;!&quot;] rel_expr;<br>
+term_bool ::= not_factor { (&quot;&amp;&quot; | &quot;&amp;&amp;&quot;) not_factor };<br>
+bool_expr ::= term_bool { (&quot;|&quot; | &quot;^&quot;) term_bool };<br>
+expr ::= bool_expr;<br>
+<br>
+assign = ident &quot;=&quot; expr;<br>
+assign_stmt ::= assign &quot;;&quot; ;<br>
+if_stmt ::= &quot;if&quot; &quot;(&quot; expr &quot;)&quot; stmt_block [ &quot;else&quot; inner_block ];<br>
+while_stmt ::= &quot;while&quot; &quot;(&quot; expr &quot;)&quot; inner_block;<br>
+for_stmt ::= &quot;for&quot; &quot;(&quot; assign &quot;;&quot; expr &quot;;&quot; assign &quot;)&quot; inner_block<br>
+break_stmt ::= &quot;break&quot; &quot;;&quot;;<br>
+cont_stmt ::= &quot;continue&quot; &quot;;&quot;;<br>
+ret_stmt ::= &quot;return&quot; expr &quot;;&quot;;<br>
+stmt ::= (<br>
+if_stmt<br>
+| while_stmt<br>
+| for_stmt<br>
+| break_stmt<br>
+| cont_stmt<br>
+| ret_stmt<br>
+| assign_stmt<br>
+);<br>
+inner_block ::= &quot;{&quot; { stmt } &quot;}&quot;;<br>
+outer_block ::= &quot;{&quot; { inner_decl } { stmt } &quot;}&quot;;<br>
+<br>
+inner_decl ::= [ class ] type ident { &quot;,&quot; ident } &quot;;&quot;;<br>
+<br>
+class ::= &quot;extern&quot; | &quot;static&quot; | &quot;auto&quot;;<br>
+type ::= &quot;int&quot; | &quot;void&quot;;<br>
+<br>
+params ::= type ident { , type ident };<br>
+outer_decl ::= [ class ] type ident { &quot;,&quot; ident } &quot;;&quot;;<br>
+func_decl ::= [ class ] type ident &quot;(&quot; params &quot;)&quot; outer_block;<h2>Sample Source and Build Output Locations</h2>
+
+
+<p>The sample source is found in sscli20\samples\compilers\myc\src directory.&nbsp; The source 
+files are:</p>
+
+
+<ul class="none">
+  <li><a href="src/asm.cs">asm.cs</a></li>
+  <li><a href="src/emit.cs">emit.cs</a></li>
+  <li><a href="src/exe.cs">exe.cs</a></li>
+  <li><a href="src/iasm.cs">iasm.cs</a></li>
+  <li><a href="src/io.cs">io.cs</a></li>
+  <li><a href="src/myc.cs">myc.cs</a></li>
+  <li><a href="src/parse.cs">parse.cs</a></li>
+  <li><a href="src/tok.cs">tok.cs</a></li>
+  <li><a href="src/var.cs">var.cs</a></li>
+  <li><a href="src/varlist.cs">varlist.cs</a></li>
+</ul>
+
+
+<p>The build output location is %_NTTREE%\samples\compilers\myc.&nbsp; 
+The output file is an executable assembly named myc.exe.</p>
+
+
+<h2>Building the Sample</h2>
+
+
+<p>All samples are built from the buildall script.&nbsp;  </p>
+
+
+<p>You can also build all the 
+samples by switching to the root of the sample directory, sscli20\samples, and typing 
+<code>build -c</code>.</p>
+
+
+<p>You can build this specific sample  by switching to the sample directory and typing 
+<code>build -c</code>.</p>
+
+
+<h2>Running the Sample</h2>
+
+
+<p>Because the MyC language does not support referencing external assemblies, 
+use the Runtime Debugger to step through test applications built using MyC.</p>
+
+
+<ol>
+  <li>Run env.bat. </li>
+  <li>Build the SSCLI using the buildall script or batch file.</li>
+  <li>Switch to the %_NTTREE%\samples\compilers\myc directory.</li>
+  <li>Type the following command:<blockquote>
+
+
+<p>clix myc /debug <i>inputfile</i></p>
+
+
+  </blockquote>
+
+
+<p>where <i>inputfile</i> is the name of a MyC source file.&nbsp; For example:</p>
+
+
+  <blockquote>
+
+
+<p>clix myc /debug tflow.myc</p>
+
+
+  </blockquote>
+  </li>
+  <li>Debug the resulting assembly:</li>
+</ol>
+<blockquote>
+  <blockquote>
+
+
+<p>cordbg tflow.exe</p>
+
+
+  </blockquote>
+</blockquote>
+<h2>
+Known Issues </h2>
+
+
+<p>The debug line number count is off by 1.</p>
+
+
+<h2>References</h2>
+<ul>
+  <li><i>Modern Compiler Implementation in C</i>, by Andrew W Appel.</li>
+  <li><i>Algorithms in C++</i> by Robert Sedgewick.</li>
+  <li><i>Advanced Compiler Design and Implementations</i>, by Steven S Muchnick.</li>
+  <li><i>Compiler Construction</i>, by Niklaus Wirth.</li>
+  <li><i>Principles of Compiler Design</i>, by Alfred V. Aho and and Jeffrey D. Ullman.</li>
+</ul>
+
+
+
+
+
+<p><i>Copyright (c) 2006 Microsoft Corporation. All rights reserved.</i></p>
+</body> 
+</html>

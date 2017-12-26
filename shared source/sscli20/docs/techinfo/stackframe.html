@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> 
+<head>
+<title>Stack Frame Format</title>
+<link rel="stylesheet" type="text/css" href="../rotor.css">
+</head>
+
+<body>
+<h1>Stack Frame Format  in the Shared Source CLI 2.0</h1>
+
+<p>When executing just-in-time (JIT) compiled code in the Shared Source Common 
+Language Infrastructure 
+(SSCLI), there are two managed native calling conventions used on
+    the x86 for just-in-time (JIT) compiled code.
+</p>
+<p>Note: In non-JIT-compiled code, such as helper stubs, other calling 
+conventions are at work, so do not expect to see a completely homogenous stack. 
+All calls to or from JIT-compiled code  follow the calling convention, but 
+calls between non-JIT-compiled components can follow other conventions.
+</p>
+
+<h3>
+    Standard x86 calling convention</h3>
+    <p>
+        The standard native calling convention is a variation on the fastcall convention
+        used by the VC++ compiler. It differs primarily in the order in which arguments
+        are pushed on the stack. The only values that can be passed in registers are managed
+        and unmanaged pointers, object references, and the built-in integer types int8,
+        unsigned int8, int16, unsigned int16, int32, unsigned it32, native int, native unsigned
+        int, and enums and value types with only one primitive-type field. Enums are passed
+        as their underlying type. All floating-point values and 8-byte integer values are
+        passed on the stack. When the return type is a value type that cannot be passed
+        in a register, the caller shall create a buffer to hold the result and pass the
+        address of this buffer as a hidden parameter.
+    </p>
+    <p>
+        Arguments are passed in left-to-right order, starting with the this pointer (for
+        instance and virtual methods), followed by the return buffer pointer if needed,
+        followed by the user-specified argument values. The first of these that can be placed
+        in a register is put into ECX, the next in EDX, and all subsequent ones are passed
+        on the stack.
+    </p>
+    <p>
+        The return value is handled as follows:
+    </p>
+    <ol>
+        <li>Floating-point values are returned on the top of the hardware FP stack.</li>
+        <li>Integers up to 32 bits long are returned in EAX.</li>
+        <li>64-bit integers are passed with EAX holding the least significant 32 bits and EDX
+            holding the most significant 32 bits.</li>
+        <li>All other cases require the use of a return buffer, through which the value is returned.
+            In addition, there is a guarantee that if a return buffer is used a value is stored
+            there only upon ordinary exit from the method. The buffer is not allowed to be used
+            for temporary storage within the method and its contents will be unaltered if an
+            exception occurs while executing the method.</li>
+    </ol>
+    <p>
+        <h4>
+        Example:</h4>
+    </p>
+    <blockquote>
+        <code>static System.Int32 f(int32 x)</code><br />
+        The incoming argument (x) is placed in ECX; the return value is in EAX
+    </blockquote>
+    <blockquote>
+        <code>static float64 f(int32 x, int32 y, int32 z)</code>
+        <br />
+        x is passed in ECX, y in EDX, z on the top of stack; the return value is on the
+        top of the floating-point (FP) stack
+    </blockquote>
+    <blockquote>
+        <code>static float64 f(int32 x, float64 y, int32 z)</code>
+        <br />
+        x is passed in ECX, y on the top of the stack (not FP stack), z in EDX; the return
+        value is on the top of the FP stack
+    </blockquote>
+    <blockquote>
+        <code>virtual float64 f(int32 x, int64 y, int64 z)</code> 
+        <br />
+        this is passed in ECX, x in EDX, y
+        pushed on the stack, then z pushed on the stack (hence z is top of the stack); the
+        return value is on the top of the FP stack
+    </blockquote>
+    <blockquote>
+        <code>virtual int64 f(int32 x, float64 y, float64 z)</code>
+        <br />
+        this is passed in ECX, x in EDX,
+        y pushed on the stack, then z pushed on the stack (hence z is on top of the stack);
+        the return value is in EDX/EAX
+    </blockquote>
+    <blockquote>
+    <code>
+        virtual [mscorlib]System.Guid f(int32 x, float64 y, float64 z)</code>
+        <br />
+        Since System.Guid is a value type the this pointer is passed in ECX, a pointer to
+        the return buffer is passed in EDX, x is pushed, then y, and then z (hence z is
+        on top the of stack); the return value is stored in the return buffer.</blockquote>
+    <h3>
+        Vararg x86 calling convention</h3>
+    <p>
+        All user-specified arguments are passed on the stack, pushed in left-to-right order.
+        Following the last argument (hence on top of the stack upon entry to the method
+        body) a special opaque “handle to argument type data” is passed which provides information
+        about the types of the arguments that have been pushed. The caller is responsible
+        for popping off the arguments.
+    </p>
+    <p>
+        As with the standard calling convention, the this pointer and a return buffer (if
+        either is needed) are passed in ECX and/or EDX. Values are returned in the same
+        way as for the standard calling convention.</p>
+
+<h3>FCALL Matching</h3>
+<p>The order of parameters to an FCALL (see fcall.h) has to match the JIT 
+calling convention described above, instead of matching the
+function signature as it appears in the framework classes. In fcall.h there are a number of macros to help in converting an 
+CIL-style signature to the JIT calling convention.
+</p>
+<br>
+<hr>
+<p><i>Copyright (c) 2006 Microsoft Corporation. All rights reserved.</i></p>
+</body>
+</html>

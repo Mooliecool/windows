@@ -1,0 +1,58 @@
+# ==++==
+#
+#   
+#    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+#   
+#    The use and distribution terms for this software are contained in the file
+#    named license.txt, which can be found in the root of this distribution.
+#    By using this software in any fashion, you are agreeing to be bound by the
+#    terms of this license.
+#   
+#    You must not remove this notice, or any other, from this software.
+#   
+#
+# ==--==
+
+TARGETNAME =corguids
+TARGETPATH =$(CLR_LIB_DEST)
+TARGETTYPE =LIBRARY
+
+# This lib is published, turn off LTCG for Whidbey Beta 1
+LTCG=0
+
+NTTARGETFILE0   = $(O)\opcode.refops copyheaders
+NTTARGETFILE1   = doscript
+
+#MIDL_OPTIMIZATION       = -Zp4 -dlldata nul -proxy nul
+MIDL_TLBDIR             = $(O)
+
+!if "$(_BUILDARCH)"=="ia64"
+MIDL_FLAGS=$(MIDL_FLAGS) /win64
+!elseif "$(_BUILDARCH)"=="amd64"
+MIDL_FLAGS=$(MIDL_FLAGS) /win64
+!endif
+
+# This lib has to be standalone without references to CRT
+NO_CRT          = 1
+NO_NTDLL        = 1
+
+!undef USE_MSVCRT
+
+SOURCES     = $(O)/cordebug_i.c  \
+              $(O)/clrdata_i.c   \
+              $(O)/clrinternal_i.c \
+              $(O)/xclrdata_i.c  \
+              $(O)/CorFFI_i.c    \
+              $(O)/CorSym_i.c    \
+              $(O)/corprof_i.c   \
+              $(O)/corpub_i.c    \
+              $(O)/IValidator_i.c \
+              $(O)/IVEHandler_i.c \
+              $(O)/gchost_i.c    \
+              $(O)/fusion_i.c     \
+              $(O)/fusionpriv_i.c
+
+
+
+MISCFILES = *.h *.idl corhlpr.cpp opcode.def $(O)\*.h
+

@@ -1,0 +1,47 @@
+#
+# 
+#  Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+# 
+#  The use and distribution terms for this software are contained in the file
+#  named license.txt, which can be found in the root of this distribution.
+#  By using this software in any fashion, you are agreeing to be bound by the
+#  terms of this license.
+# 
+#  You must not remove this notice, or any other, from this software.
+# 
+#
+
+
+TARGETNAME=caspol
+TARGETTYPE=NOTARGET
+TARGETPATH=$(_OBJ_DIR)
+
+CLR_TARGETTYPE=EXE
+
+INCLUDE_ASSEMBLY_REFS=1
+
+SOURCES=Native.rc
+
+RESGEN_SOURCE=caspol.txt
+
+# Include common string resources such as the standard command-line copyright from tools\devdiv\CommonResStrings.txt
+USE_COMMONRESSTRINGS=1
+
+CSHARP_SOURCES=caspol.cs
+
+
+
+# Turn all warnings into errors, except obsolete warnings.  Note that 
+# build lab machines have logic to turn this off - see VBL\Tools\devdiv2.def.
+# Also, make sure that obsolete methods aren't blocking errors.
+# During an integration, if treating warnings as errors ever becomes a serious
+# problem that can't be avoided, feel free to turn the problematic warnings
+# back into errors using CSC_FLAGS=$(CSC_FLAGS) /warnaserror-:<error num>
+# and file a bug to get the code cleaned up.
+CSC_TREAT_WARNINGS_AS_ERRORS=1
+CSC_OBSOLETE_WARNINGS_ARE_NOT_ERRORS=1
+
+# caspol.exe needs to be compiled bit-specific because otherwise
+# a 32-bit version would not be able to modify 32-bit security 
+# settings on a WOW64 machine for example.
+

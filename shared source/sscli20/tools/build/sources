@@ -1,0 +1,70 @@
+################################################################################
+# 
+# ==++==
+# 
+#   
+#    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+#   
+#    The use and distribution terms for this software are contained in the file
+#    named license.txt, which can be found in the root of this distribution.
+#    By using this software in any fashion, you are agreeing to be bound by the
+#    terms of this license.
+#   
+#    You must not remove this notice, or any other, from this software.
+#   
+# 
+# ==--==
+#
+#Module Name:
+#
+#   sources.
+#
+#Abstract:
+#
+#    This file specifies the target component being built and the list of
+#    sources files needed to build that component.  Also specifies optional
+#    compiler switches and libraries that are unique for the component being
+#    built.
+#
+#
+#
+###############################################################################
+
+
+INCLUDES		  =$(INCLUDES);..\..\clr\src\inc;
+
+TARGETNAME=build
+TARGETPATH=obj
+TARGETTYPE=PROGRAM
+
+USE_MSVCRT=1
+
+# The heap tracing code under #ifdef DBG in build.exe is thread-unsafe,
+# therefore we need to explicitly turn off DBG.
+C_DEFINES=$(C_DEFINES) -DDBG=0
+
+MSC_WARNING_LEVEL = /W3 /WX
+
+SUBSYSTEM_VERSION=4.00
+
+SOURCES=build.c     \
+        builddb.c   \
+        buildexe.c  \
+        buildmak.c  \
+        buildscn.c  \
+        buildsrc.c  \
+        buildutl.c  \
+        buildinc.c
+
+
+UMTYPE=console
+
+PRECOMPILED_INCLUDE=build.h
+PRECOMPILED_OBJ=buildpch.obj
+
+ROTOR_USE_NOLIBS=1
+!ifndef PLATFORM_UNIX
+LINKLIBS=$(LINKLIBS)                   \
+        $(PAL_LIB_PATH)\rotor_pal.lib
+!endif
+UNIX_DLL_LIBS=-lrotor_pal

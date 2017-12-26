@@ -1,0 +1,50 @@
+#
+# 
+#  Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+# 
+#  The use and distribution terms for this software are contained in the file
+#  named license.txt, which can be found in the root of this distribution.
+#  By using this software in any fashion, you are agreeing to be bound by the
+#  terms of this license.
+# 
+#  You must not remove this notice, or any other, from this software.
+# 
+#
+
+USER_C_FLAGS     = $(USER_C_FLAGS) -DUNICODE -D_UNICODE -DFEATURE_NO_HOST
+!if "$(FEATURE_PAL)" != "1" || "$(ROTOR_TOOLSET)" == "MSVC"
+USER_C_FLAGS     = $(USER_C_FLAGS) /TP
+!endif
+
+TARGETNAME      = ilasm
+TARGETPATH      = $(_OBJ_DIR)
+TARGETTYPE      =PROGRAM
+UMTYPE          =console
+UMENTRY         =wmain
+
+
+NTTARGETFILES =
+
+UMLIBS=$(CLR_LIB_PATH)\utilcode.lib
+
+LINKER_STACKSIZE= -STACK:4194304,$(DEFAULT_STACKCOMMIT) -HEAP:4194304,$(DEFAULT_STACKCOMMIT)
+
+# Suppress LNK4078:
+#    delayimp.lib(delayhlp2.obj) : warning LNK4078: multiple '.base' sections found with different attributes (C0100040)
+# REVIEW: fix this instead of suppressing it!
+LINK_LIB_IGNORE=$(LINK_LIB_IGNORE),4078
+
+TARGETLIBS      = \
+
+SOURCES=        \
+    assem.cpp \
+    writer.cpp \
+    writer_enc.cpp \
+    method.cpp \
+    asmman.cpp \
+    main.cpp \
+    assembler.cpp \
+    native.rc
+
+
+#NO_AUTOMATIC_MANIFEST=1

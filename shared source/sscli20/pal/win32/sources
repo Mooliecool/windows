@@ -1,0 +1,91 @@
+#
+# 
+#  Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+# 
+#  The use and distribution terms for this software are contained in the file
+#  named license.txt, which can be found in the root of this distribution.
+#  By using this software in any fashion, you are agreeing to be bound by the
+#  terms of this license.
+# 
+#  You must not remove this notice, or any other, from this software.
+# 
+#
+
+ROTOR_USE_NOLIBS=1
+
+TARGETTYPE=DYNLINK
+
+TARGETNAME=rotor_pal
+TARGETPATH=$(PAL_LIB_DEST)
+
+COFFBASE=rotor_pal
+USE_RC_FROM_TOOLS=1
+
+!ifdef PASS0ONLY
+NTTARGETFILE0 = prepbuild
+!else
+MISCFILES=$(MISCFILES) $(TARGETPATH)\$(TARGET_DIRECTORY)\$(TARGETNAME).lib
+!endif
+
+DLLENTRY=DllMain
+
+MSC_WARNING_LEVEL = /W3 /WX
+
+# Overwrite default - don't want to use PAL RT
+INCLUDES=..;.
+
+INCLUDES=$(INCLUDES);$(NDPDIR)\inc\version
+
+# Add the right Win32 SDK to the path
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+INCLUDES=$(INCLUDES);$(MINGW_WIN32_INC_PATH);$(MINGW_WIN32_GCC_LIB_INC_PATH);$(SDK_INC_PATH_BOOT);$(CRT_INC_PATH_BOOT)
+C_DEFINES=$(C_DEFINES) -DPAL_IMPLEMENTATION=1
+!else
+INCLUDES=$(INCLUDES);$(SDK_INC_PATH_BOOT);$(CRT_INC_PATH_BOOT)
+C_DEFINES=$(C_DEFINES) /DPAL_IMPLEMENTATION=1
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+# Use the def/src file for this library on MinGW
+MINGW_USE_DLLDEF=1
+!endif
+
+WIN32_WINNT_VERSION=0x0500
+
+NO_NTDLL=1
+
+EXCEPTION_HANDLING  = $(SEHONLY)
+
+SOURCES=exception.c \
+        rotor_pal.rc \
+        VerifyThread.c \
+        cpp_exceptions.cpp \
+        win32pal.c
+
+DLLDEF=$(O)\rotor_pal.def
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+
+LINKLIBS=
+
+!else
+
+LINKLIBS=$(LIBC_LIB) \
+         $(SDK_LIB_PATH)\kernel32.lib \
+         $(SDK_LIB_PATH)\ole32.lib \
+         $(SDK_LIB_PATH)\ws2_32.lib \
+         $(SDK_LIB_PATH)\user32.lib \
+         $(SDK_LIB_PATH)\advapi32.lib
+
+!endif
+
+UMTYPE=windows
+
+MESSAGE_COMPILER = mc.exe
+
+
+
+
+
+
+

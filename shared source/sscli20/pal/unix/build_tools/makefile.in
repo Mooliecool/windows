@@ -1,0 +1,80 @@
+# /*++
+# 
+#  Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+# 
+#  The use and distribution terms for this software are contained in the file
+#  named license.txt, which can be found in the root of this distribution.
+#  By using this software in any fashion, you are agreeing to be bound by the
+#  terms of this license.
+# 
+#  You must not remove this notice, or any other, from this software.
+# 
+#
+# Module Name : build_tools/makefile.in
+#
+# process this file with configure to create a makefile
+#
+# --*/
+
+############################
+# constant parts of makefile
+
+SHELL = @SHELL@
+
+TOP_SRC_DIR = @top_srcdir@
+TOP_BUILD_DIR = ..
+SRC_DIR = @top_srcdir@/build_tools
+
+INCLUDE_DIRs = -I$(TOP_SRC_DIR)/.. -I$(TOP_SRC_DIR)/include
+
+CC = @CC@
+
+C_SRCS =
+
+TOOL_SUBDIR = $(TOP_SRC_DIR)/build_tools
+
+REALMDTOOL = @MDTOOL@
+
+CFLAGS = @CFLAGS@
+
+REQUIRED_CFLAGS =
+ALLCFLAGS = $(REQUIRED_CFLAGS) $(CFLAGS)
+
+PALDEFS= -DPAL_IMPLEMENTATION @DEFS@
+
+.SUFFIXES:
+.SUFFIXES: .c .o
+
+all: makefile mdtool
+
+makefile : ../../makefile.in
+	@echo $? is newer than $@, please rerun $(TOP_SRC_DIR)/$(BUILD_ALT_DIR)/$(_BUILDARCH)/configure.
+	@exit 1
+
+mdtool_dummy:
+	@touch mdtool_dummy
+
+mdtool:	$(REALMDTOOL)
+#create link from mdtool to real mdtool (mdtool_dummy, mdtool_gcc,...)
+	@chmod +x $(REALMDTOOL)
+	@rm -f mdtool
+	@ln -s $(REALMDTOOL) mdtool
+
+depend: mdtool
+#run mdtool
+	@echo Making dependencies for build_tools
+	@if [ "$(C_SRCS)" = "" ] ; then \
+	  exit 0; \
+	fi; \
+	$(TOOL_SUBDIR)/mdtool $(PALDEFS) $(ALLCFLAGS) $(INCLUDE_DIRS) $(C_SRCS)
+
+clean:
+# remove output files (makefile, etc)
+	rm -f mdtool
+
+.c.o:
+	$(CC) -c $(PALDEFS) $(ALLCFLAGS) $(INCLUDE_DIRS) -o $@ $<
+
+#don't add anything below this line!
+#mdtool output goes here>
+

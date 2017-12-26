@@ -1,0 +1,72 @@
+# ==++==
+# 
+#   
+#    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+#   
+#    The use and distribution terms for this software are contained in the file
+#    named license.txt, which can be found in the root of this distribution.
+#    By using this software in any fashion, you are agreeing to be bound by the
+#    terms of this license.
+#   
+#    You must not remove this notice, or any other, from this software.
+#   
+# 
+# ==--==
+
+INCLUDES		  =$(INCLUDES);..\..\clr\src\inc;
+
+TARGETNAME=nmake
+TARGETPATH=obj
+TARGETTYPE=PROGRAM
+
+USE_MSVCRT=1
+
+C_DEFINES=$(C_DEFINES) -DNT_BUILD
+
+MSC_WARNING_LEVEL = -W3 -WX
+
+SOURCES=action.cpp  \
+        build.cpp   \
+        charmap.cpp \
+        command.cpp \
+        error.cpp   \
+        exec.cpp    \
+        file.cpp    \
+        getrcmsg.c  \
+        globals.cpp \
+        ifexpr.cpp  \
+        init.cpp    \
+        inline.cpp  \
+        lexer.cpp   \
+        macro.cpp   \
+        nmake.cpp   \
+        parser.cpp  \
+        print.cpp   \
+        rpn.cpp     \
+        rule.cpp    \
+        util.cpp    \
+        utilp.cpp   \
+        win32.cpp
+
+
+!if "$(ROTOR_TOOLSET)" == "MSVC"
+USECXX_FLAG=/TP
+!endif
+
+UMTYPE=console
+
+MESSAGE_SRC = nmmsg.us
+NTTARGETFILE0 =
+
+
+PRECOMPILED_INCLUDE=precomp.h
+PRECOMPILED_PCH=precomp.pch
+PRECOMPILED_OBJ=precomp.obj
+PRECOMPILED_CXX=1
+
+ROTOR_USE_NOLIBS=1
+!ifndef PLATFORM_UNIX
+LINKLIBS=$(LINKLIBS)                   \
+        $(PAL_LIB_PATH)\rotor_pal.lib
+!endif
+UNIX_DLL_LIBS=-lrotor_pal

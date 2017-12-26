@@ -1,0 +1,2688 @@
+# ==++==
+#
+#   Copyright (c) Microsoft Corporation.  All rights reserved.
+#
+# ==--==
+################################################################################
+#
+#Module Name:
+#
+#    makefile.def
+#
+#Abstract:
+#
+#    This is the standard makefile for the components of the NT project.
+#    It includes the following files:
+#
+#        .\sources.      - developer supplies this file.  It defines the
+#                          required TARGETNAME, TARGETPATH, TARGETTYPE and
+#                          SOURCES as well as optional macros that control
+#                          the behavior of the compiler and linker:
+#
+#        $(_OBJ_DIR)\_objects.mac  - built by BUILD.EXE from .\sources.
+#
+#
+#Targets:
+#
+#    all       - Builds all targets in this make file
+#
+#    clean     - Erase all targets that can be produced by this make
+#                file, ignoring errors.  Also rebuilds the depend target.
+#
+#    depend    - Rebuilts source file dependencies, using BUILD.EXE tool
+#
+#EXAMPLE:  To compile with codeview symbols for windbg:
+#
+#          set NTDEBUG=ntsd
+#          set NTDEBUGTYPE=windbg
+#          set MSC_OPTIMIZATION=/Od
+#
+#
+#    nttest=filename
+#
+#    umtest=filename
+#
+#    umappl=filename
+#
+#    NT_UP
+#            Define as 0 in environment to turn on MP.
+#            If undefined or equal to 1, you get UP.
+#
+#    xxx_warning_level
+#
+#    xxx_optimization
+#
+#    xxx_STDCALL = 1 use _stdcall calling convention
+#                  0 use _cdecl calling convention
+#
+#    ntdebug
+#
+#    browser_info
+#
+#    xxx_cppflags
+#
+#    ntcppflags
+#
+#    NT_INST - set to turn on instrumentation
+#
+#    BASEDIR - The base directory of rotor source
+#
+#    LKGVC_DIR - The base directory of LKGVC tools
+#
+#    PRECOMPILED_CXX=1 - do precompiled headers for CXX instead of C files
+#                        note: precompiled headers can not be used on both
+#                        c and cxx files in a single directory.
+################################################################################
+
+
+# A couple of overrides
+
+# <STRIP>
+!ifndef SDK_INC_PATH
+SDK_INC_PATH = $(LKGVC_DIR)\public\sdk\inc
+!endif
+
+!ifndef SDK_LIB_PATH
+SDK_LIB_PATH = $(LKGVC_DIR)\public\sdk\lib\*
+!endif
+
+!ifndef DDK_LIB_PATH
+DDK_LIB_PATH = $(LKGVC_DIR)\public\sdk\lib\*
+!endif
+
+!ifndef CRT_INC_PATH
+CRT_INC_PATH = $(LKGVC_DIR)\public\sdk\inc\crt
+!endif
+
+!ifndef CRT_LIB_PATH
+CRT_LIB_PATH = $(LKGVC_DIR)\public\sdk\lib\*
+!endif
+
+!ifndef OAK_INC_PATH
+OAK_INC_PATH = $(LKGVC_DIR)\public\oak\inc
+!endif
+# </STRIP>
+
+!ifndef DEVDIV_TOOLS
+DEVDIV_TOOLS = $(ROTOR_DIR)\env\bin
+!endif
+
+#
+# Select build target and set platform specific variables.
+#
+
+!INCLUDE makefile.plt
+
+DEVDIV2_SECTION=BEFORE_MAKEFILE_DEF
+!include devdiv2.def
+
+CLRBASE=$(NDPDIR)\clr
+
+#
+# Environment overrides
+#
+
+!INCLUDE makefile.env
+
+# Build all internal static libraries into a common location so the rest of the
+# CLR tree can remain as location independent as possible.
+
+PAL_LIB_DEST=$(_NTTREE)\sdk\pal\lib\$(_BUILDTYPE)
+PAL_LIB_PATH=$(PAL_LIB_DEST)\$(TARGET_DIRECTORY)
+
+!ifndef LANGUAGE
+LANGUAGE=usa
+!endif
+
+# define a simple macro that can be used for the object subdir in makefile.inc/sources files
+
+O = $(_OBJ_DIR)\$(TARGET_DIRECTORY)
+O_PHASE0 = $(_OBJ_DIR_PHASE0)\$(TARGET_DIRECTORY)
+O_PHASE1 = $(_OBJ_DIR_PHASE1)\$(TARGET_DIRECTORY)
+O_PHASE2 = $(_OBJ_DIR_PHASE2)\$(TARGET_DIRECTORY)
+O_PHASEDef = $(_OBJ_DIR_PHASEDEF)\$(TARGET_DIRECTORY)
+
+#
+# Run miscfiles rules during both compile and link phases.  Sources file
+# can override by setting this a value other than 0
+#
+
+MISCFILES_DURING_LINK=0
+
+#
+# Include the developer supplied file that defines the TARGETNAME, TARGETPATH,
+# TARGETTYPE and SOURCES macros.  Make sure it defines them.
+#
+
+SUBSYSTEM_VERSION_CURRENT=4.10
+
+!INCLUDE .\sources.
+SOURCES_USED=$(SOURCES_USED) .\sources
+
+!if defined(PREFIX_BUILD)
+PRECOMPILED_INCLUDE =
+PRECOMPILED_CXX =
+PRECOMPILED_SOURCEFILE	=
+!endif
+
+!IF EXIST(.\$(TARGET_DIRECTORY)\sources.)
+! INCLUDE .\$(TARGET_DIRECTORY)\sources.
+SOURCES_USED=$(SOURCES_USED) .\$(TARGET_DIRECTORY)\sources.
+!ENDIF
+
+#
+# Attempt to include the sources file from the parent target subdirectory.
+#
+
+!IF EXIST(..\$(TARGET_DIRECTORY)\sources.)
+! INCLUDE ..\$(TARGET_DIRECTORY)\sources.
+SOURCES_USED=$(SOURCES_USED) ..\$(TARGET_DIRECTORY)\sources.
+!ENDIF
+
+#
+# Attempt to include the sources file from the target subdirectory.
+#
+
+!ifdef RESOURCE_ONLY_DLL
+# Resource only DLL's have no exports, no entrypoint, no code, no data, no debug symbolic.
+NTDEBUGTYPE=
+NTDEBUG=retail
+!undef DLLENTRY
+LINK_NO_RELEASE=1
+MAKEDLL=1
+TARGETLIBS=
+LINKLIBS=
+USE_NOLIBS=1
+NO_NTDLL=1
+!endif
+
+!ifndef USE_CPPMUNGE
+USE_CPPMUNGE=1
+!endif
+
+!ifndef ALLOW_STDINC
+ALLOW_STDINC=0
+!endif
+
+!IFNDEF TARGETPATH
+! ERROR Your .\sources. file must define the TARGETPATH= macro
+!ENDIF
+
+!if "$(TARGETPATH)" == "obj" || "$(TARGETPATH)" == "OBJ"
+TARGETPATH=$(_OBJ_DIR)
+!endif
+
+!if defined(CLR_TARGETTYPE) || defined(COMPLUSTYPE)
+! ifndef USING_DEVDIV_DEFS
+!  error Managed code build not supported in this area of the tree.
+! endif
+!endif
+
+!ifdef USING_DEVDIV_DEFS
+DEVDIV2_SECTION=0
+!include devdiv2.def
+!endif
+
+!ifdef TARGETPATHLIB
+! if "$(TARGETTYPE)" == "DYNLINK"
+!  if "$(MAKEDLL)" == ""
+# Pass 1 of a two pass build.  Make sure TargetPath is the same as targetpathlib.
+NO_BROWSER_FILE=1
+TARGETPATH=$(TARGETPATHLIB)
+!  endif
+! endif
+!else
+TARGETPATHLIB=$(TARGETPATH)
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+NO_BROWSER_FILE=1
+!endif
+
+!IFNDEF TARGETTYPE
+! ERROR Your .\sources. file must define the TARGETTYPE= macro
+!ENDIF
+
+!IFNDEF TARGETNAME
+! IF "$(TARGETTYPE)" != "NOTARGET"
+!  ERROR Your .\sources. file must define the TARGETNAME= macro
+! ELSE
+TARGETNAME=
+! ENDIF
+!ENDIF
+
+!if "$(TARGETTYPE)" == "DYNLINK"
+TARGETPRE=$(SHARED_LIB_PRE)
+!endif
+
+!IFNDEF SOURCES
+! ERROR Your .\sources. file must define the SOURCES= macro
+!ENDIF
+
+!if ("$(BUILD_ALT_DIR)" != "" && "$(BUILD_ALT_DIR)" != "d")
+! if ("$(UMAPPL:*=X)" != "$(UMAPPL)")
+!  error Can't use multiple UMAPPL with Alternate Directories (other than "d")
+! elseif ("$(UMTEST:*=X)" != "$(UMTEST)")
+!  error Can't use multiple UMTEST with Alternate Directories (other than "d")
+! endif
+!endif
+
+!ifndef COFFBASE_TXT_FILE
+COFFBASE_TXT_FILE = $(ROTOR_DIR)\env\*\coffbase.txt
+!endif
+
+!ifndef PERL
+PERL=perl
+!endif
+
+!IFNDEF UMBASE
+! IFDEF COFFBASE
+UMBASE=@$(COFFBASE_TXT_FILE),$(COFFBASE)
+! ELSE
+UMBASE=@$(COFFBASE_TXT_FILE),usermode
+! ENDIF
+!ENDIF
+
+LINKLIBS=$(LINKLIBS) $(PERFLIBS)
+
+UMENTRYABS=
+
+!IFNDEF UMTYPE
+UMTYPE=windows
+!ENDIF
+
+!if "$(TARGETTYPE)" == "DYNLINK" && !defined(RESOURCE_ONLY_DLL) && "$(ROTOR_TOOLSET)" == "MSVC"
+!  ifndef DLLENTRY
+DLLENTRY=_DllMainCRTStartup
+!  endif
+!endif
+
+!if "$(DLLENTRY)" == "DllMain"
+DLLENTRY=_DllMainCRTStartup
+!endif
+
+!ifdef DEBUG_CRTS
+DCRT=d
+LIBC_DEFINES = -D_DEBUG
+!else
+DCRT=
+LIBC_DEFINES = -DNDEBUG
+!endif
+
+!if "$(ROTOR_TOOLSET)" == "MSVC"
+# Note: LIBC_LIB has to be after rotor_pal.lib to make PAL logging for CRT functions work
+LIBC_LIB=$(CRT_LIB_PATH)\msvcrt$(DCRT).lib
+LIBC_DEFINES=$(LIBC_DEFINES) -D_DLL=1 -D_MT=1
+!endif
+
+NO_NTDLL=1
+
+!IFNDEF GPSIZE
+GPSIZE= 0
+!ENDIF
+
+!ifdef NTLIBPATH
+LIBRARY_PATH = $(NTLIBPATH)\*\lib
+!else
+LIBRARY_PATH = $(SDK_LIB_PATH)
+!endif
+
+NT_LIBS=$(LIBRARY_PATH)\ntdll.lib
+
+!ifndef SUBSYSTEM_VERSION
+! ifndef EXPECTED_WINVER
+SUBSYSTEM_WINVER   = ,4.00
+! else
+SUBSYSTEM_WINVER   = ,$(EXPECTED_WINVER)
+! endif
+SUBSYSTEM_CONVER   = ,4.00
+SUBSYSTEM_OS2VER   =
+SUBSYSTEM_POSIXVER =
+SUBSYSTEM_NATVER   = ,5.00
+!else
+SUBSYSTEM_WINVER   = ,$(SUBSYSTEM_VERSION)
+SUBSYSTEM_CONVER   = ,$(SUBSYSTEM_VERSION)
+SUBSYSTEM_OS2VER   = ,$(SUBSYSTEM_VERSION)
+SUBSYSTEM_POSIXVER = ,$(SUBSYSTEM_VERSION)
+SUBSYSTEM_NATVER   = ,$(SUBSYSTEM_VERSION)
+
+# Set the appropriate default WIN32_xxxxx values
+
+! if "$(SUBSYSTEM_VERSION)" == "4.00"
+!  ifndef WIN32_WINNT_VERSION
+WIN32_WINNT_VERSION=0x0400
+!  endif
+!  ifndef WIN32_WINNT_VERSION
+WIN32_WIN95_VERSION=0x0400
+!  endif
+!  ifndef WIN32_IE_VERSION
+!    if defined(VC60)
+WIN32_IE_VERSION=0x0400
+!    else
+WIN32_IE_VERSION=0x0300
+!    endif
+!  endif
+! elseif "$(SUBSYSTEM_VERSION)" == "3.51"
+!  ifndef WIN32_WINNT_VERSION
+WIN32_WINNT_VERSION=0x0351
+!  endif
+!  ifndef WIN32_WIN95_VERSION
+WIN32_WIN95_VERSION=0x0300
+!  endif
+!  ifndef WIN32_IE_VERSION
+WIN32_IE_VERSION=0x0200
+!  endif
+!  ifndef WINVER_VERSION
+WINVER_VERSION=0x0400            # Special case - WINVER was 4.00 for NT 3.51
+!  endif
+! elseif "$(SUBSYSTEM_VERSION)" == "3.50"
+!  ifndef WIN32_WINNT_VERSION
+WIN32_WINNT_VERSION=0x0350
+!  endif
+!  ifndef WIN32_WIN95_VERSION
+WIN32_WIN95_VERSION=0x0300
+!  endif
+!  ifndef WIN32_IE_VERSION
+WIN32_IE_VERSION=0x0100
+!  endif
+!  ifndef WINVER_VERSION
+WINVER_VERSION=0x0400            # Special case - WINVER was 4.00 for NT 3.50
+!  endif
+! endif
+!endif
+
+!IF "$(UMTYPE)" == "windows"
+
+SUBSYSTEM=windows$(SUBSYSTEM_WINVER)
+UMINCL=$(CRT_INC_PATH)
+
+! IF "$(UMENTRY)" == "winmain"
+UMENTRY=-entry:WinMainCRTStartup
+! ELSEIF "$(UMENTRY)" == "wwinmain"
+UMENTRY=-entry:wWinMainCRTStartup
+! ELSEIF "$(UMENTRY)" == "wmain"
+UMENTRY=-entry:wmainCRTStartup
+! ELSEIF "$(UMENTRYABS)" == ""
+UMENTRY=-entry:mainCRTStartup
+! ELSE
+UMENTRY=-entry:$(UMENTRYABS)
+! ENDIF
+
+!ELSEIF "$(UMTYPE)" == "console"
+
+SUBSYSTEM=console$(SUBSYSTEM_CONVER)
+UMINCL=$(CRT_INC_PATH)
+
+! IF "$(UMENTRY)" == "winmain"
+UMENTRY=-entry:WinMainCRTStartup
+! ELSEIF "$(UMENTRY)" == "wwinmain"
+UMENTRY=-entry:wWinMainCRTStartup
+! ELSEIF "$(UMENTRY)" == "wmain"
+UMENTRY=-entry:wmainCRTStartup
+! ELSEIF "$(UMENTRYABS)" == ""
+UMENTRY=-entry:mainCRTStartup
+! ELSE
+UMENTRY=-entry:$(UMENTRYABS)
+! ENDIF
+
+!ELSE
+! ERROR Invalid UMTYPE value - $(UMTYPE)
+!ENDIF  # UMTYPE tests
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+UMENTRY=
+!endif
+
+#
+# If you edit this line you need to modify $(BASEDIR)\private\sdktools\build\build.c
+#
+
+!IFDEF NTINCPATH
+NTINCLUDES=$(OAK_INC_PATH);$(NTINCPATH)\$(TARGET_DIRECTORY)\inc
+!ELSE
+NTINCLUDES=$(OAK_INC_PATH);$(SDK_INC_PATH)
+!ENDIF
+
+########
+#
+# Use a global warning-control file for VC.
+#
+#######
+!IF "$(ROTOR_TOOLSET)" == "MSVC"
+COMPILER_WARNINGS   = $(COMPILER_WARNINGS) /WX /FI$(CLRBASE)\src\inc\WarningControl.h
+!ENDIF
+
+!ifndef WIN32_WINNT_VERSION
+WIN32_WINNT_VERSION=0x0500
+!endif
+
+!ifndef WIN32_WIN95_VERSION
+WIN32_WIN95_VERSION=0x0400
+!endif
+
+!ifndef WIN32_IE_VERSION
+WIN32_IE_VERSION=0x0400
+!endif
+
+!ifndef WINVER_VERSION
+WINVER_VERSION=$(WIN32_WINNT_VERSION)
+!endif
+
+!if defined(PLATFORM_UNIX) || "$(ROTOR_TOOLSET)" == "MSVC"
+WIN32_DEFINE=-DWIN32=100 
+!else
+WIN32_DEFINE=
+!endif
+
+WIN32_DEFINE = $(WIN32_DEFINE) -D_NT1X_=100 -DWINNT=1 -D_WIN32_WINNT=$(WIN32_WINNT_VERSION) -DWINVER=$(WINVER_VERSION)
+
+WIN32_DEFINE = $(WIN32_DEFINE) -D_WIN32_IE=$(WIN32_IE_VERSION)
+
+INCLUDES     = $(INCLUDES: =)
+NTINCLUDES   = $(NTINCLUDES: =)
+UMINCL       = $(UMINCL: =)
+USER_INCLUDES =$(USER_INCLUDES: =)
+
+# USER first
+
+INCPATH0=-I$(USER_INCLUDES:;= -I)
+INCPATH1=-I$(USER_INCLUDES:;= -I)
+
+# INCLUDES if set
+
+!ifdef INCLUDES
+INCPATH0 = $(INCPATH0) -I$(INCLUDES:;= -I)
+INCPATH1 = $(INCPATH1) -I$(INCLUDES:;= -I)
+!endif
+
+# Finally NT and UM
+
+INCPATH0=$(INCPATH0) -I$(NTINCLUDES:;= -I) -I$(UMINCL:;= -I)
+INCPATH1=$(INCPATH1) -I$(NTINCLUDES:;= -I) -I$(UMINCL:;= -I)
+
+# Remove empty "-I " settings
+
+# add trailing semicolon to help us catch any dangling "-I" at the very end,
+# which won't have a following ' ' and won't match "-I "
+
+INCPATH0=$(INCPATH0); 
+INCPATH1=$(INCPATH1);
+
+INCPATH0=$(INCPATH0:-I =)
+INCPATH1=$(INCPATH1:-I =)
+
+INCPATH0=$(INCPATH0:-I;=)
+INCPATH1=$(INCPATH1:-I;=)
+
+INCPATH0=$(INCPATH0:;=)
+INCPATH1=$(INCPATH1:;=)
+
+!IFNDEF RELATIVE_DEPTH
+RELATIVE_DEPTH=..\..
+!ENDIF
+
+!IFNDEF DLLENTRY
+DLLENTRY=-noentry
+!ELSE
+! if "$(DLLENTRY:-entry:=)" == "$(DLLENTRY)"
+DLLENTRY=-entry:$(DLLENTRY)
+! endif
+!ENDIF
+
+!IF $(MPPC)
+DLLENTRY=-noentry
+!ENDIF
+
+!IFNDEF DLLBASE
+! IFDEF COFFBASE
+DLLBASE=@$(COFFBASE_TXT_FILE),$(COFFBASE)
+! ELSE
+DLLBASE=@$(COFFBASE_TXT_FILE),$(TARGETNAME)
+! ENDIF
+!ENDIF
+
+!IFNDEF DLLDEF
+DLLDEF=$(@B).def
+!ENDIF
+
+!IFNDEF LD_SCRIPT
+LD_SCRIPT=$(O)$(DIR_SEP)$(TARGETNAME).lds
+!ENDIF
+
+!IFNDEF BOOTBASE
+! IFDEF FRAZZLE
+BOOTBASE=0xd0100000,0xd0104000
+! ELSE
+BOOTBASE=0xd0ff0000,0xd0ff4000
+! ENDIF
+!ENDIF
+
+!IFNDEF DRIVERBASE
+DRIVERBASE=0x10000
+!ENDIF
+
+!IFNDEF HALBASE
+HALBASE=0x80010000
+!ENDIF
+
+#
+# Map lower case to upper case for variables that can be specified from the
+# command line.
+#
+
+!IFDEF makedll
+MAKEDLL=$(makedll)
+!ENDIF
+
+!IFDEF umtest
+UMTEST=$(umtest)
+!ENDIF
+
+
+#
+# Include the list of object files (defined as the OBJECTS macro) that was
+# built by BUILD program, using the SOURCES= macro defined in the sources.
+# file.  Use macro substitution to build the supported target objects.
+#
+
+OBJECTMACFILE=$(_OBJ_DIR)\_objects.mac
+!IF EXIST($(OBJECTMACFILE))
+!INCLUDE $(OBJECTMACFILE)
+!ENDIF
+
+!IF $(ROTOR_X86)
+OBJECTS=$(ROTOR_X86_OBJECTS)
+DLLLIBOBJECTS=$(DLLLIBOBJECTS) $(ROTOR_X86_DLLLIBOBJECTS)
+!ELSEIF $(386)
+OBJECTS=$(386_OBJECTS)
+DLLLIBOBJECTS=$(DLLLIBOBJECTS) $(386_DLLLIBOBJECTS)
+!ELSEIF $(PPC)
+OBJECTS=$(PPC_OBJECTS)
+DLLLIBOBJECTS=$(DLLLIBOBJECTS) $(PPC_DLLLIBOBJECTS)
+!ELSEIF $(MPPC)
+OBJECTS=$(MPPC_OBJECTS)
+DLLLIBOBJECTS=$(DLLLIBOBJECTS) $(MPPC_DLLLIBOBJECTS)
+!ELSE
+!ERROR "Unknown platform in makefile.def! OBJECTS will not be set."
+!ENDIF
+
+!ifdef MAC_RESOURCE
+MAC_RESOURCE_OBJECT=$(_OBJ_DIR)\$(TARGET_DIRECTORY)\$(MAC_RESOURCE:.r=.rsc)
+OBJECTS=$(OBJECTS) $(MAC_RESOURCE_OBJECT)
+!endif
+
+#
+# BUILD.EXE defines the NOLINK variable to disable the building of any
+# test executables when it is recursing on a dirs. file to build components
+# in subdirectories.
+#
+
+!IF "$(BUILDMSG)" != "Stop."
+! IFDEF NOLINK
+!  UNDEF MAKEDLL
+! ELSE
+!  IFDEF nolink
+!   UNDEF MAKEDLL
+!  ENDIF
+! ENDIF # DEF NOLINK
+!ENDIF # BUILDMSG != "Stop."
+
+DYNLINK_LIB=$(TARGETPATHLIB)\$(TARGET_DIRECTORY)\$(TARGETNAME).lib
+
+!IF !$(MPPC)
+DYNLINK_EXP=$(TARGETPATHLIB)\$(TARGET_DIRECTORY)\$(TARGETNAME).exp
+!ENDIF
+
+#
+# Determine type of target link we are doing
+#
+!IF "$(TARGETTYPE)" == "PROGRAM"
+!ifndef PLATFORM_UNIX
+TARGETEXT=exe
+!endif
+TARGETLIB=
+!ELSEIF "$(TARGETTYPE)" == "DYNLINK"
+
+! IF "$(MAKEDLL)" != ""
+
+TARGETLIB=$(WIN32DLL_LIBS)
+
+!  IF "$(TARGETEXT)" == ""
+TARGETEXT=$(SHARED_LIB_EXT)
+!  ENDIF
+! ELSE # "$(MAKEDLL)" != ""
+TARGETEXT=lib
+TARGETLIB=
+! ENDIF # "$(MAKEDLL)" != ""
+
+!ELSEIF "$(TARGETTYPE)" == "LIBRARY"
+TARGETEXT=lib
+TARGETLIB=
+
+!ENDIF # TARGETTYPE
+
+
+TARGET=
+
+!IF "$(TARGETTYPE)" != "UMAPPL_NOLIB"
+
+! IF "$(OBJECTS)" != ""
+!if "$(TARGETEXT)" == ""
+TARGET=$(TARGETPATH)\*\$(TARGETNAME)
+!else
+!if "$(TARGETLIBNAME)" != "" && "$(TARGETPRIORPATH)" != ""
+FULLTARGETNAME=$(TARGETPRIORPATH)$(TARGETPRE)$(TARGETLIBNAME)
+!else
+FULLTARGETNAME=$(TARGETPRE)$(TARGETNAME)
+!endif
+TARGET=$(TARGETPATH)\*\$(FULLTARGETNAME).$(TARGETEXT)
+!endif
+! ENDIF
+
+!ENDIF # TARGETTYPE != UMAPPL_NOLIB
+
+!IFDEF NOTARGETLIB
+TARGETLIB=
+!ENDIF
+
+!ifndef UNIX_DLL_LIBS
+UNIX_DLL_LIBS=
+!endif
+
+!if "$(ROTOR_USE_NOLIBS)"!="1"
+TARGETLIB=$(TARGETLIB) $(PAL_LIB_PATH)\rotor_palrt_s.lib
+!if "$(PLATFORM_UNIX)" != "1"
+TARGETLIB=$(TARGETLIB) $(PAL_LIB_PATH)\rotor_pal.lib $(PAL_LIB_PATH)\rotor_palrt.lib $(PAL_LIB_PATH)\sscoree.lib
+!if "$(FREEBUILD)" != "1"
+TARGETLIB=$(TARGETLIB) $(PAL_LIB_PATH)\rotor_debug.lib
+!endif
+!else
+UNIX_DLL_LIBS=$(UNIX_DLL_LIBS) -lrotor_pal -lrotor_palrt -lsscoree
+!if "$(FREEBUILD)" != "1"
+UNIX_DLL_LIBS=$(UNIX_DLL_LIBS) -lrotor_debug
+!endif
+
+!endif
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+!ifndef PLATFORM_UNIX
+LINKER_FLAGS=$(LINKER_FLAGS) -L $(PAL_LIB_PATH)
+!endif
+!endif
+
+!IFNDEF MACHINE_TARGETLIBS
+MACHINE_TARGETLIBS=$(TARGETLIB) $(TARGETLIBS)
+!ENDIF
+
+
+TARGETOBJFILES=$(TARGETOBJFILES) $(OBJECTS)
+
+!IF "$(NOLINK)" == "" ||                                     \
+    ("$(NOLINK)" != "" && ("$(TARGETTYPE)"=="LIBRARY" ||     \
+                        (   "$(TARGETTYPE)"=="DYNLINK" &&    \
+                            "$(MAKEDLL)" == "")              \
+                           )                                 \
+    )
+
+
+! IF "$(NOLINK)" != "" && "$(TARGET)" != ""
+TARGETLIBFILES=$(TARGETLIBFILES) $(TARGETPATH)\*\$(TARGETNAME).lib
+! ELSE
+TARGETEXEFILES=$(TARGETEXEFILES) $(TARGET)
+! ENDIF
+
+!ENDIF # NOLINK == "" || building .lib file for dll
+
+UMOBJFILES=
+UMEXEFILES=
+
+!IF "$(UMAPPLEXT)" == ""
+!ifdef PLATFORM_UNIX
+UMAPPLEXT=
+!else
+UMAPPLEXT=.exe
+!endif
+!ENDIF
+
+!IF "$(UMAPPL)" != ""
+
+UMOBJFILES=obj\*\$(UMAPPL:*=.obj obj\*\).obj
+
+
+! IF "$(UMAPPLEXT)" == ".exe"
+!  IFNDEF NOLINK
+
+UMEXEFILES=obj\*\$(UMAPPL:*=.exe obj\*\).exe
+!  ENDIF
+! ELSE
+!  ERROR Unsupport UMAPPLEXT = $(UMAPPLEXT)
+
+! ENDIF # UMAPPLEXT
+!ENDIF # UMAPPL != ""
+
+!IF "$(UMTEST)" != ""
+
+UMOBJFILES=$(UMOBJFILES) obj\*\$(UMTEST:*=.obj obj\*\).obj
+
+! IFNDEF NOLINK
+
+UMEXEFILES=$(UMEXEFILES) obj\*\$(UMTEST:*=.exe obj\*\).exe
+
+! ENDIF
+!ENDIF
+
+!if "$(BUILD_ALT_DIR)" == "d"
+UMOBJFILES=$(UMOBJFILES:obj\*\=objd\*\)
+UMEXEFILES=$(UMEXEFILES:obj\*\=objd\*\)
+!endif
+
+#
+# Define NT_UP as 0 in environment to turn on MP.
+# If undefined or equal to 1, you get UP.
+#
+
+!IFNDEF NT_UP
+NT_UP=1
+!ENDIF
+
+!IF "$(NT_UP)"=="0"
+NT_UP_DEFINES=
+!ELSE
+NT_UP_DEFINES=-DNT_UP=1
+!ENDIF
+
+!IFNDEF NT_INST
+NT_INST=0
+!ENDIF
+
+!IFNDEF PNP_POWER
+PNP_POWER=0
+!ENDIF
+
+!IF "$(PNP_POWER)"=="0"
+NT_PNP_POWER_DEFINES=
+!ELSE
+NT_PNP_POWER_DEFINES=-D_PNP_POWER_=1
+!ENDIF
+
+!IFNDEF PNP_STUB_ENABLED
+PNP_STUB_ENABLED=0
+!ENDIF
+
+!IF "$(PNP_STUB_ENABLED)"=="0"
+NT_PNP_STUB_DEFINES=
+!ELSE
+NT_PNP_STUB_DEFINES=-D_PNP_POWER_STUB_ENABLED_=1
+!ENDIF
+
+#
+# User defined variables (environment variables or command line).
+# A cpu specific definition will take precedence over the MSC definition.
+#
+# xxx_WARNING_LEVEL
+# xxx_OPTIMIZATION
+# xxx_CPPFLAGS
+#
+
+
+ALL_WARNINGS_FLAG=-Wall
+VC_WARNING_LEVELERROR=/WX
+VC_WARNING_LEVEL3=/W3
+VC_WARNING_LEVEL4=/W4
+
+
+!IFNDEF MSC_WARNING_LEVEL
+!IF "$(ROTOR_TOOLSET)" != "MSVC"
+MSC_WARNING_LEVEL=$(ALL_WARNINGS_FLAG) -Wno-non-virtual-dtor -Wno-non-template-friend
+!ELSE
+MSC_WARNING_LEVEL=$(VC_WARNING_LEVEL3)
+!ENDIF
+!ENDIF
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+DEFAULT_MSC_OPT=-O2
+!else
+DEFAULT_MSC_OPT = /Oxs
+!endif
+
+#
+# End of user defined variables.
+#
+
+!if "$(USE_VAC_CC)" == "1"
+CPLUSPLUS_CPP_OUTPUT=-+
+CPLUSPLUS_FILE=-+
+!else
+CPLUSPLUS_CPP_OUTPUT = -x c++-cpp-output
+CPLUSPLUS_FILE = -x c++
+!endif
+
+!if "$(PLATFORM_UNIX)" != "1" || "$(ALLOW_STDINC)" != "1"
+STD_DEFINES=-DCONDITION_HANDLING=1 $(NT_UP_DEFINES) \
+            -DNT_INST=$(NT_INST) $(WIN32_DEFINE) $(NT_PNP_POWER_DEFINES) \
+            $(NT_PNP_STUB_DEFINES)
+
+!IFNDEF NOT_LEAN_AND_MEAN
+STD_DEFINES = $(STD_DEFINES) -DWIN32_LEAN_AND_MEAN=1
+!ENDIF
+!else # PLATFORM_UNIX && ALLOW_STDINC
+STD_DEFINES = 
+!endif # !PLATFORM_UNIX || !ALLOW_STDINC
+
+!IF "$(NTDEBUG)" == "retail"
+TARGET_DBG_DEFINES= -DDEVL=1
+DBGFLAGS=
+!ELSEIF "$(NTDEBUG)" == ""
+TARGET_DBG_DEFINES= -DDEVL=1
+DBGFLAGS=
+!ELSEIF "$(NTDEBUG)" == "ntsdnodbg"
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+DBGFLAGS=-g
+!else
+DBGFLAGS=/Zi
+!endif
+TARGET_DBG_DEFINES= -DDEVL=1
+!ELSEIF "$(NTDEBUG)" == "ntsd"
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+DBGFLAGS=-g
+!else
+DBGFLAGS= /Zi
+!endif
+TARGET_DBG_DEFINES= -DDBG=1 -DDEVL=1
+!ELSEIF "$(NTDEBUG)" == "cvp" || "$(NTDEBUG)" == "sym"
+DBGFLAGS= /Zd
+TARGET_DBG_DEFINES= -DDBG=1 -DDEVL=1
+!ELSE
+! ERROR NTDEBUG macro can be either "retail", "", "ntsd", "cvp" or "sym" or "ntsdnodbg"
+!ENDIF
+
+!IF "$(ROTOR_TOOLSET)" == "MSVC"
+USE_PDB=1
+!ENDIF
+
+!IF "$(PRECOMPILED_OPTION)" == ""
+! IF "$(PRECOMPILED_INCLUDE)" != ""
+!  IF "$(PRECOMPILED_INCLUDE)" != "$(PRECOMPILED_INCLUDE:.hxx=)"
+PRECOMPILED_CXX=1
+!  ENDIF
+!  IF "$(PRECOMPILED_INCLUDE)" != "$(PRECOMPILED_INCLUDE:.cxx=)"
+PRECOMPILED_CXX=1
+!  ENDIF
+!  IF "$(PRECOMPILED_INCLUDE)" != "$(PRECOMPILED_INCLUDE:.cpp=)"
+PRECOMPILED_CXX=1
+!  ENDIF
+!  IF "$(PRECOMPILED_PCH)" == ""
+PRECOMPILED_PCH=$(PRECOMPILED_INCLUDE:.hxx=.pch)
+PRECOMPILED_PCH=$(PRECOMPILED_PCH:.h=.pch)
+PRECOMPILED_PCH=$(PRECOMPILED_PCH:.cxx=.pch)
+PRECOMPILED_PCH=$(PRECOMPILED_PCH:.cpp=.pch)
+PRECOMPILED_PCH=$(PRECOMPILED_PCH:.c=.pch)
+PRECOMPILED_PCH=$(PRECOMPILED_PCH:..\=)
+!  ENDIF
+!  IF "$(PRECOMPILED_OBJ)" == ""
+PRECOMPILED_OBJ=$(PRECOMPILED_PCH:.pch=.obj)
+!  ENDIF
+! ENDIF
+!ENDIF
+
+!IF "$(PRECOMPILED_OPTION)" == ""
+! IF "$(PRECOMPILED_INCLUDE)" != ""
+!  IF "$(PRECOMPILED_PCH)" != ""
+!   IF "$(FEATURE_PRECOMPILED_HEADERS)" == "1"
+HEADERFILE=$O/$(PRECOMPILED_PCH)
+!   ELSE
+HEADERFILE=/Fp$O\$(PRECOMPILED_PCH)
+!   ENDIF
+!  ENDIF
+!  IF "$(PRECOMPILED_OBJ)" != ""
+HEADEROBJNAME=$O\$(PRECOMPILED_OBJ)
+!   IF "$(FEATURE_PRECOMPILED_HEADERS)" == "1"
+HEADEROBJ=--dump-pch $(MAKEDIR)/$(HEADEROBJNAME) $(CPLUSPLUS_CPP_OUTPUT)
+!   ELSE
+HEADEROBJ=/Fo"$(MAKEDIR)\$(HEADEROBJNAME)"
+!   ENDIF
+!  ENDIF
+
+!  IF !$(MPPC)
+!   IF "$(PRECOMPILED_CXX)" == ""
+!    IF "$(FEATURE_PRECOMPILED_HEADERS)" == "1"
+PRECOMPILED=--load-pch $(HEADEROBJNAME)
+!    ELSE
+PRECOMPILED=/Yu$(PRECOMPILED_INCLUDE:..\=) $(HEADERFILE)
+!    ENDIF
+PRECOMPILED_CXX=
+!   ELSE
+PRECOMPILED=
+!    IF "$(FEATURE_PRECOMPILED_HEADERS)" == "1"
+PRECOMPILED_CXX=--load-pch $(HEADEROBJNAME)
+!    ELSE
+PRECOMPILED_CXX=/Yu$(PRECOMPILED_INCLUDE:..\=) $(HEADERFILE)
+!    ENDIF
+!   ENDIF
+!  ENDIF
+
+PRECOMPILED_TARGET=$O\$(PRECOMPILED_PCH)
+! ELSE
+!  IF "$(PRECOMPILED_INCLUDE)" != ""
+!   IF !$(MPPC)
+!    IF "$(PRECOMPILED_CXX)" == ""
+!     IF "$(FEATURE_PRECOMPILED_HEADERS)" == "1"
+PRECOMPILED=--load-pch $(HEADEROBJNAME)
+!     ELSE
+PRECOMPILED=/Yu$(PRECOMPILED_INCLUDE)
+!     ENDIF
+PRECOMPILED_CXX=
+!    ELSE
+PRECOMPILED=
+!     IF "$(FEATURE_PRECOMPILED_HEADERS)" == "1"
+PRECOMPILED_CXX=--load-pch $(HEADEROBJNAME)
+!     ELSE
+PRECOMPILED_CXX=/Yu$(PRECOMPILED_INCLUDE)
+!     ENDIF
+!    ENDIF
+!   ENDIF
+!  ENDIF
+! ENDIF
+!ELSE
+! IF "$(PRECOMPILED_CXX)" == ""
+PRECOMPILED=$(PRECOMPILED_OPTION)
+PRECOMPILED_CXX=
+! ELSE
+PRECOMPILED=
+PRECOMPILED_CXX=$(PRECOMPILED_OPTION)
+! ENDIF
+PRECOMPILED_TARGET=$(PRECOMPILED_TARGET)
+! IF "$(PRECOMPILED_TARGET)" != ""
+HEADERFILE=/Fp$(PRECOMPILED_TARGET)
+! ENDIF
+! IF "$(PRECOMPILED_OBJ)" != ""
+HEADEROBJNAME=$(PRECOMPILED_OBJ)
+!  IF "$(FEATURE_PRECOMPILED_HEADERS)" == "1"
+HEADEROBJ=--dump-pch $(HEADEROBJNAME) $(CPLUSPLUS_CPP_OUTPUT)
+!  ELSE
+HEADEROBJ=/Fo$(HEADEROBJNAME)
+!  ENDIF
+! ENDIF
+!ENDIF
+
+USECXX_FLAG=$(USECXX_FLAG:p=P)
+
+!IF "$(PRECOMPILED_CXX)" == "" && "$(USECXX_FLAG)" == ""
+PRECOMPILED_FLAG=$(PRECOMPILED_FLAG) /Tc
+!ELSE
+PRECOMPILED_FLAG=$(PRECOMPILED_FLAG) /Tp
+!ENDIF
+
+!IF "$(NTNOPCH)" != "" || ("$(ROTOR_TOOLSET)" != "MSVC" && "$(FEATURE_PRECOMPILED_HEADERS)" != "1")
+PRECOMPILED=
+PRECOMPILED_CXX=
+!ENDIF
+
+#
+# Set linker options
+#
+
+!IF "$(FEATURE_PRECOMPILED_HEADERS)" == "1"
+PRECOMPILED_INCLUDE_FOR_MUNGER = $(PRECOMPILED_INCLUDE)
+!ELSE
+PRECOMPILED_INCLUDE_FOR_MUNGER =
+!ENDIF
+
+!if "$(ROTOR_TOOLSET)" == "MSVC" && "$(ROTOR_TOOLSET_VERSION)" != "70"
+LINKER_FLAGS = $(LINKER_FLAGS) /SAFESEH:NO
+!endif
+
+!if "$(ROTOR_TOOLSET)" == "MSVC" && "$(MSVCDIR)" == ""
+# Do not use manifest for LKG VC build
+LINKER_FLAGS = $(LINKER_FLAGS) /MANIFEST:NO
+!endif
+
+#
+# Merge _PAGE with PAGE, _TEXT with .text, and make sure
+# INIT sections are discardable
+#
+
+!ifdef LINKER_NOREF
+LINK_REF_FLAG=-OPT:NOREF -OPT:NOICF
+!else
+! ifdef LINKER_NOICF
+LINK_REF_FLAG=-OPT:REF -OPT:NOICF
+! else
+LINK_REF_FLAG=-OPT:REF -OPT:ICF
+! endif
+!endif
+
+!if "$(ROTOR_TOOLSET)" == "MSVC"
+!ifdef LINKER_STACKSIZE
+LINKER_FLAGS = $(LINKER_FLAGS) $(LINKER_STACKSIZE)
+!else
+LINKER_FLAGS = $(LINKER_FLAGS) -STACK:$(DEFAULT_STACKRESERVE),$(DEFAULT_STACKCOMMIT)
+!endif
+
+LINK_LIB_IGNORE_FLAG=-IGNORE:4001,4037,4039,4065,4070,4078,4087,4089,4198,4221
+
+!ifdef LINK_NO_RELEASE
+LINK_RELEASE=
+!else
+LINK_RELEASE=/release
+!endif
+
+!ifdef USE_INCREMENTAL_LINKING
+USE_PDB = 1                     # PDB's are required to use Incremental linking
+LINK_INCREMENTAL_FLAG = -OPT:NOREF \
+                        $(LINK_LIB_IGNORE_FLAG)
+!else
+LINK_INCREMENTAL_FLAG = $(LINK_REF_FLAG) \
+                        -INCREMENTAL:NO \
+                        -FULLBUILD \
+                        -FORCE:MULTIPLE \
+                        $(LINK_RELEASE) \
+                        $(LINK_LIB_IGNORE_FLAG)
+!endif
+!endif
+
+!ifdef BACKGROUND_USE
+LINKER_FLAGS = $(LINKER_FLAGS) -WS:aggressive
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+!if "$(TARGETTYPE)" != "PROGRAM"
+LINKER_FLAGS =  $(LINKER_FLAGS) $(LIB_LINKER_FLAGS)
+!endif
+LINKER_FLAGS =  $(LINKER_FLAGS:/LARGEADDRESSAWARE=) \
+                $(LINK_INCREMENTAL_FLAG)
+!else
+LINKER_FLAGS =  $(LINKER_FLAGS) \
+                -MERGE:_PAGE=PAGE \
+                -MERGE:_TEXT=.text \
+                -SECTION:INIT,d \
+                $(LINK_INCREMENTAL_FLAG) \
+                -NODEFAULTLIB
+
+!if "$(ROTOR_TOOLSET)" == "MSVC"
+LINKER_MERGE_RDATA=-MERGE:.rdata=.text
+!endif
+
+!endif
+
+!if "$(ROTOR_TOOLSET)" == "MSVC"
+LINKER_DBG_SECTION=-debug
+!endif
+
+!if "$(ROTOR_TOOLSET)" == "MSVC"
+LINK_OS_VERSIONS = -version:5.00 -osversion:5.00
+!endif
+
+LINKER_FLAGS = $(LINKER_FLAGS) $(LINKER_DBG_SECTION) $(LINKER_DBG_TYPE) $(LINK_OS_VERSIONS)
+
+#
+# Processor specific control and options.
+#
+
+!include $(TARGET_DIRECTORY)mk.inc
+
+!if "$(ROTOR_NO_CC_LIB)" == "1"
+CC_LIB=
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+REQUIRED_C_RUNTIME = $(REQUIRED_C_LIBS)
+LINKER_FLAGS = $(LINKER_FLAGS) $(REQUIRED_C_RUNTIME)
+
+!if "$(TARGETTYPE)" == "LIBRARY"
+LIBRARIAN_FLAGS = $(ARCHIVE_FLAGS)
+LIBRARIAN = ar $(LIBRARIAN_FLAGS) $@
+!if "$(RANLIB)" != ""
+USE_RANLIB = 1
+!endif
+!else
+LIBRARIAN_FLAGS = $(PARTIAL_LINKING) $(LIBRARIAN_FLAGS) $(LD_LIB_DIRS)
+LIBRARIAN = ld $(LIBRARIAN_FLAGS) -o $@
+!endif
+
+!else
+LIBRARIAN_FLAGS = $(LIBRARIAN_FLAGS) $(LINK_LIB_IGNORE_FLAG) -nodefaultlib
+LIBRARIAN_FLAGS = $(LIBRARIAN_FLAGS) -machine:$(MACHINE_TYPE)
+
+LIBRARIAN=lib -out:$@ $(LIBRARIAN_FLAGS)
+!endif
+
+!ifndef LINKER
+!if "$(ROTOR_TOOLSET)" == "MSVC"
+LINKER=link -out:$@ -machine:$(MACHINE_TYPE)
+!ELSE
+LINKER=g++ -o $@
+!endif
+!endif
+
+!if defined(NTPROFILEINPUT) && ("$(TARGETTYPE)" == "LIBRARY")
+! message NTPROFILEINPUT s/b removed in: $(MAKEDIR).
+!endif
+
+!IF defined(NTPROFILEINPUT) || defined(EXEPROFILEINPUT)
+ORDER=-order:@$(@B).prf
+!ENDIF
+
+!IFDEF DLLORDER
+ORDER=-order:@$(DLLORDER)
+!ENDIF
+
+!ifdef USING_DEVDIV_DEFS
+DEVDIV2_SECTION=1
+!include devdiv2.def
+!endif
+
+#
+# Standard inference rules for C files that produce object files.
+#
+
+.SUFFIXES: .asm .asmx .c .class .cs .cxx .cpp .mcpp .exe .f .java .obj .p .rc .rcpp .res .resx .resz .resources .s .sdl .thk .txt .vb
+
+MAPSYM_CMD =
+
+!ifndef BINPLACE_NAME
+BINPLACE_NAME=binplace
+!endif
+
+!ifdef PLATFORM_UNIX
+COPY_NAME=cp -f
+!endif
+
+!ifndef COPY_NAME
+COPY_NAME=copy
+!endif
+
+!if "$(USE_PDB)" == ""
+!if "$(ROTOR_TOOLSET)" == "MSVC"
+LINKER_FLAGS = $(LINKER_FLAGS) -PDB:NONE
+!endif
+!endif
+
+# Note: LIBC_LIB has to be after rotor_pal.lib to make PAL logging for CRT functions work
+LIBRARY_OBJS=$(IMPLIB_OBJS) $(LINKLIBS) $(OBJECTS) $(LIBC_LIB)
+
+LINKER_FLAGS = $(LINKER_FLAGS) $(LINKER_MERGE_RDATA)
+
+!if $(DELAYLOAD_SUPPORTED)
+! if "$(DELAYLOAD)" != ""
+DELAYLOAD = $(DELAYLOAD: =)
+DELAYLOAD_FLAGS = /delayload:$(DELAYLOAD:;= /delayload:)
+LINKER_FLAGS = $(LINKER_FLAGS) $(DELAYLOAD_FLAGS)
+! endif
+!endif
+
+#
+# Clear the suffixes list so we can ensure only pass zero stuff will be built
+#
+!IFDEF PASS0ONLY
+.SUFFIXES:
+!ENDIF
+
+!ifdef NO_BINPLACE
+BINPLACE_CMD=
+!else
+
+! ifndef BINPLACE_PLACEFILE
+BINPLACE_PLACEFILE	=$(ROTOR_DIR)\env\bin\placefil.txt
+! endif
+
+! ifndef SIGN_TXT_FILE
+SIGN_TXT_FILE	=$(ROTOR_DIR)\env\bin\sign.txt
+! endif
+
+#BINPLACE_FLAGS          = $(BINPLACE_FLAGS) -f 
+
+
+BINPLACE_FLAGS = -P $(BINPLACE_PLACEFILE) $(BINPLACE_FLAGS)
+
+! IFDEF UP_DRIVER
+BINPLACE_FLAGS= $(BINPLACE_FLAGS) -U
+DRIVER_SWITCH = -driver:uponly
+! else
+DRIVER_SWITCH = -driver
+! ENDIF
+
+! IF "$(_NTTREE)" != ""
+!  IFDEF ALT_PROJECT_TARGET
+_NTTREE= $(_NTTREE)\$(ALT_PROJECT_TARGET)
+!   if "$(_NTTREE_NO_SPLIT)" != ""
+_NTTREE_NO_SPLIT= $(_NTTREE_NO_SPLIT)\$(ALT_PROJECT_TARGET)
+!   endif
+!  ENDIF
+
+# If NTDBGFILES is defined then use binplace to split the symbols.
+# Define BINPLACE flags as needed if separate .DBG file requested.
+
+!  IFDEF NTDBGFILES
+BINPLACE_DBGFLAGS_NT = -S $(_NTTREE)\Symbols
+!  else
+BINPLACE_DBGFLAGS_NT=
+!  ENDIF
+
+BINPLACE_DBGFLAGS_NT = -S $(_NTTREE)\Symbols -x -n $(_NTTREE)\Symbols.pri -y
+
+BINPLACE_CMD_NT=$(BINPLACE_NAME) -R $(_NTTREE) $(BINPLACE_DBGFLAGS_NT) $(BINPLACE_FLAGS) $@
+BINPLACE_CMD_NS=$(BINPLACE_NAME) -R $(_NTTREE_NO_SPLIT) -Q $(BINPLACE_FLAGS) $@
+
+BINPLACE_CMD=$(BINPLACE_CMD_NT)
+
+!  if "$(_NTTREE_NO_SPLIT)" != ""
+BINPLACE_CMD=$(BINPLACE_CMD) & $(BINPLACE_CMD_NS)
+!  endif
+
+! ELSE
+BINPLACE_CMD=
+! ENDIF
+!endif
+
+BINPLACE_CMD=@$(BINPLACE_CMD)
+
+!ifdef NTDUMPAMAP
+MAPDUMP_CMD = link -dump -map $@ | sort /R /+62 > $(_NTDUMPAMAP)\$(@B).srt
+!else
+MAPDUMP_CMD =
+!endif
+
+#
+# Define this macro so including make files can supply a yes prompt
+# as appropriate.  Put the "yes." file in a visible place for OEM's
+# so they can make too.
+#
+
+!IFNDEF NOPASS0
+
+#
+# Pass Zero Inference Rules: IDL files (MIDL) and MC files
+#
+
+.SUFFIXES: .mc .asn .thk
+! IF $(ROTOR_X86)
+PASS0_OBJECTS=$(PASS0_ROTOR_X86_OBJECTS)
+! ELSEIF $(386)
+PASS0_OBJECTS=$(PASS0_386_OBJECTS)
+! ELSEIF $(PPC)
+PASS0_OBJECTS=$(PASS0_PPC_OBJECTS)
+! ELSEIF $(MPPC)
+PASS0_OBJECTS=$(PASS0_MPPC_OBJECTS)
+! ENDIF
+
+!ENDIF  # IFNDEF NOPASS0
+
+ASN = asn1
+!IFDEF USE_OLE_MC
+MC = mc -o
+!ELSE
+MC = mc
+!ENDIF
+
+!IFNDEF PASS0_HEADERDIR
+PASS0_HEADERDIR=.
+!ENDIF
+
+CPPXX = $(C_PREPROCESSOR_FLAGS:/Tc=)
+CPPXX = $(CPPXX:-Tc=)
+
+!IFNDEF NO_PASS0_RULES
+
+! IFDEF PASS0_SOURCEDIR
+MC_SOURCEDIR=$(PASS0_SOURCEDIR)
+! ELSE
+MC_SOURCEDIR=$(PASS0_CLIENTDIR)
+! ENDIF
+
+{..\}.mc{$(PASS0_HEADERDIR)}.h:
+    $(MC) -h $(PASS0_HEADERDIR) -r $(MC_SOURCEDIR) $(MC_FLAGS) $<
+
+.mc{$(PASS0_HEADERDIR)}.h:
+    $(MC) -h $(PASS0_HEADERDIR) -r $(MC_SOURCEDIR) $(MC_FLAGS) $<
+
+# OSSINFO must be set in the *environment* for the ASN compiler to find its
+# configuration file, $(OSSINFO)\ossinfo.
+
+! ifndef OSSINFO
+OSSINFO=$(LKGVC_DIR)\public\sdk\lib
+! endif
+
+! ifndef ASNDEFAULTFILE
+ASNDEFAULTFILE=$(OSSINFO)\asn1dflt.z4
+! endif
+
+! ifndef ASNSYNTAX
+ASNSYNTAX=-1990
+! endif
+
+ASNFLAGS=$(ASNDEFAULTFILE) $(ASNSYNTAX) $(ASNFLAGS)
+
+# if ASNDBG is explicitly set, let that control whether the voluminous ASN
+# symbols are supressed.  Otherwise, suppress the symbols for free builds.
+
+! ifdef ASNDBG
+!  if $(ASNDBG) == 0
+ASNFLAGS=-minimize $(ASNFLAGS)
+!  endif
+! elseif $(FREEBUILD)
+ASNFLAGS=-minimize $(ASNFLAGS)
+! endif
+
+{}.asn{$(PASS0_HEADERDIR)}.h:
+    $(ASN) $(ASNFLAGS) -out $(PASS0_HEADERDIR)\$(@B) $<
+
+!ENDIF
+
+#
+# Default language ID to US English (0x0409)
+#
+
+!IFDEF RCCODEPAGE
+RCOPTIONS=$(RCOPTIONS) -c $(RCCODEPAGE)
+!ENDIF
+
+!IFNDEF RCNOFONTMAP
+RCOPTIONS=-z "MS Sans Serif,Helv/MS Shell Dlg" $(RCOPTIONS)
+!ENDIF
+
+!ifndef EMPTY_RES
+!IF "$(ROTOR_TOOLSET)" != "MSVC"
+EMPTY_RES=$(_NTTREE)\empty.obj
+!ELSE
+EMPTY_RES=$(_NTTREE)\empty.res
+!ENDIF
+!endif
+
+RC_COMPILER=rc -l 409 $(RCOPTIONS)
+
+INCPATHRC = $(INCPATH0: =)
+INCPATHRC = $(INCPATHRC:-I=;)
+INCPATHRC = $(INCPATHRC:/I=;)
+
+CDEFINERC = $(CDEFINES:  = )
+CDEFINERC = $(CDEFINERC:  = )
+
+!IF $(MPPC)
+{..\}.rc{$O\}.res:
+     $(RC_COMPILER) -r -m -fo $(@R).res $(RC_DEFINES) $(RCXBANG) $(INCPATH0) $<
+!ELSEIF defined(FEATURE_PAL) && !defined(USE_RC_FROM_TOOLS)
+{..\}.rc{$O\}.res:
+    $(_NTTREE)\$(RC_NAME) -fo $(TARGETPATH)\$(TARGET_DIRECTORY)\$(TARGETNAME).satellite $(CDEFINERC) $(INCPATH0) $<
+    $(MAKE_NEW_DIR)
+!ifdef PLATFORM_UNIX
+    if [ -f $(TARGETPATH)\$(TARGET_DIRECTORY)\$(TARGETNAME).satellite ]; then $(BINPLACE_NAME) -R $(_NTTREE) $(BINPLACE_DBGFLAGS_NT) $(BINPLACE_FLAGS) $(TARGETPATH)\$(TARGET_DIRECTORY)\$(TARGETNAME).satellite; fi
+!else
+    if exist $(TARGETPATH)\$(TARGET_DIRECTORY)\$(TARGETNAME).satellite $(BINPLACE_NAME) -R $(_NTTREE) $(BINPLACE_DBGFLAGS_NT) $(BINPLACE_FLAGS) $(TARGETPATH)\$(TARGET_DIRECTORY)\$(TARGETNAME).satellite
+!endif
+    $(TYPE_COMMAND) $(EMPTY_RES) >$@
+!ELSE
+{..\}.rc{$O\}.res:
+    @$(MAKE_NEW_DIR)
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+    $(RC_COMPILER) -r -fo $(@R).tmp $(CDEFINES) $(INCPATH0) $<
+<<NOKEEP
+    @set include=$(INCPATHRC)
+    @$(RC_COMPILER) -r -fo $(@R).tmp $(CDEFINERC) $<
+    @set include=
+    @cvtres -nologo -machine:$(MACHINE_TYPE:i386=ix86) -readonly -out:$@ $(@R).tmp
+! IF "$(NTKEEPRESOURCETMPFILES)" == ""
+    @-$(DELETER) $(@R).tmp
+! ENDIF
+!ENDIF
+
+
+!IF $(MPPC)
+{}.rc{$O\}.res:
+    $(RC_COMPILER) -r -m -fo $(@R).res $(RC_DEFINES) $(RCXBANG) $(INCPATH0) $<
+!ELSEIF defined(FEATURE_PAL) && !defined(USE_RC_FROM_TOOLS)
+{}.rc{$O\}.res:
+    $(_NTTREE)\$(RC_NAME) -fo $(TARGETPATH)\$(TARGET_DIRECTORY)\$(TARGETNAME).satellite $(CDEFINERC) $(INCPATH0) $<
+    $(MAKE_NEW_DIR)
+!ifdef PLATFORM_UNIX
+    if [ -f $(TARGETPATH)\$(TARGET_DIRECTORY)\$(TARGETNAME).satellite ]; then $(BINPLACE_NAME) -R $(_NTTREE) $(BINPLACE_DBGFLAGS_NT) $(BINPLACE_FLAGS) $(TARGETPATH)\$(TARGET_DIRECTORY)\$(TARGETNAME).satellite; fi
+!else
+    if exist $(TARGETPATH)\$(TARGET_DIRECTORY)\$(TARGETNAME).satellite $(BINPLACE_NAME) -R $(_NTTREE) $(BINPLACE_DBGFLAGS_NT) $(BINPLACE_FLAGS) $(TARGETPATH)\$(TARGET_DIRECTORY)\$(TARGETNAME).satellite
+!endif
+    $(TYPE_COMMAND) $(EMPTY_RES) >$@
+!ELSE
+{}.rc{$O\}.res:
+    @$(MAKE_NEW_DIR)
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+    $(RC_COMPILER) -r -fo $(@R).tmp $(CDEFINES) $(INCPATH0) $<
+<<NOKEEP
+    @set include=$(INCPATHRC)
+    @$(RC_COMPILER) -r -fo $(@R).tmp $(CDEFINERC) $<
+    @set include=
+    @cvtres -nologo -machine:$(MACHINE_TYPE:i386=ix86) -readonly -out:$@ $(@R).tmp
+! IF "$(NTKEEPRESOURCETMPFILES)" == ""
+    @-$(DELETER) $(@R).tmp
+! ENDIF
+!ENDIF
+
+!IF $(MPPC)
+
+#
+# The definitions for the resource compiler are the same as the definitions
+# for the C compiler except we need to remove INC_OLE2 because the resource
+# compiler doesn't understand the pragma's that the VC guys used to rename
+# the macos include files.  Thus, the resource compiler can't parse the ole
+# headers
+#
+
+RC_DEFINES=$(C_DEFINES:INC_OLE2=NO_OLE)
+
+#
+# Setup for the mac resource compiler
+#
+
+# Macintosh-specific resourse (.r) to .rsc rule
+MRC_COMPILER=mrc -l 0x409
+
+.SUFFIXES: .r
+
+{..\}.r{$(_OBJ_DIR)\$(TARGET_DIRECTORY)\}.rsc:
+    $(MRC_COMPILER) -o $(@R).rsc $(RC_DEFINES) $(INCPATH0) $<
+
+.r{$(_OBJ_DIR)\$(TARGET_DIRECTORY)\}.rsc:
+    $(MRC_COMPILER) -o $(@R).rsc $(RC_DEFINES) $(INCPATH0) $<
+    
+!ENDIF  # $(MPPC)
+
+{..\}.rc.rcpp:
+    set include=$(INCPATHRC)
+    $(RC_COMPILER) -r -p -fo $(@R).tmp $(CDEFINERC) $<
+    @set include=
+
+{}.rc.rcpp:
+    set include=$(INCPATHRC)
+    $(RC_COMPILER) -r -p -fo $(@R).tmp $(CDEFINERC) $<
+    @set include=
+
+.thk{$O\}.asm:
+    thunk -o $@ $<
+
+JVC = jvc /nologo
+
+!ifndef JAVA_DEBUG_FLAGS
+!if $(FREEBUILD)
+JAVA_DEBUG_FLAGS = /O
+!else
+JAVA_DEBUG_FLAGS = /g
+!endif
+!endif
+
+!ifndef JAVA_WARNING_FLAGS
+JAVA_WARNING_FLAGS = /w4
+!endif
+
+JAVA_BASE_CLASS = \
+    $(LKGVC_DIR)\public\sdk\classes\afc.zip; \
+    $(LKGVC_DIR)\public\sdk\classes\classes.zip
+
+JAVA_CLASS_PATH = $(JAVA_BASE_CLASS); $(MAKEDIR); $(USER_CLASS_PATH)
+JAVA_CLASS_PATH = $(JAVA_CLASS_PATH: =)
+
+JVC_FLAGS = /cp $(JAVA_CLASS_PATH) $(JAVA_DEBUG_FLAGS) $(JAVA_WARNING_FLAGS) /d $(O)
+
+{$(MAKEDIR)}.java{$O\}.class:
+    $(JVC) $(JVC_FLAGS) $<
+
+!ifndef CL_OPT_FC
+!if "$(ROTOR_TOOLSET)" == "MSVC"
+CL_OPT_FC = /FC
+!endif
+!endif
+
+!IFNDEF NO_C_RULES
+
+ECHO_RSP = $O\echo.msg
+CL_RSP   = $O\cl.rsp
+CLCOD_RSP = $O\clcod.rsp
+LINK_RSP = $O\lnk.rsp
+
+{$O\}.cxx{$O\}.obj:
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_CXX_MSG)
+<<NOKEEP
+    @$(CXX_COMPILER_NAME) @<<$(CL_RSP) $(OUTPUT_FLAG)"$(MAKEDIR)\$O/" $(CL_OPT_FC) $(MAKEDIR)\$<
+$(CXX_COMPILER_FLAGS: =
+)
+<<NOKEEP
+
+!ifdef BATCH_NMAKE
+{..\}.cxx{$O\}.obj::
+!else
+{..\}.cxx{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_CXX_MSG)
+<<NOKEEP
+    @$(CXX_COMPILER_NAME) @<<$(CL_RSP) $(OUTPUT_FLAG)"$(MAKEDIR)\$O/" $(CL_OPT_FC) $(MAKEDIR)\$<
+$(CXX_COMPILER_FLAGS: =
+)
+<<NOKEEP
+
+!ifdef BATCH_NMAKE
+{..\$(TARGET_DIRECTORY)\}.cxx{$O\}.obj::
+!else
+{..\$(TARGET_DIRECTORY)\}.cxx{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_CXX_MSG)
+<<NOKEEP
+    @$(CXX_COMPILER_NAME) @<<$(CL_RSP) $(OUTPUT_FLAG)"$(MAKEDIR)\$O/" $(CL_OPT_FC) $(MAKEDIR)\$<
+$(CXX_COMPILER_FLAGS: =
+)
+<<NOKEEP
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+!ifdef BATCH_NMAKE
+{$O\}.cpp{$O\}.obj::
+!else
+{$O\}.cpp{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_CXX_MSG)
+<<NOKEEP
+!if "$(USE_CPPMUNGE)" != "0"
+    @$(C_PREPROCESSOR_NAME) $(USECXX_FLAG) $(C_PREPROCESSOR_FLAGS) $(CL_OPT_FC) $(MAKEDIR)$(DIR_SEP)$< | \
+    $(CPP_MUNGER_NAME) -s$(MAKEDIR)$(DIR_SEP)$< -p$(PRECOMPILED_INCLUDE_FOR_MUNGER)> $(MAKEDIR)$(DIR_SEP)$*.ii
+    @$(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) $(OUTPUT_FLAG) $(MAKEDIR)$(DIR_SEP)$@ $(CL_OPT_FC) $(CPLUSPLUS_CPP_OUTPUT) $(MAKEDIR)$(DIR_SEP)$*.ii
+!if "$(KEEP_CPPMUNGE)" == ""
+    - @$(DELETER) $(MAKEDIR)$(DIR_SEP)$*.ii
+!endif    
+!else
+    @$(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) $(OUTPUT_FLAG) $(MAKEDIR)$(DIR_SEP)$@ $(CL_OPT_FC) $(MAKEDIR)$(DIR_SEP)$<
+!endif
+!else
+!ifdef BATCH_NMAKE
+{$O\}.cpp{$O\}.obj::
+!else
+{$O\}.cpp{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_CXX_MSG)
+<<NOKEEP
+    @$(CXX_COMPILER_NAME) @<<$(CL_RSP) $(OUTPUT_FLAG)"$(MAKEDIR)\$O/" $(CL_OPT_FC) $(MAKEDIR)\$<
+$(CXX_COMPILER_FLAGS: =
+)
+<<NOKEEP
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+!ifdef BATCH_NMAKE
+{..\}.cpp{$O\}.obj::
+!else
+{..\}.cpp{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_CXX_MSG)
+<<NOKEEP
+!if "$(USE_CPPMUNGE)" != "0"
+    @$(C_PREPROCESSOR_NAME) $(USECXX_FLAG) $(C_PREPROCESSOR_FLAGS) $(CL_OPT_FC) $(MAKEDIR)$(DIR_SEP)$< | \
+    $(CPP_MUNGER_NAME) -s$(MAKEDIR)$(DIR_SEP)$< -p$(PRECOMPILED_INCLUDE_FOR_MUNGER) > $(MAKEDIR)$(DIR_SEP)$*.ii
+    @$(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) $(OUTPUT_FLAG) $(MAKEDIR)$(DIR_SEP)$@ $(CL_OPT_FC) $(CPLUSPLUS_CPP_OUTPUT) $(MAKEDIR)$(DIR_SEP)$*.ii
+!if "$(KEEP_CPPMUNGE)" == ""    
+    - @$(DELETER) $(MAKEDIR)$(DIR_SEP)$*.ii
+!endif    
+!else
+    @$(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) $(OUTPUT_FLAG) $(MAKEDIR)$(DIR_SEP)$@ $(CL_OPT_FC) $(MAKEDIR)$(DIR_SEP)$<
+!endif
+!else
+!ifdef BATCH_NMAKE
+{..\}.cpp{$O\}.obj::
+!else
+{..\}.cpp{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_CXX_MSG)
+<<NOKEEP
+    @$(CXX_COMPILER_NAME) @<<$(CL_RSP) $(OUTPUT_FLAG)"$(MAKEDIR)\$O/" $(CL_OPT_FC) $(MAKEDIR)\$<
+$(CXX_COMPILER_FLAGS: =
+)
+<<NOKEEP
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+!ifdef BATCH_NMAKE
+{..\$(TARGET_DIRECTORY)\}.cpp{$O\}.obj::
+!else
+{..\$(TARGET_DIRECTORY)\}.cpp{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_CXX_MSG)
+<<NOKEEP
+!if "$(USE_CPPMUNGE)" != "0"
+    @$(C_PREPROCESSOR_NAME) $(USECXX_FLAG) $(C_PREPROCESSOR_FLAGS) $(CL_OPT_FC) $(MAKEDIR)$(DIR_SEP)$< | \
+    $(CPP_MUNGER_NAME) -s$(MAKEDIR)$(DIR_SEP)$< -p$(PRECOMPILED_INCLUDE_FOR_MUNGER) > $(MAKEDIR)$(DIR_SEP)$*.ii
+    @$(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) $(OUTPUT_FLAG) $(MAKEDIR)$(DIR_SEP)$@ $(CL_OPT_FC) $(CPLUSPLUS_CPP_OUTPUT) $(MAKEDIR)$(DIR_SEP)$*.ii
+!if "$(KEEP_CPPMUNGE)" == ""    
+    - @$(DELETER) $(MAKEDIR)$(DIR_SEP)$*.ii
+!endif    
+!else
+    @$(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) $(OUTPUT_FLAG) $(MAKEDIR)$(DIR_SEP)$@ $(CL_OPT_FC) $(MAKEDIR)$(DIR_SEP)$<
+!endif
+!else
+!ifdef BATCH_NMAKE
+{..\$(TARGET_DIRECTORY)\}.cpp{$O\}.obj::
+!else
+{..\$(TARGET_DIRECTORY)\}.cpp{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_CXX_MSG)
+<<NOKEEP
+    @$(CXX_COMPILER_NAME) @<<$(CL_RSP) $(OUTPUT_FLAG)"$(MAKEDIR)\$O/" $(CL_OPT_FC) $(MAKEDIR)\$<
+$(CXX_COMPILER_FLAGS: =
+)
+<<NOKEEP
+!endif
+
+!ifdef BATCH_NMAKE
+{}.cxx{$O\}.obj::
+!else
+{}.cxx{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_CXX_MSG)
+<<NOKEEP
+    @$(CXX_COMPILER_NAME) @<<$(CL_RSP) $(OUTPUT_FLAG)"$(MAKEDIR)\$O/" $(CL_OPT_FC) $(MAKEDIR)\$<
+$(CXX_COMPILER_FLAGS: =
+)
+<<NOKEEP
+
+!ifdef BATCH_NMAKE
+{$(TARGET_DIRECTORY)\}.cxx{$O\}.obj::
+!else
+{$(TARGET_DIRECTORY)\}.cxx{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_CXX_MSG)
+<<NOKEEP
+    @$(CXX_COMPILER_NAME) @<<$(CL_RSP) $(OUTPUT_FLAG)"$(MAKEDIR)\$O/" $(CL_OPT_FC) $(MAKEDIR)\$<
+$(CXX_COMPILER_FLAGS: =
+)
+<<NOKEEP
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+!ifdef BATCH_NMAKE
+{}.cpp{$O\}.obj::
+!else
+{}.cpp{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_CXX_MSG)
+<<NOKEEP
+!if "$(USE_CPPMUNGE)" != "0"
+    @$(C_PREPROCESSOR_NAME) $(USECXX_FLAG) $(C_PREPROCESSOR_FLAGS) $(CL_OPT_FC) $(MAKEDIR)$(DIR_SEP)$< | \
+    $(CPP_MUNGER_NAME) -s$(MAKEDIR)$(DIR_SEP)$< -p$(PRECOMPILED_INCLUDE_FOR_MUNGER) > $(MAKEDIR)$(DIR_SEP)$*.ii
+    @$(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) $(OUTPUT_FLAG) $(MAKEDIR)$(DIR_SEP)$@ $(CL_OPT_FC) $(CPLUSPLUS_CPP_OUTPUT) $(MAKEDIR)$(DIR_SEP)$*.ii
+!if "$(KEEP_CPPMUNGE)" == ""    
+    - @$(DELETER) $(MAKEDIR)$(DIR_SEP)$*.ii
+!endif    
+!else
+    @$(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) $(OUTPUT_FLAG) $(MAKEDIR)$(DIR_SEP)$@ $(CL_OPT_FC) $(MAKEDIR)$(DIR_SEP)$<
+!endif
+!else
+!ifdef BATCH_NMAKE
+{}.cpp{$O\}.obj::
+!else
+{}.cpp{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_CXX_MSG)
+<<NOKEEP
+    @$(CXX_COMPILER_NAME) @<<$(CL_RSP) $(OUTPUT_FLAG)"$(MAKEDIR)\$O/" $(CL_OPT_FC) $(MAKEDIR)\$<
+$(CXX_COMPILER_FLAGS: =
+)
+<<NOKEEP
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+!ifdef BATCH_NMAKE
+{$(TARGET_DIRECTORY)\}.cpp{$O\}.obj::
+!else
+{$(TARGET_DIRECTORY)\}.cpp{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_CXX_MSG)
+<<NOKEEP
+!if "$(USE_CPPMUNGE)" != "0"
+    @$(C_PREPROCESSOR_NAME) $(USECXX_FLAG) $(C_PREPROCESSOR_FLAGS) $(CL_OPT_FC) $(MAKEDIR)$(DIR_SEP)$< | \
+    $(CPP_MUNGER_NAME) -s$(MAKEDIR)$(DIR_SEP)$< -p$(PRECOMPILED_INCLUDE_FOR_MUNGER) > $(MAKEDIR)$(DIR_SEP)$*.ii
+    @$(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) $(OUTPUT_FLAG) $(MAKEDIR)$(DIR_SEP)$@ $(CL_OPT_FC) $(CPLUSPLUS_CPP_OUTPUT) $(MAKEDIR)$(DIR_SEP)$*.ii
+!if "$(KEEP_CPPMUNGE)" == ""    
+    - @$(DELETER) $(MAKEDIR)$(DIR_SEP)$*.ii
+!endif    
+!else
+    @$(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) $(OUTPUT_FLAG) $(MAKEDIR)$(DIR_SEP)$@ $(CL_OPT_FC) $(MAKEDIR)$(DIR_SEP)$<
+!endif
+!else
+!ifdef BATCH_NMAKE
+{$(TARGET_DIRECTORY)\}.cpp{$O\}.obj::
+!else
+{$(TARGET_DIRECTORY)\}.cpp{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_CXX_MSG)
+<<NOKEEP
+    @$(CXX_COMPILER_NAME) @<<$(CL_RSP) $(OUTPUT_FLAG)"$(MAKEDIR)\$O/" $(CL_OPT_FC) $(MAKEDIR)\$<
+$(CXX_COMPILER_FLAGS: =
+)
+<<NOKEEP
+!endif
+
+{..\}.cxx{}.cod:
+    $(CXX_COMPILER_NAME) @<<$(CLCOD_RSP) $(CL_OPT_FC) $(CL_OPT_FC) $<
+$(CXX_COMPILER_FLAGS: =
+)
+<<NOKEEP
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+{..\}.cxx{}.pp:
+    $(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) -E $< > $@
+!else
+{..\}.cxx{}.pp:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /E $(CL_OPT_FC) $< > $@
+$(CXX_COMPILER_FLAGS: =
+)
+<<NOKEEP
+!endif
+
+{..\}.cpp{}.cod:
+    $(CXX_COMPILER_NAME) @<<$(CLCOD_RSP) $(CL_OPT_FC) $(CL_OPT_FC) $<
+$(CXX_COMPILER_FLAGS: =
+)
+<<NOKEEP
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+{..\}.cpp{}.pp:
+    $(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) -E $(CL_OPT_FC) $< > $@
+!else
+{..\}.cpp{}.pp:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /E $(CL_OPT_FC) $< > $@
+$(CXX_COMPILER_FLAGS: =
+)
+<<NOKEEP
+!endif
+
+{}.cxx{}.cod:
+    $(CXX_COMPILER_NAME) @<<$(CLCOD_RSP) $(CL_OPT_FC) $(CL_OPT_FC) $<
+$(CXX_COMPILER_FLAGS: =
+)
+<<NOKEEP
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+{}.cxx{}.pp:
+    $(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) -E $< > $@
+!else
+{}.cxx{}.pp:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /E $(CL_OPT_FC) $< > $@
+$(CXX_COMPILER_FLAGS: =
+)
+<<NOKEEP
+!endif
+
+{}.cpp{}.cod:
+    $(CXX_COMPILER_NAME) @<<$(CLCOD_RSP) $(CL_OPT_FC) $(CL_OPT_FC) $<
+$(CXX_COMPILER_FLAGS: =
+)
+<<NOKEEP
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+{}.cpp{}.pp:
+    $(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) -E $< > $@
+!else
+{}.cpp{}.pp:
+    $(CXX_COMPILER_NAME) @<<$(CL_RSP) /E $(CL_OPT_FC) $< > $@
+$(CXX_COMPILER_FLAGS: =
+)
+<<NOKEEP
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+!ifdef BATCH_NMAKE
+{..\}.c{$O\}.obj::
+!else
+{..\}.c{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_MSG)
+<<NOKEEP
+!if "$(USE_CPPMUNGE)" != "0"
+    @$(C_PREPROCESSOR_NAME) $(USECXX_FLAG) $(C_PREPROCESSOR_FLAGS) $(CL_OPT_FC) $(MAKEDIR)$(DIR_SEP)$< | \
+    $(CPP_MUNGER_NAME) -s$(MAKEDIR)$(DIR_SEP)$< -p$(PRECOMPILED_INCLUDE_FOR_MUNGER) > $(MAKEDIR)$(DIR_SEP)$*.i
+    @$(C_COMPILER_NAME) $(C_COMPILER_FLAGS) $(OUTPUT_FLAG) $(MAKEDIR)/$@ $(CL_OPT_FC) $(USECXX_FLAG) $(MAKEDIR)$(DIR_SEP)$*.i
+!if "$(KEEP_CPPMUNGE)" == ""    
+    - @$(DELETER) $(MAKEDIR)$(DIR_SEP)$*.i
+!endif
+!else
+    @$(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) $(OUTPUT_FLAG) $(MAKEDIR)$(DIR_SEP)$@ $(CL_OPT_FC) $(MAKEDIR)$(DIR_SEP)$<
+!endif
+!else
+!ifdef BATCH_NMAKE
+{..\}.c{$O\}.obj::
+!else
+{..\}.c{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_MSG)
+<<NOKEEP
+    @$(C_COMPILER_NAME) @<<$(CL_RSP) $(OUTPUT_FLAG)"$(MAKEDIR)\$O/" $(CL_OPT_FC) $(USECXX_FLAG) $<
+$(C_COMPILER_FLAGS: =
+)
+<<NOKEEP
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+!ifdef BATCH_NMAKE
+{..\$(TARGET_DIRECTORY)\}.c{$O\}.obj::
+!else
+{..\$(TARGET_DIRECTORY)\}.c{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_MSG)
+<<NOKEEP
+!if "$(USE_CPPMUNGE)" != "0"
+    @$(C_PREPROCESSOR_NAME) $(USECXX_FLAG) $(C_PREPROCESSOR_FLAGS) $(CL_OPT_FC) $(MAKEDIR)$(DIR_SEP)$< | \
+    $(CPP_MUNGER_NAME) -s$(MAKEDIR)$(DIR_SEP)$< -p$(PRECOMPILED_INCLUDE_FOR_MUNGER) > $(MAKEDIR)$(DIR_SEP)$*.i
+    @$(C_COMPILER_NAME) $(C_COMPILER_FLAGS) $(OUTPUT_FLAG) $(MAKEDIR)/$@ $(CL_OPT_FC) $(USECXX_FLAG) $(MAKEDIR)$(DIR_SEP)$*.i
+!if "$(KEEP_CPPMUNGE)" == ""    
+    - @$(DELETER) $(MAKEDIR)$(DIR_SEP)$*.i
+!endif
+!else
+    @$(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) $(OUTPUT_FLAG) $(MAKEDIR)$(DIR_SEP)$@ $(CL_OPT_FC) $(MAKEDIR)$(DIR_SEP)$<
+!endif
+!else
+!ifdef BATCH_NMAKE
+{..\$(TARGET_DIRECTORY)\}.c{$O\}.obj::
+!else
+{..\$(TARGET_DIRECTORY)\}.c{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_MSG)
+<<NOKEEP
+    @$(C_COMPILER_NAME) @<<$(CL_RSP) $(OUTPUT_FLAG)"$(MAKEDIR)\$O/" $(CL_OPT_FC) $(USECXX_FLAG) $<
+$(C_COMPILER_FLAGS: =
+)
+<<NOKEEP
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+!ifdef BATCH_NMAKE
+{$O\}.c{$O\}.obj::
+!else
+{$O\}.c{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_MSG)
+<<NOKEEP
+!if "$(USE_CPPMUNGE)" != "0"
+    @$(C_PREPROCESSOR_NAME) $(USECXX_FLAG) $(C_PREPROCESSOR_FLAGS) $(CL_OPT_FC) $(MAKEDIR)$(DIR_SEP)$< | \
+    $(CPP_MUNGER_NAME) -s$(MAKEDIR)$(DIR_SEP)$< -p$(PRECOMPILED_INCLUDE_FOR_MUNGER) > $(MAKEDIR)$(DIR_SEP)$*.i
+    @$(C_COMPILER_NAME) $(C_COMPILER_FLAGS) $(OUTPUT_FLAG) $(MAKEDIR)/$@ $(CL_OPT_FC) $(USECXX_FLAG) $(MAKEDIR)$(DIR_SEP)$*.i
+!if "$(KEEP_CPPMUNGE)" == ""    
+    - @$(DELETER) $(MAKEDIR)$(DIR_SEP)$*.i
+!endif
+!else
+    @$(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) $(OUTPUT_FLAG) $(MAKEDIR)$(DIR_SEP)$@ $(CL_OPT_FC) $(MAKEDIR)$(DIR_SEP)$<
+!endif
+!else
+!ifdef BATCH_NMAKE
+{$O\}.c{$O\}.obj::
+!else
+{$O\}.c{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_MSG)
+<<NOKEEP
+    @$(C_COMPILER_NAME) @<<$(CL_RSP) $(OUTPUT_FLAG)"$(MAKEDIR)\$O/" $(CL_OPT_FC) $<
+$(C_COMPILER_FLAGS: =
+)
+<<NOKEEP
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+!ifdef BATCH_NMAKE
+{}.c{$O\}.obj::
+!else
+{}.c{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_MSG)
+<<NOKEEP
+!if "$(USE_CPPMUNGE)" != "0"
+    @$(C_PREPROCESSOR_NAME) $(USECXX_FLAG) $(C_PREPROCESSOR_FLAGS) $(CL_OPT_FC) $(MAKEDIR)$(DIR_SEP)$< | \
+    $(CPP_MUNGER_NAME) -s$(MAKEDIR)$(DIR_SEP)$< -p$(PRECOMPILED_INCLUDE_FOR_MUNGER) > $(MAKEDIR)$(DIR_SEP)$*.i
+    @$(C_COMPILER_NAME) $(C_COMPILER_FLAGS) $(OUTPUT_FLAG) $(MAKEDIR)/$@ $(USECXX_FLAG) $(CL_OPT_FC) $(MAKEDIR)$(DIR_SEP)$*.i
+!if "$(KEEP_CPPMUNGE)" == ""    
+    - @$(DELETER) $(MAKEDIR)$(DIR_SEP)$*.i
+!endif
+!else
+    @$(CXX_COMPILER_NAME) $(CXX_COMPILER_FLAGS) $(OUTPUT_FLAG) $(MAKEDIR)$(DIR_SEP)$@ $(CL_OPT_FC) $(MAKEDIR)$(DIR_SEP)$<
+!endif
+!else
+!ifdef BATCH_NMAKE
+{}.c{$O\}.obj::
+!else
+{}.c{$O\}.obj:
+!endif
+    if not exist $(@D) md $(@D)
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_MSG)
+<<NOKEEP
+    @$(C_COMPILER_NAME) @<<$(CL_RSP) $(OUTPUT_FLAG)"$(MAKEDIR)\$O/" $(CL_OPT_FC) $(USECXX_FLAG) $<
+$(C_COMPILER_FLAGS: =
+)
+<<NOKEEP
+!endif
+
+!ifdef BATCH_NMAKE
+{$(TARGET_DIRECTORY)\}.c{$O\}.obj::
+!else
+{$(TARGET_DIRECTORY)\}.c{$O\}.obj:
+!endif
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_MSG)
+<<NOKEEP
+    @$(C_COMPILER_NAME) @<<$(CL_RSP) $(OUTPUT_FLAG)"$(MAKEDIR)\$O/" $(CL_OPT_FC) $(USECXX_FLAG) $<
+$(C_COMPILER_FLAGS: =
+)
+<<NOKEEP
+
+{..\}.c{}.cod:
+    $(C_COMPILER_NAME) @<<$(CLCOD_RSP) $(CL_OPT_FC) $(CL_OPT_FC) $(USECXX_FLAG) $<
+$(C_COMPILER_FLAGS: =
+)
+<<NOKEEP
+
+{..\$(TARGET_DIRECTORY)\}.c{}.cod:
+    $(C_COMPILER_NAME) @<<$(CLCOD_RSP) $(CL_OPT_FC) $(CL_OPT_FC) $(USECXX_FLAG) $<
+$(C_COMPILER_FLAGS: =
+)
+<<NOKEEP
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+{..\}.c{}.pp:
+    $(C_COMPILER_NAME) $(C_COMPILER_FLAGS) -E $(USECXX_FLAG) $< > $@
+!else
+{..\}.c{}.pp:
+    $(C_COMPILER_NAME) @<<$(CL_RSP) /E $(CL_OPT_FC) $(USECXX_FLAG) $< > $@
+$(C_COMPILER_FLAGS: =
+)
+<<NOKEEP
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+{..\$(TARGET_DIRECTORY)\}.c{}.pp:
+    $(C_COMPILER_NAME) $(C_COMPILER_FLAGS) -E $(USECXX_FLAG) $< > $@
+!else
+{..\$(TARGET_DIRECTORY)\}.c{}.pp:
+    $(C_COMPILER_NAME) @<<$(CL_RSP) /E $(CL_OPT_FC) $(USECXX_FLAG) $< > $@
+$(C_COMPILER_FLAGS: =
+)
+<<NOKEEP
+!endif
+
+{}.c{}.cod:
+    $(C_COMPILER_NAME) @<<$(CLCOD_RSP) $(CL_OPT_FC) $(CL_OPT_FC) $(USECXX_FLAG) $<
+$(C_COMPILER_FLAGS: =
+)
+<<NOKEEP
+
+{$(TARGET_DIRECTORY)\}.c{}.cod:
+    $(C_COMPILER_NAME) @<<$(CLCOD_RSP) $(CL_OPT_FC) $(CL_OPT_FC) $(USECXX_FLAG) $<
+$(C_COMPILER_FLAGS: =
+)
+<<NOKEEP
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+{}.c{}.pp:
+    $(C_COMPILER_NAME) $(C_COMPILER_FLAGS) -E $(USECXX_FLAG) $< > $@
+!else
+{}.c{}.pp:
+    $(C_COMPILER_NAME) @<<$(CL_RSP) /E $(CL_OPT_FC) $(USECXX_FLAG) $< > $@
+$(C_COMPILER_FLAGS: =
+)
+<<NOKEEP
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+{$(TARGET_DIRECTORY)\}.c{}.pp:
+    $(C_COMPILER_NAME) $(C_COMPILER_FLAGS) -E $(USECXX_FLAG) $< > $@
+!else
+{$(TARGET_DIRECTORY)\}.c{}.pp:
+    $(C_COMPILER_NAME) @<<$(CL_RSP) /E $(CL_OPT_FC) $(USECXX_FLAG) $< > $@
+$(C_COMPILER_FLAGS: =
+)
+<<NOKEEP
+!endif
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+{}.c{$(TARGET_DIRECTORY)\}.pp:
+    $(C_COMPILER_NAME) $(C_COMPILER_FLAGS) -E $(USECXX_FLAG) $< > $@
+!else
+{}.c{$(TARGET_DIRECTORY)\}.pp:
+    $(C_COMPILER_NAME) @<<$(CL_RSP) /E $(CL_OPT_FC) $(USECXX_FLAG) $< > $@
+$(C_COMPILER_FLAGS: =
+)
+<<NOKEEP
+!endif
+
+!ENDIF # NO_C_RULES
+
+!if "$(NTNOFUZZYLOOKUP)"=="1"
+LIBRARY_OBJS=
+!else
+!ifndef PLATFORM_UNIX
+LIBRARY_OBJS = $(LIBRARY_OBJS) $(HEADEROBJNAME)
+!endif
+!endif
+
+!ifdef USE_INCREMENTAL_LINKING
+IMPLIB_DEPEND =
+!else
+IMPLIB_DEPEND = $(LIBRARY_OBJS)
+!endif
+
+#
+# Standard inference rule for generating machine specific def files.
+#
+
+.SUFFIXES: .def .src .lds
+
+
+{..\}.src{$O}.def:
+!if "$(ROTOR_TOOLSET)" == "MSVC"
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_MSG) /EP $<
+<<NOKEEP
+    @$(C_PREPROCESSOR_NAME) @<<$(CL_RSP) /Tc$< > $@
+$(CPPXX: =
+)
+<<NOKEEP
+!else
+    $(C_PREPROCESSOR) -P -x assembler-with-cpp $< > $@
+!endif
+
+{}.src{$O}.def:
+!if "$(ROTOR_TOOLSET)" == "MSVC"
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_MSG) /EP $<
+<<NOKEEP
+    @$(C_PREPROCESSOR_NAME) @<<$(CL_RSP) /Tc$< > $@
+$(CPPXX: =
+)
+<<NOKEEP
+!else
+    $(C_PREPROCESSOR) -P -x assembler-with-cpp $< > $@
+!endif
+
+{..\}.def{$O}.def:
+!if "$(ROTOR_TOOLSET)" == "MSVC"
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_MSG) /EP $<
+<<NOKEEP
+    @$(C_PREPROCESSOR_NAME) @<<$(CL_RSP) /Tc$< > $@
+$(CPPXX: =
+)
+<<NOKEEP
+!else
+    $(C_PREPROCESSOR) -P -x assembler-with-cpp $< > $@
+!endif
+
+{}.def{$O}.def:
+!if "$(ROTOR_TOOLSET)" == "MSVC"
+    @$(TYPE_COMMAND) <<$(ECHO_RSP)
+$(ECHO_MSG) /EP $<
+<<NOKEEP
+    @$(C_PREPROCESSOR_NAME) @<<$(CL_RSP) /Tc$< > $@
+$(CPPXX: =
+)
+<<NOKEEP
+!else
+    $(C_PREPROCESSOR) -P -x assembler-with-cpp $< > $@
+!endif
+
+!ifdef NO_BROWSER_FILE
+BROWSERFILE=
+!else
+! ifdef BROWSER_INFO
+!  ifndef BROWSERFILE
+BROWSERFILE = "$(TARGETPATH)\$(TARGET_DIRECTORY)\$(TARGETNAME).bsc"
+!  endif
+! else
+BROWSERFILE=
+! endif
+!endif
+
+#
+# Standard inference rule for User Mode object files that produce User Mode
+# image files
+#
+!if "$(UMAPPLEXT)" != ""
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+{$O\}.obj{$O\}$(UMAPPLEXT):
+    $(LINKER) $(LINKER_FLAGS) $(PDB_ROOTUM) $(ORDER) $(LINKGPSIZE) $(LINKER_OPTIDATA) $(UMRES) $< $(UMOBJS) $(UMLIBS) $(CRTLIBS) $(LINKLIBS)
+    $(MAPSYM_CMD)
+    $(BINPLACE_CMD)
+    $(POST_BUILD_CMD)
+!else
+# Note: LIBC_LIB has to be after rotor_pal.lib to make PAL logging for CRT functions work
+{$O\}.obj{$O\}$(UMAPPLEXT):
+    $(LINKER) @<<
+$(LINKER_FLAGS: =
+)
+$(PDB_ROOTUM)
+$(ORDER: =
+)
+$(LINKGPSIZE: =
+)
+$(LINKER_OPTIDATA)
+-base:$(UMBASE)
+-subsystem:$(SUBSYSTEM)
+$(UMENTRY)
+$(HEADEROBJNAME: =
+)
+$(UMRES: =
+)
+$<
+$(UMOBJS: =
+)
+$(UMLIBS: =
+)
+$(CRTLIBS: =
+)
+$(LINKLIBS: =
+)
+$(LIBC_LIB: =
+)
+<<NOKEEP
+    $(MAPSYM_CMD)
+    $(BINPLACE_CMD)
+    $(POST_BUILD_CMD)
+!endif
+!endif
+
+#
+# Standard list of targets: all, clean and loc.  all is the default target.
+#
+
+!IFNDEF PASS0ONLY
+
+
+all:  $(OBJECTMACFILE) \
+        $(NTTARGETFILE0)  \
+        $(PASS0_OBJECTS) \
+        PASS0_Pub    \
+        PASS0_Binp   \
+        $(PRECOMPILED_TARGET) \
+        $(HEADEROBJNAME) \
+        build_objects \
+        $(TARGETLIBFILES) \
+        $(NTTARGETFILE1)  \
+        $(TARGETEXEFILES) \
+        $(BROWSERFILE)   \
+        PASS1_Pub     \
+        build_umobjects \
+        $(UMEXEFILES) \
+        $(NTTARGETFILES) \
+        PASS2_Pub     \
+! if !$(MISCFILES_DURING_LINK) || !defined(NOLINK)
+!  if "$(MISCFILES: =)" != ""
+        $(MISCFILES) \
+!   ifdef _NTTREE
+        binplace_miscfiles \
+!   endif
+!  endif
+! endif
+        dummy_end_target
+! if "$(BUILDMSG)" != ""
+!ifdef PLATFORM_UNIX
+    @echo
+!else
+    @echo.
+!endif
+    @echo $(BUILDMSG)
+! endif
+
+# Used to delimit target list
+dummy_end_target:
+
+binplace_miscfiles: $(MISCFILES)
+!ifndef NO_BINPLACE
+    @!$(BINPLACE_NAME) -R $(_NTTREE) $(BINPLACE_DBGFLAGS_NT) $(BINPLACE_FLAGS) $**
+!endif
+
+build_objects: $(TARGETOBJFILES)
+
+build_umobjects: $(UMOBJFILES)
+
+clean: all
+
+!ELSE   # PASS0ONLY
+
+all:    $(NTTARGETFILE0)  \
+        $(PASS0_OBJECTS)
+! IF "$(BUILDMSG)" != ""
+    @echo.
+    @echo $(BUILDMSG)
+! ENDIF
+
+clean: all
+
+!ENDIF  # PASS0ONLY
+
+update:
+    @echo Updating library.
+
+!if exist (default.mac)
+$(OBJECTMACFILE): default.mac
+    @echo Rebuilding $(OBJECTMACFILE) from default.mac.
+    @if not exist $(_OBJ_DIR) $(MD) $(_OBJ_DIR)
+    $(TYPE_COMMAND) default.mac >$@
+    @echo $@ was rebuilt, please reinvoke NMAKE
+    @$(CAUSE_ERROR)
+!else
+$(OBJECTMACFILE): $(SOURCES_USED)
+    @echo Rebuilding $(OBJECTMACFILE) from $(SOURCES_USED).
+    @build -Of $(DEV_NULL)
+    @echo $@ was rebuilt, please reinvoke NMAKE
+    @$(CAUSE_ERROR)
+!endif
+
+!ifdef NO_BINPLACE
+PASS0_BINP:
+
+PASS1_BINP:
+
+PASS2_BINP:
+
+!else
+PASS0_BINP:
+!if defined(PASS0_BINPLACE) && "$(BUILD_PASS)" != "PASS1" && "$(BUILD_PASS)" != "PASS2"
+    $(BINPLACE_TOOL) @<<
+$(BINPLACE_FLAGS) 
+$(PASS0_BINPLACE)
+<<NOKEEP
+!endif
+
+PASS1_BINP:
+!if defined(PASS1_BINPLACE) && "$(BUILD_PASS)" != "PASS0" && "$(BUILD_PASS)" != "PASS2"
+    $(BINPLACE_TOOL) @<<
+$(BINPLACE_FLAGS) 
+$(PASS1_BINPLACE)
+<<NOKEEP
+!endif
+
+PASS2_BINP:
+!if defined(PASS2_BINPLACE) && "$(BUILD_PASS)" != "PASS0" && "$(BUILD_PASS)" != "PASS1"
+    $(BINPLACE_TOOL) @<<
+$(BINPLACE_FLAGS) 
+$(PASS2_BINPLACE)
+<<NOKEEP
+!endif
+!endif
+
+PASS0_Pub:
+!if defined(PASS0_PUBLISH) && "$(BUILD_PASS)" != "PASS1" && "$(BUILD_PASS)" != "PASS2"
+    $(PUBLISH_CMD) -F <<
+$(PASS0_PUBLISH:}=}
+)
+<<$(KEEPFILES)
+!endif
+
+PASS1_Pub: 
+!if defined(PASS1_PUBLISH) && "$(BUILD_PASS)" != "PASS0" && "$(BUILD_PASS)" != "PASS2" && !defined(NOLIB)
+    $(PUBLISH_CMD) -F <<
+$(PASS1_PUBLISH:}=}
+)
+<<$(KEEPFILES)
+!endif
+
+PASS2_Pub:
+!if defined(PASS2_PUBLISH) && "$(BUILD_PASS)" != "PASS0" && "$(BUILD_PASS)" != "PASS1"
+    $(PUBLISH_CMD) -F <<
+$(PASS2_PUBLISH:}=}
+)
+<<NOKEEP
+!endif
+
+#
+# Binary drop runs only during the link phase
+#
+
+BINARY_Pub:
+!ifdef BINARY_PUBLISH
+! if "$(BINPUBLISH)" == "1"
+    $(BINDROP_CMD) -F <<
+$(BINARY_PUBLISH:}=}
+)
+<<$(KEEPFILES)
+! else
+    @echo BINARY_PUBLISH_PROJECTS in environment doesn't contain $(_PROJECT_) -
+    @echo binaries will not be published.
+! endif
+!else if defined(BINARY_PUBLISH_FILES)
+! if "$(BINPUBLISH)" == "1"
+    @cmd /v:on /c make_publish_spec.cmd $(BINARY_PUBLISH_ROOT) $(O) $(BINARY_PUBLISH_FILES) | $(BINDROP_CMD) -I
+! else
+    @echo BINARY_PUBLISH_PROJECTS in environment doesn't contain $(_PROJECT_) -
+    @echo binaries will not be published.
+! endif
+!endif
+
+loc:
+    @-loc *.h $(SOURCES)
+
+print:
+    @-ppr *.h $(SOURCES)
+
+# Include devdiv macros (necessary to allow makefile.inc definitions)
+!ifdef USING_DEVDIV_DEFS
+DEVDIV2_SECTION=3
+!include $(NTMAKEENV)\devdiv2.def
+!endif 
+
+!IF DEFINED(NTTARGETFILES) || DEFINED(NTTARGETFILE0) || DEFINED(NTTARGETFILE1) || DEFINED(USE_MAKEFILE_INC)
+! INCLUDE .\makefile.inc
+!ENDIF
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+# Unix linker is single pass. Going 3x around will hopefully resolve any cycles...
+MACHINE_TARGETLIBS=$(MACHINE_TARGETLIBS) $(LINKLIBS) $(UMLIBS) $(MACHINE_TARGETLIBS) $(LINKLIBS) $(UMLIBS) $(MACHINE_TARGETLIBS)
+!endif
+
+!IF "$(PRECOMPILED_INCLUDE)" != ""
+! IF "$(ROTOR_TOOLSET)" != "MSVC"
+# Precompile the header file by preprocessing it, running cppmunge, then
+# producing the precompiled output to PRECOMPILED_TARGET.  gcc's output
+# goes to the specified **directory** name, which is <filename>.obj in
+# this makefile.  The 'date >$(O)/$(PRECOMPILED_PCH)' creates a <filename>.pch
+# file in order to satisfy dependency information elsewhere in makefile.def.
+# The contents are unimportant, but the timestamp of the file is.
+$(PRECOMPILED_TARGET) $(HEADEROBJNAME): $(PRECOMPILED_INCLUDE)
+!  IF "$(FEATURE_PRECOMPILED_HEADERS)" == "1"
+    $(C_PREPROCESSOR_NAME) $(C_PREPROCESSOR_FLAGS) $(OUTPUT_FLAG) $(MAKEDIR)$(DIR_SEP)$*.ii $(CPLUSPLUS_FILE) $(PRECOMPILED_INCLUDE)
+    @$(CPP_MUNGER_NAME) -s$(PRECOMPILED_INCLUDE_FOR_MUNGER) -p $(MAKEDIR)$(DIR_SEP)$*.ii
+    @$(C_COMPILER_NAME) $(C_PRECOMPILER_FLAGS) $(HEADEROBJ) $(MAKEDIR)$(DIR_SEP)$*.ii
+!if "$(KEEP_CPPMUNGE)" == ""    
+    - @$(DELETER) $(MAKEDIR)$(DIR_SEP)$*.ii
+!endif    
+!  ELSE    
+    @$(C_COMPILER_NAME) $(CFLAGS) $(OUTPUT_FLAG) $(HEADEROBJNAME) $(ROTOR_DIR)$(DIR_SEP)tools$(DIR_SEP)bin$(DIR_SEP)empty.cpp
+!  ENDIF
+!  ifdef PLATFORM_UNIX
+    @date >$(O)$(DIR_SEP)$(PRECOMPILED_PCH)
+!else
+    @date /T >$(O)$(DIR_SEP)$(PRECOMPILED_PCH)
+!endif
+! ELSE
+!  ifdef PRECOMPILED_SOURCEFILE
+$(PRECOMPILED_TARGET) $(HEADEROBJNAME): $(PRECOMPILED_INCLUDE)
+    @$(TYPE_COMMAND) <<
+$(ECHO_PRECOMPILED_MSG1)
+<<NOKEEP
+    @$(C_COMPILER_NAME) @<< $(PRECOMPILED_FLAG) $(PRECOMPILED_SOURCEFILE)
+$(C_COMPILER_FLAGS: =
+) /Yl$(TARGETNAME) /Yc$(?F) $(HEADERFILE) $(HEADEROBJ)
+<<NOKEEP
+!  else
+$(PRECOMPILED_TARGET) $(HEADEROBJNAME): $(PRECOMPILED_INCLUDE)
+    if not exist $(@D) md $(@D)
+    @$(TYPE_COMMAND) <<$O\pch_hdr.src
+$(ECHO_PRECOMPILED_MSG2)
+
+#include "$(?F)"
+
+<<NOKEEP
+    @$(C_COMPILER_NAME) @<< $(PRECOMPILED_FLAG)<<$O\pch_hdr.src
+$(C_COMPILER_FLAGS: =
+) /Yl$(TARGETNAME) /Yc$(?F) $(HEADERFILE) $(HEADEROBJ)
+<<NOKEEP
+#include "$(?F)"
+<<NOKEEP
+!  endif
+! ENDIF
+!ENDIF
+
+!IFNDEF NOLINK
+
+! IF "$(UMTEST)" != "" || "$(UMAPPL)" != ""
+# Note: LIBC_LIB has to be after rotor_pal.lib to make PAL logging for CRT functions work
+$(UMEXEFILES): $(UMLIBS) $(CRTLIBS) $(LINKLIBS) $(LIBC_LIB)
+
+! ENDIF
+!ENDIF
+
+!if defined(BROWSER_INFO) && !defined(NO_BROWSER_FILE)
+
+! ifndef BSCMAKE_FLAGS
+BSCMAKE_FLAGS = -nologo
+! endif
+
+$(BROWSERFILE) : $O\*.sbr $(OTHER_SBR_FILES)
+    -bscmake $(BSCMAKE_FLAGS) -o $(BROWSERFILE) @<<$O\bscmake.rsp
+$(**: =
+)
+<<NOKEEP
+!endif
+
+# DONT_PURIFY is an override you can place in a sources file to 
+# prevent purifying in a certain subdirectory. The override is off by default.
+
+!ifndef DONT_PURIFY
+DONT_PURIFY=0
+!endif
+
+!if ("$(PURIFY_CMD)" != "" && "$(DONT_PURIFY)" != "1")
+LINKER_PREFIX=$(PURIFY_CMD)
+!else
+LINKER_PREFIX=
+!endif
+
+#
+# These dependencies produce the target binaries from the object files.
+# These will trigger the sources to object inference rules to generate the
+# object files.
+#
+
+!IF "$(TARGET)" != ""
+! IF "$(TARGETTYPE)"=="PROGRAM"
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+LINKER=$(LINKER_PREFIX) $(LINKER)
+$(TARGET): $(UMRES) $(OBJECTS) $(CRTLIBS) $(MACHINE_TARGETLIBS) $(LINKLIBS)
+    $(LINKER) $(LINKER_FLAGS) $(LD_LIB_DIRS) $(ORDER) $(LINKGPSIZE) $(LINKER_OPTIDATA) $(START_GROUP) $(UMLIBS) $(**) $(END_GROUP) $(UNIX_DLL_LIBS) $(CC_LIB) $(UNIX_DLL_LIBS) $(CC_LIB)
+    $(MAPSYM_CMD)
+    $(BINPLACE_CMD)
+    $(POST_BUILD_CMD)
+!else # "$(ROTOR_TOOLSET)" != "MSVC"
+# Note: LIBC_LIB has to be after rotor_pal.lib to make PAL logging for CRT functions work
+$(TARGET): $(UMRES) $(OBJECTS) $(CRTLIBS) $(UMLIBS) $(MACHINE_TARGETLIBS) $(LINKLIBS) $(LIBC_LIB)
+    $(LINKER) @<<
+$(LINKER_FLAGS: =
+)
+-subsystem:$(SUBSYSTEM)
+-base:$(UMBASE)
+$(ORDER: =
+)
+$(LINKGPSIZE: =
+)
+$(UMENTRY: =
+)
+$(LINKER_OPTIDATA)
+$(HEADEROBJNAME: =
+)
+$(**: =
+)
+<<NOKEEP
+    $(MAPSYM_CMD)
+    $(BINPLACE_CMD)
+    $(POST_BUILD_CMD)
+!endif
+! ELSEIF "$(TARGETTYPE)"=="DYNLINK"
+
+!  ifdef RESOURCE_ONLY_DLL
+DYNLINK_EXP=
+!  else
+!   IF "$(DLLLIBOBJECTS)" == " "
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+!if "$(PLATFORM_UNIX)" == "1"
+!if "$(USING_LD_SCRIPT)" == "1"
+!if "$(LD_SCRIPT_TYPE)" == "gnu"
+LD_VERSION_SCRIPT = -Wl,--version-script=$(LD_SCRIPT)
+DEF2LD_ARGS=-f gnu -l $(REQUIRED_C_LIBS: =,),$(CC_LIB) -o $@ $(DLLDEF)
+!elseif "$(LD_SCRIPT_TYPE)" == "apple"
+LD_VERSION_SCRIPT = -Wl,-exported_symbols_list $(LD_SCRIPT)
+DEF2LD_ARGS=-f apple -o $@ $(DLLDEF)
+!endif
+
+!if "$(DLLENTRY)" != "-noentry"
+DLLENTRY=$(DLLENTRY:_DllMainCRTStartup=DllMain)
+!  if "$(PLATFORM_OS)" == "freebsd"
+!    if "$(ROTOR_TOOLSET_VERSION)" > "3.0.0 "
+# With gcc > 2.95 on FreeBSD, we need to specially treat some symbols as global
+# The _ZTI* symbols are internally generated by gcc and refer to TypeInfo structs
+# Each struct contains a pointer to a char*, the name of the type, whose address
+# is contained in the _ZTS* symbols.
+DEF2LD_ARGS=-s $(DLLENTRY:-entry:=),_ZTI*,_ZTS* $(DEF2LD_ARGS)
+!    else
+DEF2LD_ARGS=-s $(DLLENTRY:-entry:=) $(DEF2LD_ARGS)
+!    endif
+!  else
+DEF2LD_ARGS=-s $(DLLENTRY:-entry:=) $(DEF2LD_ARGS)
+!  endif
+!endif
+
+$(LD_SCRIPT) : $(DLLDEF)
+        $(PERL) $(ROTOR_DIR)\env\bin\def2ld.pl $(DEF2LD_ARGS)
+
+
+$(DYNLINK_LIB) $(DYNLINK_EXP) : $(LD_SCRIPT) $(IMPLIB_DEPEND)
+!else
+$(DYNLINK_LIB) $(DYNLINK_EXP) : $(IMPLIB_DEPEND)
+!endif
+!else
+$(DYNLINK_LIB) $(DYNLINK_EXP) : $(DLLDEF) $(IMPLIB_DEPEND)
+!endif
+!else
+$(DYNLINK_LIB) $(DYNLINK_EXP) : $(DLLDEF) $(IMPLIB_DEPEND)
+    -lib -out:$(DYNLINK_LIB) @<<
+$(LIBRARIAN_FLAGS: =
+)
+!if "$(USING_DLL_DEF)" == "1"
+-def:$(DLLDEF)
+!else # !USING_DLL_DEF
+-def
+!endif # USING_DLL_DEF
+$(LIBRARY_OBJS: =
+)
+<<NOKEEP
+!endif
+
+!   ELSE # "$(DLLLIBOBJECTS)" == " "
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+!if "$(PLATFORM_UNIX)" == "1"
+$(DYNLINK_LIB) $(DYNLINK_EXP) : $(IMPLIB_DEPEND) $(DLLLIBOBJECTS)
+!else
+$(DYNLINK_LIB) $(DYNLINK_EXP) : $(DLLDEF) $(IMPLIB_DEPEND)
+!endif
+!else
+$(DYNLINK_LIB) $(DYNLINK_EXP) : $(DLLDEF) $(IMPLIB_DEPEND) $(DLLLIBOBJECTS)
+    -lib -out:$(DYNLINK_LIB) @<<
+$(LIBRARIAN_FLAGS: =
+)
+!if "$(USING_DLL_DEF)" == "1"
+-def:$(DLLDEF)
+!else # !USING_DLL_DEF
+-def
+!endif # USING_DLL_DEF
+$(LIBRARY_OBJS: =
+)
+<<NOKEEP
+    -lib -out:$(DYNLINK_LIB) @<<
+$(LIBRARIAN_FLAGS: =
+)
+$(@R).lib
+$(DLLLIBOBJECTS)
+<<NOKEEP
+!endif
+
+!   ENDIF # "$(DLLLIBOBJECTS)" == " "
+!  endif # RESOURCE_ONLY_DLL
+
+!  IF "$(MAKEDLL)" != ""
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+!ifndef PLATFORM_UNIX
+# need a separate rule on MinGW because of $(DLLDEF)
+$(TARGET): $(DLLDEF) $(OBJECTS) $(LINKLIBS) $(CRTLIBS) $(MACHINE_TARGETLIBS)
+    $(LINKER) $(LINKER_FLAGS) $(LD_LIB_DIRS) $(SHARED_LIB) $(LD_VERSION_SCRIPT) $(ORDER) $(LINKER_OPTIDATA) $(START_GROUP) $(**) $(END_GROUP) $(UNIX_DLL_LIBS) $(CC_LIB) $(UNIX_DLL_LIBS) $(CC_LIB) $(SONAME)
+    $(MAPSYM_CMD)
+    $(BINPLACE_CMD)
+    $(MAPDUMP_CMD)
+    $(POST_BUILD_CMD)
+!else # PLATFORM_UNIX
+$(TARGET): $(OBJECTS) $(LINKLIBS) $(CRTLIBS) $(MACHINE_TARGETLIBS)
+    $(LINKER) $(LINKER_FLAGS) $(LD_LIB_DIRS) $(SHARED_LIB) $(LD_VERSION_SCRIPT) $(ORDER) $(LINKER_OPTIDATA) $(START_GROUP) $(**) $(END_GROUP) $(UNIX_DLL_LIBS) $(CC_LIB) $(UNIX_DLL_LIBS) $(CC_LIB) $(SONAME)
+    $(MAPSYM_CMD)
+    $(BINPLACE_CMD)
+    $(MAPDUMP_CMD)
+    $(POST_BUILD_CMD)
+!endif
+!else # "$(ROTOR_TOOLSET)" != "MSVC"
+# Note: LIBC_LIB has to be after rotor_pal.lib to make PAL logging for CRT functions work
+$(TARGET): $(DYNLINK_EXP) $(OBJECTS) $(LINKLIBS) $(CRTLIBS) $(MACHINE_TARGETLIBS) $(LIBC_LIB)
+    $(LINKER) @<<
+$(LINKER_FLAGS: =
+)
+-dll
+$(ORDER: =
+)
+$(LINKER_OPTIDATA)
+-base:$(DLLBASE)
+-subsystem:$(SUBSYSTEM)
+$(DLLENTRY: =
+)
+$(HEADEROBJNAME: =
+)
+$(**: =
+)
+<<NOKEEP
+    $(MAPSYM_CMD)
+    $(BINPLACE_CMD)
+    $(MAPDUMP_CMD)
+    $(POST_BUILD_CMD)
+!endif
+
+!  ENDIF # "$(MAKEDLL)" != ""
+
+! ELSEIF "$(TARGETTYPE)"=="LIBRARY"
+
+!if "$(ROTOR_TOOLSET)" != "MSVC"
+$(TARGET): $(OBJECTS) $(OBJLIBFILES)
+    $(MAKE_NEW_DIR)
+    @-$(DELETER) $@ $(DEV_NULL)
+    -$(LIBRARIAN) $(**)
+!if "$(USE_RANLIB)" == "1"
+    -$(RANLIB) $(RANLIB_FLAGS) $@
+!endif
+!else
+$(TARGET): $(OBJECTS) $(OBJLIBFILES)
+    $(MAKE_NEW_DIR)
+    @-$(DELETER) $@ $(DEV_NULL)
+    -$(LIBRARIAN) @<<
+$(HEADEROBJNAME: =
+)
+$(**: =
+)
+<<NOKEEP
+!endif
+
+! ENDIF
+!ENDIF
+
+$O\*.res : $(MASTER_VERSION_FILE)
+
+!ifdef USING_DEVDIV_DEFS
+DEVDIV2_SECTION=AFTER_MAKEFILE_DEF
+!include devdiv2.def
+!endif

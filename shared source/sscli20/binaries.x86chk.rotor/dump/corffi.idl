@@ -1,0 +1,51 @@
+// ==++==
+// 
+//   
+//    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+//   
+//    The use and distribution terms for this software are contained in the file
+//    named license.txt, which can be found in the root of this distribution.
+//    By using this software in any fashion, you are agreeing to be bound by the
+//    terms of this license.
+//   
+//    You must not remove this notice, or any other, from this software.
+//   
+// 
+// ==--==
+/**************************************************************************************
+ **                                                                                  **
+ ** Corffi.idl - CLR FFI interfaces.                                                 **
+ **                                                                                  **
+ **************************************************************************************/
+
+import "unknwn.idl";
+import "oaidl.idl";
+
+/* modelled after System.Reflection.BindingFlags */
+typedef enum CorFFIBindingFlags
+{
+    CorFFIInvokeMethod        = 0x0100,
+    // CreateInstance   = 0x0200,
+    CorFFIGetField            = 0x0400,
+    CorFFISetField            = 0x0800,
+    CorFFIGetProperty         = 0x1000,
+    CorFFISetProperty         = 0x2000,
+} CorFFIBindingFlags;
+
+/*
+ * Simple "COM-lite" invoke mechanism for Rotor
+ */
+[
+    object,
+    uuid(96E328FE-9A83-439F-A298-8F9CAA2995F0),
+    pointer_default(unique),
+    local
+] 
+interface IManagedInstanceWrapper : IUnknown
+{
+    HRESULT InvokeByName([in] LPCWSTR MemberName,
+                         [in] INT32 BindingFlags,
+                         [in] INT32 ArgCount,
+                         [optional,in,out] VARIANT *ArgList,
+                         [optional,out] VARIANT *pRetVal);
+}

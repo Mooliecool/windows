@@ -1,0 +1,878 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> 
+<head>
+<title>Logging in the Rotor Shared Source CLI</title>
+<link rel="stylesheet" type="text/css" href="../rotor.css">
+</head>
+
+<body>		
+<h1>Logging in the Shared Source CLI 2.0</h1>
+
+ 
+<h3>Contents</h3>
+
+ 
+<ul>
+  <li><a href="#PALLogging">PAL Logging</a><ul>
+    <li><a href="#PALLoggingonWindows">PAL Logging on Windows</a></li>
+  </ul>
+  </li>
+  <li><a href="#UnifiedCLILogging">Unified CLI Logging</a><ul>
+    <li><a href="#JIT-SpecificLoggingEnvironmentVariables">JIT-Specific Logging 
+    Environment Variables</a></li>
+    <li><a href="#GC-SpecificLoggingEnvironmentVariables">Garbage 
+    Collection-Specific Logging Environment Variables</a></li>
+    <li><a href="#AdditionalLoggingOptions">Additional Logging Options</a></li>
+  </ul>
+  </li>
+  <li><a href="#ExampleLoggingSession">Example Logging Sessions</a><ul>
+  <li><a href="#GarbageCollectionExample">Garbage Collection Example</a></li>
+  <li><a href="#SecurityExample">Security Example</a></li>
+  <li><a href="#LoaderExample">Loader Example</a></li>
+  <li><a href="#DumpOnClassLoadExample">DumpOnClassLoad Example</a></li>
+  <li><a href="#JitCodeLogMainExampleLogLevel4">JitCodeLog=Main Example: 
+  LogLevel=4</a></li>
+  <li><a href="#JitCodeLogMainExampleLogLevel5">JitCodeLog=Main Example: 
+  LogLevel=5</a></li>
+  <li><a href="#JitCodeLogMainExampleLogLevel6">JitCodeLog=Main Example: 
+  LogLevel=6</a></li>
+  <li><a href="#GarbageCollectionExampleDetailLevel1">Garbage Collection 
+  Example: Detail Level=1</a></li>
+  <li><a href="#GarbageCollectionExampleDetailLevel2">Garbage Collection 
+  Example: Detail Level=2</a></li>
+  <li><a href="#GarbageCollectionExampleDetailLevel3">Garbage Collection 
+  Example: Detail Level=3</a></li>
+  <li><a href="#ManagedCodeLoggingSerializationExample">Managed Code Logging - 
+  Serialization Example</a></li>
+  <li><a href="#ManagedCodeLoggingResourcesExample">Managed Code Logging - 
+  Resources Example</a></li>
+</ul>
+
+ 
+  </li>
+</ul>
+
+ 
+<p>There are several ways to turn on logging in the Shared Source Common 
+Language Infrastructure (SSCLI) 
+implementation.&nbsp; The two main categories of logging are:</p>
+
+ 
+<ul>
+  <li>Platform Adaptation Layer (PAL) logging.&nbsp; 
+
+ 
+<ul>
+  <li>This is logging at a low level before calls are made to the operating 
+  system.</li>
+</ul>
+
+ 
+  </li>
+  <li>Unified CLI logging.&nbsp; 
+
+ 
+<ul>
+  <li>This log processes in the SSCLI&nbsp; such as garbage 
+  collection, just-in-time (JIT) compilation, and so on.</li>
+</ul>
+
+ 
+  </li>
+</ul>
+
+ 
+<h2><a name="PALLogging"></a>PAL Logging</h2>
+
+ 
+<p>
+    Note: It is safe to copy and use a checked or fastchecked build of 
+the rotor_pal dynamic library in a retail build, so you can utilize API logging 
+while running optimized binaries.</p>
+
+ 
+<h3><a name="PALLoggingonWindows"></a>PAL Logging on Windows</h3>
+
+ 
+    <table border="1" width="90%">
+      <tr VALIGN="top">
+        <th width="18%">Environment variable</th>
+        <th width="14%">Value</th>
+        <th width="35%">Description</th>
+      </tr>
+      <tr VALIGN="top">
+        <td width="18%" rowspan="4">PAL_API_TRACING</td>
+        <td width="14%">debugger</td>
+        <td width="35%">Sends log output to the debugger through OutputDebugString 
+        API.<p>
+        Note that from inside a debugger, if you modify the global variable 
+        rotor_pal!<i>LogFileHandle</i> from the default value of 0 to 0xffffffff, then 
+        logging will immediately begin to be output to the debugger. Setting the 
+        variable 
+        back to 0 will disable it again.</td>
+      </tr>
+      <tr VALIGN="top">
+        <td width="14%"><i>filename</i></td>
+        <td width="35%">Sends log output to the  specified <i>filename.</i></td>
+      </tr>
+      <tr VALIGN="top">
+        <td width="14%">stderr</td>
+        <td width="35%">Sends log output to the standard error handler.</td>
+      </tr>
+      <tr VALIGN="top">
+        <td width="14%">stdout</td>
+        <td width="35%">Sends log output to the console.</td>
+      </tr>
+</table>
+
+ 
+<h3><a name="PALLoggingonUNIXSystem-basedPlatforms"></a>&nbsp;</h3>
+
+ 
+<h2><a name="UnifiedCLILogging"></a>Unified CLI Logging</h2>
+
+ 
+<p>The following environment variables can be set  to enable detailed 
+execution 
+logging.&nbsp; </p>
+
+ 
+<p>A unified logging system is used for garbage collection, JIT compilation, and other execution logging; the logging system is controlled by a set of variables.&nbsp;The implementation 
+of the logging system is in %ROTOR_DIR%/clr/src/utilcode/<a href="../../clr/src/utilcode/log.cpp">log.cpp</a> and %ROTOR_DIR%/clr/src/inc/<a href="../../clr/src/inc/log.h">log.h</a>.&nbsp; Logging  is enabled 
+only in 
+checked and fastchecked builds.&nbsp;If you want to change, this see the comment 
+in log.cpp.</p>
+
+ 
+<p>Environment variables have the same name as code variables but must be 
+prefaced with &quot;COMPlus_&quot;.</p>
+
+ 
+<p>Every variable is read first from the environment, then from the per-user 
+rotor.ini configuration file, and finally from the per-installation rotor.ini configuration file.</p>
+
+ 
+<p>Some additional environment variables are used by the specific subsystem as 
+described in the following table.</p>
+
+ 
+    <table border="1" width="90%">
+      <tr VALIGN="top">
+        <th width="15%">Environment variable</th>
+        <th width="24%">Value</th>
+        <th width="28%">Description</th>
+      </tr>
+      <tr VALIGN="top">
+        <td width="15%">COMPlus_LogEnable</td>
+        <td width="24%">1</td>
+        <td width="28%">Enables logging.&nbsp;This value can be toggled on and 
+        off without changing the other options.</td>
+      </tr>
+      <tr VALIGN="top">
+        <td width="15%">COMPlus_LogToConsole</td>
+        <td width="24%" rowspan="3">1<p>One of these options must be set 
+        to 1 to enable logging output</td>
+        <td width="28%">Enables logging output to the console</td>
+      </tr>
+      <tr VALIGN="top">
+        <td width="15%">COMPlus_LogToDebugger</td>
+        <td width="28%">Enables logging to the debugger (cordbg.exe)</td>
+      </tr>
+      <tr VALIGN="top">
+        <td width="15%">COMPlus_LogToFile</td>
+        <td width="28%">Enables logging to a file</td>
+      </tr>
+      <tr VALIGN="top">
+        <td width="15%">COMPlus_LogFile</td>
+        <td width="24%">Name of log file</td>
+        <td width="28%">Requires COMPlus_LogToFile=1</td>
+      </tr>
+      <tr VALIGN="top">
+        <td width="15%">COMPlus_LogFlushFile</td>
+        <td width="24%">&nbsp;</td>
+        <td width="28%">Flushes file buffers every time anything is logged. Applies 
+        to both LogToConsole and LogToFile. Slow but very reliable logging.</td>
+      </tr>
+      <tr VALIGN="top">
+        <td width="15%">COMPlus_LogFileAppend</td>
+        <td width="24%">1</td>
+        <td width="28%">Appends to log file instead of replacing it.</td>
+      </tr>
+      <tr VALIGN="top">
+        <td width="15%">COMPlus_LogLevel</td>
+        <td width="24%"><i>n</i></td>
+        <td width="28%">Specifies the detail level of log output. n
+        ranges from 1 to 9, where 1 is the least detailed log output and 9 is 
+        the most detailed log output.</td>
+      </tr>
+      <tr VALIGN="top">
+        <td width="15%">COMPlus_LogFacility</td>
+        <td width="24%"><i>bitmask_value</i></td>
+        <td width="28%">Hexadecimal bitmask of facilities log.&nbsp;Each bit represents 
+        one facility to log.<p>The list of facilities is in 
+        <a href="../../clr/src/inc/loglf.h">sscli20/clr/src/inc/loglf.h</a></p>
+        <p>Some useful settings for <i>bitmask_value</i>:</p>
+        <ul>
+          <li>0x00000001&nbsp;&nbsp; Log garbage collector activity.</li>
+          <li>0x00000008&nbsp;&nbsp; Log JIT compilation activity.</li>
+          <li>0x12000003&nbsp;&nbsp; Log garbage collector, live pointers, app domains, 
+          and security activity.</li>
+        </ul>
+        <p>For more details on this option, see the examples below.</td>
+      </tr>
+      </table>
+
+ 
+<h3><a name="JIT-SpecificLoggingEnvironmentVariables"></a>JIT Compilation-Specific Logging Environment Variables</h3>
+
+ 
+<p>By default, these environment variables are  operational only on checked or fastchecked builds.</p>
+
+ 
+<p>Note: The COMPlus_JitDisasm variable that emits native code is 
+not supported in the SSCLI.&nbsp;To obtain similar functionality, set 
+COMPlus_JitBreak to the function you are interested in disassembling and then 
+view the disassembled code in the debugger after the debugger breaks in that function.</p>
+
+ 
+    <table border="1" width="90%">
+      <tr>
+        <th width="15%">Environment variable</th>
+        <th width="24%">Value</th>
+        <th width="28%">Description</th>
+      </tr>
+      <tr VALIGN="top">
+        <td width="15%">COMPlus_JitName </td>
+        <td width="24%"><i>LibraryName</i></td>
+        <td width="28%">Indicates the name of the JIT DLL library.&nbsp; If not defined, defaults 
+        to the hard-coded names mscorejt.dll on Microsoft&reg; Windows&reg; or libmscorejt.so on 
+        UNIX system-based platforms.</td>
+      </tr>
+      <tr VALIGN="top">
+        <td width="15%">COMPlus_JitBreak</td>
+        <td width="24%"><i>FunctionName</i></td>
+        <td width="28%">Breaks into the debugger before JIT-compiling <i>FunctionName.</i><p>
+        Use the wildcard character *  to JIT-compile all functions.</td>
+      </tr>
+      <tr VALIGN="top">
+        <td width="15%">COMPlus_JitHalt</td>
+        <td width="24%"><i>FunctionName</i></td>
+        <td width="28%">Emits a debugger break before the prolog of <i>FunctionName</i>. 
+        The inserted break  occurs just before execution of the function.<p>
+        Use the wildcard character *  to JIT-compile all functions.</td>
+      </tr>
+      <tr VALIGN="top">
+        <td width="15%">COMPlus_JitTrace</td>
+        <td width="24%">0<p>1</td>
+        <td width="28%">If 1, prints out the trace of functions that were 
+        JIT-compiled.
+        <p>This trace output can also be obtained through the central logging system 
+        but this is a more lightweight mechanism that generates only JIT 
+        information.<br>
+&nbsp;</td>
+      </tr>
+      </table>
+
+ 
+<h3><a name="GC-SpecificLoggingEnvironmentVariables"></a>Garbage 
+Collection-Specific Logging Environment Variables</h3>
+
+ 
+<p>By default these are  operational only on checked or fastchecked builds.</p>
+
+ 
+    <table border="1" width="90%">
+      <tr>
+        <th width="15%">Environment Variable</th>
+        <th width="24%">Value</th>
+        <th width="28%">Description</th>
+      </tr>
+      <tr VALIGN="top">
+        <td width="15%">COMPlus_GCprnLvl</td>
+        <td width="24%"><i>detailnumber</i></td>
+        <td width="28%">Sets the level of detail of the logging output to <i>
+        detailnumber</i>.&nbsp;The higher the number, the more data  output.</td>
+      </tr>
+      <tr VALIGN="top">
+        <td width="15%">COMPlus_GCtraceStart</td>
+        <td width="24%"><i>startnumber</i></td>
+        <td width="28%">The garbage collection generation at which to start 
+        logging output.</td>
+      </tr>
+      <tr VALIGN="top">
+        <td width="15%">COMPlus_GCtraceEnd</td>
+        <td width="24%"><i>endnumber</i></td>
+        <td width="28%">The garbage collection generation at which to stop 
+        logging output.</td>
+      </tr>
+</table>
+
+ 
+<h3><a name="AdditionalLoggingOptions"></a>Additional Logging Options</h3>
+
+ 
+<p>By default these are  operational only on checked or fastchecked builds.</p>
+
+ 
+<p>These options require that Unified CLI Logging be enabled but do not affect 
+the other options set for Unified logging.</p>
+
+ 
+    <table border="1" width="90%">
+      <tr>
+        <th width="15%">Environment variable</th>
+        <th width="24%">Value</th>
+        <th width="28%">Description</th>
+      </tr>
+      <tr>
+        <td width="15%">COMPlus_DumpOnClassLoad</td>
+        <td width="24%"><i>classname</i></td>
+        <td width="28%">Dumps information about the <i>classname</i> class when 
+        it is loaded.&nbsp; The information that is dumped contains:<ul>
+          <li>Method table summary.</li>
+          <li>Number of class static fields.</li>
+          <li>Number of class instance fields.</li>
+          <li>Number of class static object reference fields.</li>
+          <li>Number of declared fields.</li>
+          <li>Number of declared methods.</li>
+          <li>A vtable dump.</li>
+          <li>A field layout dump.</li>
+          <li>A garbage collection descriptor dump.</li>
+        </ul>
+        </td>
+      </tr>
+      <tr VALIGN="top">
+        <td width="15%">COMPlus_JitCodeLog</td>
+        <td width="24%"><i>FunctionName</i></td>
+        <td width="28%">Used only for JIT-compilation logging.<p>Log JIT-compilation information for <i>FunctionName</i>.</p>
+        <p>You can 
+        use FunctionName=* to  log all  functions</td>
+      </tr>
+</table>
+
+ 
+<h3>Managed Code Logging Options</h3>
+
+ 
+<p>By default, these are operational only on checked or fastchecked builds.</p>
+
+ 
+<p>These options require that Unified CLI Logging be enabled.&nbsp; </p>
+
+ 
+<p>This functionality is defined in
+<a href="../../clr/src/bcl/system/bcldebug.cs">sscli20\clr\src\bcl\system\bcldebug.cs</a>.&nbsp; To find locations where 
+this logging facility is used, search for BCLDebug.Log in the sscli20\clr\src\bcl
+base class library source code 
+files.</p>
+
+ 
+<p>When using these logging functions it is recommended that you turn off logging for 
+most unmanaged code facilities. For example, set COMPlus_LogFacility=1.</p>
+
+ 
+<p>The COMPlus_LogLevel values are mapped for managed code logging to the following:</p>
+
+ 
+<table border="1" style="width: 90%">
+  <tr>
+    <th width="5%">Loglevel</th>
+    <th width="17%">Mapping</th>
+    <th width="30%">Description</th>
+  </tr>
+  <tr>
+    <td width="5%">0</td>
+    <td width="17%">LogLevel.Panic</td>
+    <td width="30%">Logs panic asserts.</td>
+  </tr>
+  <tr>
+    <td width="5%">1</td>
+    <td width="17%">LogLevel.Error</td>
+    <td width="30%">Logs error asserts.</td>
+  </tr>
+  <tr>
+    <td width="5%">2</td>
+    <td width="17%">LogLevel.Error</td>
+    <td width="30%">Logs error asserts.</td>
+  </tr>
+  <tr>
+    <td width="5%">3</td>
+    <td width="17%">LogLevel.Warning</td>
+    <td width="30%">Logs warning asserts.</td>
+  </tr>
+  <tr>
+    <td width="5%">4</td>
+    <td width="17%">LogLevel.Warning</td>
+    <td width="30%">Logs warning asserts.</td>
+  </tr>
+  <tr>
+    <td width="5%">5</td>
+    <td width="17%">LogLevel.Status</td>
+    <td width="30%">Logs status-level output.</td>
+  </tr>
+  <tr>
+    <td width="5%">6</td>
+    <td width="17%">LogLevel.Status</td>
+    <td width="30%">Logs status-level output.</td>
+  </tr>
+  <tr>
+    <td width="5%">7</td>
+    <td width="17%">LogLevel.Trace</td>
+    <td width="30%">Logs all trace output.&nbsp; This is the highest degree of 
+    detail.</td>
+  </tr>
+  <tr>
+    <td width="5%">8</td>
+    <td width="17%">LogLevel.Trace</td>
+    <td width="30%">Logs all trace output. Same as 7.</td>
+  </tr>
+  <tr>
+    <td width="5%">9</td>
+    <td width="17%">LogLevel.Trace</td>
+    <td width="30%">Logs all trace output. Same as 7.</td>
+  </tr>
+  </table>
+
+ 
+<p>To see detailed output from the COMPlus_ManagedLogFacility setting requires 
+having COMPlus_LogLevel set to 7, 8, or 9.</p>
+
+ 
+<p>The following table contains additional environment variables used by the 
+managed code logging implementation.</p>
+
+ 
+    <table border="1" width="90%">
+      <tr>
+        <th width="15%">Environment variable</th>
+        <th width="12%">Value</th>
+        <th width="40%" colspan="3">Description</th>
+      </tr>
+      <tr>
+        <td width="15%" rowspan="13">COMPlus_ManagedLogFacility</td>
+        <td width="12%" rowspan="13"><i>bitmask_value</i></td>
+        <td width="40%" colspan="3">Hexadecimal bitmask of facilities log.&nbsp; Each bit represents 
+        one facility to log.<p>The settings for <i>bitmask_value </i>are:</p>
+        </td>
+      </tr>
+      <tr>
+        <td width="8%" align="center"><b>Mask Value</b></td>
+        <td width="11%" align="center"><b>Switch Name</b></td>
+        <td width="21%" align="center"><b>Description</b></td>
+      </tr>
+      <tr>
+        <td width="8%">0x00000001&nbsp; </td>
+        <td width="11%">NLS</td>
+        <td width="21%">Traces globalization usage.</td>
+      </tr>
+      <tr>
+        <td width="8%">0x00000002</td>
+        <td width="11%">SER</td>
+        <td width="21%">Traces serialization usage.</td>
+      </tr>
+      <tr>
+        <td width="8%">0x00000004&nbsp;&nbsp;&nbsp; </td>
+        <td width="11%">DYNIL</td>
+        <td width="21%">Traces some Reflection.Emit usage.</td>
+      </tr>
+      <tr>
+        <td width="8%">0x00000008&nbsp;&nbsp;&nbsp; </td>
+        <td width="11%">REMOTE</td>
+        <td width="21%">Traces remoting usage. </td>
+      </tr>
+      <tr>
+        <td width="8%">0x00000010 </td>
+        <td width="11%">BINARY</td>
+        <td width="21%">Traces binary formatter usage.</td>
+      </tr>
+      <tr>
+        <td width="8%">0x00000020 </td>
+        <td width="11%">SOAP</td>
+        <td width="21%">Traces soap formatter usage.</td>
+      </tr>
+      <tr>
+        <td width="8%">0x00000040 </td>
+        <td width="11%">REMOTINGCHANNELS</td>
+        <td width="21%">Traces remoting channels usage.</td>
+      </tr>
+      <tr>
+        <td width="8%">0x00000080</td>
+        <td width="11%">CACHE</td>
+        <td width="21%">Traces reflection cache usage.</td>
+      </tr>
+      <tr>
+        <td width="8%">0x00000100&nbsp; </td>
+        <td width="11%">RESMGRFILEFORMAT</td>
+        <td width="21%">Traces .resources file usage.</td>
+      </tr>
+      <tr>
+        <td width="8%">0x00000200</td>
+        <td width="11%">PERF</td>
+        <td width="21%">Traces perf.&nbsp; Not used in SSCLI.</td>
+      </tr>
+      <tr>
+        <td width="8%">0x00000400&nbsp; </td>
+        <td width="11%">CORRECTNESS</td>
+        <td width="21%">Traces correctness.&nbsp; Not used in SSCLI.</td>
+      </tr>
+</table>
+
+ 
+<p>&nbsp;</p>
+
+ 
+<h2><a name="ExampleLoggingSession"></a>Example Logging Sessions</h2>
+
+ 
+<h3><a name="GarbageCollectionExample"></a>Garbage Collection Example</h3>
+
+ 
+<h4>Environment</h4>
+
+ 
+<ul class="none">
+  <li>set COMPlus_LogEnable=1</li>
+  <li>set COMPlus_LogFacility=1</li>
+  <li>set COMPlus_LogToConsole=1</li>
+  <li>set COMPlus_LogToFile=0</li>
+  <li>set COMPlus_LogLevel=4</li>
+</ul>
+
+ 
+<h4>Application execution command.</h4>
+
+ 
+<p>This runs remoting tests.</p>
+
+ 
+<blockquote>
+
+ 
+<p>clix tests\dev\remotingmarshal.exe</p>
+
+ 
+</blockquote>
+
+ 
+<h4>Log output that is sent to the console.</h4>
+
+ 
+<ul class="none">
+  <li>TID 013c: Executing program with command line 'tests\dev\remotingmarshal.exe'
+  </li>
+    <li>TID 0160: Finalizer thread starting...{ =========== BEGINGC 0, (gen = 0, collect_classes
+        = 0) ========== </li>
+    <li>TID 013c: WARNING: handle 00a213d8 causes pinning of object 01c03d50 System.Object[]
+    </li>
+    <li>TID 013c: WARNING: handle 00a213dc causes pinning of object 01c03b28 System.Object[]
+    </li>
+    <li>TID 013c: WARNING: handle 00a213e0 causes pinning of object 01c03900 System.Object[]
+    </li>
+    <li>TID 013c: WARNING: handle 00a213e4 causes pinning of object 01c036d8 System.Object[]
+    </li>
+    <li>TID 013c: WARNING: handle 00a213e8 causes pinning of object 01c034b0 System.Object[]
+    </li>
+    <li>TID 013c: WARNING: handle 00a213ec causes pinning of object 01c03288 System.Object[]
+    </li>
+    <li>TID 013c: WARNING: handle 00a213f0 causes pinning of object 01c01258 System.Object[]
+    </li>
+    <li>TID 013c: WARNING: handle 00a213f4 causes pinning of object 01c01030 System.Object[]
+    </li>
+    <li>TID 013c: WARNING: handle 00a213f8 causes pinning of object 00ccfa0c System.Object[C:\sscli20\binaries.x86chk.rotor\mscorlib.dll]
+    </li>
+    <li>TID 013c: WARNING: handle 00a213fc causes pinning of object 01c00018 System.Object[]
+    </li>
+    <li>TID 013c: WARNING: handle 037012fc causes pinning of object 01c02270 System.Object[]
+    </li>
+    <li>TID 013c: ========== ENDGC (gen = 0, collect_classes = 0) ===========} Field setters
+        succeeded </li>
+    <li>TID 013c: { =========== BEGINGC 1, (gen = 0, collect_classes = 0) ========== </li>
+    <li>TID 013c: ========== ENDGC (gen = 0, collect_classes = 0) ===========} Method invokes
+        succeeded Field getters succeeded All test passed </li>
+    <li>TID 013c: Signalling finalizer to quit...Waiting for finalizer to quit...Finalizer
+        thread done.</li>
+</ul>
+
+ 
+<h3><a name="SecurityExample"></a>Security Example</h3>
+
+ 
+<h4>Environment</h4>
+
+ 
+<ul class="none">
+  <li>set COMPlus_LogEnable=1</li>
+  <li>set COMPlus_LogFacility=0x10000000</li>
+  <li>set COMPlus_LogToConsole=1</li>
+  <li>set COMPlus_LogToFile=0</li>
+  <li>set COMPlus_LogLevel=6</li>
+</ul>
+
+ 
+<h4>Application execution command.</h4>
+
+ 
+<p>This runs StringBuilder and threadsafety tests.</p>
+
+ 
+<blockquote>
+
+ 
+<p>clix tests\dev\remotingmarshal.exe</p>
+
+ 
+</blockquote>
+
+ 
+<h4>Log output that is sent to the console.</h4>
+
+ 
+<ul class="none">
+  <li>TID 0aec: Executing program with command line 'tests\dev\remotingmarshal.exe'
+  </li>
+    <li>TID 0aec: No certificates found in module </li>
+    <li>TID 0aec: No certificates found in module </li>
+    <li>TID 0aec: No certificates found in module </li>
+    <li>TID 0aec: Code-access security check immediate invoked. </li>
+    <li>TID 0aec: Method: System.Security.CodeAccessSecurityEngine[C:\sscli20\binaries.x86chk.
+        rotor\mscorlib.dll].CheckNReturnSO </li>
+    <li>TID 0aec: Method: System.Security.CodeAccessSecurityEngine[C:\sscli20\binaries.x86chk.
+        rotor\mscorlib.dll].Assert </li>
+    <li>TID 0aec: Method: System.Security.CodeAccessPermission[C:\sscli20\binaries.x86chk.roto
+        r\mscorlib.dll].Assert </li>
+    <li>TID 0aec: Method: System.Runtime.Serialization.Formatters.Binary.ObjectReader[C:\sscli
+        20\binaries.x86chk.rotor\mscorlib.dll].FastBindToType </li>
+    <li>TID 0aec: Code-access stackwalk completed. </li>
+    <li>TID 0aec: Code-access security check immediate invoked. </li>
+    <li>TID 0aec: Method: System.Security.CodeAccessSecurityEngine[C:\sscli20\binaries.x86chk.
+        rotor\mscorlib.dll].CheckNReturnSO </li>
+    <li>TID 0aec: Method: System.Security.CodeAccessSecurityEngine[C:\sscli20\binaries.x86chk.
+        rotor\mscorlib.dll].Assert </li>
+    <li>TID 0aec: Method: System.Security.CodeAccessPermission[C:\sscli20\binaries.x86chk.roto
+        r\mscorlib.dll].Assert </li>
+    <li>TID 0aec: Method: System.Runtime.Serialization.Formatters.Binary.ObjectReader[C:\sscli
+        20\binaries.x86chk.rotor\mscorlib.dll].FastBindToType </li>
+    <li>TID 0aec: Code-access stackwalk completed. </li>
+    <li>TID 0aec: Code-access security check immediate invoked. </li>
+    <li>TID 0aec: Method: System.Security.CodeAccessSecurityEngine[C:\sscli20\binaries.x86chk.
+        rotor\mscorlib.dll].CheckNReturnSO<a name="LoaderExample"></a>Loader Example</li>
+    <li>...&nbsp;</li>
+</ul>
+
+ 
+<h3><a name="DumpOnClassLoadExample"></a><a name="JitCodeLogMainExampleLogLevel4"></a>JitCodeLog=Main Example: 
+LogLevel=4 </h3>
+
+ 
+<h4>Environment</h4>
+
+ 
+<p>Entry and exit logging for JIT-compiling in the prolog and epilog sections, 
+and in exception handlers</p>
+
+ 
+<ul class="none">
+  <li>set COMPlus_JitCodeLog=Main</li>
+  <li>set COMPlus_LogEnable=1</li>
+  <li>set COMPlus_LogFacility=0x00000008</li>
+  <li>set COMPlus_LogToConsole=1</li>
+  <li>set COMPlus_LogToFile=0</li>
+  <li>set COMPlus_LogLevel=4</li>
+</ul>
+
+ 
+<h4>Application execution command.</h4>
+
+ 
+<p>This runs the try and finally tests.</p>
+
+ 
+<blockquote>
+<p>clix tests\bvt\short\CS_TryFinally.exe</p>
+
+ 
+</blockquote>
+
+ 
+<h4>Log output that is sent to the console.</h4>
+
+ 
+<ul class="none">
+  <li>TID 12cc: Executing program with command line 'cs_tryfinally.exe' </li>
+    <li>TID 12cc: Fjitted 'CO_TryFinally::Main' at addr 0x375c2b8 to 0x375cb4c header 0
+    </li>
+    <li>TID 12cc: { entering CO_TryFinally::Main 1: </li>
+    <li>Abort( ) </li>
+    <li>1: finally 1 </li>
+    <li>1: finally 2 </li>
+    <li>1: finally 3 </li>
+    <li>1: finally 4 </li>
+    <li>1: finally 5 </li>
+    <li>1: finally 6 </li>
+    <li>1: finally 7 </li>
+    <li>1: finally 8 </li>
+    <li>2: Abort( ) </li>
+    <li>2: finally 8 </li>
+    <li>2: finally 7 </li>
+    <li>2: finally 6 </li>
+    <li>2: finally 5 </li>
+    <li>2: finally 4 </li>
+    <li>2: finally 3 </li>
+    <li>2: finally 2 </li>
+    <li>2: finally 1 </li>
+    <li>3: Abort( ) </li>
+    <li>3: finally 1 </li>
+    <li>TID 12cc: } </li>
+    <li>leaving TextWriter::Main <a name="JitCodeLogMainExampleLogLevel5"></a>JitCodeLog=Main Example: 
+LogLevel=5 </li>
+</ul>
+
+ 
+<h4>Environment</h4>
+
+ 
+<ul class="none">
+  <li>set COMPlus_JitCodeLog=Main</li>
+  <li>set COMPlus_LogEnable=1</li>
+  <li>set COMPlus_LogFacility=0x00000008</li>
+  <li>set COMPlus_LogToConsole=1</li>
+  <li>set COMPlus_LogToFile=0</li>
+  <li>set COMPlus_LogLevel=5</li>
+</ul>
+
+ 
+<p>Garbage collection map information is printed describing the locals and the 
+arguments.&nbsp; </p>
+
+ 
+<p>Logging code fragments describing the state of the processor are inserted 
+after code for each intermediate language (IL) instruction.</p>
+
+ 
+<h4>Application execution command.</h4>
+
+ 
+<p>This runs the try and finally tests.</p>
+
+ 
+<blockquote>
+
+ 
+<p>clix tests\bvt\short\CS_TryFinally.exe</p>
+
+ 
+</blockquote>
+
+ 
+<h4>Log output that is sent to the console.</h4>
+
+ 
+<ul class="none">
+  <li>TID 10ec: Executing program with command line 'cs_tryfinally.exe' </li>
+    <li>TID 10ec: Request
+      new LoaderCodeHeap::CreateCodeHeap(00010000, 00000000, for domain 7965a3 48 in 00000000
+      .. 00000000 ) </li>
+    <li>TID 10ec: Created new CodeHeap( 0375005c .. 03760000 ) </li>
+    <li>TID 10ec: ********* GC map info ******* </li>
+    <li>TID 10ec: Locals: (Length = 0x5, Frame size = 0x18) </li>
+    <li>TID 10ec:
+      local 0: offset: -0x18 type: typeRef </li>
+    <li>TID 10ec: local 1: offset: -0x1c type: typeRef </li>
+    <li>TID 10ec: local 2: offset: -0x20 type: typeRef </li>
+    <li>TID 10ec: local 3: offset: -0x24
+      type: typeRef </li>
+    <li>TID 10ec: local 4: offset: -0x28 type: typeI4 </li>
+    <li>TID 10ec: Bitvectors printed low bit (low local), first </li>
+    <li>TID 10ec: LocalsGCRef bit vector len=4 bits: 1 1 1 1 </li>
+    <li>TID 10ec: interiorGC bitvector len=0 bits: </li>
+    <li>TID 10ec: Pinned LocalsGCRef bit vector: len=0 bits: </li>
+    <li>TID 10ec: Pinned interiorGC bit vector len =0 bits: </li>
+    <li>TID
+      10ec: Args: (Length = 0x1, Frame size = 0) </li>
+    <li>TID 10ec: offset: -0xc type: typeRef </li>
+    <li>TID 10ec: Fjitted 'CO_TryFinally::Main' at addr 0x375c2b8 to 0x375cb4c header 0
+    </li>
+    <li>TID 10ec: { entering CO_TryFinally::Main </li>
+    <li>TID 10ec: ESP: 1ae89c[ 0: 0: 0] EBP: 1ae8c4 IL: 0 nop </li>
+    <li>TID 10ec: ESP: 1ae89c[ 0: 0: 0] EBP: 1ae8c4 IL: 1 newobj </li>
+    <li>TID 10ec: ESP:+
+      1ae898[ cd21c8: 0: 0] EBP: 1ae8c4 IL: 6 stloc.0 </li>
+    <li>TID 10ec: ESP: 1ae89c[ 0: 0: 0] EBP: 1ae8c4 IL: 7 ldloc.0 </li>
+    <li>TID 10ec: ESP:+ 1ae898[ cd21c8: 0: 0] EBP: 1ae8c4 IL: 8 ldftn </li>
+    <li>TID 10ec: ESP:+ 1ae894[ a42fc8: cd21c8: 0] EBP: 1ae8c4 IL: e newobj </li>
+    <li>TID
+      10ec: ESP:+ 1ae898[ cd21d8: 0: 0] EBP: 1ae8c4 IL: 13 newobj </li>
+    <li>TID 10ec: ESP:+ 1ae898[
+      cd21f8: 0: 0] EBP: 1ae8c4 IL: 18 stloc.1 </li>
+    <li>TID 10ec: ESP: 1ae89c[ 0: 0: 0] EBP: 1ae8c4 IL: 19 ldloc.0 </li>
+    <li>TID 10ec: ESP:+ 1ae898[ cd21c8: 0: 0] EBP: 1ae8c4 IL: 1a ldftn </li>
+    <li>TID
+      10ec: ESP:+ 1ae894[ a42fe8: cd21c8: 0] EBP: 1ae8c4 IL: 20 newobj </li>
+    <li>TID 10ec: ESP:+
+      1ae898[ cd229c: 0: 0] EBP: 1ae8c4 IL: 25 newobj </li>
+    <li>TID 10ec: ESP:+ 1ae898[ cd22bc:
+      0: 0] EBP: 1ae8c4 IL: 2a stloc.2 </li>
+    <li>TID 10ec: ESP: 1ae89c[ 0: 0: cd22bc] EBP: 1ae8c4
+      IL: 2b ldloc.0 </li>
+    <li>TID 10ec: ESP:+ 1ae898[ cd21c8: 0: 0] EBP: 1ae8c4 IL: 2c ldftn </li>
+    <li>TID
+      10ec: ESP:+ 1ae894[ a43008: cd21c8: 0] EBP: 1ae8c4 IL: 32 newobj </li>
+    <li>TID 10ec: ESP:+
+      1ae898[ cd2324: 0: 0] EBP: 1ae8c4 IL: 37 newobj </li>
+    <li>TID 10ec: ESP:+ 1ae898[ cd2344:
+      0: 0] EBP: 1ae8c4 IL: 3c stloc.3 </li>
+    <li>TID 10ec: ESP: 1ae89c[ 0: cd2344: cd22bc] EBP:
+      1ae8c4 IL: 3d ldloc.1 </li>
+    <li>TID 10ec: ESP:+ 1ae898[ cd21f8: 0: cd2344] EBP: 1ae8c4 IL:
+      3e callvirt </li>
+    <li>...</li>
+    <li></li>
+</ul>
+
+ 
+<h4>Environment</h4>
+
+ 
+<ul class="none">
+  <li>set COMPlus_JitCodeLog=Main</li>
+  <li>set COMPlus_LogEnable=1</li>
+  <li>set COMPlus_LogFacility=0x00000008</li>
+  <li>set COMPlus_LogToConsole=1</li>
+  <li>set COMPlus_LogToFile=0</li>
+  <li>set COMPlus_LogLevel=6</li>
+</ul>
+
+ 
+<h4>Application execution command.</h4>
+
+ 
+<p>This runs the try and finally tests.</p>
+
+ 
+<blockquote>
+
+ 
+<p>clix tests\bvt\short\CS_TryFinally.exe</p>
+
+ 
+</blockquote>
+
+ 
+<h4>Log output that is sent to the console.</h4>
+
+ 
+<p>Too much output to list.&nbsp;
+With this log level setting the stack states encoded for garbage collection are output. </p>
+
+ 
+<h3><a name="GarbageCollectionExampleDetailLevel1"></a>
+<hr>
+    &nbsp;</h3>
+
+ 
+<p><i>Copyright (c) 2006 Microsoft Corporation. All rights reserved.</i><br>
+&nbsp;</p>
+
+ 
+</body> 
+</html>

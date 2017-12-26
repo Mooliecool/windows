@@ -1,0 +1,1064 @@
+# ==++==
+#
+#   
+#    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+#   
+#    The use and distribution terms for this software are contained in the file
+#    named license.txt, which can be found in the root of this distribution.
+#    By using this software in any fashion, you are agreeing to be bound by the
+#    terms of this license.
+#   
+#    You must not remove this notice, or any other, from this software.
+#   
+#
+# ==--==
+
+BUILD_PRODUCES = mscorlib.dll
+
+NTTARGETFILES=pre_mscorlib_steps post_mscorlib_steps
+
+# Mscorlib.dll is consumed by just about everything that builds next, so let's
+# hold up the build until we're finished here.
+SYNCHRONIZE_PASS2_BLOCK=1
+
+# Need to wait for ilasm to be available
+SYNCHRONIZE_PASS2_DRAIN=1
+
+TARGETNAME      =mscorlib
+TARGETTYPE  = NOTARGET
+TARGETPATH  = $(_OBJ_DIR)
+
+CLR_TARGETTYPE=DLL
+CLR_ENABLE_ASMMETA=1
+
+SOURCES=native.rc
+
+ASSEMBLY_KEY_TYPE=ECMA
+
+ALLOW_PARTIALTRUSTCALLS=1
+INCLUDE_ASSEMBLY_REFS=1
+
+# Experimental switch to build a US English satellite assembly for testing
+# purposes.  Longhorn will eventually require this support of us as well.
+# See tools\devdiv2.def & tools\devdiv\AssemblyAttributes.cspp for more places
+# that use this.  You may have to do a clean build of the BCL directory and
+# install mscorlib.resources.dll into the GAC yourself to use this.
+#USE_US_ENGLISH_SATELLITE=1
+
+COM_VISIBLE=0
+
+COMPILER_SERVICES_SOURCES=\
+    system\runtime\compilerservices\accessedthroughpropertyattribute.cs \
+    system\runtime\compilerservices\assemblyattributesgohere.cs \
+    system\runtime\compilerservices\callingconvention.cs \
+    system\runtime\compilerservices\runtimehelpers.cs \
+    system\runtime\compilerservices\compilergeneratedattribute.cs \
+    system\runtime\compilerservices\customconstantattribute.cs \
+    system\runtime\compilerservices\datetimeconstantattribute.cs \
+    system\runtime\compilerservices\discardableattribute.cs \
+    system\runtime\compilerservices\decimalconstantattribute.cs \
+    system\runtime\compilerservices\compilationrelaxations.cs \
+    system\runtime\compilerservices\compilerglobalscopeattribute.cs \
+    system\runtime\compilerservices\fixedbufferattribute.cs \
+    system\runtime\compilerservices\indexernameattribute.cs \
+    system\runtime\compilerservices\internalsvisibletoattribute.cs \
+    system\runtime\compilerservices\isvolatile.cs \
+    system\runtime\compilerservices\methodimplattribute.cs \
+    system\runtime\compilerservices\fixedaddressvaluetypeattribute.cs \
+    system\runtime\compilerservices\unsafevaluetypeattribute.cs \
+    system\runtime\compilerservices\requiredattributeattribute.cs \
+    system\runtime\compilerservices\assemblysettingattributes.cs \
+    system\runtime\compilerservices\typedependencyattribute.cs \
+    system\runtime\compilerservices\compilermarshaloverride.cs \
+    system\runtime\compilerservices\hascopysemanticsattribute.cs \
+    system\runtime\compilerservices\isboxed.cs \
+    system\runtime\compilerservices\isbyvalue.cs \
+    system\runtime\compilerservices\isconst.cs \
+    system\runtime\compilerservices\isexplicitlydereferenced.cs \
+    system\runtime\compilerservices\isimplicitlydereferenced.cs \
+    system\runtime\compilerservices\isjitintrinsic.cs \
+    system\runtime\compilerservices\islong.cs \
+    system\runtime\compilerservices\ispinned.cs \
+    system\runtime\compilerservices\issignunspecifiedbyte.cs \
+    system\runtime\compilerservices\isudtreturn.cs \
+    system\runtime\compilerservices\scopelessenumattribute.cs \
+    system\runtime\compilerservices\specialnameattribute.cs \
+    system\runtime\compilerservices\suppressmergecheckattribute.cs \
+    system\runtime\compilerservices\iscopyconstructed.cs \
+    system\runtime\compilerservices\suppressildasmattribute.cs \
+    system\runtime\compilerservices\nativecppclassattribute.cs \
+    system\runtime\compilerservices\decoratednameattribute.cs \
+    system\runtime\compilerservices\TypeForwardedToAttribute.cs \
+    system\runtime\compilerservices\RuntimeCompatibilityAttribute.cs \
+    system\runtime\compilerservices\RuntimeWrappedException.cs \
+
+RELIABILITY_SOURCES=\
+    system\runtime\reliability\criticalfinalizerobject.cs \
+    system\runtime\reliability\reliabilitycontractattribute.cs \
+    system\runtime\reliability\prepreparemethodattribute.cs
+
+RUNTIME_SOURCES=\
+    system\runtime\memoryfailpoint.cs \
+    system\runtime\gcsettings.cs \
+
+COLLECTIONS_SOURCES=\
+    system\collections\arraylist.cs \
+    system\collections\bitarray.cs \
+    system\collections\caseinsensitivecomparer.cs \
+    system\collections\caseinsensitivehashcodeprovider.cs \
+    system\collections\collectionbase.cs \
+    system\collections\comparer.cs \
+    system\collections\dictionarybase.cs \
+    system\collections\dictionaryentry.cs \
+    system\collections\emptyreadonlydictionaryinternal.cs \
+    system\collections\hashtable.cs \
+    system\collections\keyvaluepairs.cs \
+    system\collections\listdictionaryinternal.cs \
+    system\collections\icollection.cs \
+    system\collections\icomparer.cs \
+    system\collections\idictionary.cs \
+    system\collections\idictionaryenumerator.cs \
+    system\collections\ienumerable.cs \
+    system\collections\ienumerator.cs \
+    system\collections\ihashcodeprovider.cs \
+    system\collections\iequalitycomparer.cs \
+    system\collections\compatiblecomparer.cs \
+    system\collections\ilist.cs \
+    system\collections\queue.cs \
+    system\collections\readonlycollectionbase.cs \
+    system\collections\sortedlist.cs \
+    system\collections\stack.cs
+
+DEPLOYMENT_SOURCES=\
+
+INTEROP_SOURCES=\
+    system\runtime\interopservices\arraywithoffset.cs \
+    system\runtime\interopservices\attributes.cs \
+    system\runtime\interopservices\callingconvention.cs \
+    system\runtime\interopservices\charset.cs \
+    system\runtime\interopservices\comexception.cs \
+    system\runtime\interopservices\criticalhandle.cs \
+    system\runtime\interopservices\externalexception.cs \
+    system\runtime\interopservices\gchandle.cs \
+    system\runtime\interopservices\gchandlecookietable.cs \
+    system\runtime\interopservices\handleref.cs \
+    system\runtime\interopservices\icustommarshaler.cs \
+    system\runtime\interopservices\iexception.cs \
+    system\runtime\interopservices\invalidolevarianttypeexception.cs \
+    system\runtime\interopservices\layoutkind.cs \
+    system\runtime\interopservices\marshal.cs \
+    system\runtime\interopservices\marshaldirectiveexception.cs \
+    system\runtime\interopservices\pinvokemap.cs \
+    system\runtime\interopservices\runtimeenvironment.cs \
+    system\runtime\interopservices\sehexception.cs \
+    system\runtime\interopservices\safehandle.cs \
+
+INTEROP_COMTYPES_SOURCES=\
+
+SYSTEM_SOURCES = \
+    system\object.cs \
+    system\icloneable.cs \
+    system\array.cs   \
+    system\arraysegment.cs   \
+    system\icomparable.cs \
+    system\iequatable.cs \
+    system\throwhelper.cs \
+    system\string.cs   \
+    system\stringcomparer.cs   \
+    system\stringcomparison.cs   \
+    system\text\stringbuilder.cs   \
+    system\exception.cs \
+    system\datetime.cs \
+    system\datetimekind.cs \
+    system\systemexception.cs \
+    system\outofmemoryexception.cs \
+    system\stackoverflowexception.cs \
+    system\datamisalignedexception.cs \
+    system\executionengineexception.cs \
+    system\delegate.cs  \
+    system\multicastdelegate.cs  \
+    system\__filters.cs \
+    system\__hresults.cs \
+    system\bcldebug.cs \
+    system\memberaccessexception.cs   \
+    system\activator.cs   \
+    system\accessviolationexception.cs \
+    system\applicationexception.cs \
+    system\appdomain.cs \
+    system\appdomainmanager.cs \
+    system\iappdomain.cs \
+    $(O)\appdomainsetup.cs \
+    system\iappdomainsetup.cs \
+    system\appdomainattributes.cs \
+    system\appdomainunloadedexception.cs \
+    system\activationarguments.cs \
+    system\applicationid.cs \
+    system\argumentexception.cs \
+    system\argumentnullexception.cs \
+    system\argumentoutofrangeexception.cs \
+    system\argiterator.cs \
+    system\arithmeticexception.cs \
+    system\arraytypemismatchexception.cs \
+    system\asynccallback.cs \
+    system\attribute.cs \
+    system\attributetargets.cs \
+    system\attributeusageattribute.cs \
+    system\badimageformatexception.cs \
+    system\bitconverter.cs \
+    system\boolean.cs \
+    system\buffer.cs \
+    system\byte.cs   \
+    system\cannotunloadappdomainexception.cs \
+    system\char.cs   \
+    system\charenumerator.cs \
+    system\cfgparser.cs \
+    system\clscompliantattribute.cs \
+    system\typeunloadedexception.cs \
+    system\cominterfaces.cs \
+    system\complusmethodframegeneric.cs \
+    $(O)\compatibilityflags.cs \
+    system\console.cs \
+    system\consolecanceleventargs.cs \
+    system\consolespecialkey.cs \
+    system\contextmarshalexception.cs \
+    system\convert.cs \
+    system\contextboundobject.cs \
+    system\contextstaticattribute.cs \
+    system\stringfreezingattribute.cs \
+    system\currency.cs \
+    system\currenttimezone.cs \
+    system\dayofweek.cs \
+    system\dbnull.cs \
+    system\decimal.cs \
+    system\defaultbinder.cs \
+    system\delegateserializationholder.cs \
+    system\dividebyzeroexception.cs \
+    system\double.cs   \
+    system\duplicatewaitobjectexception.cs   \
+    system\empty.cs \
+    system\enum.cs \
+    system\entrypointnotfoundexception.cs \
+    system\dllnotfoundexception.cs \
+    system\environment.cs \
+    system\eventargs.cs  \
+    system\eventhandler.cs  \
+    system\fieldaccessexception.cs \
+    system\flagsattribute.cs \
+    system\formatexception.cs \
+    system\gc.cs \
+    system\guid.cs   \
+    system\iasyncresult.cs \
+    system\icustomformatter.cs \
+    system\idisposable.cs \
+    system\iformatprovider.cs \
+    system\iformattable.cs \
+    system\indexoutofrangeexception.cs \
+    system\insufficientmemoryexception.cs \
+    system\int16.cs   \
+    system\int32.cs   \
+    system\int64.cs   \
+    system\intptr.cs   \
+    system\internal.cs \
+    system\invalidcastexception.cs \
+    system\invalidoperationexception.cs \
+    system\invalidprogramexception.cs \
+    system\iconvertible.cs \
+    system\iserviceobjectprovider.cs \
+    system\_localdatastore.cs   \
+    system\_localdatastoremgr.cs   \
+    system\marshalbyrefobject.cs \
+    system\math.cs   \
+    system\mda.cs \
+    system\methodaccessexception.cs \
+    system\midpointrounding.cs \
+    system\missingfieldexception.cs \
+    system\missingmemberexception.cs \
+    system\missingmethodexception.cs \
+    system\multicastnotsupportedexception.cs  \
+    system\ndirectmethodframeex.cs \
+    system\nonserializedattribute.cs \
+    system\notfinitenumberexception.cs \
+    system\notimplementedexception.cs  \
+    system\notsupportedexception.cs \
+    system\nullreferenceexception.cs \
+    system\number.cs \
+    system\objectdisposedexception.cs \
+    system\obsoleteattribute.cs \
+    system\oleautbinder.cs \
+    system\operatingsystem.cs \
+    system\operationcanceledexception.cs \
+    system\overflowexception.cs \
+    system\paramarrayattribute.cs \
+    system\parsenumbers.cs \
+    system\platformid.cs \
+    system\platformnotsupportedexception.cs \
+    system\random.cs \
+    system\rankexception.cs \
+    system\resid.cs \
+    system\rttype.cs \
+    system\runtimeargumenthandle.cs \
+    system\runtimehandles.cs \
+    system\sbyte.cs   \
+    system\serializableattribute.cs \
+    system\sharedstatics.cs   \
+    system\single.cs   \
+    system\threadattributes.cs \
+    system\timeoutexception.cs \
+    system\timespan.cs \
+    system\timezone.cs \
+    system\type.cs \
+    system\typecode.cs \
+    system\typedreference.cs \
+    system\typeinitializationexception.cs \
+    system\typeloadexception.cs \
+    system\uint16.cs \
+    system\uint32.cs \
+    system\uint64.cs \
+    system\uintptr.cs \
+    system\unauthorizedaccessexception.cs \
+    system\unityserializationholder.cs \
+    system\unhandledexceptioneventargs.cs  \
+    system\unhandledexceptioneventhandler.cs  \
+    system\unsafecharbuffer.cs   \
+    system\valuetype.cs \
+    system\variant.cs \
+    system\version.cs \
+    system\void.cs \
+    system\weakreference.cs \
+    system\xmlignorememberattribute.cs
+
+SEC_CRYPTOGRAPHY_SOURCES = \
+    system\security\cryptography\crypto.cs \
+    system\security\cryptography\icryptotransform.cs \
+    system\security\cryptography\randomnumbergenerator.cs \
+    system\security\cryptography\rngcryptoserviceprovider.cs \
+
+SERIALIZATION_FORMATTERS_BINARY_SOURCES=\
+    system\runtime\serialization\formatters\binary\binaryenums.cs \
+    system\runtime\serialization\formatters\binary\binaryformatter.cs \
+    system\runtime\serialization\formatters\binary\binaryparser.cs \
+    system\runtime\serialization\formatters\binary\binaryformatterwriter.cs \
+    system\runtime\serialization\formatters\binary\binarycommonclasses.cs \
+    system\runtime\serialization\formatters\binary\binaryutilclasses.cs \
+    system\runtime\serialization\formatters\binary\binaryobjectreader.cs \
+    system\runtime\serialization\formatters\binary\binaryobjectwriter.cs \
+    system\runtime\serialization\formatters\binary\binaryconverter.cs \
+    system\runtime\serialization\formatters\binary\binaryobjectinfo.cs \
+    system\runtime\serialization\formatters\binary\binarymethodmessage.cs
+
+REFLECTION_SOURCES=\
+    system\reflection\__filters.cs \
+    system\reflection\ambiguousmatchexception.cs \
+    system\reflection\assembly.cs \
+    system\reflection\assemblyattributes.cs \
+    system\reflection\assemblyname.cs \
+    system\reflection\assemblynameproxy.cs \
+    system\reflection\assemblynameflags.cs \
+    system\reflection\customattributeformatexception.cs \
+    system\reflection\binder.cs \
+    system\reflection\bindingflags.cs \
+    system\reflection\callingconventions.cs \
+    system\reflection\cominterfaces.cs \
+    system\reflection\customattribute.cs \
+    system\reflection\defaultmemberattribute.cs \
+    system\reflection\eventattributes.cs \
+    system\reflection\fieldattributes.cs \
+    system\reflection\genericparameterattributes.cs \
+    system\reflection\icustomattributeprovider.cs \
+    system\reflection\interfacemapping.cs \
+    system\reflection\invalidfiltercriteriaexception.cs \
+    system\reflection\ireflect.cs \
+    system\reflection\manifestresourceinfo.cs \
+    system\reflection\mdimport.cs \
+    system\reflection\memberfilter.cs \
+    system\reflection\memberinfoserializationholder.cs \
+    system\reflection\membertypes.cs \
+    system\reflection\methodattributes.cs \
+    system\reflection\methodimplattributes.cs \
+    system\reflection\missing.cs \
+    system\reflection\module.cs \
+    system\reflection\obfuscateassemblyattribute.cs \
+    system\reflection\obfuscationattribute.cs \
+    system\reflection\methodbody.cs \
+    system\reflection\parameterattributes.cs \
+    system\reflection\parametermodifier.cs \
+    system\reflection\pointer.cs \
+    system\reflection\propertyattributes.cs \
+    system\reflection\reflectiontypeloadexception.cs \
+    system\reflection\resourceattributes.cs \
+    system\reflection\strongnamekeypair.cs \
+    system\reflection\targetexception.cs \
+    system\reflection\targetinvocationexception.cs \
+    system\reflection\targetparametercountexception.cs \
+    system\reflection\typeattributes.cs \
+    system\reflection\typedelegator.cs \
+    system\reflection\typefilter.cs \
+    system\reflection\xxxinfos.cs \
+
+REFLECTION_EMIT_SOURCES = \
+    system\reflection\emit\assemblybuilder.cs \
+    system\reflection\emit\assemblybuilderdata.cs \
+    system\reflection\emit\assemblybuilderaccess.cs \
+    system\reflection\emit\aqnbuilder.cs \
+    system\reflection\emit\cominterfaces.cs \
+    system\reflection\emit\constructorbuilder.cs \
+    system\reflection\emit\dynamicilgenerator.cs \
+    system\reflection\emit\dynamicmethod.cs \
+    system\reflection\emit\eventbuilder.cs \
+    system\reflection\emit\eventtoken.cs \
+    system\reflection\emit\fieldbuilder.cs \
+    system\reflection\emit\fieldtoken.cs \
+    system\reflection\emit\ilgenerator.cs \
+    system\reflection\emit\label.cs \
+    system\reflection\emit\localbuilder.cs \
+    system\reflection\emit\methodbuilder.cs \
+    system\reflection\emit\methodbuilderinstantiation.cs \
+    system\reflection\emit\symboltype.cs \
+    system\reflection\emit\symbolmethod.cs \
+    system\reflection\emit\customattributebuilder.cs \
+    system\reflection\emit\methodrental.cs \
+    system\reflection\emit\methodtoken.cs \
+    system\reflection\emit\modulebuilder.cs \
+    system\reflection\emit\modulebuilderdata.cs \
+    system\reflection\emit\pefilekinds.cs \
+    system\reflection\emit\opcodes.cs \
+    system\reflection\emit\opcode.cs \
+    system\reflection\emit\opcodetype.cs \
+    system\reflection\emit\stackbehaviour.cs \
+    system\reflection\emit\operandtype.cs \
+    system\reflection\emit\flowcontrol.cs \
+    system\reflection\emit\parameterbuilder.cs \
+    system\reflection\emit\parametertoken.cs \
+    system\reflection\emit\propertybuilder.cs \
+    system\reflection\emit\propertytoken.cs \
+    system\reflection\emit\signaturehelper.cs \
+    system\reflection\emit\signaturetoken.cs \
+    system\reflection\emit\stringtoken.cs \
+    system\reflection\emit\typebuilder.cs \
+    system\reflection\emit\typebuilderinstantiation.cs \
+    system\reflection\emit\generictypeparameterbuilder.cs \
+    system\reflection\emit\enumbuilder.cs \
+    system\reflection\emit\typetoken.cs \
+    system\reflection\emit\xxxontypebuilderinstantiation.cs \
+    system\reflection\emit\unmanagedmarshal.cs \
+
+REFLECTION_CACHE_SOURCES = \
+    system\reflection\cache\cacheobjtype.cs \
+    system\reflection\cache\clearcacheeventargs.cs \
+    system\reflection\cache\clearcachehandler.cs \
+    system\reflection\cache\internalcache.cs \
+    system\reflection\cache\internalcacheitem.cs \
+    system\reflection\cache\typenamecache.cs \
+    system\reflection\cache\typenamestruct.cs \
+
+GLOBALIZATION_SOURCES=\
+    system\globalization\baseinfotable.cs \
+    system\globalization\bidicategory.cs \
+    system\globalization\calendar.cs \
+    system\globalization\calendartable.cs \
+    system\globalization\calendaralgorithmtype.cs \
+    system\globalization\calendarweekrule.cs \
+    system\globalization\charunicodeinfo.cs \
+    system\globalization\chineselunisolarcalendar.cs \
+    system\globalization\compareinfo.cs \
+    system\globalization\cultureinfo.cs \
+    system\globalization\culturetypes.cs \
+    system\globalization\datetimeformat.cs \
+    system\globalization\datetimeparse.cs \
+    system\globalization\datetimestyles.cs \
+    system\globalization\datetimeformatinfo.cs \
+    system\globalization\datetimeformatinfoscanner.cs \
+    system\globalization\daylighttime.cs \
+    system\globalization\digitshapes.cs \
+    system\globalization\eastasianlunisolarcalendar.cs \
+    system\globalization\encodingdataitem.cs \
+    system\globalization\encodingtable.cs \
+    system\globalization\globalizationassembly.cs \
+    system\globalization\gregoriancalendar.cs \
+    system\globalization\gregoriancalendartypes.cs \
+    system\globalization\gregoriancalendarhelper.cs \
+    system\globalization\hebrewcalendar.cs \
+    system\globalization\hijricalendar.cs \
+    system\globalization\idnmapping.cs \
+    system\globalization\japanesecalendar.cs \
+    system\globalization\japaneselunisolarcalendar.cs \
+    system\globalization\Persiancalendar.cs \
+    system\globalization\juliancalendar.cs \
+    system\globalization\koreancalendar.cs \
+    system\globalization\koreanlunisolarcalendar.cs \
+    system\globalization\regioninfo.cs \
+    system\globalization\sortkey.cs \
+    system\globalization\stringinfo.cs \
+    system\globalization\taiwancalendar.cs \
+    system\globalization\taiwanlunisolarcalendar.cs \
+    system\globalization\textelementenumerator.cs \
+    system\globalization\textinfo.cs \
+    system\globalization\thaibuddhistcalendar.cs \
+    system\globalization\numberformatinfo.cs \
+    system\globalization\numberstyles.cs \
+    system\globalization\umalquracalendar.cs \
+    system\globalization\unicodecategory.cs \
+    system\globalization\culturetable.cs \
+    system\globalization\culturetabledata.cs \
+    system\globalization\calendartabledata.cs \
+    system\globalization\culturetableheader.cs \
+    system\globalization\culturetablerecord.cs \
+    system\globalization\hebrewnumber.cs \
+    system\globalization\memorymapfile.cs \
+
+THREADING_SOURCES = \
+    system\threading\abandonedmutexexception.cs \
+    system\threading\autoresetevent.cs \
+    system\threading\synchronizationcontext.cs \
+    system\threading\compressedstack.cs \
+    system\threading\eventresetmode.cs \
+    system\threading\eventwaithandle.cs \
+    system\threading\executioncontext.cs \
+    system\threading\interlocked.cs   \
+    system\threading\iobjecthandle.cs \
+    system\threading\hostexecutioncontextmanager.cs \
+    system\threading\lockcookie.cs \
+    system\threading\manualresetevent.cs \
+    system\threading\monitor.cs \
+    system\threading\mutex.cs \
+    system\threading\overlapped.cs \
+    system\threading\parameterizedthreadstart.cs \
+    system\threading\readerwriterlock.cs \
+    system\threading\synchronizationlockexception.cs \
+    system\threading\thread.cs \
+    system\threading\threadabortexception.cs \
+    system\threading\threadinterruptedexception.cs \
+    system\threading\threadpool.cs \
+    system\threading\threadpriority.cs \
+    system\threading\threadstart.cs \
+    system\threading\threadstate.cs \
+    system\threading\threadstateexception.cs \
+    system\threadstaticattribute.cs \
+    system\threading\threadstartexception.cs \
+    system\threading\timeout.cs \
+    system\threading\timer.cs \
+    system\threading\waithandle.cs \
+    system\threading\waithandlecannotbeopenedexception.cs \
+
+IO_SOURCES=\
+    system\io\__debugoutputtextwriter.cs \
+    system\io\__consolestream.cs \
+    system\io\__error.cs \
+    system\io\__hresults.cs \
+    system\io\binaryreader.cs \
+    system\io\binarywriter.cs \
+    system\io\bufferedstream.cs \
+    system\io\directory.cs \
+    system\io\directoryinfo.cs \
+    system\io\searchoption.cs \
+    system\io\directorynotfoundexception.cs \
+    system\io\driveinfo.cs \
+    system\io\drivenotfoundexception.cs \
+    system\io\endofstreamexception.cs \
+    system\io\file.cs \
+    system\io\fileaccess.cs \
+    system\io\fileinfo.cs \
+    system\io\fileloadexception.cs \
+    system\io\filemode.cs \
+    system\io\filenotfoundexception.cs \
+    system\io\fileoptions.cs \
+    system\io\fileshare.cs \
+    system\io\filestream.cs \
+    system\io\filesysteminfo.cs \
+    system\io\fileattributes.cs \
+    system\io\ioexception.cs \
+    system\io\memorystream.cs \
+    system\io\path.cs \
+    system\io\pathtoolongexception.cs \
+    system\io\pinnedbuffermemorystream.cs \
+    system\io\seekorigin.cs \
+    system\io\stream.cs \
+    system\io\streamreader.cs \
+    system\io\streamwriter.cs \
+    system\io\stringreader.cs \
+    system\io\stringwriter.cs \
+    system\io\textreader.cs \
+    system\io\textwriter.cs \
+    system\io\unmanagedmemorystream.cs \
+    system\io\unmanagedmemorystreamwrapper.cs
+
+ISOSTORE_SOURCES=\
+    system\io\isolatedstorage\isolatedstorage.cs \
+    system\io\isolatedstorage\isolatedstoragefile.cs \
+    system\io\isolatedstorage\isolatedstoragefilestream.cs \
+    system\io\isolatedstorage\isolatedstorageexception.cs \
+    system\io\isolatedstorage\inormalizeforisolatedstorage.cs \
+    system\io\isolatedstorage\__hresults.cs
+
+SECURITY_SOURCES = \
+    system\security\attributes.cs \
+    system\security\codeaccesspermission.cs \
+    system\security\codeaccesssecurityengine.cs \
+    system\security\ievidencefactory.cs \
+    system\security\ipermission.cs \
+    system\security\isecurityencodable.cs \
+    system\security\isecuritypolicyencodable.cs \
+    system\security\istackwalk.cs \
+    system\security\framesecuritydescriptor.cs \
+    system\security\hostsecuritymanager.cs \
+    system\security\namedpermissionset.cs \
+    system\security\permissionsetenumerator.cs \
+    system\security\permissionset.cs \
+    system\security\permissiontoken.cs \
+    system\security\permissionsettriple.cs \
+    system\security\permissionlistset.cs \
+    system\security\policymanager.cs \
+    system\security\securitycontext.cs \
+    system\security\securityexception.cs \
+    system\security\hostprotectionexception.cs \
+    system\security\securityframe.cs \
+    system\security\securitymanager.cs \
+    system\security\securityruntime.cs \
+    system\security\securityzone.cs \
+    system\security\verificationexception.cs
+
+SEC_UTIL_SOURCES=\
+    system\security\util\config.cs \
+    system\security\util\hex.cs \
+    system\security\util\sitestring.cs \
+    system\security\util\stringexpressionset.cs \
+    system\security\util\tokenbasedset.cs \
+    system\security\util\tokenbasedsetenumerator.cs \
+    system\security\util\urlstring.cs \
+    system\security\util\xmlutil.cs
+
+DIAGNOSTICS_SOURCES=\
+    system\diagnostics\assert.cs \
+    system\diagnostics\assertfilter.cs \
+    system\diagnostics\assertfilters.cs \
+    system\diagnostics\conditionalattribute.cs \
+    system\diagnostics\debugger.cs \
+    system\diagnostics\debuggerattributes.cs \
+    system\diagnostics\log.cs \
+    system\diagnostics\logginglevels.cs \
+    system\diagnostics\logswitch.cs \
+    system\diagnostics\stacktrace.cs \
+    system\diagnostics\stackframe.cs \
+
+DIAGNOSTICS_CODEANALYSIS_SOURCES = \
+    system\diagnostics\codeanalysis\suppressmessageattribute.cs \
+
+DIAGNOSTICS_SYMBOLSTORE_SOURCES=\
+    system\diagnostics\symbolstore\isymbinder.cs \
+    system\diagnostics\symbolstore\isymdocument.cs \
+    system\diagnostics\symbolstore\isymdocumentwriter.cs \
+    system\diagnostics\symbolstore\isymmethod.cs \
+    system\diagnostics\symbolstore\isymnamespace.cs \
+    system\diagnostics\symbolstore\isymreader.cs \
+    system\diagnostics\symbolstore\isymscope.cs \
+    system\diagnostics\symbolstore\isymvariable.cs \
+    system\diagnostics\symbolstore\isymwriter.cs \
+    system\diagnostics\symbolstore\symaddresskind.cs \
+    system\diagnostics\symbolstore\symdocumenttype.cs \
+    system\diagnostics\symbolstore\symlanguagetype.cs \
+    system\diagnostics\symbolstore\symlanguagevendor.cs \
+    system\diagnostics\symbolstore\token.cs
+
+SERIALIZATION_SOURCES = \
+    system\runtime\serialization\deserializationeventhandler.cs \
+    system\runtime\serialization\formatter.cs \
+    system\runtime\serialization\formatterconverter.cs \
+    system\runtime\serialization\formatterservices.cs \
+    system\runtime\serialization\ideserializationcallback.cs \
+    system\runtime\serialization\iformatter.cs \
+    system\runtime\serialization\iformatterconverter.cs \
+    system\runtime\serialization\iobjectreference.cs \
+    system\runtime\serialization\iserializable.cs \
+    system\runtime\serialization\iserializationsurrogate.cs \
+    system\runtime\serialization\isurrogateselector.cs \
+    system\runtime\serialization\objectclonehelper.cs \
+    system\runtime\serialization\objectidgenerator.cs \
+    system\runtime\serialization\objectmanager.cs \
+    system\runtime\serialization\serializationobjectmanager.cs \
+    system\runtime\serialization\memberholder.cs \
+    system\runtime\serialization\serializationattributes.cs \
+    system\runtime\serialization\serializationbinder.cs \
+    system\runtime\serialization\serializationeventscache.cs \
+    system\runtime\serialization\serializationfieldinfo.cs \
+    system\runtime\serialization\serializationinfo.cs \
+    system\runtime\serialization\serializationinfoenumerator.cs \
+    system\runtime\serialization\serializationexception.cs \
+    system\runtime\serialization\streamingcontext.cs \
+    system\runtime\serialization\surrogateselector.cs \
+    system\runtime\serialization\valuetypefixupinfo.cs
+
+VERSIONING_SOURCES = \
+    system\runtime\versioning\resourceattributes.cs
+
+CONFIGURATION_ASSEMBLIES_SOURCES=\
+    system\configuration\assemblies\assemblyhash.cs \
+    system\configuration\assemblies\assemblyhashalgorithm.cs \
+    system\configuration\assemblies\assemblyversioncompatibility.cs
+
+SEC_PUBLICKEY_SOURCES=\
+    system\security\cryptography\x509certificates\x509certificate.cs \
+
+
+SERIALIZATION_FORMATTERS_SOURCES=\
+    system\runtime\serialization\formatters\commonenums.cs \
+    system\runtime\serialization\formatters\isoapmessage.cs \
+    system\runtime\serialization\formatters\ifieldinfo.cs \
+    system\runtime\serialization\formatters\sertrace.cs \
+    system\runtime\serialization\formatters\soapmessage.cs \
+    system\runtime\serialization\formatters\soapfault.cs
+
+REMOTING_SOURCES=\
+    system\runtime\remoting\__hresults.cs \
+    system\runtime\remoting\activationservices.cs \
+    system\runtime\remoting\asyncresult.cs \
+    system\runtime\remoting\callcontext.cs \
+    system\runtime\remoting\channelservices.cs \
+    system\runtime\remoting\channelsinkstacks.cs \
+    system\runtime\remoting\clientsponsor.cs \
+    system\runtime\remoting\configuration.cs \
+    system\runtime\remoting\context.cs \
+    system\runtime\remoting\contextproperty.cs \
+    system\runtime\remoting\crosscontextchannel.cs \
+    system\runtime\remoting\crossappdomainchannel.cs \
+    system\runtime\remoting\dispatchchannelsink.cs \
+    system\runtime\remoting\dynamicpropertyholder.cs \
+    system\runtime\remoting\header.cs \
+    system\runtime\remoting\headerhandler.cs \
+    system\runtime\remoting\iactivator.cs \
+    system\runtime\remoting\ichannel.cs \
+    system\runtime\remoting\icontributeclientcontextsink.cs \
+    system\runtime\remoting\icontributedynamicsink.cs \
+    system\runtime\remoting\icontributeenvoysink.cs \
+    system\runtime\remoting\icontributeobjectsink.cs \
+    system\runtime\remoting\icontributeservercontextsink.cs \
+    system\runtime\remoting\idynamicmessagesink.cs \
+    system\runtime\remoting\identity.cs \
+    system\runtime\remoting\identityholder.cs \
+    system\runtime\remoting\iinternalmessage.cs \
+    system\runtime\remoting\ilease.cs \
+    system\runtime\remoting\isponsor.cs \
+    system\runtime\remoting\imessage.cs \
+    system\runtime\remoting\imessagectrl.cs \
+    system\runtime\remoting\imessagesink.cs \
+    system\runtime\remoting\imethodmessage.cs \
+    system\runtime\remoting\iremotingformatter.cs \
+    system\runtime\remoting\isecurablechannel.cs \
+    system\runtime\remoting\lease.cs \
+    system\runtime\remoting\leasemanager.cs \
+    system\runtime\remoting\leasestate.cs \
+    system\runtime\remoting\lifetimeservices.cs \
+    system\runtime\remoting\message.cs \
+    system\runtime\remoting\messagesmuggler.cs \
+    system\runtime\remoting\objecthandle.cs \
+    system\runtime\remoting\objref.cs \
+    system\runtime\remoting\onewayattribute.cs \
+    system\runtime\remoting\proxyattribute.cs \
+    system\runtime\remoting\realproxy.cs \
+    system\runtime\remoting\redirectionproxy.cs \
+    system\runtime\remoting\remotingattributes.cs \
+    system\runtime\remoting\remotingconfigparser.cs \
+    system\runtime\remoting\remotingconfiguration.cs \
+    system\runtime\remoting\remotingexception.cs \
+    system\runtime\remoting\remotingproxy.cs \
+    system\runtime\remoting\remotingservices.cs \
+    system\runtime\remoting\remotingsurrogateselector.cs \
+    system\runtime\remoting\serveridentity.cs \
+    system\runtime\remoting\soap.cs \
+    system\runtime\remoting\soapinteroptypes.cs \
+    system\runtime\remoting\stackbuildersink.cs \
+    system\runtime\remoting\synchronizeddispatch.cs \
+    system\runtime\remoting\__transparentproxy.cs \
+    system\runtime\remoting\terminatorsinks.cs \
+    system\runtime\remoting\trackingservices.cs \
+    system\runtime\remoting\urlattribute.cs
+
+TEXT_SOURCES=\
+    system\text\asciiencoding.cs        \
+    system\text\basecodepageencoding.cs \
+    system\text\codepageencoding.cs     \
+    system\text\decoder.cs              \
+    system\text\decodernls.cs           \
+    system\text\decoderbestfitfallback.cs           \
+    system\text\decoderexceptionfallback.cs         \
+    system\text\decoderfallback.cs                  \
+    system\text\decoderreplacementfallback.cs       \
+    system\text\encoder.cs                          \
+    system\text\encodernls.cs                       \
+    system\text\encoderbestfitfallback.cs           \
+    system\text\encoderexceptionfallback.cs         \
+    system\text\encoderfallback.cs                  \
+    system\text\encoderreplacementfallback.cs       \
+    system\text\encoding.cs             \
+    system\text\encodinginfo.cs         \
+    system\text\encodingnls.cs          \
+    system\text\isciiencoding.cs        \
+    system\text\latin1encoding.cs       \
+    system\text\mlangcodepageencoding.cs    \
+    system\text\normalization.cs        \
+    system\text\dbcscodepageencoding.cs \
+    system\text\sbcscodepageencoding.cs \
+    system\text\surrogateencoder.cs     \
+    system\text\unicodeencoding.cs      \
+    system\text\utf7encoding.cs         \
+    system\text\utf8encoding.cs         \
+    system\text\utf32encoding.cs        \
+    system\text\gb18030encoding.cs   \
+    system\text\iso2022encoding.cs   \
+    system\text\eucjpencoding.cs
+
+SECURITY_ACL_SOURCES = \
+
+SECURITY_POLICY_SOURCES = \
+    system\security\policy\allmembershipcondition.cs \
+    system\security\policy\applicationdirectory.cs \
+    system\security\policy\applicationdirectorymembershipcondition.cs \
+    system\security\policy\codegroup.cs \
+    system\security\policy\evidence.cs \
+    system\security\policy\filecodegroup.cs \
+    system\security\policy\firstmatchcodegroup.cs \
+    system\security\policy\ibuiltinevidence.cs \
+    system\security\policy\iidentitypermissionfactory.cs \
+    system\security\policy\iconstantmembershipcondition.cs \
+    system\security\policy\imembershipcondition.cs \
+    system\security\policy\netcodegroup.cs \
+    system\security\policy\permissionrequestevidence.cs \
+    system\security\policy\policyexception.cs \
+    system\security\policy\policylevel.cs \
+    system\security\policy\policystatement.cs \
+    system\security\policy\site.cs \
+    system\security\policy\sitemembershipcondition.cs \
+    system\security\policy\strongname.cs \
+    system\security\policy\strongnamemembershipcondition.cs \
+    system\security\policy\unioncodegroup.cs \
+    system\security\policy\url.cs \
+    system\security\policy\urlmembershipcondition.cs \
+    system\security\policy\zone.cs \
+    system\security\policy\zonemembershipcondition.cs \
+    system\security\policy\gac.cs \
+    system\security\policy\gacmembershipcondition.cs \
+
+INTEROP_EXPANDO_SOURCES=\
+    system\runtime\interopservices\expando\iexpando.cs
+
+XML_SOURCES=\
+    system\security\securitydocument.cs \
+    system\security\securityelement.cs \
+    system\security\util\parser.cs \
+    system\security\util\tokenizer.cs \
+    system\security\xmlsyntaxexception.cs
+
+WIN32_SOURCES = \
+    microsoft\win32\fusionwrap.cs \
+    microsoft\win32\win32native.cs \
+
+INTEROP_TCEADAPTERGEN_SOURCES=\
+
+SECURITY_PRINCIPAL_SOURCES = \
+    system\security\principal\genericidentity.cs \
+    system\security\principal\genericprincipal.cs \
+    system\security\principal\iidentity.cs \
+    system\security\principal\iprincipal.cs \
+    system\security\principal\principalpolicy.cs \
+
+
+RESOURCES_SOURCES = \
+    system\resources\__fastresourcecomparer.cs \
+    system\resources\iresourcereader.cs \
+    system\resources\iresourcewriter.cs \
+    system\resources\looselylinkedresourcereference.cs \
+    system\resources\missingmanifestresourceexception.cs \
+    system\resources\missingsatelliteassemblyexception.cs \
+    system\resources\neutralresourceslanguageattribute.cs \
+    system\resources\resourcemanager.cs \
+    system\resources\resourcereader.cs  \
+    system\resources\resourceset.cs     \
+    system\resources\resourcetypecode.cs \
+    system\resources\resourcewriter.cs  \
+    system\resources\runtimeresourceset.cs \
+    system\resources\satellitecontractversionattribute.cs \
+    system\resources\ultimateresourcefallbacklocation.cs
+
+PERMISSIONS_SOURCES=\
+    system\security\permissions\environmentpermission.cs \
+    system\security\permissions\filedialogpermission.cs \
+    system\security\permissions\fileiopermission.cs \
+    system\security\permissions\hostprotectionpermission.cs \
+    system\security\permissions\ibuiltinpermission.cs \
+    system\security\permissions\isolatedstoragepermission.cs \
+    system\security\permissions\isolatedstoragefilepermission.cs \
+    system\security\permissions\permissionstate.cs \
+    system\security\permissions\permissionattributes.cs \
+    system\security\permissions\reflectionpermission.cs \
+    system\security\permissions\principalpermission.cs \
+    system\security\permissions\securitypermission.cs \
+    system\security\permissions\siteidentitypermission.cs \
+    system\security\permissions\strongnameidentitypermission.cs \
+    system\security\permissions\strongnamepublickeyblob.cs \
+    system\security\permissions\uipermission.cs \
+    system\security\permissions\urlidentitypermission.cs \
+    system\security\permissions\zoneidentitypermission.cs \
+    system\security\permissions\gacidentitypermission.cs \
+    system\security\permissions\iunrestrictedpermission.cs \
+
+GENERICS_SOURCES = \
+    system\nullable.cs \
+    system\collections\generic\comparer.cs \
+    system\collections\generic\dictionary.cs \
+    system\collections\generic\equalitycomparer.cs \
+    system\collections\generic\functor.cs \
+    system\collections\generic\debugview.cs \
+    system\collections\generic\icollection.cs \
+    system\collections\generic\icomparer.cs \
+    system\collections\generic\idictionary.cs \
+    system\collections\generic\ienumerable.cs \
+    system\collections\generic\ienumerator.cs \
+    system\collections\generic\iequalitycomparer.cs \
+    system\collections\generic\ilist.cs \
+    system\collections\generic\keynotfoundexception.cs \
+    system\collections\generic\keyvaluepair.cs \
+    system\collections\generic\list.cs \
+    system\collections\generic\arraysorthelper.cs \
+    system\collections\objectmodel\collection.cs \
+    system\collections\objectmodel\readonlycollection.cs \
+    system\collections\objectmodel\keyedcollection.cs \
+    
+SAFEHANDLE_SOURCES = \
+    microsoft\win32\safehandles\safefilehandle.cs \
+    microsoft\win32\safehandles\safefilemappinghandle.cs \
+    microsoft\win32\safehandles\safefindhandle.cs \
+    microsoft\win32\safehandles\safepefilehandle.cs \
+    microsoft\win32\safehandles\safeviewoffilehandle.cs \
+    microsoft\win32\safehandles\safewaithandle.cs \
+    microsoft\win32\safehandles\win32safehandles.cs \
+    microsoft\win32\safehandles\safenativememoryhandle.cs \
+
+
+SAFEHANDLE_SOURCES = $(SAFEHANDLE_SOURCES) \
+    microsoft\win32\safehandles\safefusionhandle.cs
+
+CSHARP_SOURCES=\
+     $(SYSTEM_SOURCES)       \
+     $(THREADING_SOURCES)  \
+     $(DEPLOYMENT_SOURCES)  \
+     $(COLLECTIONS_SOURCES)   \
+     $(GENERICS_SOURCES)   \
+     $(DIAGNOSTICS_SOURCES)   \
+     $(DIAGNOSTICS_CODEANALYSIS_SOURCES)   \
+     $(DIAGNOSTICS_SYMBOLSTORE_SOURCES)   \
+     $(REFLECTION_SOURCES)    \
+     $(SERIALIZATION_SOURCES) \
+     $(GLOBALIZATION_SOURCES) \
+     $(TEXT_SOURCES) \
+     $(RESOURCES_SOURCES) \
+     $(WIN32_SOURCES) \
+     $(SAFEHANDLE_SOURCES) \
+     $(SEC_UTIL_SOURCES) \
+     $(SECURITY_POLICY_SOURCES) \
+     $(SECURITY_PRINCIPAL_SOURCES) \
+     $(STREAM_SOURCES) \
+     $(COMPILERSERVICES_SOURCES) \
+     $(RELIABILITY_SOURCES) \
+     $(INTEROP_SOURCES) \
+     $(INTEROP_COMTYPES_SOURCES) \
+     $(INTEROP_EXPANDO_SOURCES) \
+     $(IO_SOURCES) \
+     $(COMPILER_SERVICES_SOURCES) \
+     $(RUNTIME_SOURCES) \
+     $(XML_SOURCES) \
+     $(PERMISSIONS_SOURCES) \
+     $(SECURITY_SOURCES) \
+     $(REMOTING_SOURCES) \
+     $(ISOSTORE_SOURCES) \
+     $(SERIALIZATION_FORMATTERS_SOURCES) \
+     $(SERIALIZATION_FORMATTERS_BINARY_SOURCES) \
+     $(REFLECTION_EMIT_SOURCES) \
+     $(REFLECTION_CACHE_SOURCES) \
+     $(CONFIGURATION_ASSEMBLIES_SOURCES) \
+     $(SEC_CRYPTOGRAPHY_SOURCES) \
+     $(SEC_PUBLICKEY_SOURCES) \
+     $(INTEROP_TCEADAPTERGEN_SOURCES) \
+     $(SECURITY_ACL_SOURCES) \
+     $(IDENTITY_SOURCES) \
+     $(VERSIONING_SOURCES) \
+
+
+BUILDING_MSCORLIB=1
+
+
+!if "$(_BUILDARCH)" == "ia64" || "$(_BUILDARCH)" == "amd64"
+CSC_DEFINES=$(CSC_DEFINES) /d:ALIGN_ACCESS /d:MDA_SUPPORTED
+!endif
+
+!if "$(_BUILDARCH)" == "x86"
+CSC_DEFINES=$(CSC_DEFINES) /d:MDA_SUPPORTED
+!endif
+
+# To test mscorlib with a US English satellite assembly, simulating a
+# localized build.  (You'll need to add mscorlib.resources.dll to the GAC)
+# Until we fix GetSatelliteAssembly to not throw when a file isn't found,
+# this will break some debugger tests.
+#CSC_DEFINES=$(CSC_DEFINES) /d:SIMULATE_LOCALIZED_BUILD
+
+CSC_DEFINES=$(CSC_DEFINES) /d:_USE_NLS_PLUS_TABLE /d:GENERICS_WORK /d:ARRAY_GENERIC_METHODS /d:RESOURCE_SATELLITE_CONFIG /d:NEW_EXPERIMENTAL_ASYNC_IO
+
+
+# For CMS/ActivationContext code.
+CSC_DEFINES=$(CSC_DEFINES) /d:ISOLATION_IN_MSCORLIB
+
+# For side by side versioning work (ResourceConsumption & Exposure attributes)
+!if "$(_BUILDTYPE)" == "chk" || "$(_BUILDTYPE)" == "dbg"
+CSC_DEFINES=$(CSC_DEFINES) /d:RESOURCE_ANNOTATION_WORK
+!endif
+
+# warning settings
+CSC_TREAT_WARNINGS_AS_ERRORS=1
+CSC_OBSOLETE_WARNINGS_ARE_NOT_ERRORS=1
+CSC_WARNING_DISABLE=649
+
+CSHARP_ALLOW_UNSAFE=1
+
+RESGEN_SOURCE=mscorlib.txt
+
+NLPOBJDIR=$(O)
+
+
+LINKRESOURCE_FILES=\
+    $(NLPOBJDIR)\sortkey.nlp,sortkey.nlp \
+    $(NLPOBJDIR)\sorttbls.nlp,sorttbls.nlp \
+    $(NLPOBJDIR)\big5.nlp,big5.nlp \
+    $(NLPOBJDIR)\bopomofo.nlp,bopomofo.nlp \
+    $(NLPOBJDIR)\ksc.nlp,ksc.nlp \
+    $(NLPOBJDIR)\prc.nlp,prc.nlp \
+    $(NLPOBJDIR)\prcp.nlp,prcp.nlp \
+    $(NLPOBJDIR)\xjis.nlp,xjis.nlp \
+    $(NLPOBJDIR)\normidna.nlp,normidna.nlp \
+    $(NLPOBJDIR)\normnfc.nlp,normnfc.nlp \
+    $(NLPOBJDIR)\normnfd.nlp,normnfd.nlp \
+    $(NLPOBJDIR)\normnfkc.nlp,normnfkc.nlp \
+    $(NLPOBJDIR)\normnfkd.nlp,normnfkd.nlp
+
+RESOURCE_FILES=\
+    $(NLPOBJDIR)\culture.nlp,culture.nlp \
+    $(NLPOBJDIR)\l_intl.nlp,l_intl.nlp \
+    $(NLPOBJDIR)\l_except.nlp,l_except.nlp \
+    $(NLPOBJDIR)\charinfo.nlp,charinfo.nlp \
+    $(NLPOBJDIR)\codepages.nlp,codepages.nlp
+
+
+# binplace these in PASS2
+!if "$(LINKONLY)"=="1"
+MISCFILES=\
+    $(NLPOBJDIR)\sortkey.nlp \
+    $(NLPOBJDIR)\sorttbls.nlp \
+    $(NLPOBJDIR)\big5.nlp \
+    $(NLPOBJDIR)\bopomofo.nlp \
+    $(NLPOBJDIR)\ksc.nlp \
+    $(NLPOBJDIR)\prc.nlp \
+    $(NLPOBJDIR)\prcp.nlp \
+    $(NLPOBJDIR)\xjis.nlp \
+    $(NLPOBJDIR)\normnfc.nlp \
+    $(NLPOBJDIR)\normnfd.nlp \
+    $(NLPOBJDIR)\normnfkc.nlp \
+    $(NLPOBJDIR)\normnfkd.nlp \
+    $(NLPOBJDIR)\normidna.nlp \
+!endif

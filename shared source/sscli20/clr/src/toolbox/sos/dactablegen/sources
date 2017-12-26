@@ -1,0 +1,52 @@
+# ==++==
+#
+#   
+#    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+#   
+#    The use and distribution terms for this software are contained in the file
+#    named license.txt, which can be found in the root of this distribution.
+#    By using this software in any fashion, you are agreeing to be bound by the
+#    terms of this license.
+#   
+#    You must not remove this notice, or any other, from this software.
+#   
+#
+# ==--==
+
+# Wait for DiaLib.dll to be generated.
+SYNCHRONIZE_PASS2_DRAIN=1
+
+
+TARGETNAME      = DacTableGen
+TARGETPATH      = $(_OBJ_DIR)
+TARGETTYPE      = NOTARGET
+
+CLR_TARGETTYPE  = EXE
+
+SOURCES         =
+
+CSHARP_SOURCES  = \
+                  mapsymbolprovider.cs \
+                  main.cs
+
+CLR_REFERENCES  = \
+    $(SDK_REF_PATH)\System.dll
+
+# We define /platform:x86 because 
+# 1) this is a build tool, only used in building
+# 2) In all the places we check this tool into the build system, we
+#    make sure to run it under the WOW if built on an AMD64 machine.
+#    
+# Checking in /platform:x86 will prevent bugs that occur when this DLL
+# needs to be updated in the build tools directory, but the person
+# forgot to rebuild with that flag (happened several times).
+CSC_FLAGS       = $(CSC_FLAGS) /DEFINE:VERBOSE /DEFINE:DEBUG /platform:x86
+
+CLS_COMPLIANT   = 0
+COMPONENT_NO_DOC= 1
+
+# warning settings
+CSC_TREAT_WARNINGS_AS_ERRORS=1
+CSC_OBSOLETE_WARNINGS_ARE_NOT_ERRORS=1
+CSC_WARNING_DISABLE=649
+CSC_WARNING_DISABLE=3008

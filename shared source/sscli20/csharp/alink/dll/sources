@@ -1,0 +1,59 @@
+# ==++==
+# 
+#   
+#    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+#   
+#    The use and distribution terms for this software are contained in the file
+#    named license.txt, which can be found in the root of this distribution.
+#    By using this software in any fashion, you are agreeing to be bound by the
+#    terms of this license.
+#   
+#    You must not remove this notice, or any other, from this software.
+#   
+# 
+# ==--==
+
+PROJECT_ROOT=$(BASEDIR)\csharp
+!include $(DEVDIV_TOOLS)\sources.inc
+
+TARGETNAME=alink
+TARGETTYPE=DYNLINK
+TARGETPATH=$(_OBJ_DIR)
+TARGETPATHLIB=$(_OBJ_DIR)
+
+DLLENTRY=_DllMainCRTStartup
+
+UMTYPE=windows
+NO_NTDLL=1
+USE_MSVCRT=1
+USE_STATIC_ATL=1
+
+
+COFFBASE=ALink
+DLLDEF=alink.def
+
+
+USER_INCLUDES=$(MFC_INCLUDES);..\inc;..\..\inc;$(SDK_INC_PATH);$(DEBUGGER_INC_PATH)
+C_DEFINES=$(C_DEFINES) -DX86 -D_MBCS -DALINK_EXPORTS -D_WINDOWS -DSTRICT -DNT -D_ATL_STATIC_REGISTRY -D_USRDLL
+
+USE_NATIVE_EH=ASYNC
+
+# These files are listed in alphabetical order.  Keep them that way!
+SOURCES= \
+    alink.rc \
+    alinklib.cpp \
+    asmlink.cpp \
+    assembly.cpp \
+    resfile.cpp
+
+
+TARGETLIBS= \
+    $(_NTTREE)\lib\*\alink_shared.lib \
+    $(_NTTREE)\lib\*\cscutil.lib \
+    $(PAL_LIB_PATH)\unilib.lib \
+
+PRECOMPILED_INCLUDE=stdafx.h
+PRECOMPILED_SOURCEFILE=stdafx.cpp
+PRECOMPILED_PCH=stdafx.pch
+PRECOMPILED_OBJ=stdafx.obj
+PRECOMPILED_CXX=1

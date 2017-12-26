@@ -1,0 +1,806 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> 
+<head>
+<link rel="stylesheet" type="text/css" href="../rotor.css">
+<TITLE>Rotor Shared Source C# Compiler</TITLE>
+</HEAD>
+<body>
+<H1>Shared Source C# 2.0 Compiler (csc.exe)</H1>
+
+<h3>Contents</h3>
+
+<ul>
+  <li><a href="#Overview">Overview</a></li>
+  <li><a href="#ChangesintheSharedSourceCSharpImplementation">Changes in the 
+  Shared Source C# 2.0 Implementation</a></li>
+  <li><a href="#CSharpCommandLine">C# Command Line</a><ul>
+    <li><a href="#RulesforCommand-LineSyntax">Rules for Command-Line Syntax</a></li>
+    <li><a href="#CSharpCompilerOptions">C# Compiler Options</a></li>
+    <li><a href="#SampleCommandLines">Sample Command Lines</a></li>
+  </ul>
+  </li>
+</ul>
+<h2><a name="Overview"></a>Overview</h2>
+
+<p>The Microsoft&reg; Shared Source implementation of the C# 2.0 compiler is very 
+similar to the implementation in the Microsoft&reg; .NET Framework SDK and Microsoft&reg; Visual Studio&reg; 2005.&nbsp; Both&nbsp;implementations originate from the same source base but 
+some options and features that rely on functionality in Microsoft&reg; Windows&reg; have 
+been 
+removed from the Shared Source implementation.</p>
+
+<p>The application file for the C# compiler is named csc.exe on Windows.</p>
+
+<h2><a name="ChangesintheSharedSourceCSharpImplementation"></a>Changes in the Shared Source C# 2.0 Implementation</h2>
+
+<p>The following option areas and related options were modified</p>
+
+<ul>
+  <li>No features using Windows resources are  supported.<ul>
+    <li>Option removed: <b>/win32res</b>.</li>
+    <li>Option removed: <b>/win32icon</b>.</li>
+    <li>No resource file is automatically generated and embedded in the output 
+    file.</li>
+  </ul>
+  </li>
+  <li>Bug reporting is not supported.<ul>
+    <li>Option removed: <b>/bugreport</b>.</li>
+  </ul>
+  </li>
+  <li>Documentation generation is not supported. The .NET Framework 
+  implementation of C# supports generation of XML documents from specifically 
+  formatted comments.<ul>
+  <li>Option removed: <b>/doc</b>.</li>
+</ul>
+  </li>
+</ul>
+<p>Complete documentation for the .NET Framework C# compiler and tutorials is available on
+<a href="http://msdn.microsoft.com">msdn.microsoft.com</a>.&nbsp;Other than the changes mentioned above, the functionality in the Shared Source 
+implementation of the C# compiler is the same as the .NET Framework 
+implementation.</p>
+
+<p>Note: Because the C# compiler builds complete portable executable (PE) files (.exe 
+files, .dll files, and 
+.netmodule files) it can be considered a compiler and linker.&nbsp;The compiler has 
+linker-style options that set Windows-specific information in the generated PE 
+file.&nbsp;The Shared Source  CLI (SSCLI) loads applications using the
+<a href="../tools/clix.html">clix</a> loader and does not use the Windows system 
+loader.&nbsp;Windows-specific settings that affect file loading are ignored when 
+files are loaded  into the SSCLI.&nbsp; However, if an assembly built 
+with the Shared Source implementation of the C# compiler 
+is executed under the .NET Framework, the file is first loaded by the system 
+loader and the information in the PE file does change the Windows PE file 
+loading behavior.&nbsp; The Shared Source C# compiler does make the required 
+modifications to the PE file but these changes are only used by the Windows 
+loader and not by the clix loader.</p>
+
+<p>Some of the options to which this note applies are:</p>
+
+<ul>
+  <li>baseaddress</li>
+  <li>filealign</li>
+  <li>target</li>
+</ul>
+
+<h2><font face="verdana">
+<a name="CSharpCommandLine"></a>C# Command Line</font></h2>
+
+<P>The compiler produces PE format executable (.exe) files, dynamic-link 
+libraries (DLLs), or code modules (.netmodule files).&nbsp;For information on the PE format of files loaded by ECMA CLI implementations see 
+the ECMA-335 Common Language Infrastructure specification, Partition II, section 
+24.</P>
+
+<P>For information on how the Shared Source CLI (SSCLI) implementation loads PE files, see the 
+implementation code for the <a href="../tools/clix.html">clix</a> application 
+loader: sscli20\clr\src\tools\clix.</P>
+
+<P>The C# compiler can be invoked at the command line by typing the name of the 
+executable file on the command line. For more details on correctly setting your environment to build and execute 
+SSCLI utilities including the C# compiler, see <a href="../buildtools/env.html">env.html</a></P>
+
+<h3><a name="RulesforCommand-LineSyntax"></a>Rules for Command-Line Syntax</h3>
+
+<P>The C# compiler code uses the following rules when interpreting arguments given on the operating system command line:
+
+<UL>
+	<LI>Arguments are delimited by white space, which is either a space or a tab.</li>
+
+	<LI>A string surrounded by double quotation marks ("string") is interpreted as a single argument, regardless of 
+    any white space contained within. A quoted string can be embedded in an argument.</li>
+
+	<LI>A double quotation mark preceded by a backslash (\") is interpreted as a literal double quotation mark character (").</li>
+
+	<LI>Backslashes are interpreted literally, unless they immediately precede a double quotation mark.</li>
+
+	<LI>If an even number of backslashes is followed by a double quotation mark, one backslash is placed in the argv array for every pair of backslashes, and the double quotation mark is interpreted as a string delimiter.</li>
+
+	<LI>If an odd number of backslashes is followed by a double quotation mark, one backslash is placed in the argv array for every pair of backslashes, and the double quotation mark is "escaped" by the remaining backslash, causing a literal double quotation mark (") to be placed in argv.</li>
+</UL>
+
+
+<h3><a name="CSharpCompilerOptions"></a>C# Compiler Options</h3>
+
+<P>Every compiler option is available in two forms: <B>-option</B> and <B>/option</B>.</P>
+
+<table border=1 width="100%">
+
+<TR VALIGN="top">
+<TH width="25%">Option</TH>
+<TH width="75%" colspan="2">Description</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>@</b><i>response_file</i></TD>
+<TD width="75%" colspan="2">Specifies a response file, <i>response_file.</i><p>The 
+<b>@ </b>option lets you specify a file that contains compiler options and source code 
+files to compile. These compiler options and source code files will be processed 
+by the compiler just as if they had been specified on the command line.<br>
+<br>
+To specify more than one response file in a compilation, specify multiple 
+response file options. <p>For example:<blockquote>
+  <p><br>
+@file1.rsp @file2.rsp</blockquote>
+<p><br>
+In a response file, multiple compiler options and source code files can appear 
+on one line. A single compiler option specification must appear on one line 
+(it cannot span multiple lines). Response files can have comments that begin with 
+the # symbol.<br>
+<br>
+Specifying compiler options from within a response file is just like issuing 
+those commands on the command line. <br>
+<br>
+The compiler processes the command options as they are encountered. Therefore, 
+command-line arguments can override previously listed options in response files. 
+Conversely, options in a response file will override options listed previously 
+on the command line or in other response files.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/?</b></TD>
+<TD width="75%" colspan="2">Outputs compiler options to the console.&nbsp; Same as
+<b>/help</b>.<p>This option sends a listing of compiler options, and a brief description 
+of each option, to stdout. If this option is included in a compilation, no 
+output file will be created and no compilation will take place.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/addmodule:</b><i>file[;file2]</i></TD>
+<TD width="75%" colspan="2">Specifies one or more modules (<i>file, file2,</i> and 
+so on<i>)</i> to be part of this assembly.<p>
+All modules added with <b>/addmodule </b>must be in the same directory as the output 
+file at run time. That is, you can specify a module in any directory at compile 
+time but the module must be in the application directory at run time. If the 
+module is not in the application directory at run time, you will get a 
+System.TypeLoadException.<br>
+<br>
+<i>file</i> cannot contain an assembly. For example, if the output file was 
+created with <b>/target:</b><i>module</i>, its metadata can be imported with<b> /addmodule</b>.<br>
+<br>
+If the output file was created with a <b>/target</b> option other than <b>/target:</b><i>module</i>, 
+its metadata cannot be imported with /addmodule but can be imported with 
+<b>/reference</b>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/baseaddress:</b><i>address_value</i></TD>
+<TD width="75%" colspan="2">Specifies the preferred base address (<i>address_value)</i> at which to load a 
+DLL.&nbsp; 
+<p>The loading base address is only relevant if the file is going to be run on 
+the  .NET Framework on Windows.&nbsp; Differences in loading behavior 
+can occur in the .NET Framework on Windows depending on the version of the 
+Windows operating system.</p>
+<p>The SSCLI implementation ignores base address information stored in the PE 
+assembly file.&nbsp; </p>
+    <p>
+        For information on the PE format of files loaded by ECMA CLI implementations see
+        the ECMA-335 Common Language Infrastructure specification, Partition II, section
+        24.</p>
+<p>For more information on DLL base addresses in Windows, go to
+<a href="http://msdn.microsoft.com">msdn.microsoft.com</a> and search for 
+&quot;dll base address&quot;.&nbsp;The Microsoft Windows Platform SDK tool Rebase.exe 
+documentation and the Microsoft Visual Studio Linker.exe documentation also provide 
+detailed information.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/checked[+ | -]</b></TD>
+<TD width="75%" colspan="2">Specifies whether integer arithmetic that overflows the bounds of the data type will cause an exception at run time.<p>
+The <b>/checked</b> option specifies whether an integer arithmetic statement that is 
+not in the scope of the checked or unchecked keywords and that results in a 
+value outside the range of the data type shall cause a run-time exception.<br>
+<br>
+An integer arithmetic statement that is in the scope of the checked or unchecked 
+keywords is not subject to the effect of the <b>/checked</b> option.<br>
+<br>
+If an integer arithmetic statement that is not in the scope of the checked or 
+unchecked keywords results in a value outside the range of the data type, and 
+<b>/checked+</b> (the default if an option is not specified) is used in the compilation, then 
+that statement will cause an exception at run time. If <b>/checked-</b> is used in the 
+compilation, then that statement will not cause an exception at run time.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/codepage:</b><i>id</i></TD>
+<TD width="75%" colspan="2">Specifies the code page to use for all source code files 
+in the compilation with <i>id</i>.<p>If you compile one or more source code 
+files that were not created to use the default code page on your computer, you 
+can use the -codepage option to specify which code page should be used.<br>
+<br>
+If the source code files were created with the same codepage that is in effect 
+on your computer or if the source code files were created with UNICODE or UTF-8, 
+you need not use <b>/codepage</b>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/debug[+ | -]</b><br>
+<b>/debug:</b>{full | pdbonly}</TD>
+<TD width="75%" colspan="2">Emits debugging information.<p>The <b>/debug</b> option causes 
+the compiler to generate debugging information and place it in the output 
+file. Use this option to create debug builds. If /debug, /debug+, or 
+/debug:full is not specified, you will not be able to  debug the 
+output assembly at the source code level.</p>
+<p>Options values:</p>
+<blockquote>
+  <p><b>+ | - </b> </p>
+</blockquote>
+<p>Specifying +, or just <b>/debug</b>, causes the compiler to generate debugging 
+information and place it in a program database (.ildb file). Specifying -, which 
+is in effect if you do not specify <b>/debug</b>, prevents debug information 
+from being 
+created. </p>
+<blockquote>
+  <p><b>full | pdbonly </b> </p>
+</blockquote>
+<p>These arguments specify the type of debugging information generated by the compiler. The 
+full argument, which is in effect if you do not specify <b>/debug:pdbonly</b>, enables 
+attaching a debugger to the running program. Specifying <b>pdbonly</b> allows source 
+code debugging when the program is started in the debugger, but will  display CIL 
+only when the running program is attached to the debugger. </TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/define:</b><i>name[;name2]</i></TD>
+<TD width="75%" colspan="2">Defines preprocessor symbols where <i>name </i>and<i> name2</i> 
+are the names of one or more symbols that you want to define. <br>
+&nbsp;<p>The <b>/define</b> option defines <i>name</i> as a symbol in your program. It has the 
+same effect as using a <b>#define</b> preprocessor directive in your source file. A 
+symbol remains defined until an <b>#undef </b>directive in the source file removes the 
+definition or the compiler reaches the end of the file.<br>
+<br>
+You can use symbols created by this option with <b>#if</b>, <b>#else</b>, <b>#elif</b>, and 
+<b>#endif </b>to 
+compile source files conditionally.&nbsp; </p>
+<p>The short form of <b>/define</b> is <b>/d</b>.</p>
+<p>You can define multiple symbols with /define by using a semicolon or comma to 
+separate symbol names. </p>
+<p>For example:</p>
+<blockquote>
+  <p><b>/define:</b>DEBUG;TUESDAY</p>
+</blockquote>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/filealign:</b><i>number</i></TD>
+<TD width="75%" colspan="2">Specifies the size of sections in the output binary file where
+<i>number</i> has values of 512, 1024, 2048, 4096, 8192, or 16384. These values are in 
+bytes. 
+<p>The information stored in the PE file as the result of using this option is 
+not used on the SSCLI implementation of the CLI assembly loader. </TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/fullpaths</b></TD>
+<TD width="75%" colspan="2">Specifies the absolute path to the file in compiler output.<p>
+By default, errors and warnings that result from compilation specify the name of 
+the file in which an error was found. The <b>/fullpaths</b> option causes the compiler 
+to specify the full path to the file.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/help</b></TD>
+<TD width="75%" colspan="2">Outputs compiler options to the console.&nbsp; Same as 
+<b>/?</b>.<p>This option sends a list of compiler options, and a brief description of 
+each option, to stdout. If this option is included in a compilation, no output 
+file will be created and no compilation will take place.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/incremental[+ | -]</b></TD>
+<TD width="75%" colspan="2">Enables incremental compilation of source code files.<p>
+The <b>/incremental</b> compiler option enables the incremental compiler, which 
+compiles only those methods that have changed since the last compilation. 
+Information about the state of the previous compilation is stored in the 
+following file, which is created by the compiler: </p>
+<blockquote>
+  <p>output_file_name.dbg </p>
+</blockquote>
+<p>When compiling with <b>/debug</b>, the status of debug information is stored in the 
+program database (.ildb file). </p>
+<p>Information about the status of the compilation, other than debug 
+information, is stored in an .incr file.&nbsp;For example:<blockquote>
+<p>output_file_name.extension.incr
+</blockquote>
+<p> <br>
+The first time you use <b>/incremental</b>, the .incr and .ildb files are fully updated and 
+all subsequent compilations will be incremental. Changing the compiler options 
+from the previous <b>/incremental</b> compilation will cause a full rebuild of the 
+.incr and .ildb files.<br>
+<br>
+If the compiler detects many changes since the last incremental build, it might 
+perform a full build, as a full build would be at least as efficient as an 
+incremental build. If the compiler cannot find the project's .ildb or .incr 
+files, a full rebuild will occur.<br>
+<br>
+By default, <b>/incremental-</b> is in effect. Specifying <b>/incremental</b> is the same as 
+specifying <b>/incremental+</b>.<br>
+<br>
+Output files created with the <b>/incremental</b> option might be larger than those 
+created with incremental compilation disabled. Because the output files can be 
+larger, you should use <b>/incremental-</b> in the final build of your output file.<br>
+<br>
+This option will speed compilation on projects with many, smaller files, and 
+will have little or no speed improvement on projects with a few large files.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/lib:</b><i>dir1[, dir2]</i></TD>
+<TD width="75%" colspan="2">Specifies the location of assemblies that will be referenced 
+through the <b>/reference</b> option 
+where <i>dir1 </i>is a directory for the compiler to look in if a referenced 
+assembly is not found in the current working directory (the directory from which 
+you are invoking the compiler) or in the CLI implementation assembly directory 
+and <i>dir2</i> is one or more additional directories to search in to resolve assembly 
+references. 
+<p>Separate additional directory names with a comma.  
+<p>The <b>/lib</b> option specifies the location of assemblies referenced through the 
+<b>/reference</b> option.<br>
+<br>
+The compiler searches for assembly references that are not fully qualified in 
+the following order: 
+<ol>
+  <li>The current working directory. This is the directory from which the compiler 
+  is invoked. </li>
+  <li>The common language runtime system directory. </li>
+  <li>Directories specified by <b>/lib</b>. </li>
+  <li>Directories specified by the LIB environment variable. </li>
+  </ol>
+<p>Use <b>/reference </b>to specify an assembly reference.<br>
+<br>
+<b>/lib</b> is additive; specifying it more than once appends to any prior values.<br>
+<br>
+An alternative to using <b>/lib</b> is to copy into the working directory any required 
+assemblies; this will allow you to simply pass the assembly name to <b>/reference</b>. 
+After compilation you can  delete the assemblies from the working 
+directory. Since the assembly references store only the assembly name and  do 
+not specify a path, the application can be started on the target computer and 
+will find and use the assembly in the global assembly cache.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/linkresource:</b><i>filename[,identifier]</i></TD>
+<TD width="75%" colspan="2">Creates a link to a managed resource where <i>filename</i> 
+is the resource file to which you want to link from the assembly and <i>
+identifier</i> (optional) is the logical name for the resource (the name used in 
+code to load the resource).<p>The default identifier is  the file 
+name. <p>The <b>/linkresource</b> option creates a link to a resource in the output 
+file; the resource file is not placed in the output file. The <b>/resource</b> option 
+embeds a resource file in the output file.<br>
+<br>
+Linked resources are public in the assembly when created with the C# compiler.<br>
+<br>
+<b>/linkresource</b> requires one of the /target options other than <b>/target</b>:<i>module</i>.<br>
+<br>
+If <i>filename</i> is a .resource file created by resgen.exe or in the 
+development environment, for example, it can be accessed with members in the <b>System.Resources</b> 
+namespace. For all other resources, use the <b>GetManifestResource</b>* methods in the 
+<b>System.Reflection.Assembly </b>class to access the resource at run time.<br>
+<br>
+<b>/linkres</b> is the short form of <b>/linkresource</b>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/main:</b><i>class</i></TD>
+<TD width="75%" colspan="2">Specifies the location of the <b>Main</b> method where <i>class</i> 
+is the type that contains the <b>Main</b> method. <br>
+<br>
+If your compilation includes more than one type with a <b>Main</b> method, the 
+<b>/main</b> 
+option allows you to specify which type contains the <b>Main</b> method that you want 
+to use as the entry point into the program.<br>
+<br>
+This option is only for use when compiling an .exe file.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/nologo</b></TD>
+<TD width="75%" colspan="2">Suppresses compiler banner information.<p>The <b>/nologo</b> 
+option suppresses the display of the sign-on banner when the compiler starts up and 
+suppresses the display of informational messages during compiling.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/nostdlib[+ | -]</b></TD>
+<TD width="75%" colspan="2">Prevents the default importation of the base class library (mscorlib.dll).<p>The 
+<b>/nostdlib</b> option prevents the import of mscorlib.dll, which defines the entire 
+System namespace. Use this option if you want to define or create your own 
+System namespace and objects.</p>
+<p>This option is used by the SSCLI build system in order to bootstrap the build 
+of the base class libraries in mscorlib.dll.<br>
+<br>
+If you do not specify <b>/nostdlib</b>, mscorlib.dll will be imported into your program 
+just as when you specify <b>/nostdlib-</b>. If you specify <b>/nostdlib</b>, it is the same as 
+specifying <b>/nostdlib+</b>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/noconfig</b></TD>
+<TD width="75%" colspan="2">Prevents compilation with the global or local versions of csc.rsp.<p>
+The <b>/noconfig</b> option tells the compiler not to compile with the global or local 
+versions of csc.rsp.<br>
+<br>
+By default, the C# compiler looks in the compiler directory and then in the 
+directory from which the compiler was invoked for files called csc.rsp.<br>
+<br>
+The csc.rsp file that is supplied in the compiler directory references the .NET 
+Framework assemblies that would be included in a C# project created in the 
+Visual Studio .NET development environment. You can modify this global csc.rsp file 
+to contain any other compiler options that you want to include in a compilation 
+from the command line with csc.exe.<br>
+<br>
+The compiler will then look for a csc.rsp file in the directory from which the 
+compiler was invoked. The commands in the local csc.rsp file will be combined 
+with the global csc.rsp file for the compilation. Because the global csc.rsp is 
+processed first, any command that is also in the local csc.rsp file will 
+override the setting of the same command in the global csc.rsp file.<br>
+<br>
+Finally, the compiler will read the options passed to the csc command. Because 
+these are processed last, any option on the command line will override a setting 
+of the same option in either of the csc.rsp files.<br>
+<br>
+If you do not want the compiler to look for and use the settings in the global 
+and local csc.rsp files, specify <b>/noconfig</b>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/nowarn:</b><i>number1[,number2[...]]</i></TD>
+<TD width="75%" colspan="2">Suppresses the compiler's ability to generate 
+specified warnings where <i>number1 </i>and<i> number2</i> are warning numbers that you 
+want the compiler to suppress. <p>The <b>/nowarn</b> option lets you suppress the 
+compiler's ability to generate one or more warnings. Separate multiple warning 
+numbers with a comma.<br>
+<br>
+You  need to specify only the numeric part of the warning identifier. For 
+example, if you want to suppress CS0028, you could specify <b>/nowarn:</b>28.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/optimize[+ | -]</b></TD>
+<TD width="75%" colspan="2">Enables or disables optimizations.<p>The <b>/optimize</b> option 
+enables or disables optimizations performed by the compiler to make your output 
+file smaller, faster, and more efficient. <b>/optimize</b> also tells the common 
+language runtime to optimize code at runtime.<br>
+<br>
+By default, <b>/optimize</b> is in effect. Specifying <b>/optimize</b> is the equivalent to 
+specifying <b>/optimize+</b>.<br>
+<br>
+All references (see <b>/reference</b>) in an assembly must have the same optimization 
+settings.<br>
+<br>
+To prevent the compiler from generating an optimized output file, specify 
+<b>/optimize-</b>.<br>
+<br>
+<b>/o</b> is the short form of <b>/optimize</b>.<br>
+<br>
+It is possible to combine the <b>/optimize</b> and <b>/debug</b> options.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/out:</b><i>filename</i></TD>
+<TD width="75%" colspan="2">Specifies the output file where <i>filename</i> is the 
+name of the output file created by the compiler. 
+<p>The <b>/out</b> option specifies the name of the output file. The compiler expects 
+to find one or more source code files following the <b>/out</b> option.<br>
+<br>
+If you do not specify the name of the output file: </p>
+<ul>
+  <li>An .exe file will take its name from the source code file that contains the 
+  Main method. </li>
+  <li>A .dll or .netmodule file will take its name from the first source code file.
+  </li>
+</ul>
+<p>On the command line, it is possible to specify multiple output files for your 
+compilation. All source code files specified after an /out option will be 
+compiled into the output file specified by that /out option. A source code file 
+used to compile one output file cannot be used in the same compilation to 
+compile another output file.<br>
+<br>
+Specify the full name and extension of the file you want to create.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/recurse:</b><i>[dir\]file</i></TD>
+<TD width="75%" colspan="2">Searches subdirectories for source files to compile 
+where <i>dir</i> (optional) is the directory in which you want the search to 
+begin and <i>file</i> is the file or files to search for. Wildcard characters are 
+allowed. 
+<p>If <i>dir</i> is not specified, the search begins in the directory where the csc 
+command was executed.</p>
+<p>The <b>/recurse</b> option lets you compile source code files in all child 
+directories of either the specified directory (dir) or the directory where the 
+csc command was executed.<br>
+<br>
+You can use wildcard characters in a file name to compile all matching files in the 
+project directory without using <b>/recurse</b>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/reference:</b><i>file[;file2]</i><p><br>
+&nbsp;</TD>
+<TD width="75%" colspan="2">Imports the information in the metadata of the 
+referenced assembly for use in resolving external references where <i>file </i>
+and<i> 
+file2</i> are one or more files  containing an assembly manifest. To import 
+more than one file, separate file names with either a comma or a semicolon.
+<p>The <b>/reference</b> option causes the compiler to make public type information in 
+the specified files available to the project you are currently compiling.<br>
+<br>
+The file or files you import must contain a manifest; the output file must have been 
+compiled with one of the <b>/target</b> options other than <b>/target:module</b>.<br>
+<br>
+Use <b>/addmodule</b> to import metadata from an output file that does not contain an 
+assembly manifest.<br>
+<br>
+Although executable files can be referenced as assemblies it is not recommended 
+that shared, referenced code be stored in executable assemblies.&nbsp;Instead, 
+place the shared code in an assembly library.<br>
+<br>
+If you reference an assembly (Assembly A), which itself references another 
+assembly (Assembly B), you will need to reference Assembly B if: </p>
+<ul>
+  <li>A type you use from Assembly A inherits from a type or implements an 
+  interface from Assembly B. </li>
+  <li>You invoke a field, property, event, or method that has a return type 
+  or parameter type from Assembly B. </li>
+</ul>
+<p>Use <b>/lib </b>to specify the directory in which one or more of your assembly 
+references is located. The <b>/lib</b> topic also discusses which directories the 
+compiler searches for assemblies.<br>
+<br>
+<b>/r</b> is the short form of <b>/reference</b>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/resource:</b><i>filename</i>[,<i>identifier</i>]</TD>
+<TD width="75%" colspan="2">Embeds a .NET Framework resource into the output file 
+where <i>filename</i> is the SSCLI resource file you want to embed in the output 
+file and <i>identifier</i> (optional) is the logical name for the resource; the 
+name used in code to load the resource. 
+<p>The default identifier is  the file name. </p>
+<p>Use <b>/linkresource </b>to link a resource to an assembly rather than placing the 
+resource file in the output file.<br>
+<br>
+Resources are public in the assembly when created with the C# compiler.<br>
+<br>
+If <i>filename</i> is an SSCLI resource file created, for example, by resgen.exe, it can be accessed with members in the 
+<b>System.Resources</b> namespace (for more information see <b>System.Resources.ResourceManager</b>). For all other resources, use the 
+<b>GetManifestResource</b>* methods in 
+the <b>System.Reflection.Assembly</b> class to access the resource at run time.<br>
+<br>
+<b>/res</b> is the short form of <b>/resource</b>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%" rowspan="5"><b>/target:</b><i>output_type</i></TD>
+<TD width="75%" colspan="2">Specifies the type of assembly to be generated by 
+the compiler.<p>Unless you specify <b>/target:module</b>, <b>/target</b> causes assembly 
+metadata to be placed in an output file.<br>
+<br>
+The assembly manifest is placed in the first .exe output file in the compilation 
+or in the first DLL, if there is no EXE output file. For example, in the 
+following command line, the manifest will be placed in 1.exe:</p>
+<blockquote>
+  <p>csc <b>/out:</b>1.exe t1.cs <b>/out:</b>2.netmodule t2.cs</p>
+</blockquote>
+<p>The compiler creates only one assembly manifest per compilation. Information 
+about all files in a compilation is placed in the assembly metadata. All output 
+files except those created with <b>/target:</b>module can contain an assembly manifest. 
+When producing multiple output files at the command line, only one assembly 
+manifest can be created and it must go into the first output file specified on 
+the command line. If the first output file is an executable assembly 
+(<b>/target:</b><i>exe</i> or <b>/target:</b><i>winexe</i>) or code library (<b>/target</b>:<i>library</i>), then any 
+other output files produced in the same compilation must be modules 
+(<b>/target:</b><i>module</i>).<br>
+<br>
+If you create an assembly, you can indicate that all or part of your code is CLS-compliant with the 
+<b>CLSCompliant</b> attribute.</p>
+<p>Specify the format of the output file using one of four options:</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="1%">
+<b>/target:</b><i>exe</i></TD>
+<TD width="160%">The <b>/target:</b><i>exe</i> option causes the compiler to create an executable 
+(EXE), console application. The /target:exe option is in effect by default. The 
+executable file will be created with the .exe extension.<br>
+<br>
+Unless otherwise specified with the /out option, the output file name takes the 
+name of the input file that contains the Main method.<br>
+<br>
+When specified at the command line, all files up to the next <b>/out</b>, 
+<b>/target:</b><i>winexe</i>, or <b>/target:</b><i>library</i> option are used to create the .exe file. The 
+<b>/target:</b><i>exe</i> option is in effect for all files following the previous /out or 
+/target:library option.<br>
+<br>
+One and only one <b>Main</b> method is required in the source code files that are 
+compiled into an .exe file. The <b>/main</b> compiler option lets you specify which 
+class contains the <b>Main</b> method, in cases where your code has more than one class 
+with a <b>Main</b> method.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="1%">
+<b>/target:</b><i>library</i></TD>
+<TD width="160%">The <b>/target:</b><i>library</i> option causes the compiler to create a 
+dynamic-link library (DLL) rather than an executable file (EXE). The DLL will be 
+created with the .dll extension.<br>
+<br>
+Unless otherwise specified with the <b>/out</b> option, the output file name takes the 
+name of the first input file.<br>
+<br>
+When specified at the command line, all files up to the next <b>/out</b>, 
+<b>/target:</b><i>winexe</i>, or <b>/target:</b><i>exe</i> option are used to create the .dll file.<br>
+<br>
+When building a .dll file, a <b>Main</b> method is not required.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="1%">
+<b>/target:</b><i>module</i></TD>
+<TD width="160%">To prevent generation of an assembly manifest, use the /target:module 
+option. By default, the output file will have a .netmodule extension.<br>
+<br>
+A file that does not have an assembly manifest cannot be directly loaded by the 
+SSCLI execution engine. However, such a file can be incorporated into the 
+assembly manifest of an assembly using the <b>/addmodule</b> option.<br>
+<br>
+If more than one module is created in a single compilation, internal types in 
+one module will be available to other modules in the compilation. When code in 
+one module references <b>internal</b> types in another module, then both modules 
+must be incorporated into an assembly manifest, using <b>/addmodule</b>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="1%">
+<b>/target:</b><i>winexe</i></TD>
+<TD width="160%">The <b>/target:winexe </b>option causes the compiler to create an 
+executable  Windows GUI application. The executable file will be created 
+with the .exe extension. This sets the subsystem information in the PE file 
+that is used by  Windows to determine some execution characteristics 
+of the application.<p>This information is ignored by the SSCLI implementation of 
+the CLI.&nbsp;However, if the application is executed under the  .NET 
+Framework this option will be significant.&nbsp;For more information on the 
+console or Windows subsystem setting see <a href="http://msdn.microsoft.com">http://msdn.microsoft.com</a> and search for 
+&quot;console subsystem&quot;.<br>
+<br>
+Use <b>/target:</b><i>exe</i> to create a console application. <br>
+<br>
+Unless otherwise specified with the <b>/out</b> option, the output file name takes the 
+name of the input file that contains the <b>Main</b> method.<br>
+<br>
+When specified at the command line, all files until the next <b>/out</b> or <b>/target</b> 
+option are used to create the Windows application.<br>
+<br>
+Only one <b>Main</b> method is required in the source code files that are compiled into 
+an .exe file. The /main option lets you specify which class contains the <b>Main</b> 
+method, in the case where your code has more than one class with a static <b>Main</b> 
+method.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/unsafe</b></TD>
+<TD width="75%" colspan="2">Allows code that uses the <b>unsafe</b> 
+keyword to compile.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/utf8output</b></TD>
+<TD width="75%" colspan="2">Displays compiler output using UTF-8 encoding.<p>In some international configurations, compiler output cannot correctly be 
+displayed in the console. In these configurations, use <b>/utf8output</b> and redirect 
+compiler output to a file.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%" rowspan="7"><b>/warn:</b><i>option</i></TD>
+<TD width="75%" colspan="2">Specifies the warning level for the 
+compiler to display.<br>
+<br>
+Use <b>/warnaserror</b> to treat all warnings as errors.<br>
+<br>
+<b>/w</b> is the short form of <b>/warn</b>.<p><i>option </i>is the minimum warning level you 
+want displayed for the build. <p>Valid values are 0-4.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="17%" align="center"><b>Warning level</b></TD>
+<TD width="58%" align="center"><b>Meaning</b></TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="17%">0</TD>
+<TD width="58%">Turns off emission of all warning messages.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="17%">1</TD>
+<TD width="58%">Displays severe warning messages.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="17%">2</TD>
+<TD width="58%">Displays level 1 warnings plus certain, less-severe warnings, 
+such as warnings about hiding class members.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="17%">3</TD>
+<TD width="58%">Displays level 2 warnings plus certain, less-severe warnings, 
+such as warnings about expressions that always evaluate to <b>true</b> or <b>false</b>.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="17%">4</TD>
+<TD width="58%">Displays all level 3 warnings plus informational warnings. This 
+is the default warning level at the command line.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="25%"><b>/warnaserror[+ | -]</b></TD>
+<TD width="75%" colspan="2">Promotes warnings to errors.<p>The <b>/warnaserror+</b> 
+option treats all warnings as errors. Any messages that would ordinarily be 
+reported as warnings are instead reported as errors, and the build process is 
+halted (no output files are built). <br>
+<br>
+By default, <b>/warnaserror-</b> is in effect and causes warnings to permit the 
+generation of an output file. <b>/warnaserror</b>, which is equivalent to <b>/warnaserror+</b>, 
+causes warnings to be treated as errors.<br>
+<br>
+Use <b>/warn</b> to specify the level of warnings that you want the compiler to 
+display.</TD>
+</TR>
+
+</table>
+
+
+<h3><a name="SampleCommandLines"></a>Sample Command Lines</h3>
+
+<UL>
+	<LI>Compiles File.cs producing File.exe:
+<PRE>csc File.cs </PRE>
+</li>
+
+	<LI>Compiles File.cs producing File.dll:
+<PRE>csc /target:library File.cs</PRE>
+</li>
+
+	<LI>Compiles File.cs and creates My.exe:
+<PRE>csc /out:My.exe File.cs</PRE>
+</li>
+
+	<LI>Compiles  C# files in the current directory with optimizations on and defines the DEBUG symbol. The output is File2.exe:
+<PRE>csc /define:DEBUG /optimize /out:File2.exe *.cs</PRE>
+</li>
+
+	<LI>Compiles all C# files in the current directory producing a debug version of File2.dll. No logo and no warnings are displayed:
+<PRE>csc /target:library /out:File2.dll /warn:0 /nologo /debug *.cs</PRE>
+</li>
+
+	<LI>Compiles all C# files in the current directory to Something.xyz (a DLL):
+<PRE>csc /target:library /out:Something.xyz *.cs</PRE>
+</li>
+</UL>
+
+
+
+<p><i>Copyright (c) 2006 Microsoft Corporation. All rights reserved.</i></p>
+</BODY>
+</HTML>

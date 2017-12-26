@@ -1,0 +1,57 @@
+# ==++==
+#
+#   
+#    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+#   
+#    The use and distribution terms for this software are contained in the file
+#    named license.txt, which can be found in the root of this distribution.
+#    By using this software in any fashion, you are agreeing to be bound by the
+#    terms of this license.
+#   
+#    You must not remove this notice, or any other, from this software.
+#   
+#
+# ==--==
+
+!include $(DEVDIV_TOOLS)\sources.inc
+
+# Required definitions for empty no classical targets.
+TARGETNAME=jsc
+TARGETPATH=$(O)
+COOLC_OUTPUTDIR=$(_NTTREE)\bin\$(TARGET_DIRECTORY)
+TARGETTYPE=NOTARGET
+
+# DON'T use BINPLACE_INPLACE since we actually build to $(O)
+!undef BINPLACE_INPLACE
+
+
+CSC_FLAGS = $(CSC_FLAGS) /NOWARN:0618
+
+SOURCES=
+
+# Other projects require the output of this project. For multiproc builds, we 
+# force build to wait for this project to finish building before continuing.
+SYNCHRONIZE_BLOCK=1
+
+CLR_TARGETTYPE=EXE
+CSC_DLLBASE=jsc
+CSC_RES=jsc.res
+RESGEN_SOURCE=jsc.txt
+
+#SCRIPT_ASSEMBLY_SUPPRESS_VERSION=1
+USE_VSVERSION=1
+
+
+CLR_REFERENCES = \
+    $(SDK_REF_PATH)\System.dll \
+    $(SDK_REF_PATH)\Microsoft.Vsa.dll \
+    $(SDK_REF_PATH)\Microsoft.JScript.dll
+
+CSHARP_SOURCES=jsc.cs $(O)\BuildVersionInfo.cs
+
+#COOLC_STRIPPDBPATH=1
+
+CSC_ASSEMBLY_TITLE="JScript Compiler"
+CSC_ASSEMBLY_DESCRIPTION="JScript command line compiler"
+
+NTTARGETFILES=$(O)\BuildVersionInfo.cs

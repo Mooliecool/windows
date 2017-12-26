@@ -1,0 +1,275 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html> 
+<head>
+<title>Native and Managed Code Interop on Rotor</title>
+<link rel="stylesheet" type="text/css" href="../rotor.css">
+</head>
+<body>
+
+<h1 align="left">Native and Managed Code Interop in the Shared Source CLI 2.0</h1>
+
+ 
+<p>The Microsoft&reg; Shared Source CLI (SSCLI) 2.0 implementation supports  reduced  interoperation between native and managed code as compared to 
+the Microsoft .NET Framework implementation on Microsoft&reg; Windows&reg;. 
+Because of platform independence (via the PAL), the SSCLI does not support COM 
+interop in any form.&nbsp; This includes calling from managed code out to an 
+unmanaged COM implementation as well as native code calling into managed code 
+through COM wrappers over managed classes.</p>
+
+ 
+<p>The following tables indicate the interoperability options available on 
+either implementation.</p>
+
+ 
+<table border="1" width="100%" >
+  <tr VALIGN="top">
+    <th width="21%">Managed Code Calling Native Code</th>
+    <th width="39%">Microsoft .NET Framework</th>
+    <th width="40%">Microsoft  Shared Source CLI 2.0</th>
+  </tr>
+  <tr VALIGN="top">
+    <td width="21%">COM interop</td>
+    <td width="39%">Supported.&nbsp; 
+    <p>Managed wrapper classes allow managed code to create instances of unmanaged COM 
+    classes and invoke methods.</td>
+    <td width="40%">Not supported.</td>
+  </tr>
+  <tr VALIGN="top">
+    <td width="21%">Platform invoke</td>
+    <td width="39%">Supported.&nbsp; 
+    <p>Managed code can call directly to stdcall or cdecl C-style functions 
+    exported by dynamic libraries implemented in native code.</td>
+    <td width="40%">Supported.&nbsp; 
+    <p>No changes from the .NET Frameworks on Windows.</td>
+  </tr>
+</table>
+
+ 
+<p>&nbsp;</p>
+
+ 
+<table border="1" width="100%" >
+  <tr VALIGN="top">
+    <th width="21%">Native Code Calling Managed Code</th>
+    <th width="40%">Microsoft .NET Framework</th>
+    <th width="39%">Microsoft  Shared Source CLI 2.0</th>
+  </tr>
+  <tr VALIGN="top">
+    <td width="21%">COM interop</td>
+    <td width="40%">Supported.&nbsp; 
+    <p>Unmanaged code can use COM wrapper classes to create instances of managed classes 
+    and invoke methods.</td>
+    <td width="39%">Not supported.</td>
+  </tr>
+  <tr VALIGN="top">
+    <td width="21%">Managed Extensions for C++ </td>
+    <td width="40%">Supported.&nbsp; 
+    <p>Native C++ classes can be compiled in the same assembly as managed 
+    classes and can interoperate directly.&nbsp; Managed methods can be exported 
+    directly as dynamic library entry points.</td>
+    <td width="39%">Not supported.</td>
+  </tr>
+  <tr VALIGN="top">
+    <td width="21%">Delegates</td>
+    <td width="40%">Supported.&nbsp; 
+    <p>Managed code implements a delegate that is exported as a function 
+    pointer to native code.&nbsp; </td>
+    <td width="39%">Supported. 
+    <p>No changes from the .NET Framework on Windows.</td>
+  </tr>
+  <tr VALIGN="top">
+    <td width="21%">Foreign Function Interface (FFI)</td>
+    <td width="40%">Not supported.</td>
+    <td width="39%">Supported.&nbsp; 
+    <p>This is a light-weight substitute for COM interop.</td>
+  </tr>
+</table>
+
+ 
+<h2>Foreign Function Interface (FFI)</h2>
+<p>Because the SSCLI implementation does not support either the Managed 
+Extensions for C++ or COM interop, the Foreign Function Interface (FFI) was 
+implemented.&nbsp; The FFI allows code implemented in unmanaged native C to 
+create instances of managed classes and invoke methods.&nbsp; The following 
+FFI class and interface definitions are located in <tt>corffi.idl </tt>and <tt>mscoree.idl.
+</p>
+<hr>
+<pre>
+/* modeled after System.Reflection.BindingFlags */
+typedef enum CorFFIBindingFlags
+{
+  CorFFIInvokeMethod = 0x0100,
+  // CreateInstance = 0x0200,
+  CorFFIGetField = 0x0400,
+  CorFFISetField = 0x0800,
+  CorFFIGetProperty = 0x1000,
+  CorFFISetProperty = 0x2000,
+} CorFFIBindingFlags;
+
+interface IManagedInstanceWrapper : IUnknown { 
+  HRESULT InvokeByName( [in] LPCWSTR MemberName, 
+			[in] INT32 BindingFlags, 
+			[in] INT32 ArgCount, 
+			[optional,in,out] VARIANT *ArgList, 
+			[optional,out] VARIANT *pRetVal); 
+			}
+
+STDAPI ClrCreateManagedInstance(LPCWSTR pTypeName, REFIID riid, void **ppObject);</pre>
+
+<hr>
+<p>The SSCLI platform adaptation layer (PAL) runtime supports a limited version of some COM-style types:&nbsp; rotor_palrt.h defines HRESULT, IUnknown* and VARIANT. Since 
+IManagedInstanceWrapper derives from IUnknown, FFI calls can return managed object references 
+by having the marshaler 
+create a new IManagedInstanceWrapper and store it in the VARIANT as an IUnknown*.&nbsp;&nbsp; This allows integer 
+types, floating point types, strings, and objects to be passed
+through FFI in both directions ([in] parameters, [out] parameters,
+and return values).</p>
+
+<p>FFI is  modeled on COM semantics, so some familiarity with COM programming is required to use it.&nbsp; 
+Standard COM reference-counting semantics must be followed.&nbsp; For more 
+details, consult 
+standard COM reference documentation.&nbsp; There are many 
+sources for information on COM programming, for example,
+<a href="http://msdn.microsoft.com/library/en-us/dncomg/html/msdn_com_co.asp">
+The COM Programmer's Cookbook</a> and many other articles on
+<a href="http://msdn.microsoft.com">msdn.microsoft.com</a> as well as the 
+Microsoft Visual C++&reg; .NET documentation.</p>
+
+<h4>FFI and Object References</h4>
+
+<p>Object references are treated as  vectors of function pointers.&nbsp;
+</p>
+
+<h4>FFI and Strings</h4>
+
+<p>VT_BST should be used for by-value strings and VT_BSTR | VT_BYREF used for by-reference strings.</p>
+
+<h4>FFI and VARIANT</h4>
+
+<p>The following VARIANT types can be marshaled:</p>
+
+<ul>
+  <li>VT_EMPTY</li>
+  <li>VT_NULL</li>
+  <li>VT_I2</li>
+  <li>VT_I4</li>
+  <li>VT_R4</li>
+  <li>VT_R8</li>
+  <li>VT_DATE</li>
+  <li>VT_BSTR</li>
+  <li>VT_BOOL</li>
+  <li>VT_UNKNOWN </li>
+  <li>VT_DECIMAL</li>
+  <li>VT_I1 </li>
+  <li>VT_UI1 </li>
+  <li>VT_UI2 </li>
+  <li>VT_UI4 </li>
+  <li>VT_I8</li>
+  <li>VT_UI8 </li>
+  <li>VT_INT</li>
+  <li>VT_UINT </li>
+  <li>VT_VOID</li>
+</ul>
+
+<p>Note: VT_BYREF can be marshaled but VT_ARRAY is not supported.<h3>
+FFI Sample Code</h3>
+<pre>    
+    IManagedInstanceWrapper *pWrap; 
+    VARIANT RetVal; 
+    HRESULT hr; 
+
+    hr = ClrCreateManagedInstance( 
+        L"System.Random,mscorlib,PublicKeyToken=b03f5f7f11d50a3a", 
+        IID_IManagedInstanceWrapper, 
+        (void**)&amp;pWrap); 
+    if (FAILED(hr)) { 
+        fprintf(stderr, "ClrCreateManagedInstance failed with hr=0x%08x\n", hr); 
+        return; 
+    }   
+
+    VariantClear(&amp;RetVal); 
+    hr = pWrap->InvokeByName( 
+        L"Next", CorFFIInvokeMethod, 0, NULL, &amp;RetVal); 
+
+    if (FAILED(hr)) { 
+        fprintf(stderr, "InvokeMethodByName failed with hr=0x%08x\n", hr); 
+        return; 
+    } 
+
+    printf("System.Random.Next() returned %d\n", V_I4(&amp;RetVal)); 
+
+    pWrap->Release(); 
+</pre>
+<h3>SSCLI FFI Implementation Location</h3>
+
+ 
+<p>The implementation of the SSCLI FFI interop functionality can be found in the 
+following source files:</p>
+
+ 
+<ul>
+  <li>%ROTOR_DIR%\clr\src\inc\mscoree.idl</li>
+  <li>%ROTOR_DIR%\clr\src\vm\ceemain.cpp</li>
+  <li>%ROTOR_DIR%\clr\src\inc\corffi.idl</li>
+  <li>%ROTOR_DIR%\clr\src\vm\comcallablewrapper.cpp</li>
+  <li>%ROTOR_DIR%\clr\src\vm\comcallablewrapper.h</li>
+</ul>
+<p>The following tests show examples of using the FFI functionality:</p>
+<ul>
+  <li>%ROTOR_DIR%\tests\dev\interoptest1.cs</li>
+  <li>%ROTOR_DIR%\tests\dev\ffitest\ffitest.cpp</li>
+</ul>
+<h2>Wrapping cdecl Native Function Callbacks With Managed Delegates</h2>
+
+ 
+<p>Both the .NET Framework on Windows and the SSCLI implementation support 
+delegates that can be exposed to native code as either stdcall or cdecl function 
+pointers.&nbsp; The default calling convention for marshaled delegates is stdcall.
+Use UnmanagedFunctionPointer attribute on the delegate to override the default:
+
+<pre>
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal unsafe delegate int Tcl_AppInitProc(Tcl_Interp* interp);
+</pre>
+
+<p>Note that this 
+only impacts cdecl APIs that are callback functions where the native code needs to call back 
+on a function pointer into the managed code for notification purposes. An 
+example of this would be a native API that requires a function pointer to call 
+back a function for 
+progress indication or resource enumeration.</p>
+
+
+<h2>Shared Source CLI Platform Invoke</h2>
+
+ 
+<p>In general, the SSCLI implementation of a platform invoke method is the same as that 
+provided by the Microsoft .NET Framework on Windows.&nbsp; </p>
+
+ 
+<p>For example,&nbsp; the SSCLI implementation follows the same rules as those 
+for the  .NET Framework for string marshaling. 
+Strings are marshaled by read-only value.&nbsp; The value that is returned is the pinned 
+string object itself, so you can not modify it because the CLI string data type is immutable.</p>
+
+ 
+<p>For some examples of using platform invoke in SSCLI please see 
+%ROTOR_DIR%\tests\dev\interoptest1.cs.</p>
+
+ 
+<p>Managed pointers an be marshaled using [MarshalAs(UnmanagedType.IUnknown)].&nbsp; 
+Because almost any type can be turned into the type Object through boxing, it 
+should be possible to marshal almost all types as IUnknown.&nbsp;&nbsp; If the 
+default marshaling does not work for your requirements, you can create a custom 
+marshaler in the same way as that supported in the  .NET Framework.</p>
+
+ 
+<p>Unlike the .NET Framework implementation of a platform invoke method, the SSCLI 
+implementation does not support VARIANT marshalling.<br>
+&nbsp;</p>
+
+
+
+<p><i>Copyright (c) 2006 Microsoft Corporation. All rights reserved.</i></p>
+</body> 
+</html>

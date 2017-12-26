@@ -1,0 +1,38 @@
+#
+# Copyright (c) Microsoft Corporation. All rights reserved.
+#
+
+USER_C_FLAGS                        = $(USER_C_FLAGS) -DUNICODE -D_UNICODE
+USE_NOLIBS                          = 1
+
+INCLUDES                            = $(INCLUDES);.
+
+TARGETNAME                          = sscoree
+TARGETPATH                          = $(_OBJ_DIR)
+TARGETPATHLIB                       = $(PAL_LIB_DEST)
+TARGETTYPE                          = DYNLINK
+UMTYPE                              = windows
+
+!if "$(ROTOR_TOOLSET)" == "MSVC"
+DLLENTRY                            = _DllMainCRTStartup
+!endif
+
+DLLDEF                              = $(O)\sscoree.def
+
+!if "$(MINGW_BUILD)" != "1"
+# For Mingw build, use the .def file
+MINGW_USE_DLLDEF=1
+!endif
+
+ROTOR_USE_NOLIBS=1
+!ifndef PLATFORM_UNIX
+LINKLIBS=$(LINKLIBS)                   \
+        $(PAL_LIB_PATH)\rotor_pal.lib
+!endif
+UNIX_DLL_LIBS=-lrotor_pal
+
+SOURCES                             = functions.cpp \
+                                      globals.cpp \
+                                      sscoree_exports.cpp \
+                                      sscoree_int.cpp  \
+                                      sscoree_debug.cpp

@@ -1,0 +1,59 @@
+# ==++==
+#
+#   
+#    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+#   
+#    The use and distribution terms for this software are contained in the file
+#    named license.txt, which can be found in the root of this distribution.
+#    By using this software in any fashion, you are agreeing to be bound by the
+#    terms of this license.
+#   
+#    You must not remove this notice, or any other, from this software.
+#   
+#
+# ==--==
+# ============================================================================
+# File: makefile
+# makefile for build
+# ============================================================================
+
+# Common part
+TOP_SRC_DIR = @top_srcdir@
+include $(TOP_SRC_DIR)/obj${BUILD_ALT_DIR}/${_BUILDARCH}/makefile.common
+
+# Local changes
+TARGET_NAME = $(_NTTREE)/build
+
+SOURCES=build.c \
+        builddb.c \
+        buildexe.c \
+        buildinc.c \
+        buildmak.c \
+        buildscn.c \
+        buildsrc.c \
+        buildutl.c
+
+# The heap tracing code under #ifdef DBG in build.exe is thread-unsafe,
+# therefore we need to explicitly turn off DBG.
+LOCAL_CFLAGS = -DDBG=0
+
+# Objects
+CPP_OBJS = $(SOURCES:.cpp=.o)
+OBJS = $(CPP_OBJS:.c=.o)
+
+#################
+# Targets
+
+all: makefile $(TARGET_NAME)
+
+$(TARGET_NAME) : makefile $(OBJS)
+	$(LINK_CC) -o $@ $(OBJS)
+
+makefile : ../../makefile.in
+	@echo $? is newer than $@. Please rerun $(TOP_SRC_DIR)/obj${BUILD_ALT_DIR}/${_BUILDARCH}/configure.
+	@exit 1
+
+clean:
+	rm -f *.o
+	rm -f $(TARGET_NAME)
+

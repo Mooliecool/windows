@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html> 
+<head>
+<TITLE>Resource File Generator (Resgen.exe)</TITLE>
+<link rel="stylesheet" type="text/css" href="../rotor.css">
+</head>
+<body>
+
+<H1>Resource File Generator (resgen.exe)</H1>
+
+<P>The Resource File Generator converts .txt files and .resx (XML-based resource 
+format) files to common language infrastructure (CLI) binary .resources files 
+that can be embedded in a runtime binary executable or compiled into satellite 
+assemblies. The Resource File Generator performs the following conversions:
+
+<UL>
+	<LI>Converts .txt files to .resources or .resx files.</li>
+
+	<LI>Converts .resources files to text or .resx files.</li>
+
+	<LI>Converts .resx files to text or .resources files.</li>
+</UL>
+
+<p>The Resource File Generator is a managed application.&nbsp; In order to execute managed 
+applications in the Shared Source CLI (SSCLI), you must use the <a href="clix.html">clix</a> application launcher.</p>
+<h4>Usage</h4>
+<blockquote>
+
+<PRE>clix resgen [<B>/compile</B>] <I>filename.extension</I> [<I>outputFilename.extension</I>][...]</PRE>
+</blockquote>
+
+<table border="1" width="90%">
+
+<TR VALIGN="top">
+<TH width="30%">Argument</TH>
+<TH width="60%">Description</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width="30%"><I>filename.extension</I></TD>
+<TD width="60%">The name of the input file to convert. The <I>extension</I> must be one of the following:
+<DL>
+<DT>.txt</DT>
+
+<DD>Specifies the extension for a text file to convert to a .resources or a .resx file. Text files can only contain string resources.</dd>
+
+<DT>.resx</DT>
+
+<DD>Specifies the extension for an XML-based resource file to convert to a .resources or a .txt file.</dd>
+
+<DT>.resources</DT>
+
+<DD>Specifies the extension for a resource file to convert to a .resx or a .txt file.</dd>
+</DL>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width="30%"><I>outputFilename.extension</I></TD>
+<TD width="60%">The name of the resource file to create.
+<P>This argument is optional when converting from a .txt or .resx file. You can specify the .resources extension when converting a text or .resx file to a .resources file.  If you do not specify an o<I>utputFilename</I>, 
+the Resource File Generator appends a .resources extension to the input <I>filename </I>argument and writes the file to the directory that contains <I>filename</I>. </P>
+
+<P>The <I>outputFilename</I> argument is mandatory when converting from a .resources file. Specify the .resx extension when converting a .resources file to an XML-based resource file. Specify the .txt extension when converting a .resources file to a text file. You should only convert a .resources file to a .txt file when the .resources file contains only string values.</P>
+</TD>
+</TR>
+</table>
+
+<h4 align="left"><span style="font-weight: 400">Options</span><br>
+
+</h4>
+
+<table border="1" width="90%">
+
+<TR VALIGN="top">
+<TH width="30%">Option</TH>
+<TH width="60%">Description</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width="30%"><B>/compile</B></TD>
+<TD width="60%">Allows you to specify multiple .resx or .txt files to convert to .resources files in a single bulk operation. If you do not specify this option, you can specify only one input file argument.</TD>
+</TR>
+</table>
+
+<H4>Remarks</H4>
+
+<P>The Resource File Generator converts files by wrapping the methods implemented by the following four classes: 
+
+<UL>
+	<LI>The <b>ResourceReader</b> class reads a .resources file.</li>
+
+	<LI>The <b>ResourceWriter</b> class creates a .resources file from specified resources.</li>
+
+	<LI>The <b>ResXResourceReader</b> class reads a .resx file. </li>
+
+	<LI>The <b>ResXResourceWriter</b> class creates a .resx file from specified resources.</li>
+</UL>
+
+<P>Note that a .resx file created by the <B>ResXResourceWriter</B> cannot be 
+used directly by a .NET Framework application. Before adding this file to your 
+application, run it through the Resource File Generator to convert it to a .resources file. 
+For more information about implementing these classes in your code, see their respective reference topics.</P>
+
+<P>In order for the Resource File Generator to be able to parse your input, it is critical that your .txt and .resx files follow the correct format.</P>
+
+<P>Text files can only contain string resources. String resources are useful if 
+you are writing an application that must have strings translated into several 
+languages. For example, you can easily regionalize menu strings by using the 
+appropriate string resource. The Resource File Generator reads text files containing name/value pairs, where the name is a string that describes the resource, and the value is the resource string itself.  You must specify each name/value pair on a separate line as follows:</P>
+
+<blockquote>
+
+<PRE>name=value</PRE>
+
+</blockquote>
+
+<P>The Resource File Generator checks the text file for duplicate resource 
+names. For more details on the text file format, see the
+<a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconresourcesintextfileformat.asp">
+Resources in Text File Format</a> topic on MSDN.</P>
+
+<P>The .resx resource file format consists of XML entries. Similar to .txt files, you can specify string resources within these XML entries. A primary advantage of .resx files over .txt files is that you can also specify or embed objects. When you view a .resx file, you can actually see the binary form of an embedded object (a picture for example) when this binary information is a part of the resource manifest. Just as with .txt files, you can open a .resx file with a text editor  and write, parse, and manipulate the contents.&nbsp; 
+Note that in order to do this, you need to have a good knowledge of XML tags and 
+the .resx file structure.</P>
+
+<P>In order to create a .resources file containing embedded nonstring objects, 
+you must either use the Resource File Generator to convert a .resx file containing objects or add the 
+object resources to your file directly from code, using the methods provided by 
+the <b>ResourceWriter</b> class. If you use the Resource File Generator to convert a .resources file 
+containing objects to a .txt file, all the string resources will be converted 
+correctly, but the data types of the nonstring objects will also be written to 
+the file as strings. You will lose the embedded objects in the conversion and 
+the Resource File Generator will report that an error occurred in retrieving the resources.</P>
+
+<P>When you have finished creating .resources files with the Resource File 
+Generator, use the
+<a href="al.html">Assembly Linker (Al.exe)</a> to either embed the resources in a runtime binary executable or compile them into satellite assemblies.</P>
+
+<H4>Examples</H4>
+
+<P>The following command, with no options specified, displays the command syntax 
+and options for the Resource File Generator.</P>
+
+<PRE>resgen</PRE>
+
+<P>The following command reads the name/value pairs in <CODE>myResources.txt</CODE> and writes a binary resources file named <CODE>myResources.resources. </CODE>Because the output file name is not specified explicitly, it receives the same name as the input file by default.</P>
+
+<PRE>resgen myResources.txt </PRE>
+
+<P>The following command reads the name/value pairs in <CODE>myResources.txt</CODE> and writes a binary resources file named <CODE>yourResources.resources</CODE>.</P>
+
+<PRE>resgen myResources.txt yourResources.resources</PRE>
+
+<P>The following command reads an XML-based input file <CODE>myResources.resx</CODE> and writes a binary resources file named <CODE>myResources.resources</CODE>.</P>
+
+<PRE>resgen myResources.resx myResources.resources</PRE>
+
+<P>The following command reads a binary resources file <CODE>myResources.resources</CODE> and writes an XML-based output file named <CODE>myResources.resx</CODE>.</P>
+
+<PRE>resgen myResources.resources myResources.resx</PRE>
+
+<P>The following command reads an XML-based input file <CODE>myResources.resx</CODE> and writes a .txt file named <CODE>myResources.txt. </CODE>Note that if the .resx file contains any embedded objects, they will not be accurately converted into the .txt file.</P>
+
+<PRE>resgen myResources.resx myResources.txt
+</PRE>
+
+<h5>See Also</h5>
+
+<P><a href="tools_index.html">Tools Index</a></P>
+
+<p><i>Copyright (c) 2006 Microsoft Corporation. All rights reserved.</i></p>
+</BODY>
+</HTML>

@@ -1,0 +1,59 @@
+# ==++==
+#
+#   
+#    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+#   
+#    The use and distribution terms for this software are contained in the file
+#    named license.txt, which can be found in the root of this distribution.
+#    By using this software in any fashion, you are agreeing to be bound by the
+#    terms of this license.
+#   
+#    You must not remove this notice, or any other, from this software.
+#   
+#
+# ==--==
+
+INCLUDES        =$(INCLUDES);.;..\inc;..\inc\$(_TGTCPU);$(VCTOOLS_INC_PATH)
+
+USER_C_FLAGS    =$(USER_C_FLAGS) -DUNICODE -D_UNICODE -DFEATURE_NO_HOST
+
+TARGETNAME      =$(CORBUILDENV)cordbdi
+TARGETPATH      =$(CLR_LIB_DEST)
+TARGETTYPE      =LIBRARY
+
+BUILD_PRODUCES  =cordbdi.lib
+
+### CCover, for some reason, has a problem instrumenting 
+### source in the precompiled headers for this directory.
+PRECOMPILED_INCLUDE     = stdafx.h
+PRECOMPILED_CXX         = 1
+PRECOMPILED_SOURCEFILE  = stdafx.cpp
+
+SOURCES=        \
+    process.cpp \
+    RsAppDomain.cpp \
+    RsAssembly.cpp \
+    RsMain.cpp \
+    RsRegSetCommon.cpp \
+    publish.cpp \
+    hash.cpp \
+    module.cpp \
+    RsMda.cpp \
+    breakpoint.cpp \
+    RsThread.cpp \
+    RsType.cpp \
+    cordb.cpp \
+    DIValue.cpp \
+    shared.cpp
+        
+# For some reason $(_TGTCPU) doesn't work.  Need to revisit why.
+I386_SOURCES=i386\CordbRegisterSet.cpp \
+             i386\primitives.cpp
+
+ROTOR_X86_SOURCES=rotor_x86\CordbRegisterSet.cpp \
+                  rotor_x86\primitives.cpp
+
+PPC_SOURCES=ppc\CordbRegisterSet.cpp \
+             ppc\primitives.cpp
+
+

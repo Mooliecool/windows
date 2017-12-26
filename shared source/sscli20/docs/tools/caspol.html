@@ -1,0 +1,515 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html> 
+<head>
+<TITLE>Code Access Security Policy Tool (Caspol.exe)</TITLE>
+<link rel="stylesheet" type="text/css" href="../rotor.css">
+</head>
+<BODY>
+
+<H1>Code Access Security Policy Tool (caspol.exe)</H1>
+
+<P>The Code Access Security Policy tool enables users and administrators to modify security policy for the machine policy level, the user policy level, and the enterprise policy level. </P>
+
+<P>The caspol.exe tool is a managed application.&nbsp; To execute managed 
+applications you must use the <a href="clix.html">clix</a> application launcher.</P>
+
+<h4>Usage</h4>
+
+<blockquote>
+
+<PRE class="syntax"><B>clix caspol</B> [<I>options</I>]</PRE>
+
+</blockquote>
+
+<p>The following options can be specified using either a dash (-) or a slash (/).</p>
+<table border=1>
+
+<TR VALIGN="top">
+<TH width=50%>Option</TH>
+<TH width=50%>Description</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-addfulltrust</B> <I>assembly_file</I>
+<P>or</P>
+
+<P><B>-af</B> <I>assembly_file</I></P>
+</TD>
+<TD width=50%>Adds an assembly that implements a custom security object (such as a custom permission or a custom membership condition) to the full trust assembly list for a specific policy level. The <I>assembly_file</I> argument specifies the assembly to add. This file must be signed with a strong name. You can sign an assembly with a strong name using the <A HREF="sn.html">Strong Name Tool (Sn.exe)</A>.
+<P>When a permission set containing a custom permission is added to policy, the assembly implementing the custom permission must be added to the full trust list for that policy level. In general,  assemblies implementing custom security objects (such as custom code groups or membership conditions) used in a security policy (such as the machine policy) should be added to the full trust assembly list. If the assembly implementing the custom security object references other assemblies, those assemblies must also be added to the list, and so on. </P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-addgroup</B>{<I>parent_label | parent_name</I>}<I> mship pset_name </I>[<I>flags</I>]
+<P>or</P>
+
+<P><B>-ag</B> {<I>parent_label | parent_name</I>}<I> mship pset_name </I>[<I>flags</I>]</P>
+</TD>
+<TD width=50%>Adds a new code group to the code group hierarchy. You can specify either the <I>parent_label</I> or <I>parent_name</I>. The <I>parent_label</I> argument specifies the label (such as 1. or 1.1.) of the code group that is the parent of the code group being added. The <I>parent_name </I>argument specifies the name of the code group that is the parent of the code group being added. Because <I>parent_label</I> and <I>parent_name</I> can be used interchangeably, 
+caspol.exe must be able to distinguish between them. Therefore, <I>parent_name</I> cannot begin with a number. Additionally, <I>parent_name</I> can only contain A-Z, 0-9 and the underscore character.   
+<P>The <I>mship </I>argument specifies the membership condition for the new code group. For more information, see the table of <A HREF="#cpgrfcodeaccesssecuritypolicyutilitycaspolexeanchor2">mship arguments</A> later in this section. </P>
+
+<P>The <I>pset_name</I> argument is the name of the permission set that will be associated with the new code group. You can also set one or more <I>flags</I> for the new group. For more information, see the table of <A HREF="#cpgrfcodeaccesssecuritypolicyutilitycaspolexeanchor3">flags arguments</A> later in this section. </P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-addpset</B>{<I>psfile </I>| <I>psfile</I> p<I>set_name</I>} 
+<P>or</P>
+
+<P><B>-ap</B> {<I>named</I>_<I>psfile </I>| <I>psfile</I> <I>pset_name</I>}</P>
+</TD>
+<TD width=50%>Adds a new named permission set to policy. The permission set must be authored in XML and stored in an .xml file. If the 
+.xml file contains the name of the permission set, only that file (<I>psfile</I>) is specified. If the 
+.xml file does not contain the permission set name, you must specify both the 
+.xml file name (<I>psfile</I>) and the permission set name (<I>pset_name</I>). </TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-a</B>[<B>ll</B>]</TD>
+<TD width=50%>Indicates that all options following this one apply to the 
+computer, user, and enterprise policies. The <B>-all</B> option always refers to the policy of the currently logged-on user. See the <B>-customall</B> option to refer to the user policy of a user other than the current user. </TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-chggroup</B>{<I>label |name</I>} {<I>mship </I>| <I>pset_name</I> |
+<P><I>flags</I><CODE>}</CODE></P>
+
+<P>or</P>
+
+<P><B>-cg</B>{<I>label |name</I>} {<I>mship </I>| <I>pset_name</I> |</P>
+
+<P><I>flags</I><CODE>}</CODE></P>
+</TD>
+<TD width=50%>Changes a code group's membership condition, permission set, or the settings of the 
+<B>exclusive</B>, <B>levelfinal</B>, <B>name</B>, or <B>description</B> flags. 
+You can specify either the <I>label</I> or <I>name</I>. The <I>label</I> argument specifies the label (such as 1. or 1.1.) of the code group. 
+The <I>name </I>argument specifies the name of the code group to change. Because <I>label</I> and <I>name</I> can be used interchangeably, 
+caspol.exe must be able to distinguish between them. Therefore, <I>name</I> cannot begin with a number. Additionally, <I>name</I> can only 
+contain A-Z, 0-9 and the underscore character.   
+<P>The <I>pset_name</I> argument specifies the name of the permission set to associate with the code group. 
+See the tables later in this section for information on the <A HREF="#cpgrfcodeaccesssecuritypolicyutilitycaspolexeanchor2">mship</A> and 
+<A HREF="#cpgrfcodeaccesssecuritypolicyutilitycaspolexeanchor3">flags</A>arguments. </P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-chgpset</B><I> psfile pset_name</I>
+<P>or</P>
+
+<P><B>-cp</B> <I>psfile pset_name</I></P>
+</TD>
+<TD width=50%>Changes a named permission set. The <I>psfile</I> argument supplies the new definition for the permission set; it is a serialized permission set file in XML format. The <I>pset_name</I> argument specifies the name of the permission set you want to change.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-customall </B><I>path</I>
+<P>or</P>
+
+<P><B>-ca</B><I> path</I></P>
+</TD>
+<TD width=50%>Indicates that all options following this one apply to the 
+computer, enterprise, and the specified custom user policies. You must specify the location of the custom user's security configuration file with the <I>path</I> argument.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-cu</B>[<B>stomuser</B>]<I>path</I></TD>
+<TD width=50%>Allows the administration of a custom user policy that does not belong to the user on whose behalf 
+caspol.exe is currently running. You must specify the location of the custom user's security configuration file with the <I>path</I> argument.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-enterprise </B>
+<P>or</P>
+
+<P><B>-en</B></P>
+</TD>
+<TD width=50%>Indicates that all options following this one apply to the enterprise level policy. Users who are not enterprise administrators do not have sufficient rights to modify the enterprise policy, although they can view it. In nonenterprise scenarios, this policy, by default, does not interfere with machine and user policy.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-e</B>[<B>xecution</B>] {<B>on</B> | <B>off</B>}</TD>
+<TD width=50%>Turns on or turns off the mechanism that checks for the permission to run before code starts to execute.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-f</B>[<B>orce</B>]</TD>
+<TD width=50%>Suppresses the tool's self-destruct test and changes the policy as specified by the user. 
+Typically, caspol.exe determines whether any policy changes would prevent caspol.exe itself from running properly; if so, 
+caspol.exe does not save the policy change and prints an error message. To force 
+caspol.exe to change policy even if this prevents caspol.exe itself from running, use the
+<b>-force</b> option. </TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-h</B>[<B>elp</B>]</TD>
+<TD width=50%>Displays command syntax and options for caspol.exe.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-l</B>[<B>ist</B>]</TD>
+<TD width=50%>Lists the code group hierarchy and the permission sets for the specified machine, user, enterprise, or all policy levels. 
+caspol.exe displays the code group's label first, followed by the name, if it is not null.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-listdescription</B></TD>
+<TD width=50%>Lists all code group descriptions for the specified policy level.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-listfulltrust</B> 
+<P>or </P>
+
+<P><B>-lf</B></P>
+</TD>
+<TD width=50%>Lists the contents of the full trust assembly list for the specified policy level. </TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-listgroups</B>
+<P>or</P>
+
+<P><B>-lg</B></P>
+</TD>
+<TD width=50%>Displays the code groups of the specified policy level or all 
+policy levels. caspol.exe displays the code group's label first, followed by the 
+name, if the name is not null.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-listpset</B> or <B>-lp</B></TD>
+<TD width=50%>Displays the permission sets for the specified policy level or all policy levels.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-m</B>[<B>achine</B>]</TD>
+<TD width=50%>Indicates that all options following this one apply to the machine level policy. Users who are not administrators do not have sufficient rights to modify the machine policy, although they can view it. For administrators, <B>-machine</B> is the default.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-polchgprompt</B> {<B>on</B> | <B>off</B>}
+<P>or</P>
+
+<P><B>-pp</B> {<B>on</B> | <B>off</B>}</P>
+</TD>
+<TD width=50%>Enables or disables the prompt that is displayed whenever caspol.exe is run using an option that would cause policy changes.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><b>-quiet</b><p>or</p>
+<p><b>-q</b></TD>
+<TD width=50%>Allows caspol.exe to be run from scripts with a single command.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-r</B>[<B>ecover</B>]</TD>
+<TD width=50%>Recovers policy from a backup file. Whenever a policy change is made, 
+caspol.exe stores the old policy in a backup file. </TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-remfulltrust</B> <I>assembly_file</I>
+<P>or</P>
+
+<P><B>-rf</B><I> assembly_file</I></P>
+</TD>
+<TD width=50%>Removes an assembly from the full trust list of a policy level. This operation should be performed if a permission set that contains a custom permission is no longer used by policy. However, you should remove an assembly that implements a custom permission from the full trust list only if the assembly does not implement any other custom permissions that are still being used. When you remove an assembly from the list, you should also remove any other assemblies that it depends on. </TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-remgroup</B> {<I>label |name</I>}
+<P>or</P>
+
+<P><B>-rg</B>{l<I>abel | name</I>}</P>
+</TD>
+<TD width=50%>Removes the code group specified by either its label or name. If the specified code group has child code groups, 
+caspol.exe also removes all the child code groups.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-rempset</B> <I>pset_name</I>
+<P>or</P>
+
+<P><B>-rp</B> <I>pset_name</I></P>
+</TD>
+<TD width=50%>Removes the specified permission set from policy. The <I>pset_name </I>
+argument indicates which permission set to remove. caspol.exe removes the 
+permission set only if it is not associated with any code group. The default 
+(built-in) permission sets cannot be removed.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-reset</B> 
+<P>or </P>
+
+<P><B>-rs</B></P>
+</TD>
+<TD width=50%>Returns policy to its default state and persists it to disk. This is useful whenever a changed policy seems to be beyond repair and you want to start over with the installation defaults. Resetting can also be convenient when you want to use the default policy as a starting point for modifications to specific security configuration files. For more information, see <A HREF="#cpgrfcodeaccesssecuritypolicyutilitycaspolexeanchor1">Manually Editing the Security Configuration Files</A>. </TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-resolvegroup</B> <I>assembly_file</I>
+<P>or</P>
+
+<P><B>-rsg</B><I> assembly_file</I></P>
+</TD>
+<TD width=50%>Shows the code groups that a specific assembly (<I>assembly_file</I>) belongs to. By default, this option displays the machine, user, and enterprise policy levels to which the assembly belongs. To view only one policy level, use this option with either the <B>-machine</B>, <B>-user</B>, or <B>-enterprise</B> option. </TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-resolveperm</B> <I>assembly_file</I>
+<P>or</P>
+
+<P><B>-rsp</B> <I>assembly_file</I></P>
+</TD>
+<TD width=50%>Displays all permissions that the specified (or default) level of security policy would grant the assembly if the assembly 
+were allowed to run. The <I>assembly_file</I> argument specifies the assembly. If you specify the <B>-all</B> option, 
+caspol.exe calculates the permissions for the assembly based on user, machine, and enterprise policy; otherwise, default behavior rules apply. </TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-s</B>[<B>ecurity</B>] {<B>on</B> | <B>off</B>}</TD>
+<TD width=50%>Turns code access security on or off. This option should be used only with extreme caution.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-u</B>[<B>ser</B>]</TD>
+<TD width=50%>Indicates that all options following this one apply to the user level policy for the user on whose behalf 
+caspol.exe is running. For nonadministrative users, <B>-user</B> is the default.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-?</B></TD>
+<TD width=50%>Displays command syntax and options for caspol.exe.</TD>
+</TR>
+</table>
+
+<P><A NAME="cpgrfcodeaccesssecuritypolicyutilitycaspolexeanchor2"></A>The<I> mship </I>argument, which specifies the membership condition 
+for a code group, can be used with the <B>-addgroup</B> and <B>-chggroup</B> options. To specify <I>mship,</I> use one of the following.</P>
+<table border="1" width="90%">
+
+<TR VALIGN="top">
+<TH width=50%>Argument</TH>
+<TH width=50%>Description</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-all</B></TD>
+<TD width=50%>Specifies all code.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-appdir</B></TD>
+<TD width=50%>Specifies the application directory. If you specify <B>-appdir</B> as the membership condition, the URL evidence of 
+the code is compared with the application directory evidence of that code. If both evidence values are the same, this membership condition is satisfied. </TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-custom </B><I>xmlfile</I></TD>
+<TD width=50%>Adds a custom membership condition. The mandatory <I>xmlfile</I> argument specifies the .xml file that contains XML serialization of the custom membership condition. </TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-hash</B> <I>hashAlg </I>{<B>-hex</B> <I>hashValue</I> | <B>-file</B> <I>assembly_file </I>}</TD>
+<TD width=50%>Specifies code that has the given assembly hash. To use a hash as a code group membership condition, you must specify either the hash value or the assembly file.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-pub</B> { <B>-cert</B> <I>cert_file_name </I>| <BR>
+<B>-file</B> <I>signed_file_name</I> | <B>-hex</B><I> hex_string</I> }</TD>
+<TD width=50%>Specifies code that has the given software publisher, as denoted by a certificate file, a signature on a file, or the hexadecimal representation of an X509 certificate.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-site</B> <I>website</I></TD>
+<TD width=50%>Specifies code that has the given site of origin. For example: 
+<P><B>-site</B> www.proseware.com </P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-strong</B>  <B>-file</B> <I>file_name</I> {<I>name</I> | <B>-noname</B>} {<I>version</I> | <B>-noversion</B>} </TD>
+<TD width=50%>Specifies code that has a specific strong name, as designated by the file name, the assembly name as a string, and the assembly version in the format <I>major</I>.<I>minor</I>.<I>build</I>.<I>revision</I>. For example: 
+<P><B>-strong -file</B> myAssembly.exe myAssembly 1.2.3.4</P>
+</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-url</B><I>URL</I></TD>
+<TD width=50%>Specifies code that originates from the given URL.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-zone</B> <I>zonename</I></TD>
+<TD width=50%>Specifies code with the given zone of origin. The <I>zonename </I>argument can be one of the following values: <B>MyComputer</B>,<B> Intranet</B>,<B> Trusted</B>, <B>Internet</B>, or <B>Untrusted</B>.</TD>
+</TR>
+</table>
+
+<P><A NAME="cpgrfcodeaccesssecuritypolicyutilitycaspolexeanchor3"></A>The <I>flags</I> argument, which can be used with the <B>-addgroup</B> and <B>-chggroup</B> options, is specified using one of the following.</P>
+<table border=1>
+
+<TR VALIGN="top">
+<TH width=50%>Argument</TH>
+<TH width=50%>Description</TH>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-description "</B><I>description</I><B>"</B></TD>
+<TD width=50%>If used with the <B>-addgroup</B> option, specifies the description for a code group to add. If used with the <B>-chggroup</B> option, specifies the description for a code group to edit. The <I>description</I> argument must be enclosed in double quotes.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-exclusive</B> {<B>on</B>|<B>off</B>}</TD>
+<TD width=50%>When set to <B>on</B>, indicates that only the permission set associated with the code group you are adding or modifying is considered when some code fits the membership condition of the code group. When this option is set to <B>off</B>, 
+caspol.exe considers the permission sets of all matching code groups in the policy level.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-levelfinal</B> {<B>on</B>|<B>off</B>}</TD>
+<TD width=50%>When set to <B>on</B>, indicates that no policy level below the level in which the added or modified code group occurs is considered. 
+This option is typically used at the machine policy level. For example, if you set this flag for a code group at the machine level and some code 
+matches this code group's membership condition, 
+caspol.exe does not calculate or apply the user level policy for this code.</TD>
+</TR>
+
+<TR VALIGN="top">
+<TD width=50%><B>-name "</B><I>name</I><B>"</B></TD>
+<TD width=50%>If used with the <B>-addgroup</B> option, specifies the scripting name for a code group to add. If used with the <B>-chggroup</B> option, specifies the scripting name for a code group to edit. The <I>name</I> argument must be enclosed in double quotes. The <I>name</I> argument cannot begin with a number, and can only contain A-Z, 0-9, and the underscore character. On every change or addition of a scripting name, 
+caspol.exe checks whether the added or changed name is unique in the code group hierarchy in which it is added or changed. Code groups can be referred to by this <I>name</I> instead of by their numeric label. The <I>name</I> is also highly useful for scripting purposes. </TD>
+</TR>
+</table>
+
+<h2>Remarks</h2>
+
+<P>Security policy is expressed using three policy levels: machine policy, user policy, and enterprise policy. The set of permissions that an assembly receives is determined by the intersection of the permission sets allowed by these three policy levels. Each policy level is represented by a hierarchical structure of code groups. Every code group has a membership condition that determines which code is a member of that group. A named permission set is also associated with each code group. This permission set specifies the permissions the 
+CLI allows code to have if the code meets the membership condition. A code group hierarchy, 
+together with its associated named permission sets, defines and maintains each level of security policy. You can use the<B>-user</B>, <B>-customuser</B>, <B>-machine</B> and <B>-enterprise </B>options to set the level of security policy.</P>
+
+<h3>Referencing Code Groups and Permission Sets</h3>
+
+<P>To facilitate references to code groups in a hierarchy, the <B>-list</B> option displays an indented list of code groups along with their numerical labels (1, 1.1, 1.1.1, and so on). The other command-line operations that target code groups also use the numerical labels to refer to specific code groups.</P>
+
+<P>Named permission sets are referenced by their names. The <B>-list</B> 
+option displays the list of code groups followed by a list of named permission 
+sets available in that policy. </P>
+
+<h3>Code Access Security Policy Tool Behavior</h3>
+
+<P>All options use the runtime version that caspol.exe was installed with. If you run the 
+Code Access Security Policy tool that was installed with version <I>X</I> of the runtime, the changes apply only to that version of the runtime. Other side-by-side installations of the runtime, if any, are not affected. If you run 
+caspol.exe from the command line without being in a versioned runtime directory, the tool is executed from the first runtime directory in the path (usually the most recent runtime version installed).</P>
+
+<P>When a user without administrative rights runs caspol.exe, all options refer to the user level policy unless the <B>-machine</B> option is specified. When an administrator runs 
+caspol.exe, all options refer to the machine policy unless the <B>-user</B> option is specified.</P>
+
+<P>The Code Access Security Policy tool must be granted the equivalent of the <B>Everything</B> permission set to function. The tool has a protective mechanism that prevents policy from being modified in ways that would prevent 
+caspol.exe from being granted the permissions it needs to run. If you try to make such changes, 
+caspol.exe notifies you that the requested policy change will break the tool, and the policy change is rejected. You can turn this protective mechanism off for a given command by using the <B>-force</B> option.</P>
+
+<h3><B><A NAME="cpgrfcodeaccesssecuritypolicyutilitycaspolexeanchor1"></A></B>Manually Editing the Security Configuration Files</h3>
+
+<P>Three security configuration files correspond to the three policy levels supported by 
+Code Access Security Policy tool: one for the machine policy, one for a given user's policy, and one for the enterprise policy. These files are created on disk only when machine, user, or enterprise policy is changed using 
+caspol.exe. You can use the <B>-reset</B> option in caspol.exe to save the default security policy to disk, if needed.</P>
+
+<P>In most cases, it is recommended that you do not manually edit the security configuration files. 
+However, might be necessary to modify these files, such as when an administrator wants to edit the security configuration for a particular user. </P>
+
+<H4>Examples</H4>
+
+<P><B>-addfulltrust</B></P>
+
+<P>Assume that a permission set containing a custom permission has been added to machine policy. This custom permission is implemented in <CODE>MyPerm.exe</CODE>, and <CODE>MyPerm.exe</CODE> references classes in <CODE>MyOther.exe</CODE>. Both assemblies must be added to the full trust assembly list. The following command adds the <CODE>MyPerm.exe</CODE> assembly to the full trust list for the machine policy.</P>
+
+<PRE>caspol -machine -addfulltrust MyPerm.exe</PRE>
+
+<P>The following command adds the <CODE>MyOther.exe</CODE> assembly to the full trust list for the machine policy.</P>
+
+<PRE>caspol -machine -addfulltrust MyOther.exe</PRE>
+
+<P><B>-addgroup</B></P>
+
+<P>The following command adds a child code group to the root of the machine policy code group hierarchy. The new code group is a member of the <B>Internet</B> zone and is associated with the <B>Execution</B> permission set.</P>
+
+<PRE>caspol -machine -addgroup 1.  -zone Internet Execution</PRE>
+
+<P><B>-addpset</B></P>
+
+<P>The following command adds the <CODE>Mypset</CODE> permission set to the user policy.</P>
+
+<PRE>caspol -user -addpset Mypset.xml Mypset</PRE>
+
+<P><B>-chggroup</B></P>
+
+<P>The following command changes the permission set in the user policy of the code group  labeled 1.2. to the <B>Execution</B> permission set.</P>
+
+<PRE>caspol -user -chggroup 1.2. Execution</PRE>
+
+<P>The following command changes the membership condition in the default policy of the code group labeled 1.2.1. and changes the setting of the <B>exclusive</B> flag. The membership condition is defined to be code that originates from the <B>Internet</B> zone and the <B>exclusive</B> flag is switched on.</P>
+
+<PRE>caspol -chggroup 1.2.1. -zone Internet -exclusive on</PRE>
+
+<P><B>-chgpset</B></P>
+
+<P>The following command changes the permission set with name <CODE>Mypset</CODE> to the permission set contained in <CODE>newpset.xml</CODE>. Note that the current release does not support changing permission sets that are being used by the code group hierarchy.</P>
+
+<PRE>caspol -chgpset Mypset newpset.xml</PRE>
+
+<P><B>-force</B></P>
+
+<P>The following command causes the user policy's root code group (labeled 1) to be associated with the <B>Nothing</B> named permission set. This prevents 
+caspol.exe from running.</P>
+
+<PRE>caspol -force -user -chggroup 1 Nothing</PRE>
+
+<P><B>-recover</B></P>
+
+<P>The following command recovers the most recently saved machine policy.</P>
+
+<PRE>caspol -machine -recover</PRE>
+
+<P><B>-remgroup</B></P>
+
+<P>The following command removes the code group labeled 1.1. If this code group has any child code groups, those groups are also deleted.</P>
+
+<PRE>caspol -remgroup 1.1.</PRE>
+
+<P><B>-rempset</B></P>
+
+<P>The following command removes the <B>Execution</B> permission set from the user policy.</P>
+
+<PRE>caspol -user -rempset Execution</PRE>
+
+<P>The following command removes <CODE>Mypset</CODE> from the user policy level.</P>
+
+<PRE>caspol -rempset MyPset</PRE>
+
+<P><B>-resolvegroup</B></P>
+
+<P>The following command shows all code groups of the machine policy that <CODE>myassembly </CODE>belongs to.</P>
+
+<PRE>caspol -machine -resolvegroup myassembly</PRE>
+
+<P>The following command shows all code groups of the machine, enterprise, and specified custom user policy that <CODE>myassembly</CODE> belongs to.</P>
+
+<PRE>caspol -customall "c:\config_test\security.config" -resolvegroup myassembly</PRE>
+
+<P><B>-resolveperm</B></P>
+
+<P>The following command calculates the permissions for <CODE>testassembly</CODE> based on the machine and user policy levels.</P>
+
+<PRE>caspol -all resolveperm testassembly</PRE>
+
+<h5>See Also</h5>
+
+<blockquote>
+
+<P><a href="tools_index.html">Tools Index</a></P>
+</blockquote>
+<hr>
+<p><i>Copyright (c) 2006
+    Microsoft Corporation. All rights reserved.</i></p>
+</BODY>
+</HTML>

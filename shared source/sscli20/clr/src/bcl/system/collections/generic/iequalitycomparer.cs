@@ -1,0 +1,27 @@
+// ==++==
+// 
+//   
+//    Copyright (c) 2006 Microsoft Corporation.  All rights reserved.
+//   
+//    The use and distribution terms for this software are contained in the file
+//    named license.txt, which can be found in the root of this distribution.
+//    By using this software in any fashion, you are agreeing to be bound by the
+//    terms of this license.
+//   
+//    You must not remove this notice, or any other, from this software.
+//   
+// 
+// ==--==
+
+namespace System.Collections.Generic {
+    using System;
+
+    // The generic IEqualityComparer interface implements methods to if check two objects are equal
+    // and generate Hashcode for an object.
+    // It is use in Dictionary class.    
+    public interface IEqualityComparer<T> {
+        bool Equals(T x, T y);
+        int GetHashCode(T obj);                
+    }
+}
+
