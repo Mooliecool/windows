@@ -1,0 +1,31 @@
+﻿<!-- Copyright (c) Microsoft Corporation.  All rights reserved. -->
+<p:Activity x:Class="Microsoft.Samples.WorkflowApplicationReadLineHost.Sequence2" 
+            xmlns="clr-namespace:System.Activities.Design.Xaml;assembly=System.Activities.Design" 
+            xmlns:p="http://schemas.microsoft.com/netfx/2009/xaml/activities" 
+            xmlns:s="clr-namespace:Microsoft.Samples.WorkflowApplicationReadLineHost;assembly=WorkflowApplicationReadLineHost" 
+            xmlns:sad="clr-namespace:System.Activities.Debugger;assembly=System.Activities" 
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <p:Sequence>
+        <p:Sequence.Variables>
+            <p:Variable x:TypeArguments="x:String" Name="name" />
+        </p:Sequence.Variables>
+        <p:WriteLine Text="Enter your name" />
+        <p:Parallel CompletionCondition="[completed]" >
+            <p:Parallel.Variables>
+                <p:Variable x:TypeArguments="x:Boolean" Name="completed" />
+            </p:Parallel.Variables>
+            <p:Sequence>
+                <s:ReadLine BookmarkName="[&quot;branch1Bookmark&quot;]" Result="[name]" />
+                <p:WriteLine Text="Hello from branch1" />
+                <p:WriteLine Text="[name]" />
+                <p:Assign x:TypeArguments="x:Boolean" To="[completed]" Value="True" />
+            </p:Sequence>
+            <p:Sequence>
+                <s:ReadLine BookmarkName="[&quot;branch2Bookmark&quot;]" Result="[name]" />
+                <p:WriteLine Text="Hello from branch2" />
+                <p:WriteLine Text="[name]" />
+                <p:Assign x:TypeArguments="x:Boolean" To="[completed]" Value="True" />
+            </p:Sequence>
+        </p:Parallel>
+    </p:Sequence>
+</p:Activity>

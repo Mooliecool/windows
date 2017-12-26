@@ -1,0 +1,52 @@
+﻿<!-- Copyright (c) Microsoft Corporation.  All rights reserved. -->
+<p:Activity x:Class="Microsoft.Samples.CancelationScopeXAML.Sequence1" xmlns="clr-namespace:System.Activities.Presentation.Xaml;assembly=System.Activities.Presentation" xmlns:p="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:sad="clr-namespace:System.Activities.Debugger;assembly=System.Activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <p:Sequence>
+    <p:Sequence.Variables>
+      <p:Variable x:TypeArguments="s:TimeSpan" Name="agencyADuration" Default="[TimeSpan.FromSeconds(6)]" />
+      <p:Variable x:TypeArguments="s:TimeSpan" Name="agencyBDuration" Default="[TimeSpan.FromSeconds(4)]" />
+    </p:Sequence.Variables>
+    <p:WriteLine>["Client: Buy me a ticket to Miami and confirm asap."]</p:WriteLine>
+    <p:Parallel CompletionCondition="[true]">
+      <p:CancellationScope DisplayName="CancellationScope Agency A">
+        <p:CancellationScope.CancellationHandler>
+          <p:TryCatch>
+            <p:TryCatch.Try>
+              <p:WriteLine>["User: Agency A, cancel my order."]</p:WriteLine>
+            </p:TryCatch.Try>
+            <p:TryCatch.Catches>
+              <p:Catch x:TypeArguments="s:Exception">
+                <p:ActivityAction x:TypeArguments="s:Exception">
+                  <p:WriteLine>["There should be not throwing after cancel"]</p:WriteLine>
+                </p:ActivityAction>
+              </p:Catch>
+            </p:TryCatch.Catches>
+          </p:TryCatch>
+        </p:CancellationScope.CancellationHandler>
+        <p:Sequence>
+          <p:Delay>[agencyADuration]</p:Delay>
+          <p:WriteLine>["Agency A: Your ticket has been bought!!!"]</p:WriteLine>
+        </p:Sequence>
+      </p:CancellationScope>
+      <p:CancellationScope DisplayName="CancellationScope Agency B">
+        <p:CancellationScope.CancellationHandler>
+          <p:TryCatch>
+            <p:TryCatch.Try>
+              <p:WriteLine>["User: Agency B, cancel my order."]</p:WriteLine>
+            </p:TryCatch.Try>
+            <p:TryCatch.Catches>
+              <p:Catch x:TypeArguments="s:Exception">
+                <p:ActivityAction x:TypeArguments="s:Exception">
+                  <p:WriteLine>["There should be not throwing after cancel"]</p:WriteLine>
+                </p:ActivityAction>
+              </p:Catch>
+            </p:TryCatch.Catches>
+          </p:TryCatch>
+        </p:CancellationScope.CancellationHandler>
+        <p:Sequence>
+          <p:Delay>[agencyBDuration]</p:Delay>
+          <p:WriteLine>["Agency B: Your ticket has been bought!!!"]</p:WriteLine>
+        </p:Sequence>
+      </p:CancellationScope>
+    </p:Parallel>
+  </p:Sequence>
+</p:Activity>

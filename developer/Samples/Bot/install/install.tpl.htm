@@ -1,0 +1,292 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Program O Installation</title>
+    <link rel="stylesheet" href="[admin_url]style.css" type="text/css" />
+  </head>
+  <body>
+    <div id="logo">&nbsp;</div>
+    <div id="title">
+      <div id="titlespan">
+        Program O Installation
+        <div class="ul"></div>
+        <div class="ll"></div>
+        <div class="ur"></div>
+        <div class="lr"></div>
+      </div>
+    </div>[cr6]
+ <!-- Section Header End -->
+<!-- Section Container Start -->
+      <div id="container">
+        [mainPanel]
+        <div id="leftWarning" class="floatLeft bold red"></div>
+        <div id="rightWarning" class="floatRight bold red"></div>
+      </div>[cr4]
+<!-- Section Container End -->
+<!-- Section Footer Start -->
+    <div class="spacer">&nbsp;</div>
+<!-- Section Footer End -->
+<!-- Section jQuery1 Start -->
+    <script type="text/javascript" src="../scripts/tzDetect.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+    <script type="text/javascript" src="../scripts/jquery.selectboxes.min.js"></script>
+    <script type="text/javascript" src="../scripts/jquery.validate.js"></script>
+    <script type="text/javascript">
+      var rowHeight = 16.5;
+      var url = 'about:blank';
+      var helpWindow = null; // global variable
+      $(function() {
+        //var sWidth = $(window).width();
+        buildSelect('time_zone_locale');
+        $('#save_stateSession').attr('checked', true);
+        $('#adm_dbp_confirm').blur(function() {
+          if (!validatePass()) {
+            alert('passwords don\'t match, or both are empty!');
+          }
+        });
+        $('#action').click(function() {
+          return confirm("You are about to over-write the configuration file.\nIncorrect or incomplete data will cause errors.\nAre you sure you wish to continue?");
+        });
+        $('#helpLink1').click(function(e) {
+          e.preventDefault();
+          var url = 'help.php';
+          helpPopups(url);
+        });
+        $('span.helpButton').attr('title','Click here to get help for the current item.');
+        $('span.helpButton').click(function() {
+          var tmpHash = $(this).attr('id');
+          var hash = tmpHash.replace('hb_','');
+          url = 'help.php#' + hash;
+          helpPopups(url);
+        });
+      });
+      function buildSelect(id) {
+        var timezone = determine_timezone().timezone;
+        var thisLocale = timezone.olson_tz;
+        var label = '#' + id;
+        for(var tz in olson.timezones) {
+          var tmpTZ = olson.timezones[tz];
+          var val = tmpTZ.olson_tz;
+          $(label).addOption(val, val);
+        }
+        $(label).selectOptions(thisLocale);
+      }
+      function helpPopups (url) {
+        var options = 'left=150,top=100,width=800,height=600,scrollbars=1';
+        if (null === helpWindow || helpWindow.closed) {
+          helpWindow = window.open(url,'helpWindow',options,true);
+          setTimeout(function(){helpWindow.highlight()},500);
+        }
+        else if (null === helpWindow.location) {
+          helpWindow.close();
+          helpWindow = null;
+          helpPopups (url);
+        }
+        else {
+          helpWindow.location.replace(url);
+          helpWindow.focus();
+          helpWindow.highlight();
+        }
+      }
+      function validatePass() {
+        var pw1 = $('#adm_dbp').val();
+        var pw2 = $('#adm_dbp_confirm').val();
+        return (('' !== pw1) && (pw1 === pw2));
+      }
+    </script>
+<!-- Section jQuery1 End -->
+<!-- Section InstallForm Start -->
+  [errorMessage]
+  <form name="installForm" id="installForm" action="[PHP_SELF]" method="post">
+    <a href="#" id="helpLink1" title="Get help for this page" name="helpLink1">Help!</a><br />
+    <table width="100%" cellpadding="2" cellspacing="0">
+      <tr>
+        <td width="50%">
+          <table width="100%" cellpadding="2" cellspacing="0">
+            <tr>
+              <td colspan="2" class="bold center underline" >Botmaster Info:</td>
+            </tr>
+            <tr>
+              <td class="label" width="60%"><label for="botmaster_name"><span class="helpButton" id="hb_botmaster_name"></span>Your Name</label></td>
+              <td class="formw" width="40%"><input name="botmaster_name" id="botmaster_name" value="" /></td>
+            </tr>
+            <tr>
+              <td class="label"><label for="debugemail"><span class="helpButton" id="hb_debugemail"> </span>Email Address</label></td>
+              <td class="formw"><input name="debugemail" id="debugemail" value="" /></td>
+            </tr>
+            <tr>
+              <td class="bold center underline" colspan="2">Bot Configuration:</td>
+            </tr>
+            <tr>
+              <td class="label"><label for="bot_name"><span class="helpButton" id="hb_bot_name"> </span>Bot Name</label></td>
+              <td class="formw"><input name="bot_name" id="bot_name" value="" /></td>
+            </tr>
+            <tr>
+              <td class="label"><label for="bot_desc"><span class="helpButton" id="hb_bot_desc"> </span>Bot Description</label></td>
+              <td class="formw"><input name="bot_desc" id="bot_desc" value="" /></td>
+            </tr>
+            <tr>
+              <td class="label"><label for="bot_active"><span class="helpButton" id="hb_bot_active"> </span>Bot Active?</label></td>
+              <td class="formw"><input type="checkbox" name="bot_active" id="bot_active" value="1" checked="checked" /></td>
+            </tr>
+            <tr>
+              <td class="label"><label for="format"><span class="helpButton" id="hb_format"> </span>Response Format</label></td>
+              <td class="formw">
+                <select name="format" id="format" size="1">
+                  <option value="json" selected="selected">JSON</option>
+                  <option value="html">HTML</option>
+                  <option value="xml">XML</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td class="label"><label for="error_response"><span class="helpButton" id="hb_error_response"> </span>Error Response String</label></td>
+              <td class="formw"><input type="text" name="error_response" id="error_response" value="[error_response]" /></td>
+            </tr>
+            <tr>
+              <td colspan="2" id="notes">[notes]</td>
+            </tr>
+            <tr>
+              <td colspan="2" class="center">
+                <input name="page" value="2" type="hidden">
+                <input name="bot_id" value="1" type="hidden">
+                <input name="error_response" value="[error_response]" type="hidden">
+                <input name="action" id="action" type="submit" value="Save">
+              </td>
+            </tr>
+          </table>
+        </td>
+        <td>
+          <table width="100%" cellpadding="2" cellspacing="0">
+            <tr>
+              <td class="bold center underline" colspan="2">Database Configuration:</td>
+            </tr>
+            <tr>
+              <td width="60%" class="label"><label for="dbh"><span class="helpButton" id="hb_dbh"> </span>DB Host Name</label></td>
+              <td width="40%" class="formw"><input name="dbh" id="dbh" value="" /></td>
+            </tr>
+            <tr>
+              <td class="label"><label for="dbn"><span class="helpButton" id="hb_dbn"> </span>DB Name</label></td>
+              <td class="formw"><input name="dbn" id="dbn" value="" /></td>
+            </tr>
+            <tr>
+              <td class="label"><label for="dbPort"><span class="helpButton" id="hb_dbPort"> </span>DB Port</label></td>
+              <td class="formw"><input name="dbPort" id="dbPort" value="3306" /></td>
+            </tr>
+            <tr>
+              <td class="label"><label for="dbu"><span class="helpButton" id="hb_dbu"> </span>DB Username</label></td>
+              <td class="formw"><input name="dbu" id="dbu" value="" /></td>
+            </tr>
+            <tr>
+              <td class="label"><label for="dbp"><span class="helpButton" id="hb_dbp"> </span>DB Password</label></td>
+              <td class="formw"><input name="dbp" id="dbp" value="" /></td>
+            </tr>
+            <tr>
+              <td class="label"><label for="time_zone_locale"><span class="helpButton" id="hb_timezone"> </span>DB Timezone</label></td>
+              <td class="formw">
+                <select name="time_zone_locale" id="time_zone_locale">
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td class="label"><label for="adm_dbu"><span class="helpButton" id="hb_adm_dbu"> </span>Admin Area Username</label></td>
+              <td class="formw"><input name="adm_dbu" id="adm_dbu" value="" /></td>
+            </tr>
+            <tr>
+              <td class="label"><label for="adm_dbp"><!--suppress XmlDuplicatedId -->
+                  <span class="helpButton" id="hb_adm_dbp"> </span>Admin Area Password</label></td>
+              <td class="formw"><input name="adm_dbp" id="adm_dbp" type="password" /></td>
+            </tr>
+            <tr>
+              <td class="label"><label for="adm_dbp_confirm"><!--suppress XmlDuplicatedId -->
+                  <span class="helpButton" id="hb_adm_dbp"> </span>Confirm Admin Area Password</label></td>
+              <td class="formw"><input name="adm_dbp_confirm" id="adm_dbp_confirm" type="password" /></td>
+            </tr>
+            <!-- tr>
+              <td class="bold center underline" colspan="2">Debugging Options:</td>
+            </tr -->
+            <tr>
+              <td class="label"><label for="debug_level"><span class="helpButton" id="hb_debug_level"> </span>Debug Level</label></td>
+              <td class="formw">
+                  <select name="debug_level" id="debug_level" size="1">
+                    <option value="0">Show no debugging</option>
+                    <option value="1">errors only</option>
+                    <option value="2" selected="selected">general + errors</option>
+                    <option value="3">general + errors + sql</option>
+                    <option value="4" selected="selected">show everything</option>
+                  </select>
+              </td>
+            </tr>
+            <tr>
+              <td class="label"><label for="debug_mode"><span class="helpButton" id="hb_debug_mode"> </span>Debug Mode</label></td>
+              <td class="formw">
+                <select name="debug_mode" id="debug_mode" size="1">
+                  <option value="0">Show in Source</option>
+                  <option value="1" selected="selected">File (default)</option>
+                  <option value="2">Display</option>
+                  <option value="3">Email</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td class="label"><label for="save_state"><span class="helpButton" id="hb_save_state"> </span>Save State</label></td>
+              <td class="formw">
+                <select name="save_state" id="save_state" size="1">
+                  <option value="session" selected="selected">Session</option>
+                  <option value="database">Database</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    </form>
+<!-- Section InstallForm End -->
+<!-- Section InstallComplete Start -->
+           <div class="row bold fullSize center shadowBorderOutset">Installation Complete!</div>
+           [notes]
+<!-- Section InstallComplete End -->
+<!-- Section InstallError Start -->
+           <div class="row bold fullSize center shadowBorderOutset">Installation Failed!</div>
+           [errorMessage]
+<!-- Section InstallError End -->
+<!-- Section DBCreationError Start -->
+            <div class="row">
+              <span class="red bold">WARNING! </span>
+              <span>
+                Could not create the database. Please check your database settings and make any
+                necessary corrections. Some database hosts do not allow users to directly create
+                new databases. You may need to contact your hosting provider to learn how to set
+                up a new database. If you have questions about this, or anytyhing else regarding
+                Program O, please visit us at <a href="http://www.program-o.com">www.program-o.com</a>
+              </span>
+            </div>
+<!-- Section DBCreationError End -->
+<!-- Section Page 1 Notes Start -->
+            <p>
+              Please note that all fields are required, but some are already filled out with generic, default
+              values.
+            </p>
+            <p>
+              For more detailed information with this page, please see the <a href="help.php" target="_blank">Help Page</a>, or
+              click the help icon <img src="[admin_url]images/help_small.png" width="16" height="16" alt="" /> for an individual field.
+            </p>
+            &nbsp;
+<!-- Section Page 1 Notes End -->
+<!-- Section Page 2 Notes Start -->
+            <div class="row">
+              The configuration for both the bot and the database are complete,
+              but you now need to upload your bot's AIML categories.</div>
+              <div class="row red bold">Your bot will <strong><u>not work</u></strong> until you have completed these instructions outlined here: <a href="https://github.com/Program-O/Program-O/wiki/Installation-Guide#administer-the-chatbot">administer the chatbot</a>.</div>
+              <div class="row">Once you are confident you are ready to proceed please log into the <a href="[admin_url]">Admin Page</a> to upload your aiml files and create your bot.</div>
+            <div class="row"><!-- spacer div --></div>
+            <div class="row">
+              <div class="red bold">NOTE: </div>If you wish to use a different account
+              for your Program O Admin user, then you will need to edit the configuration
+              file manually.<br/>If you have any questions about this, or anything else Program O, please visit us at <a href="http://www.program-o.com" target="blank">www.program-o.com</a>.
+            </div>
+<!-- Section Page 2 Notes End -->
+  </body>
+</html>

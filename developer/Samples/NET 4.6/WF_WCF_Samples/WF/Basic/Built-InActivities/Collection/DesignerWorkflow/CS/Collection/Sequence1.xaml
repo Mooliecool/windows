@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) Microsoft Corporation.  All rights reserved. -->
+<Activity x:Class="Microsoft.Samples.Collection.Sequence1"
+          mva:VisualBasic.Settings="Assembly references and imported namespaces serialized as XML namespaces"
+          xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities"
+          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+          xmlns:msc="clr-namespace:Microsoft.Samples.Collection;assembly=Collection"
+          xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities"
+          xmlns:s="clr-namespace:System;assembly=mscorlib"
+          xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=mscorlib"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Sequence>
+    <Sequence.Variables>
+      <Variable x:TypeArguments="sco:Collection(x:Int32)" Default="[New System.Collections.ObjectModel.Collection(Of Integer) From {1, 2, 3, 4}]" Name="Numbers" />
+      <Variable x:TypeArguments="s:Random" Default="[New Random()]" Name="random" />
+      <Variable x:TypeArguments="x:Boolean" Name="exists" />
+    </Sequence.Variables>
+    <WriteLine DisplayName="Write info message" Text="[&quot;Initial collection:&quot;]" />
+    <msc:PrintCollection x:TypeArguments="x:Int32" Collection="[Numbers]" DisplayName="Print initial collection"  />
+    <WriteLine DisplayName="Write separator 1" Text="[&quot;-----------------&quot;]" />
+    <WriteLine DisplayName="Write message clear" Text="[&quot;Clearing the collection&quot;]" />
+    <ClearCollection x:TypeArguments="x:Int32" Collection="[Numbers]" DisplayName="Clear collection"  />
+    <msc:PrintCollection x:TypeArguments="x:Int32" Collection="[Numbers]" DisplayName="Print collection after clear"  />
+    <WriteLine DisplayName="Write separator 2"  Text="[&quot;-----------------&quot;]" />
+    <AddToCollection x:TypeArguments="x:Int32" Collection="[Numbers]" DisplayName="Add a num to collection 1"  Item="[random.Next(1, 10)]" />
+    <AddToCollection x:TypeArguments="x:Int32" Collection="[Numbers]" DisplayName="Add a num to collection 2"  Item="[random.Next(1, 10)]" />
+    <AddToCollection x:TypeArguments="x:Int32" Collection="[Numbers]" DisplayName="Add a num to collection 3"  Item="[random.Next(1, 10)]" />
+    <WriteLine DisplayName="Write message add" Text="[&quot;Collection with three random numbers:&quot;]" />
+    <msc:PrintCollection x:TypeArguments="x:Int32" Collection="[Numbers]" DisplayName="Print collection after add"  />
+    <WriteLine DisplayName="Write separator 3" Text="[&quot;-----------------&quot;]" />
+    <ExistsInCollection x:TypeArguments="x:Int32" Collection="[Numbers]" DisplayName="Check whether 5 exists" Item="5" Result="[exists]" />
+    <If Condition="[exists]" >
+      <If.Then>
+        <RemoveFromCollection x:TypeArguments="x:Int32" Collection="[Numbers]" DisplayName="Remove 5 from collection" Item="5" />
+      </If.Then>
+    </If>
+    <WriteLine DisplayName="Write message after remove"  Text="[&quot;Collection without a 5:&quot;]" />
+    <msc:PrintCollection x:TypeArguments="x:Int32" Collection="[Numbers]" DisplayName="Final printout of collection"  />
+  </Sequence>
+</Activity>

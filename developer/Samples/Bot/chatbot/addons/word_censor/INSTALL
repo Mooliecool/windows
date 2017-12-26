@@ -1,0 +1,58 @@
+/***************************************
+* www.program-o.com
+* PROGRAM O 
+* Version: 2.5.3
+* FILE: word_censor/INSTALL
+* AUTHOR: ELIZABETH PERREAU
+* DATE: MAY 17TH 2014
+* DETAILS: word censor INSTALL instructions
+***************************************/
+
+
+
+STEP 1:
+----------------------------------------------------------------------------------------------
+- run the following sql on your bot database*
+----------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `wordcensor` (
+  `censor_id` int(11) NOT NULL auto_increment,
+  `word_to_censor` varchar(50) NOT NULL,
+  `replace_with` varchar(50) NOT NULL default '****',
+  `bot_exclude` varchar(255) NOT NULL,
+  PRIMARY KEY  (`censor_id`)
+);
+
+INSERT INTO `wordcensor` (`censor_id`, `word_to_censor`, `replace_with`, `bot_exclude`) VALUES
+(1, 'shit', 's***', ''),
+(2, 'crap', 'c***', '');
+
+
+* OPTIONAL:
+Locate the file wordcensor.sql in the word_censor directory and import the data into your bot database.
+This will handle both steps, listed above.
+
+STEP 2:
+----------------------------------------------------------------------------------------------
+- put the word_censor folder in the bot chatbot/addons/ folder
+
+
+STEP 3:
+----------------------------------------------------------------------------------------------
+- add the following lines to load_addons.php
+
+//load the word censor functions
+include("word_censor/word_censor.php");
+
+
+STEP 4:
+----------------------------------------------------------------------------------------------
+- add the following line to the function run_post_response_useraddon() (in load_addons.php)
+
+//run the word censor before outputting
+run_censor($convoArr);
+
+
+
+
+
+

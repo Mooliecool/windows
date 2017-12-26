@@ -1,0 +1,1 @@
+Placeholder for content that will be generated when the solution is built for the first time

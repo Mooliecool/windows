@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) Microsoft Corporation.  All rights reserved. -->
+<p:Activity x:Class="Microsoft.Samples.NestedTransactionScopeSample.ScenarioTwo"
+          xmlns:p="http://schemas.microsoft.com/netfx/2009/xaml/activities"
+          xmlns:p1="http://schemas.microsoft.com/netfx/2008/xaml/schema"
+          xmlns:s="clr-namespace:System;assembly=mscorlib"
+          xmlns:sad="clr-namespace:System.Activities.Debugger;assembly=System.Activities"
+          xmlns:sadx="clr-namespace:System.Activities.Presentation.Xaml;assembly=System.Activities.Presentation"
+          xmlns:rules="clr-namespace:System.Activities.Core.Rules;assembly=System.Activities.Core"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+          xmlns:ntsa="clr-namespace:Microsoft.Samples.NestedTransactionScopeSample;assembly=NestedTransactionScope">
+    <p:Sequence>    
+        <p:WriteLine>["    Begin workflow"]</p:WriteLine>
+        <p:TransactionScope>
+          <p:Sequence>
+            <p:WriteLine>["    Begin TransactionScope"]</p:WriteLine>
+            <ntsa:PrintTransactionId/>
+            <p:TransactionScope>
+              <p:Sequence>
+                <p:Delay>
+                  00:00:05
+                </p:Delay>
+                <p:TransactionScope>
+                  <p:TransactionScope.Timeout>00:00:02</p:TransactionScope.Timeout>
+              </p:TransactionScope>
+              </p:Sequence>
+            </p:TransactionScope>
+            <p:WriteLine>["    End TransactionScope"]</p:WriteLine>
+            <p:TransactionScope>
+              <p:TransactionScope.Timeout>00:00:10</p:TransactionScope.Timeout>
+            </p:TransactionScope>
+          </p:Sequence>
+        </p:TransactionScope>
+        <p:WriteLine>["    End workflow"]</p:WriteLine>
+    </p:Sequence>
+  </p:Activity>

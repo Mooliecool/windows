@@ -1,0 +1,28 @@
+﻿<!-- Copyright (c) Microsoft Corporation.  All rights reserved. -->
+<Activity x:Class="Microsoft.Samples.Activities.PowerShell.Filesystem.TestPath"
+          xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities"
+          xmlns:msap="clr-namespace:Microsoft.Samples.Activities.PowerShell;assembly=Microsoft.Samples.Activities.PowerShell"
+          xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=mscorlib"
+          xmlns:sma="clr-namespace:System.Management.Automation;assembly=System.Management.Automation"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="Path" Type="InArgument(x:String)" />
+    <x:Property Name="Exists" Type="OutArgument(x:Boolean)" />
+  </x:Members>
+  <Sequence>
+    <Sequence.Variables>
+      <Variable x:TypeArguments="sco:Collection(x:Boolean)" Name="psoutput" />
+    </Sequence.Variables>
+    <msap:InvokePowerShell x:TypeArguments="x:Boolean" CommandText="test-path" Output="[psoutput]">
+      <InArgument x:TypeArguments="x:String" x:Key="Path">[Path]</InArgument>
+    </msap:InvokePowerShell>
+    <Assign>
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Boolean">[Exists]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Boolean">[psoutput(0)]</InArgument>
+      </Assign.Value>
+    </Assign>
+  </Sequence>
+</Activity>

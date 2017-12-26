@@ -1,0 +1,45 @@
+﻿<p:Activity mc:Ignorable="" x:Class="Microsoft.Samples.Compensation.ConfirmationSample.VariableAccessVignette" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities/design" xmlns:__VariableAccessVignette="clr-namespace:Microsoft.Sample.Compensation.ConfirmationSample;" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:p="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:sad="clr-namespace:System.Activities.Debugger;assembly=System.Activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <p:Sequence>
+    <p:Sequence.Variables>
+      <p:Variable x:TypeArguments="x:Int32" Name="mySum" />
+      </p:Sequence.Variables>
+      <p:WriteLine>Start of workflow</p:WriteLine>
+      <p:CompensableActivity>
+        <p:CompensableActivity.CompensationHandler>
+          <p:WriteLine>CompensableActivity1: Compensation Handler</p:WriteLine>
+        </p:CompensableActivity.CompensationHandler>
+        <p:CompensableActivity.ConfirmationHandler>
+          <p:Sequence>
+            <p:WriteLine>CompensableActivity1: Confirmation Handler</p:WriteLine>
+            <p:WriteLine>["CompensableActivity2: The sum is: " + mySum.toString()]</p:WriteLine>
+            <p:Subtract x:TypeArguments="x:Int32, x:Int32, x:Int32" Left="[mySum]" Result="[mySum]" Right="12" />
+            <p:WriteLine>["CompensableActivity2: After subtracting 12 the sum is now: " + mySum.toString()]</p:WriteLine>
+          </p:Sequence>
+        </p:CompensableActivity.ConfirmationHandler>
+        <p:Sequence>
+          <p:WriteLine>CompensableActivity1: Body</p:WriteLine>
+          <p:Add x:TypeArguments="x:Int32, x:Int32, x:Int32" Left="5" Result="[mySum]" Right="10" />
+          <p:WriteLine>["CompensableActivity1: The sum is: " + mySum.toString()]</p:WriteLine>
+        </p:Sequence>      
+    </p:CompensableActivity>
+    <p:CompensableActivity>
+        <p:CompensableActivity.CompensationHandler>
+          <p:WriteLine>CompensableActivity2: Compensation Handler</p:WriteLine>
+        </p:CompensableActivity.CompensationHandler>
+        <p:CompensableActivity.ConfirmationHandler>
+          <p:WriteLine>CompensableActivity2: Confirmation Handler</p:WriteLine>
+        </p:CompensableActivity.ConfirmationHandler>
+        <p:Sequence>
+          <p:WriteLine>CompensableActivity2: Body</p:WriteLine>
+          <p:WriteLine>CompensableActivity2: Adding 7 to the sum</p:WriteLine>
+          <p:Add x:TypeArguments="x:Int32, x:Int32, x:Int32" Left="[mySum]" Result="[mySum]" Right="7" />
+          <p:WriteLine>["CompensableActivity2: The sum is now: " + mySum.toString()]</p:WriteLine>        
+      </p:Sequence>
+      </p:CompensableActivity>
+    <p:WriteLine>End of workflow</p:WriteLine>  
+  
+  
+  
+  
+  </p:Sequence>
+</p:Activity>

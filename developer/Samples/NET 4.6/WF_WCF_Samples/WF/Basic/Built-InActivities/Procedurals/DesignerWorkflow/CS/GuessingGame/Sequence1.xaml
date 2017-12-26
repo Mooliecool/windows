@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) Microsoft Corporation. All rights reserved. -->
+<Activity mc:Ignorable="sad" x:Class="Microsoft.Samples.GuessingGame.GuessingGameWF" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:msg="clr-namespace:Microsoft.Samples.GuessingGame;assembly=GuessingGame" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:sad="http://schemas.microsoft.com/netfx/2009/xaml/activities/design" xmlns:sad1="clr-namespace:System.Activities.Debugger;assembly=System.Activities" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Sequence DisplayName="Guessing Game">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:Int32" Name="numberToGuess" />
+      <Variable x:TypeArguments="x:Int32" Name="numberFromUser" />
+      <Variable x:TypeArguments="x:Int32" Default="[0]" Name="attempts" />
+      <Variable x:TypeArguments="x:Boolean" Default="[false]" Name="finished" />
+    </Sequence.Variables>
+    <Assign DisplayName="Calculate the number to guess">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Int32">[numberToGuess]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Int32">[New System.Random().Next(1, 100)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <While DisplayName="While number not guessed..." Condition="[not finished]">
+      <Sequence>
+        <Assign DisplayName="Increment attempts">
+          <Assign.To>
+            <OutArgument x:TypeArguments="x:Int32">[attempts]</OutArgument>
+          </Assign.To>
+          <Assign.Value>
+            <InArgument x:TypeArguments="x:Int32">[attempts + 1]</InArgument>
+          </Assign.Value>
+        </Assign>
+        <TryCatch DisplayName="Get the number and verify it">
+          <TryCatch.Try>
+            <Sequence>
+              <msg:PromptInt DisplayName="Ask the number " Result="[numberFromUser]" Text="[&quot;What is your guess?&quot;]" />
+              <Switch x:TypeArguments="x:Int32" DisplayName="Verify if the player guessed " Expression="[numberFromUser.CompareTo(numberToGuess)]">
+                <WriteLine x:Key="1" DisplayName="The number is too high">[" Try a lower number number..."]</WriteLine>
+                <WriteLine x:Key="-1" DisplayName="The number is too low">[" Try a higher number"]</WriteLine>
+                <Assign x:Key="0" DisplayName="The player guessed!">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:Boolean">[finished]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:Boolean">[true]</InArgument>
+                  </Assign.Value>
+                </Assign>
+              </Switch>
+            </Sequence>
+          </TryCatch.Try>
+          <TryCatch.Catches>
+            <Catch x:TypeArguments="s:FormatException">
+              <ActivityAction x:TypeArguments="s:FormatException">
+                <ActivityAction.Argument>
+                  <DelegateInArgument x:TypeArguments="s:FormatException" Name="formatException" />
+                </ActivityAction.Argument>
+                <WriteLine DisplayName="Show error on format exception">["Hey! You must enter a integer number between 1 and 100."]</WriteLine>
+              </ActivityAction>
+            </Catch>
+            <Catch x:TypeArguments="s:OverflowException">
+              <ActivityAction x:TypeArguments="s:OverflowException">
+                <ActivityAction.Argument>
+                  <DelegateInArgument x:TypeArguments="s:OverflowException" Name="overflowException" />
+                </ActivityAction.Argument>
+                <WriteLine DisplayName="Show error on overflow exception">["Hey! The number that you entered is too big...You must enter a integer number between 1 and 100."]</WriteLine>
+              </ActivityAction>
+            </Catch>
+          </TryCatch.Catches>
+        </TryCatch>
+      </Sequence>
+    </While>
+    <If Condition="[attempts &lt; 7]">
+      <If.Then>
+        <WriteLine>["Congratulations, you've found it in " &amp; attempts &amp; " attempts!!!"]</WriteLine>
+      </If.Then>
+      <If.Else>
+        <WriteLine>["You've found it in " &amp; attempts &amp; " attempts...You need more practice!"]</WriteLine>
+      </If.Else>
+    </If>
+  </Sequence>
+</Activity>

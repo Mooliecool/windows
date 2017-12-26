@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) Microsoft Corporation.  All rights reserved. -->
+<WorkflowService xmlns="http://schemas.microsoft.com/netfx/2009/xaml/servicemodel"  xmlns:p1="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:sad="clr-namespace:System.Activities.Debugger;assembly=System.Activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <WorkflowService.Endpoints>
+    <Endpoint ServiceContractName="IWorkFlowEchoService" AddressUri="">
+      <Endpoint.Binding>
+        <BasicHttpBinding />
+      </Endpoint.Binding>
+    </Endpoint>
+  </WorkflowService.Endpoints>
+    <p1:Sequence DisplayName="WorkFlowEchoService" sad:XamlDebuggerXmlReader.FileName="Service.xamlx">
+      <p1:Sequence.Variables>
+        <p1:Variable x:TypeArguments="x:String" Name="message" />
+        <p1:Variable x:TypeArguments="CorrelationHandle" Name="requestResponse" />
+      </p1:Sequence.Variables>
+      <Receive x:Name="__ReferenceID0" CanCreateInstance="True" DisplayName="ReceiveEchoInput" OperationName="EchoInput" ServiceContractName="IWorkFlowEchoService" CorrelatesWith="[requestResponse]">
+        <ReceiveMessageContent>
+          <p1:OutArgument x:TypeArguments="x:String" x:Key="inMessage">[message]</p1:OutArgument>
+        </ReceiveMessageContent>
+      </Receive>
+      
+      <SendReply Request="{x:Reference Name=__ReferenceID0}">
+        <SendMessageContent>
+          <p1:InArgument x:TypeArguments="x:String" x:Key="outMessage">[message]</p1:InArgument>
+        </SendMessageContent>
+      </SendReply>
+    </p1:Sequence>
+</WorkflowService>

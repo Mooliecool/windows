@@ -1,0 +1,47 @@
+﻿<Activity mc:Ignorable="sap" x:Class="Microsoft.Samples.DurableDuplex.DurableDuplexClient" mva:VisualBasic.Settings="Assembly references and imported namespaces serialized as XML namespaces" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:mv="clr-namespace:Microsoft.VisualBasic;assembly=System" xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities" xmlns:p="clr-namespace:Microsoft.Samples.DurableDuplex.Service1.Activities;" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:s1="clr-namespace:System;assembly=System" xmlns:s2="clr-namespace:System;assembly=System.Xml" xmlns:s3="clr-namespace:System;assembly=System.Core" xmlns:sad="clr-namespace:System.Activities.Debugger;assembly=System.Activities" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sc="clr-namespace:System.Configuration;assembly=System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" xmlns:sc1="clr-namespace:System.Configuration;assembly=System.Configuration, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System" xmlns:scg1="clr-namespace:System.Collections.Generic;assembly=System.ServiceModel" xmlns:scg2="clr-namespace:System.Collections.Generic;assembly=System.Core" xmlns:scg3="clr-namespace:System.Collections.Generic;assembly=mscorlib" xmlns:sd="clr-namespace:System.Data;assembly=System.Data" xmlns:sd1="clr-namespace:System.Data;assembly=System.Data.DataSetExtensions" xmlns:sl="clr-namespace:System.Linq;assembly=System.Core" xmlns:sm="clr-namespace:System.Messaging;assembly=System.Messaging, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" xmlns:sm1="clr-namespace:System.Messaging;assembly=System.Messaging" xmlns:st="clr-namespace:System.Text;assembly=mscorlib" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Sequence sap:VirtualizedContainerService.HintSize="486.4,1216">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:String" Name="service1QueueName" />
+      <Variable x:TypeArguments="x:String" Name="service2QueueName" />
+    </Sequence.Variables>
+    <sap:WorkflowViewStateService.ViewState>
+      <scg3:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+      </scg3:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+    <WriteLine sap:VirtualizedContainerService.HintSize="464,62.4" Text="Initializing queues . . . " />
+    <Assign sap:VirtualizedContainerService.HintSize="464,59.2">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[service1QueueName]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[ConfigurationManager.AppSettings("service1QueueName")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign sap:VirtualizedContainerService.HintSize="464,59.2">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[service2QueueName]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[ConfigurationManager.AppSettings("service2QueueName")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <If Condition="[Not MessageQueue.Exists(service1QueueName)]" sap:VirtualizedContainerService.HintSize="464,241.6">
+      <If.Then>
+        <InvokeMethod sap:VirtualizedContainerService.HintSize="276.8,132.8" MethodName="Create" TargetType="sm1:MessageQueue">
+          <InArgument x:TypeArguments="x:String">[service1QueueName]</InArgument>
+        </InvokeMethod>
+      </If.Then>
+    </If>
+    <If Condition="[Not MessageQueue.Exists(service2QueueName)]" sap:VirtualizedContainerService.HintSize="464,241.6">
+      <If.Then>
+        <InvokeMethod sap:VirtualizedContainerService.HintSize="276.8,132.8" MethodName="Create" TargetType="sm1:MessageQueue">
+          <InArgument x:TypeArguments="x:String">[service2QueueName]</InArgument>
+        </InvokeMethod>
+      </If.Then>
+    </If>
+    <WriteLine sap:VirtualizedContainerService.HintSize="464,62.4" Text="Activating Service1 . . . " />
+    <p:Start sap:VirtualizedContainerService.HintSize="464,22.4" />
+    <WriteLine sap:VirtualizedContainerService.HintSize="464,62.4" Text="Done - see C:\Inbox\result.xml" />
+  </Sequence>
+</Activity>

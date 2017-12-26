@@ -1,0 +1,57 @@
+﻿<Activity
+  mc:Ignorable="sap"
+  x:Class="Microsoft.Samples.PowerShell.DesignerClient.Sequence1"
+  xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities"
+  xmlns:mvc="clr-namespace:Microsoft.VisualBasic.CompilerServices;assembly=Microsoft.VisualBasic, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
+  xmlns:p="clr-namespace:Microsoft.Samples.Activities.PowerShell.Activities;"
+  xmlns:p1="clr-namespace:Microsoft.Samples.Activities.PowerShell.Process;"
+  xmlns:p2="clr-namespace:Microsoft.Samples.Activities.PowerShell.Filesystem;"
+  xmlns:s="clr-namespace:System;assembly=mscorlib"
+  xmlns:s1="clr-namespace:System;assembly=mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+  xmlns:sad="clr-namespace:System.Activities.Debugger;assembly=System.Activities"
+  xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation"
+  xmlns:sapx="clr-namespace:System.Activities.Presentation.Xaml;assembly=System.Activities.Presentation"
+  xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib"
+  xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=mscorlib"
+  xmlns:sd="clr-namespace:System.Diagnostics;assembly=System"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Sequence>
+    <Sequence.Variables>
+      <Variable x:TypeArguments="sco:Collection(x:Object)" Name="FileContent" />
+      <Variable x:TypeArguments="x:Boolean" Name="PathExists" />
+      <Variable x:TypeArguments="sco:Collection(sd:Process)" Name="SysProcesses" />
+      <Variable x:TypeArguments="x:String" Name="Input" />
+    </Sequence.Variables>
+    <DoWhile Condition="[Input = &quot;&quot;]">
+      <Sequence>
+        <WriteLine DisplayName="Prompt for name" Text="Please enter the name of the process you wish to stop (e.g. notepad)." />
+        <p:ReadLine BookmarkName="[&quot;Input&quot;]" Result="[Input]" />
+      </Sequence>
+    </DoWhile>
+    <WriteLine DisplayName="Write: stopping" Text="[&quot;Stopping &quot; &amp; Input]" />
+    <p1:StopProcess ProcessName="[Input]" />
+    <p1:GetProcesses Processes="[SysProcesses]" />
+    <p:PrintCollection x:TypeArguments="sd:Process" Collection="[SysProcesses]" DisplayName="Print processes" />
+    <WriteLine DisplayName="Write: creating directory" Text="[&quot;Create a directory named Folder.&quot;]" />
+    <p2:MakeDir Name="[&quot;Folder&quot;]" Path="[&quot;.&quot;]" />
+    <WriteLine DisplayName="Write: creating file" Text="[&quot;Create a text file named Sample.txt with some content in it.&quot;]" />
+    <p2:CreateFile Path="[&quot;Sample.txt&quot;]" Value="[&quot;The fox jumps over the lazy dog.&quot;]" />
+    <WriteLine DisplayName="Write: copying file" Text="[&quot;Copy Sample.txt to Sample2.txt.&quot;]" />
+    <p2:Copy Destination="[&quot;Sample2.txt&quot;]" Path="[&quot;Sample.txt&quot;]" />
+    <WriteLine DisplayName="Write: deleting file" Text="[&quot;Delete Sample.txt.&quot;]" />
+    <p2:Delete Recurse="{x:Null}" Path="[&quot;Sample.txt&quot;]" />
+    <WriteLine DisplayName="Write: moving file" Text="[&quot;Move Sample2.txt to Sample.txt.&quot;]" />
+    <p2:Move Destination="[&quot;Sample.txt&quot;]" Path="[&quot;Sample2.txt&quot;]" />
+    <WriteLine DisplayName="Write: reading file" Text="[&quot;The content of Sample.txt is:&quot;]" />
+    <p2:ReadFile Content="[FileContent]" Path="[&quot;Sample.txt&quot;]" />
+    <p:PrintCollection x:TypeArguments="x:Object" Collection="[FileContent]" DisplayName="Print file contents" />
+    <WriteLine DisplayName="Write: test path" Text="[&quot;Does Sample2.txt exist?&quot;]" />
+    <p2:TestPath Exists="[PathExists]" Path="[&quot;Sample2.txt&quot;]" />
+    <WriteLine DisplayName="Write: test path results" Text="[CStr(PathExists)]" />
+    <WriteLine Text="Cleaning up..." />
+    <p2:Delete Recurse="{x:Null}" Path="Sample.txt" />
+    <p2:Delete Recurse="{x:Null}" Path="Folder" />
+  </Sequence>
+</Activity>

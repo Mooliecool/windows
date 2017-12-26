@@ -1,0 +1,186 @@
+﻿<Activity mc:Ignorable="sap" x:Class="Microsoft.Samples.CorrelatedCalculator.CalculatorService.Calculator" mva:VisualBasic.Settings="Assembly references and imported namespaces serialized as XML namespaces" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities" xmlns:p="http://schemas.microsoft.com/netfx/2009/xaml/servicemodel" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:sad="clr-namespace:System.Activities.Debugger;assembly=System.Activities" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sapx="clr-namespace:System.Activities.Presentation.Xaml;assembly=System.Activities.Presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib" xmlns:ssx="clr-namespace:System.ServiceModel.XamlIntegration;assembly=System.ServiceModel" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Sequence DisplayName="CorrelatedCalculator" sap:VirtualizedContainerService.HintSize="2134,715.383333333333">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:Boolean" Default="[True]" Name="Running" />
+    </Sequence.Variables>
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, s:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+    <While sap:VirtualizedContainerService.HintSize="2088,466.106666666667">
+      <While.Variables>
+        <Variable x:TypeArguments="p:CorrelationHandle" Name="calculatorIdHandle" />
+        <Variable x:TypeArguments="x:Double" Name="InputValue" />
+        <Variable x:TypeArguments="x:Double" Default="[0.0]" Name="CurrentValue" />
+      </While.Variables>
+      <While.Condition>[Running]</While.Condition>
+      <Pick sap:VirtualizedContainerService.HintSize="2060,352.553333333333">
+        <PickBranch sap:VirtualizedContainerService.HintSize="289,294.553333333333">
+          <PickBranch.Trigger>
+            <p:Receive CanCreateInstance="True" CorrelatesWith="[calculatorIdHandle]" DisplayName="ReceiveAdd" sap:VirtualizedContainerService.HintSize="257,100" OperationName="Add" ServiceContractName="ICalculator">
+              <p:Receive.CorrelatesOn>
+                <p:MessageQuerySet>
+                  <p:XPathMessageQuery x:Key="CalcId">
+                    <p:XPathMessageQuery.Namespaces>
+                      <ssx:XPathMessageContextMarkup>
+                        <x:String x:Key="xgSc">http://tempuri.org/</x:String>
+                      </ssx:XPathMessageContextMarkup>
+                    </p:XPathMessageQuery.Namespaces>sm:body()/xgSc:Add/xgSc:CalculatorId</p:XPathMessageQuery>
+                </p:MessageQuerySet>
+              </p:Receive.CorrelatesOn>
+              <p:ReceiveParametersContent>
+                <OutArgument x:TypeArguments="x:Double" x:Key="Value">[InputValue]</OutArgument>
+                <OutArgument x:TypeArguments="x:String" x:Key="CalculatorId" />
+              </p:ReceiveParametersContent>
+            </p:Receive>
+          </PickBranch.Trigger>
+          <Assign sap:VirtualizedContainerService.HintSize="257,100">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:Double">[CurrentValue]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:Double">[CurrentValue + InputValue]</InArgument>
+            </Assign.Value>
+          </Assign>
+        </PickBranch>
+        <PickBranch sap:VirtualizedContainerService.HintSize="289,294.553333333333">
+          <PickBranch.Trigger>
+            <p:Receive CanCreateInstance="True" CorrelatesWith="[calculatorIdHandle]" DisplayName="ReceiveSubtract" sap:VirtualizedContainerService.HintSize="257,100" OperationName="Subtract" ServiceContractName="ICalculator">
+              <p:Receive.CorrelatesOn>
+                <p:MessageQuerySet>
+                  <p:XPathMessageQuery x:Key="CalcId">
+                    <p:XPathMessageQuery.Namespaces>
+                      <ssx:XPathMessageContextMarkup>
+                        <x:String x:Key="xgSc">http://tempuri.org/</x:String>
+                      </ssx:XPathMessageContextMarkup>
+                    </p:XPathMessageQuery.Namespaces>sm:body()/xgSc:Subtract/xgSc:CalculatorId</p:XPathMessageQuery>
+                </p:MessageQuerySet>
+              </p:Receive.CorrelatesOn>
+              <p:ReceiveParametersContent>
+                <OutArgument x:TypeArguments="x:Double" x:Key="Value">[InputValue]</OutArgument>
+                <OutArgument x:TypeArguments="x:String" x:Key="CalculatorId" />
+              </p:ReceiveParametersContent>
+            </p:Receive>
+          </PickBranch.Trigger>
+          <Assign sap:VirtualizedContainerService.HintSize="257,100">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:Double">[CurrentValue]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:Double">[CurrentValue - InputValue]</InArgument>
+            </Assign.Value>
+          </Assign>
+        </PickBranch>
+        <PickBranch sap:VirtualizedContainerService.HintSize="289,294.553333333333">
+          <PickBranch.Trigger>
+            <p:Receive CanCreateInstance="True" CorrelatesWith="[calculatorIdHandle]" DisplayName="ReceiveMultiply" sap:VirtualizedContainerService.HintSize="257,100" OperationName="Multiply" ServiceContractName="ICalculator">
+              <p:Receive.CorrelatesOn>
+                <p:MessageQuerySet>
+                  <p:XPathMessageQuery x:Key="CalcId">
+                    <p:XPathMessageQuery.Namespaces>
+                      <ssx:XPathMessageContextMarkup>
+                        <x:String x:Key="xgSc">http://tempuri.org/</x:String>
+                      </ssx:XPathMessageContextMarkup>
+                    </p:XPathMessageQuery.Namespaces>sm:body()/xgSc:Multiply/xgSc:CalculatorId</p:XPathMessageQuery>
+                </p:MessageQuerySet>
+              </p:Receive.CorrelatesOn>
+              <p:ReceiveParametersContent>
+                <OutArgument x:TypeArguments="x:Double" x:Key="Value">[InputValue]</OutArgument>
+                <OutArgument x:TypeArguments="x:String" x:Key="CalculatorId" />
+              </p:ReceiveParametersContent>
+            </p:Receive>
+          </PickBranch.Trigger>
+          <Assign sap:VirtualizedContainerService.HintSize="257,100">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:Double">[CurrentValue]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:Double">[CurrentValue * InputValue]</InArgument>
+            </Assign.Value>
+          </Assign>
+        </PickBranch>
+        <PickBranch sap:VirtualizedContainerService.HintSize="289,294.553333333333">
+          <PickBranch.Trigger>
+            <p:Receive CanCreateInstance="True" DisplayName="ReceiveDivide" sap:VirtualizedContainerService.HintSize="257,100" OperationName="Divide" ServiceContractName="ICalculator">
+              <p:Receive.CorrelatesOn>
+                <p:MessageQuerySet>
+                  <p:XPathMessageQuery x:Key="CalcId">
+                    <p:XPathMessageQuery.Namespaces>
+                      <ssx:XPathMessageContextMarkup>
+                        <x:String x:Key="xgSc">http://tempuri.org/</x:String>
+                      </ssx:XPathMessageContextMarkup>
+                    </p:XPathMessageQuery.Namespaces>sm:body()/xgSc:Divide/xgSc:CalculatorId</p:XPathMessageQuery>
+                </p:MessageQuerySet>
+              </p:Receive.CorrelatesOn>
+              <p:ReceiveParametersContent>
+                <OutArgument x:TypeArguments="x:Double" x:Key="Value">[InputValue]</OutArgument>
+                <OutArgument x:TypeArguments="x:String" x:Key="CalculatorId" />
+              </p:ReceiveParametersContent>
+            </p:Receive>
+          </PickBranch.Trigger>
+          <Assign sap:VirtualizedContainerService.HintSize="257,100">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:Double">[CurrentValue]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:Double">[CurrentValue / InputValue]</InArgument>
+            </Assign.Value>
+          </Assign>
+        </PickBranch>
+        <PickBranch sap:VirtualizedContainerService.HintSize="289,294.553333333333" Trigger="{x:Reference __ReferenceID0}">
+          <p:SendReply DisplayName="SendReplyToReceiveEquals" sap:VirtualizedContainerService.HintSize="257,100">
+            <p:SendReply.Request>
+              <p:Receive x:Name="__ReferenceID0" CanCreateInstance="True" CorrelatesWith="[calculatorIdHandle]" DisplayName="ReceiveEquals" sap:VirtualizedContainerService.HintSize="257,100" OperationName="Equals" ServiceContractName="ICalculator">
+                <p:Receive.CorrelatesOn>
+                  <p:MessageQuerySet>
+                    <p:XPathMessageQuery x:Key="CalcId">
+                      <p:XPathMessageQuery.Namespaces>
+                        <ssx:XPathMessageContextMarkup>
+                          <x:String x:Key="xgSc">http://tempuri.org/</x:String>
+                        </ssx:XPathMessageContextMarkup>
+                      </p:XPathMessageQuery.Namespaces>sm:body()/xgSc:Equals/xgSc:CalculatorId</p:XPathMessageQuery>
+                  </p:MessageQuerySet>
+                </p:Receive.CorrelatesOn>
+                <p:ReceiveParametersContent>
+                  <OutArgument x:TypeArguments="x:String" x:Key="CalculatorId" />
+                </p:ReceiveParametersContent>
+              </p:Receive>
+            </p:SendReply.Request>
+            <p:SendParametersContent>
+              <InArgument x:TypeArguments="x:Double" x:Key="Value">[CurrentValue]</InArgument>
+            </p:SendParametersContent>
+          </p:SendReply>
+        </PickBranch>
+        <PickBranch sap:VirtualizedContainerService.HintSize="289,294.553333333333">
+          <PickBranch.Trigger>
+            <p:Receive CanCreateInstance="True" CorrelatesWith="[calculatorIdHandle]" DisplayName="ReceiveReset" sap:VirtualizedContainerService.HintSize="257,100" OperationName="Reset" ServiceContractName="ICalculator">
+              <p:Receive.CorrelatesOn>
+                <p:MessageQuerySet>
+                  <p:XPathMessageQuery x:Key="CalcId">
+                    <p:XPathMessageQuery.Namespaces>
+                      <ssx:XPathMessageContextMarkup>
+                        <x:String x:Key="xgSc">http://tempuri.org/</x:String>
+                      </ssx:XPathMessageContextMarkup>
+                    </p:XPathMessageQuery.Namespaces>sm:body()/xgSc:Reset/xgSc:CalculatorId</p:XPathMessageQuery>
+                </p:MessageQuerySet>
+              </p:Receive.CorrelatesOn>
+              <p:ReceiveParametersContent>
+                <OutArgument x:TypeArguments="x:String" x:Key="CalculatorId" />
+              </p:ReceiveParametersContent>
+            </p:Receive>
+          </PickBranch.Trigger>
+          <Assign sap:VirtualizedContainerService.HintSize="257,100">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:Boolean">[Running]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:Boolean">[False]</InArgument>
+            </Assign.Value>
+          </Assign>
+        </PickBranch>
+      </Pick>
+    </While>
+    <WriteLine sap:VirtualizedContainerService.HintSize="2088,71.2766666666667" Text="[&quot;Calculator Completed&quot;]" />
+  </Sequence>
+</Activity>

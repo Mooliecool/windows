@@ -1,0 +1,543 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Swarm Logic</name>
+    </assembly>
+    <members>
+        <member name="T:Swarm_Logic.Agent">
+            <summary>
+            A class that represents an agent of the Particle Swarm Optimization algorithm. It is responsible for taking -not executing- decisions,
+            communicating with other agents, and searching fr the radiation source.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.Agent.FoundSource">
+            <summary>
+            A boolean that indicates if the agent has found a radiation source before.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.Agent.WasSending">
+            <summary>
+            A boolean that indicates if the agent was sending information in the last iteration.
+            That boolean can be used by a graphical user interface, to indicate when each agent had sent information.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.Agent.PX">
+            <summary>
+            Represents the X coordinate of the agent position.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.Agent.PY">
+            <summary>
+            Represents the Y coordinate of the agent position.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.Agent.VX">
+            <summary>
+            Represents the X coordinate of the agent velocity.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.Agent.VY">
+            <summary>
+            Represents the Y coordinate of the agent velocity.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.Agent.MyBestX">
+            <summary>
+            Represents the X coordinate of the visited-by-the-agent position with the most radiation intensity.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.Agent.MyBestY">
+            <summary>
+            Represents the Y coordinate of the visited-by-the-agent position with the most radiation intensity.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.Agent.MyBestValue">
+            <summary>
+            Represents the radiation intensity of the visited-by-the-agent position with the most radiation intensity.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.Agent.OthersBestX">
+            <summary>
+            Represents the X coordinate of the known position with the most radiation intensity.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.Agent.OthersBestY">
+            <summary>
+            Represents the Y coordinate of the known position with the most radiation intensity.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.Agent.OthersBestValue">
+            <summary>
+            Represents the radiation intensity of the known position with the most radiation intensity.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.Agent.RadiationFunction">
+            <summary>
+            Represents the function used by the agent to calculate the radiation intensity as measured by a sensor at any given position.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.Agent.SendMessage">
+            <summary>
+            Represents the function used by the agent to send messages to other nearby agents. 
+            </summary>
+        </member>
+        <member name="T:Swarm_Logic.Agent.PositionFunction">
+            <summary>
+            The delegate of the function used by the agent to calculate the radiation intensity as measured by a sensor at any given position.
+            </summary>
+            <param name="PX">Represents the X coordinate of the agent position.</param>
+            <param name="PY">Represents the Y coordinate of the agent position.</param>
+            <returns>The intensity of radiation as measured by the agent sensor at that position.</returns>
+        </member>
+        <member name="T:Swarm_Logic.Agent.SendMessageFunction">
+            <summary>
+            The delegate of the function used by the agent to send messages to other nearby agents.
+            </summary>
+            <param name="SendingAgent">Represents the agent who is sending.</param>
+            <param name="Message">Represents the message which is being sent.</param>
+        </member>
+        <member name="M:Swarm_Logic.Agent.TakeTotalyRandomDecision">
+            <summary>
+            This function calculates a random decision.
+            It is used after the agent had found a radiation source, in order to wander around telling everyone else with the source position.
+            </summary>
+        </member>
+        <member name="M:Swarm_Logic.Agent.TakeRandomOppositeDecision">
+            <summary>
+            This function calculates a random decision related to the direction opposite to the current velocity.
+            </summary>
+        </member>
+        <member name="M:Swarm_Logic.Agent.TakeRandomTangentDecision">
+            <summary>
+            This function calculates a random decision related to the direction tangent -perpendicular- to the current velocity.
+            </summary>
+        </member>
+        <member name="M:Swarm_Logic.Agent.#ctor(System.Double,System.Double,System.Double,System.Double,Swarm_Logic.Agent.PositionFunction,Swarm_Logic.Agent.SendMessageFunction)">
+            <summary>
+            Creates a new agent with the specified position, velocity, radiation function and send message function.
+            </summary>
+            <param name="PX">Represents the X coordinate of the agent position.</param>
+            <param name="PY">Represents the Y coordinate of the agent position.</param>
+            <param name="VX">Represents the X coordinate of the agent velocity.</param>
+            <param name="VY">Represents the Y coordinate of the agent velocity.</param>
+            <param name="RadiationFunction">Represents the function used by the agent to calculate the radiation intensity as measured by a sensor at any given position.</param>
+            <param name="SendMessage">// Represents the function used by the agent to send messages to other nearby agents.</param>
+        </member>
+        <member name="M:Swarm_Logic.Agent.Receive(Swarm_Logic.AgentMessage)">
+            <summary>
+            This function is called -by the environment- when this agent receives a message from another agent.
+            It updates the best known position with the most radiation intensity.
+            </summary>
+            <param name="Message">The message received from the other agent.</param>
+        </member>
+        <member name="M:Swarm_Logic.Agent.CalculateNextAction">
+            <summary>
+            This function calculates the next velocities according to the Particle Swarm Optimization algorithm.
+            It stores the output in VX and VY.
+            </summary>
+        </member>
+        <member name="M:Swarm_Logic.Agent.TakeRandomDecision">
+            <summary>
+            This function calculates a random decision, either parallel to or opposite to the current velocity direction,
+            With some randomness employed.
+            </summary>
+        </member>
+        <member name="M:Swarm_Logic.Agent.AfterMoving">
+            <summary>
+            This function updates agent parameters and communicate them to other agents
+            after executing the decisions -if needed.
+            </summary>
+        </member>
+        <member name="T:Swarm_Logic.Barrier2">
+            <summary>
+            A class that represents a barrier, that prevents moving from one side to another.
+            It is responsible for detecting collisions with moving agents.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.Barrier2.X1">
+            <summary>
+            Represents the X coordinate of the first end of the barrier.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.Barrier2.Y1">
+            <summary>
+            Represents the Y coordinate of the first end of the barrier.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.Barrier2.X2">
+            <summary>
+            Represents the X coordinate of the second end of the barrier.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.Barrier2.Y2">
+            <summary>
+            Represents the Y coordinate of the second end of the barrier.
+            </summary>
+        </member>
+        <member name="M:Swarm_Logic.Barrier2.#ctor(System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Creates a new barrier with the specified begining and ending coordinates.
+            </summary>
+            <param name="X1">Represents the X coordinate of the first end of the barrier.</param>
+            <param name="Y1">Represents the Y coordinate of the first end of the barrier.</param>
+            <param name="X2">Represents the X coordinate of the second end of the barrier.</param>
+            <param name="Y2">Represents the Y coordinate of the second end of the barrier.</param>
+        </member>
+        <member name="M:Swarm_Logic.Barrier2.IsIntersected(System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Checks if a moving agent crosses the barrier or not.
+            </summary>
+            <param name="startX">Represents the X coordinate of the inital position of agent before moving.</param>
+            <param name="startY">Represents the Y coordinate of the inital position of agent before moving.</param>
+            <param name="endX">Represents the X coordinate of the last position of agent after moving.</param>
+            <param name="endY">Represents the Y coordinate of the last position of agent after moving.</param>
+            <returns>true if the agent crosses the barrier and returns false otherwise.</returns>
+        </member>
+        <member name="T:Swarm_Logic.Environment">
+            <summary>
+            A class that represents the enviroment where the agents move and interact. It is responsible for initialization of agents, inter-communication between them,
+            detecting collisions with barriers, validating agents decisions and radiation source(s).
+            </summary>
+        </member>
+        <member name="F:Swarm_Logic.Environment.Source">
+            <summary>
+            Represents the radiation source(s).
+            </summary>
+        </member>
+        <member name="F:Swarm_Logic.Environment.Agents">
+            <summary>
+            Represents a list of all agents in the environment.
+            </summary>
+        </member>
+        <member name="F:Swarm_Logic.Environment.Barriers">
+            <summary>
+            Represents a list of all barriers in the environment.
+            </summary>
+        </member>
+        <member name="M:Swarm_Logic.Environment.WillTheAgentReceiveTheMessage(Swarm_Logic.Agent,Swarm_Logic.Agent)">
+            <summary>
+             This function decides if an agent will receive a meesage sent from another agent or not.
+            </summary>
+            <param name="SendingAgent">Represents the agent who is sending.</param>
+            <param name="ReceivingAgent">Represents the agent who is receiving.</param>
+            <returns>true if the second agent will receive the message from the first agent and returns false otherwise.</returns>
+        </member>
+        <member name="E:Swarm_Logic.Environment.OnIterationEnd">
+            <summary>
+            Represents an event called on the end of each iteration done by the Run function.
+            Can be used to update a graphical user interface.
+            </summary>
+        </member>
+        <member name="M:Swarm_Logic.Environment.#ctor(System.Int32,System.Double,System.Double,System.Collections.Generic.List{Swarm_Logic.Barrier2},Swarm_Logic.RadiationSource)">
+            <summary>
+            Creates a new environment with the specified number of agents, environment dimensions, list of barriers,
+            and radiation source(s).
+            </summary>
+            <param name="NumberOfAgents">Represents the number of all agents in the environment.</param>
+            <param name="Width">Represents the width of the enviroment.</param>
+            <param name="Height">Represents the height of the enviroment.</param>
+            <param name="Barriers">Represents all barriers in the enviroment.</param>
+            <param name="Source">Represents the source(s) of radiation in the environment.</param>
+        </member>
+        <member name="M:Swarm_Logic.Environment.#ctor(System.Collections.Generic.List{Swarm_Logic.Agent},System.Double,System.Double,System.Collections.Generic.List{Swarm_Logic.Barrier2},Swarm_Logic.RadiationSource)">
+            <summary>
+            Creates a new environment with the specified list of agents, environment dimensions, list of barriers,
+            and radiation source(s).
+            </summary>
+            <param name="Agents">Represents all agents in the enviroment.</param>
+            <param name="Width">Represents the width of the enviroment.</param>
+            <param name="Height">Represents the height of the enviroment.</param>
+            <param name="Barriers">Represents all barriers in the enviroment.</param>
+            <param name="Source">Represents the source(s) of radiation in the environment.</param>
+        </member>
+        <member name="M:Swarm_Logic.Environment.Send(Swarm_Logic.Agent,Swarm_Logic.AgentMessage)">
+            <summary>
+            This function is used by all the agents to send messages to eachother.
+            </summary>
+            <param name="SendingAgent">Represents the agent who is sending.</param>
+            <param name="Message">Represents the message which is being sent.</param>
+        </member>
+        <member name="M:Swarm_Logic.Environment.Update">
+            <summary>
+            This function executes only one iteration of the Particle Swarm Optimization algorithm.
+            </summary>
+        </member>
+        <member name="M:Swarm_Logic.Environment.Run(System.Int32)">
+            <summary>
+            This function executes the specified number of iterations of the Particle Swarm Optimization algorithm.
+            </summary>
+            <param name="NumberOfIterations">The number of iterations to be executed.</param>
+        </member>
+        <member name="T:Swarm_Logic.GeneralParameters">
+            <summary>
+            A static class that contains various parameters for the Particle Swarm Optimization algorithm,
+            communication range, minimum and maximum velocities.
+            </summary>
+        </member>
+        <member name="F:Swarm_Logic.GeneralParameters.W">
+            <summary>
+            Represents the ratio of the agent's current velocity that affects the next velocity decesion.
+            </summary>
+        </member>
+        <member name="F:Swarm_Logic.GeneralParameters.P">
+            <summary>
+            Represents the ratio of the agent's distance to the best encountered position that affects the next velocity decesion.
+            </summary>
+        </member>
+        <member name="F:Swarm_Logic.GeneralParameters.G">
+            <summary>
+            Represents the ratio of the agent's distance to the best known position that affects the next velocity decesion.
+            </summary>
+        </member>
+        <member name="F:Swarm_Logic.GeneralParameters.ReceiveRange">
+            <summary>
+            Represents the range in which agents can communicate with each other.
+            </summary>
+        </member>
+        <member name="F:Swarm_Logic.GeneralParameters.MaxVelocity">
+            <summary>
+            Represents the maximum velocity for every agent.
+            </summary>
+        </member>
+        <member name="F:Swarm_Logic.GeneralParameters.MinVelocity">
+            <summary>
+            Represents the minimum velocity for every agent.
+            </summary>
+        </member>
+        <member name="F:Swarm_Logic.GeneralParameters.NearDistance">
+            <summary>
+            An agent is considered reached a radiation source, if it is at distance NearDistance or less to the radiation source.
+            </summary>
+        </member>
+        <member name="T:Swarm_Logic.AgentMessage">
+            <summary>
+            A struct that represents the messages sent between different agents.
+            It contains position coordinates and value of the radiation intensity at that position.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.AgentMessage.PX">
+            <summary>
+            Represents the X coordinate of the sent message.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.AgentMessage.PY">
+            <summary>
+            Represents the Y coordinate of the sent message.
+            </summary>
+        </member>
+        <member name="P:Swarm_Logic.AgentMessage.Value">
+            <summary>
+            Represents radiation intensity at the position (PX,PY).
+            </summary>
+        </member>
+        <member name="M:Swarm_Logic.AgentMessage.#ctor(System.Double,System.Double,System.Double)">
+            <summary>
+            Creates an new agent message with the specified coordinates and radiation intensity value.
+            </summary>
+            <param name="PX">Represents the X coordinate of the sent message.</param>
+            <param name="PY">Represents the Y coordinate of the sent message.</param>
+            <param name="Value">Represents radiation intensity at the position (PX,PY).</param>
+        </member>
+        <member name="T:Swarm_Logic.ExponintialRandom">
+            <summary>
+            This class implements an exponintial random generator with mean.
+            </summary>
+        </member>
+        <member name="M:Swarm_Logic.ExponintialRandom.#ctor(System.Double)">
+            <summary>
+            Creates a new exponintial random generator with the specified mean.
+            </summary>
+            <param name="Mean">Represents the mean of the exponintial random generator.</param>
+        </member>
+        <member name="M:Swarm_Logic.ExponintialRandom.#ctor(System.Double,System.Int32)">
+            <summary>
+            Creates a new exponintial random generator with the specified mean and with the specified seed.
+            </summary>
+            <param name="Mean">Represents the mean of the exponintial random generator.</param>
+            <param name="Seed">Represents the seed used for the internal pseudo-random number generator.</param>
+        </member>
+        <member name="M:Swarm_Logic.ExponintialRandom.NextDouble">
+            <summary>
+            This function returns the next exponintial-randomly generated double number.
+            </summary>
+            <returns>The next exponintial-random double number.</returns>
+        </member>
+        <member name="T:Swarm_Logic.NormalRandom">
+            <summary>
+            This class implements a normal random generator with a mean and a variance.
+            </summary>
+        </member>
+        <member name="M:Swarm_Logic.NormalRandom.#ctor(System.Double,System.Double)">
+            <summary>
+            Creates a new normal random generator with the specified mean and variance.
+            </summary>
+            <param name="Mean"> Represents the mean of the normal random generator.</param>
+            <param name="Variance">Represents the variance of the normal random generator.</param>
+        </member>
+        <member name="M:Swarm_Logic.NormalRandom.#ctor(System.Double,System.Double,System.Int32,System.Int32)">
+            <summary>
+            Creates a new normal random generator with the specified mean and variance and with the specified seeds.
+            </summary>
+            <param name="Mean"> Represents the mean of the normal random generator.</param>
+            <param name="Variance">Represents the variance of the normal random generator.</param>
+            <param name="Seed1">>Represents the seed used for the first internal pseudo-random number generator.</param>
+            <param name="Seed2">>Represents the seed used for the second internal pseudo-random number generator.</param>
+        </member>
+        <member name="M:Swarm_Logic.NormalRandom.NextDouble">
+            <summary>
+            This function returns the next normal-randomly generated double number.
+            </summary>
+            <returns>The next normal-randomly double number.</returns>
+        </member>
+        <member name="T:Swarm_Logic.NumberGenerator">
+            <summary>
+            An interface for the classes that implement random number generators.
+            It must contain a function that returns the next random double number.
+            </summary>
+        </member>
+        <member name="M:Swarm_Logic.NumberGenerator.NextDouble">
+            <summary>
+            This function returns the next randomly generated double number.
+            </summary>
+            <returns>The next random double number.</returns>
+        </member>
+        <member name="T:Swarm_Logic.UniformRandom">
+            <summary>
+            This class implements a uniform random generator with a minimum and maximum values.
+            </summary>
+        </member>
+        <member name="M:Swarm_Logic.UniformRandom.#ctor(System.Double,System.Double)">
+            <summary>
+            Creates a new uniform random generator with the specified minimum and maximum values.
+            </summary>
+            <param name="Min">Represents the minimum value reteurned by this uniform random generator.</param>
+            <param name="Max">Represents the maximum value reteurned by this uniform random generator.</param>
+        </member>
+        <member name="M:Swarm_Logic.UniformRandom.#ctor(System.Double,System.Double,System.Int32)">
+            <summary>
+            Creates a new uniform random generator with the specified minimum and maximum values and with the specified seed.
+            </summary>
+            <param name="Min">Represents the minimum value reteurned by this uniform random generator.</param>
+            <param name="Max">Represents the maximum value reteurned by this uniform random generator.</param>
+            <param name="Seed">Represents the seed used for the internal pseudo-random number generator.</param>
+        </member>
+        <member name="M:Swarm_Logic.UniformRandom.NextDouble">
+            <summary>
+            This function returns the next uniform-randomly generated double number.
+            </summary>
+            <returns>The next uniform-random double number.</returns>
+        </member>
+        <member name="T:Swarm_Logic.GaussianFunctionSource">
+            <summary>
+            This class model the intensity of a gaussian radiation source.
+            </summary>
+        </member>
+        <member name="M:Swarm_Logic.GaussianFunctionSource.#ctor(System.Double,System.Double,System.Double)">
+            <summary>
+            Creates a new gaussian radiation source with the specified position and sigma square value.
+            </summary>
+            <param name="SourceX">Represents the X coordinate of the gaussian radiation source.</param>
+            <param name="SourceY">Represents the Y coordinate of the gaussian radiation source.</param>
+            <param name="Source1B">Represents the sigma square value of the gaussian radiation source.</param>
+        </member>
+        <member name="M:Swarm_Logic.GaussianFunctionSource.GetRadiation(System.Double,System.Double)">
+            <summary>
+            This function takes the coordinates of an agent position and returns the intensity of the gaussian radiation source as measured by a sensor at that position.
+            </summary>
+            <param name="PX">Represents the X coordinate of the agent.</param>
+            <param name="PY">Represents the Y coordinate of the agent.</param>
+            <returns>The intensity of the gaussian radiation source as measured by the agent sensor at that position.</returns>
+        </member>
+        <member name="M:Swarm_Logic.GaussianFunctionSource.IsNearASource(System.Double,System.Double)">
+            <summary>
+            This function takes the coordinates of an agent position and returns true if the position is near gaussian radiation source and returns false otherwise.
+            </summary>
+            <param name="PX">Represents the X coordinate of the agent.</param>
+            <param name="PY">Represents the Y coordinate of the agent.</param>
+            <returns>true if the position is near gaussian radiation source and returns false otherwise.</returns>
+        </member>
+        <member name="T:Swarm_Logic.MultipleGaussianFunctionSources">
+            <summary>
+            This class model the intensity of multiple gaussian radiation sources.
+            </summary>
+        </member>
+        <member name="M:Swarm_Logic.MultipleGaussianFunctionSources.#ctor(System.Double[],System.Double[],System.Double[],System.Double[])">
+            <summary>
+            Creates new multiple gaussian radiation sources with the specified positions, amplitudes and sigma square values.
+            </summary>
+            <param name="SourceXs">Represents the X coordinates of all the gaussian radiation sources.</param>
+            <param name="SourceYs">Represents the Y coordinates of all the gaussian radiation sources.</param>
+            <param name="SourceAs">Represents the amplitude values of all the gaussian radiation sources.</param>
+            <param name="SourceBs">Represents the sigma square values of all the gaussian radiation sources.</param>
+        </member>
+        <member name="M:Swarm_Logic.MultipleGaussianFunctionSources.GetRadiation(System.Double,System.Double)">
+            <summary>
+            This function takes the coordinates of an agent position and returns the intensity of the multiple gaussian radiation sources as measured by a sensor at that position.
+            </summary>
+            <param name="PX">Represents the X coordinate of the agent.</param>
+            <param name="PY">Represents the Y coordinate of the agent.</param>
+            <returns>The intensity of the multiple gaussian radiation sources as measured by the agent sensor at that position.</returns>
+        </member>
+        <member name="M:Swarm_Logic.MultipleGaussianFunctionSources.IsNearASource(System.Double,System.Double)">
+            <summary>
+            This function takes the coordinates of an agent position and returns true if the position is near any of the multiple gaussian radiation sources and returns false otherwise.
+            </summary>
+            <param name="PX">Represents the X coordinate of the agent.</param>
+            <param name="PY">Represents the Y coordinate of the agent.</param>
+            <returns>true if the position is near any of the multiple gaussian radiation sources and returns false otherwise.</returns>
+        </member>
+        <member name="T:Swarm_Logic.MultipleNoisyGaussianFunctionSources">
+            <summary>
+            This class model the intensity of multiple gaussian radiation sources with some noise effects.
+            </summary>
+        </member>
+        <member name="M:Swarm_Logic.MultipleNoisyGaussianFunctionSources.#ctor(System.Double[],System.Double[],System.Double[],System.Double[])">
+            <summary>
+            Creates new noisy multiple gaussian radiation sources with the specified positions, amplitudes and sigma square values.
+            </summary>
+            <param name="SourceXs">Represents the X coordinates of all the gaussian radiation sources.</param>
+            <param name="SourceYs">Represents the Y coordinates of all the gaussian radiation sources.</param>
+            <param name="SourceAs">Represents the amplitude values of all the gaussian radiation sources.</param>
+            <param name="SourceBs">Represents the sigma square values of all the gaussian radiation sources.</param>
+        </member>
+        <member name="M:Swarm_Logic.MultipleNoisyGaussianFunctionSources.GetRadiation(System.Double,System.Double)">
+            <summary>
+            This function takes the coordinates of an agent position and returns the intensity of the noisy multiple gaussian radiation sources as measured by a sensor at that position.
+            </summary>
+            <param name="PX">Represents the X coordinate of the agent.</param>
+            <param name="PY">Represents the Y coordinate of the agent.</param>
+            <returns>The intensity of the noisy multiple gaussian radiation sources as measured by the agent sensor at that position.</returns>
+        </member>
+        <member name="M:Swarm_Logic.MultipleNoisyGaussianFunctionSources.IsNearASource(System.Double,System.Double)">
+            <summary>
+            This function takes the coordinates of an agent position and returns true if the position is near any of the noisy multiple gaussian radiation sources and returns false otherwise.
+            </summary>
+            <param name="PX">Represents the X coordinate of the agent.</param>
+            <param name="PY">Represents the Y coordinate of the agent.</param>
+            <returns>true if the position is near any of the noisy multiple gaussian radiation sources and returns false otherwise.</returns>
+        </member>
+        <member name="T:Swarm_Logic.RadiationSource">
+            <summary>
+            An interface for the classes that model the intensity of radiation source(s).
+            It must contain a function that takes the coordinates of a position and returns the intensity of the radiation as measured by a sensor at that position.
+            It must also contain a function that takes the coordinates of a position and returns true if the position is near radiation source(s) and returns false otherwise.
+            </summary>
+        </member>
+        <member name="M:Swarm_Logic.RadiationSource.GetRadiation(System.Double,System.Double)">
+            <summary>
+            This function takes the coordinates of an agent position and returns the intensity of the radiation as measured by a sensor at that position.
+            </summary>
+            <param name="PX">Represents the X coordinate of the agent.</param>
+            <param name="PY">Represents the Y coordinate of the agent.</param>
+            <returns>The intensity of radiation as measured by the agent sensor at that position.</returns>
+        </member>
+        <member name="M:Swarm_Logic.RadiationSource.IsNearASource(System.Double,System.Double)">
+            <summary>
+            This function takes the coordinates of an agent position and returns true if the position is near radiation source(s) and returns false otherwise.
+            </summary>
+            <param name="PX">Represents the X coordinate of the agent.</param>
+            <param name="PY">Represents the Y coordinate of the agent.</param>
+            <returns>true if the position is near radiation source(s) and returns false otherwise.</returns>
+        </member>
+    </members>
+</doc>
