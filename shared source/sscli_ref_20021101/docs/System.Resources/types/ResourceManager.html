@@ -1,0 +1,1258 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Resources.ResourceManager</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Resources.ResourceManager Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Resources<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides convenient access to culture-specific resources at runtime.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public class ResourceManager</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Thread Safety</b><br><dl>
+<dd> This type is safe for multithreaded operations.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> class looks up culture-specific resources, provides resource fallback when a localized resource does not exist, and supports resource serialization.<p> Using the methods of  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a>, a caller can access the resources for a particular culture using the  <a href="#GetObject(System.String)">ResourceManager.GetObject</a> and  <a href="#GetString(System.String)">ResourceManager.GetString</a> methods. By default, these methods return the resource for the culture determined by the current cultural settings of the thread that made the call. (See  <a href="../../System.Threading/types/Thread.html#CurrentUICulture">Thread.CurrentUICulture</a> for more information.) A caller can use the  <a href="#GetResourceSet(System.Globalization.CultureInfo,System.Boolean,System.Boolean)">ResourceManager.GetResourceSet</a> method to obtain a  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a>, which represents the resources for a particular culture, ignoring culture fallback rules. You can then use the  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> to access the resources, localized for that culture, by name.</p>
+<p> Ideally, you should create resources for every language, or at least a meaningful subset of the language. The resource file names follow the naming convention basename.cultureName.resources, where basename is the name of the application or the name of a class, depending on the granularity you want. The  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> 's  <a href="../../System.Globalization/types/CultureInfo.html#Name">CultureInfo.Name</a> property is used to determine the cultureName. A resource for the neutral culture (returned by  <a href="../../System.Globalization/types/CultureInfo.html#InvariantCulture">CultureInfo.InvariantCulture</a>) should be named basename.resources.</p>
+<p> For example, suppose that an assembly has several resources in a resource file with the basename <code>
+            "MyResources"
+          </code>. These resource files will have names such as <code>
+            "MyResources.ja-JP.resources"
+          </code>, <code>
+            "MyResources.de.resources"
+          </code>, <code>
+            "MyResources.zh-CHS.resources"
+          </code>, or <code>
+            "MyResources.fr-BE.resources"
+          </code>, which contain resources respectively for Japanese, German, simplified Chinese, and French (Belgium). The default resource file should be named MyResources.resources. The culture-specific resource files are commonly packaged in satellite assemblies for each culture. The default resource file should be in your main assembly.</p>
+<p> Now suppose that a  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> has been created to represent the resources with this basename. Using the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a>, you can obtain a  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> that encapsulates <code>
+            "MyResources.ja-JP.resources"
+          </code> by calling <code>
+            GetResourceSet(new CultureInfo ("ja-JP"), TRUE, FALSE)
+          </code>. Or, if you know that <code>
+            "MyResources"
+          </code> contains a resource named <code>
+            "TOOLBAR_ICON"
+          </code>, you can obtain the value of that resource localized for Japan by calling <code>
+            GetObject("TOOLBAR_ICON", new CultureInfo("ja-JP"))
+          </code>.</p>
+<p> While not strictly necessary for the most basic uses of the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a>, publically shipping assemblies should use the  <a href="../../System.Resources/types/SatelliteContractVersionAttribute.html">SatelliteContractVersionAttribute</a> to support versioning your main assembly without redeploying your satellites, and the  <a href="../../System.Resources/types/NeutralResourcesLanguageAttribute.html">NeutralResourcesLanguageAttribute</a> to avoid looking up a satellite assembly that might never exist. For assistance with localization of Windows Forms dialogs, see the  tool in the Microsoft .NET Framework SDK. To learn more about creating satellite assemblies, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconcreatingsatelliteassemblies.asp">MSDN: creatingsatelliteassemblies</a>.</p>
+<p> To learn more about setting up and creating resources, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconcreatingusingresources.asp">MSDN: creatingusingresources</a>.</p> Using standalone .resources files in an ASP.NET application will break XCOPY deployment, because the resources remain locked until they are explicitly released by the  <a href="#ReleaseAllResources">ResourceManager.ReleaseAllResources</a> method. If you want to deploy resources into ASP.NET applications, you should compile your .resources into satellite assemblies. Resources marked as private are accesible only in the assembly in which they are placed. Because a satellite assembly contains no code, resources private to it become unavailable thrugh any mechanism. Therefore, resources in satellite assemblies should always be public so that they are accessible from your main assembly. Resources embedded in your main assembly are accessible to your main assembly, whether private or public.</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Resources/System.Resources.html">System.Resources Namespace</a> |  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> |  <a href="../../System.Resources/types/SatelliteContractVersionAttribute.html">SatelliteContractVersionAttribute</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpcondesigningglobalapplications.asp">MSDN: designingglobalapplications</a></dd>
+</dl>
+<h3>System.Resources.ResourceManager Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(Type resourceSource)<br><br></code> Creates a  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> that looks up resources in satellite assemblies based on information from the specified  <a href="../../System/types/Type.html">Type</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor3">ctor #3</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(string baseName, Assembly assembly)<br><br></code> Initializes a new instance of the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> class that looks up resources contained in files derived from the specified root name using the given  <a href="../../System.Reflection/types/Assembly.html">Assembly</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor4">ctor #4</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(string baseName, Assembly assembly, Type usingResourceSet)<br><br></code> Initializes a new instance of the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> class that looks up resources contained in files derived from the specified root name using the given  <a href="../../System.Reflection/types/Assembly.html">Assembly</a>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Fields</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#HeaderVersionNumber">HeaderVersionNumber</a></td>
+<td width="55%"> A constant <b>readonly</b> value indicating the version of resource file headers that the current implementation of  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> can interpret and produce.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MagicNumber">MagicNumber</a></td>
+<td width="55%"> Holds the number used to identify resource files.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#BaseName">BaseName</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the root name of the resource files that the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> searches for resources.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IgnoreCase">IgnoreCase</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets a Boolean value indicating whether the current instance of ResourceManager allows case-insensitive resource lookups in the  <a href="#GetString(System.String)">ResourceManager.GetString</a> and  <a href="#GetObject(System.String)">ResourceManager.GetObject</a> methods.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ResourceSetType">ResourceSetType</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the  <a href="../../System/types/Type.html">Type</a> of the  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> uses to construct a  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> object.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#CreateFileBasedResourceManager(System.String,System.String,System.Type)">CreateFileBasedResourceManager</a></td>
+<td width="55%"> Returns a  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> that searches a specific directory for resources instead of in the assembly manifest.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetObject(System.String)">GetObject</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetObject(string name)<br><br></code> Returns the value of the specified  <a href="../../System/types/Object.html">Object</a> resource.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetObject(System.String,System.Globalization.CultureInfo)">GetObject</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetObject(string name, CultureInfo culture)<br><br></code> Gets the value of the  <a href="../../System/types/Object.html">Object</a> resource localized for the specified culture.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetResourceSet(System.Globalization.CultureInfo,System.Boolean,System.Boolean)">GetResourceSet</a></td>
+<td width="55%"> Gets the  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> for a particular culture.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetString(System.String)">GetString</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetString(string name)<br><br></code> Returns the value of the specified  <a href="../../System/types/String.html">String</a> resource.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetString(System.String,System.Globalization.CultureInfo)">GetString</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetString(string name, CultureInfo culture)<br><br></code> Gets the value of the  <a href="../../System/types/String.html">String</a> resource localized for the specified culture.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ReleaseAllResources">ReleaseAllResources</a></td>
+<td width="55%"> Tells the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> to call  <a href="../../System.Resources/types/ResourceSet.html#Close">ResourceSet.Close</a> on all  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> objects and release all resources.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor()<br><br></code>Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Initializes a new instance of the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> class with default values.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Fields</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#BaseNameField">BaseNameField</a></td>
+<td width="55%"> Indicates the root name of the resource files that the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> searches for resources.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MainAssembly">MainAssembly</a></td>
+<td width="55%"> Indicates the main  <a href="../../System.Reflection/types/Assembly.html">Assembly</a> that contains the resources.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ResourceSets">ResourceSets</a></td>
+<td width="55%"> Contains a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> that returns a mapping from cultures to  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetNeutralResourcesLanguage(System.Reflection.Assembly)">GetNeutralResourcesLanguage</a></td>
+<td width="55%"> Returns the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> for the main assembly's neutral resources by reading the value of the  <a href="../../System.Resources/types/NeutralResourcesLanguageAttribute.html">NeutralResourcesLanguageAttribute</a> on a specified  <a href="../../System.Reflection/types/Assembly.html">Assembly</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetResourceFileName(System.Globalization.CultureInfo)">GetResourceFileName</a></td>
+<td width="55%"> Generates the name for the resource file for the given  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetSatelliteContractVersion(System.Reflection.Assembly)">GetSatelliteContractVersion</a></td>
+<td width="55%"> Returns the  <a href="../../System/types/Version.html">Version</a> specified by the  <a href="../../System.Resources/types/SatelliteContractVersionAttribute.html">SatelliteContractVersionAttribute</a> in the given assembly.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#InternalGetResourceSet(System.Globalization.CultureInfo,System.Boolean,System.Boolean)">InternalGetResourceSet</a></td>
+<td width="55%"> Provides the implementation for finding a  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Resources.ResourceManager</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Resources.ResourceManager Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> class with default values.</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected ResourceManager();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The current constructor is only useful for writing your own derived class of the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates a  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> that looks up resources in satellite assemblies based on information from the specified  <a href="../../System/types/Type.html">Type</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public ResourceManager(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>resourceSource</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>resourceSource</i><br><dl>
+<dd>
+<param> A  <a href="../../System/types/Type.html">Type</a> from which the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> derives all information for finding .resources files.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>resourceSource</i> parameter is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> infer the assembly, the base name, and a namespace for .resources files from the  <a href="../../System/types/Type.html">Type</a>. The  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> assumes you will be using satellite assemblies and want to use the default  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> class. Given a type such as MyCompany.MyProduct.MyType, the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> will look for a .resources file (in the main assembly and satellite assemblies) named "MyCompany.MyProduct.MyType.[culture name.]resources" in the assembly that defines MyType.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic3"></a><a name="ctor3">ctor #3</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> class that looks up resources contained in files derived from the specified root name using the given  <a href="../../System.Reflection/types/Assembly.html">Assembly</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public ResourceManager(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>baseName</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/Assembly.html">Assembly</a> <i>assembly</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>baseName</i><br><dl>
+<dd>
+<param> The root name of the resources. For example, the root name for the resource file named "MyResource.en-US.resources" is "MyResource".
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>assembly</i><br><dl>
+<dd>
+<param> The main  <a href="../../System.Reflection/types/Assembly.html">Assembly</a> for the resources.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>baseName</i> or <i>assembly</i> parameter is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The individual resource files should be contained in satellite assemblies with the invariant culture's .resources file contained in the main assembly. A satellite assembly is assumed to contain resources for a single culture specified in that assembly's manifest, and are loaded as necessary.<p> This constructor uses the system provided  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> implementation. To use a custom resource file format, you should derive from the  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> class, override  <a href="../../System.Resources/types/ResourceSet.html#GetDefaultReader">ResourceSet.GetDefaultReader</a> and  <a href="../../System.Resources/types/ResourceSet.html#GetDefaultWriter">ResourceSet.GetDefaultWriter</a>, and pass that type to the constructor that takes a  <a href="../../System/types/Type.html">Type</a> as the third parameter. Using a custom  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> can be useful for controlling resource caching policy or supporting your own resource file format, but is generally not necessary.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic4"></a><a name="ctor4">ctor #4</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> class that looks up resources contained in files derived from the specified root name using the given  <a href="../../System.Reflection/types/Assembly.html">Assembly</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public ResourceManager(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>baseName</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/Assembly.html">Assembly</a> <i>assembly</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>usingResourceSet</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>baseName</i><br><dl>
+<dd>
+<param> The root name of the resources. For example, the root name for the resource file named "MyResource.en-US.resources" is "MyResource".
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>assembly</i><br><dl>
+<dd>
+<param> The main  <a href="../../System.Reflection/types/Assembly.html">Assembly</a> for the resources.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>usingResourceSet</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Type.html">Type</a> of the custom  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> to use. If <b>null</b>, the default runtime  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> is used.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>usingResourceset</i> is not a derived class of  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>baseName</i> or <i>assembly</i> parameter is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The individual resource files should be contained in satellite assemblies with the invariant culture's .resources file contained in the main assembly. A satellite assembly is assumed to contain resources for a single culture specified in that assembly's manifest, and are loaded as necessary.<p> You can specify a  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> implementation to be used. If you do not need a specific  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> implementation but would like to use a custom resource file format, you should derive from the  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> class, override  <a href="../../System.Resources/types/ResourceSet.html#GetDefaultReader">ResourceSet.GetDefaultReader</a> and  <a href="../../System.Resources/types/ResourceSet.html#GetDefaultWriter">ResourceSet.GetDefaultWriter</a>, and pass that type to this constructor.</p><br><br><b>Note </b> The <i>usingResourceSet</i> parameter is used to support your own resource format, and will commonly be <b>null</b>. This is different from the constructor that takes a  <a href="../../System/types/Type.html">Type</a> only.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="BaseNameFieldTopic1"></a><a name="BaseNameField">BaseNameField</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Indicates the root name of the resource files that the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> searches for resources.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">string</a> BaseNameField;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="HeaderVersionNumberTopic1"></a><a name="HeaderVersionNumber">HeaderVersionNumber</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> A constant <b>readonly</b> value indicating the version of resource file headers that the current implementation of  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> can interpret and produce.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static readonly <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">int</a> HeaderVersionNumber;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="MagicNumberTopic1"></a><a name="MagicNumber">MagicNumber</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Holds the number used to identify resource files.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static readonly <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">int</a> MagicNumber;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The value is set to 0xBEEFCACE. The first four bytes of the system default file format contain a 32-bit signed integer in little-endian format (see  <a href="../../System.Text/types/Encoding.html">Encoding</a>).<p> If the  <a href="#MagicNumber">ResourceManager.MagicNumber</a> is found, the bytes following it will be a version number for a  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> header, followed by a number indicating how many bytes should be skipped to get past this header. The next number indicates the version of the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> that created the header, followed by version specific information.</p>
+<p> The version number for the current implementation is one. The next bytes are a length-prefixed string containing the name of an  <a href="../../System.Resources/types/IResourceReader.html">IResourceReader</a>, which can read this file.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="MainAssemblyTopic1"></a><a name="MainAssembly">MainAssembly</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Indicates the main  <a href="../../System.Reflection/types/Assembly.html">Assembly</a> that contains the resources.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">Assembly</a> MainAssembly;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="ResourceSetsTopic1"></a><a name="ResourceSets">ResourceSets</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Contains a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> that returns a mapping from cultures to  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> objects.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">Hashtable</a> ResourceSets;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="BaseNameTopic1"></a><a name="BaseName">BaseName</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the root name of the resource files that the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> searches for resources.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/String.html">string</a> BaseName {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IgnoreCaseTopic1"></a><a name="IgnoreCase">IgnoreCase</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets a Boolean value indicating whether the current instance of ResourceManager allows case-insensitive resource lookups in the  <a href="#GetString(System.String)">ResourceManager.GetString</a> and  <a href="#GetObject(System.String)">ResourceManager.GetObject</a> methods.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IgnoreCase {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The current property indicates whether a resource with the name "Resource" is equivalent to the resource with the name "resource". If the value of the  <a href="#IgnoreCase">ResourceManager.IgnoreCase</a> property is <b>true</b>, the two resource strings would cause the current instance of  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> to return the same resource value. If the property value is <b>false</b>, the resource values corresponding to the two resource strings can be different.<br><br><b>Note </b> For performance reasons, it is best to always specify the correct case for your resource names. <a href="#IgnoreCase">ResourceManager.IgnoreCase</a> can cause a significant workingset and performance hit.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ResourceSetTypeTopic1"></a><a name="ResourceSetType">ResourceSetType</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the  <a href="../../System/types/Type.html">Type</a> of the  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> uses to construct a  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Type.html">Type</a> ResourceSetType {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CreateFileBasedResourceManagerTopic1"></a><a name="CreateFileBasedResourceManager(System.String,System.String,System.Type)">CreateFileBasedResourceManager</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>baseName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>resourceDir</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>usingResourceSet</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns a  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> that searches a specific directory for resources instead of in the assembly manifest.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> CreateFileBasedResourceManager(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>baseName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>resourceDir</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>usingResourceSet</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>baseName</i><br><dl>
+<dd>
+<param> The root name of the resources. For example, the root name for the resource file named "MyResource.en-US.resources" is "MyResource".
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>resourceDir</i><br><dl>
+<dd>
+<param> The name of the directory to search for the resources.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>usingResourceSet</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Type.html">Type</a> of the custom  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> to use. If <b>null</b>, the default runtime  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> is used.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The newly created  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> that searches a specific directory for resources instead of in the assembly manifest.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The <i>baseName</i> ends in .resources.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>baseName</i> parameter is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method returns a  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> that is not dependent on any particular assembly. The returned  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> can be used to load resources for an ASP.NET page or for testing a  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> implementation.<p> You can specify a  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> implementation. If you do not need a specific  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> implementation, but would like to use a custom resource file format, you should derive from the  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> class, override  <a href="../../System.Resources/types/ResourceSet.html#GetDefaultReader">ResourceSet.GetDefaultReader</a> and  <a href="../../System.Resources/types/ResourceSet.html#GetDefaultWriter">ResourceSet.GetDefaultWriter</a>, and pass that type to this constructor.</p> Using standalone .resources files in an ASP.NET application will break XCOPY deployment because the resources remain locked until they are explicitly released by the  <a href="#ReleaseAllResources">ResourceManager.ReleaseAllResources</a> method. If you want to deploy resources into ASP.NET applications, compile your .resources into satellite assemblies.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~ResourceManager();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetNeutralResourcesLanguageTopic1"></a><a name="GetNeutralResourcesLanguage(System.Reflection.Assembly)">GetNeutralResourcesLanguage</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Reflection/types/Assembly.html">Assembly</a> <i>a</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> for the main assembly's neutral resources by reading the value of the  <a href="../../System.Resources/types/NeutralResourcesLanguageAttribute.html">NeutralResourcesLanguageAttribute</a> on a specified  <a href="../../System.Reflection/types/Assembly.html">Assembly</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected static <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> GetNeutralResourcesLanguage(<br>   <font color="#008080"><a href="../../System.Reflection/types/Assembly.html">Assembly</a> <i>a</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>a</i><br><dl>
+<dd>
+<param> The assembly for which to return a  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The culture from the  <a href="../../System.Resources/types/NeutralResourcesLanguageAttribute.html">NeutralResourcesLanguageAttribute</a>, if found; otherwise,  <a href="../../System.Globalization/types/CultureInfo.html#InvariantCulture">CultureInfo.InvariantCulture</a>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> Use this method in derived classes of the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> to speed up lookups in one particular culture. For example, if this method returns "en-US" for the CultureInfo, then any U.S. English resource lookups will go straight to the main assembly and not look for the "en-US" nor "en" satellite assemblies.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetObjectTopic1"></a><a name="GetObject(System.String)">GetObject</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the value of the specified  <a href="../../System/types/Object.html">Object</a> resource.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> GetObject(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the resource to get.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The value of the resource localized for the caller's current culture settings. If a match is not possible, <b>null</b> is returned. The resource value can be <b>null</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>name</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Resources/types/MissingManifestResourceException.html">MissingManifestResourceException</a></td>
+<td> No usable set of resources has been found, and there are no neutral culture resources.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The returned resource is localized for the culture determined by the current cultural settings of the current  <a href="../../System.Threading/types/Thread.html">Thread</a> (this is accomplished using the culture's  <a href="../../System.Globalization/types/CultureInfo.html#CurrentUICulture">CultureInfo.CurrentUICulture</a> property). If the resource has not been localized for that culture, the resource that is returned is localized for a best match (this is accomplished using the  <a href="../../System.Globalization/types/CultureInfo.html#Parent">CultureInfo.Parent</a> property). Otherwise, <b>null</b> is returned.<p> If no usable set of resources has been found, the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> falls back on the neutral culture's resources, which are expected to be included in the main assembly. If an appropriate culture resource has not been found, a  <a href="../../System.Resources/types/MissingManifestResourceException.html">MissingManifestResourceException</a> is thrown.</p><br><br><b>Note </b> The  <a href="#GetObject(System.String)">ResourceManager.GetObject</a> method is thread-safe.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetObjectTopic2"></a><a name="GetObject(System.String,System.Globalization.CultureInfo)">GetObject</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> <i>culture</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the value of the  <a href="../../System/types/Object.html">Object</a> resource localized for the specified culture.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> GetObject(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> <i>culture</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the resource to get.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>culture</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> object that represents the culture for which the resource is localized. Note that if the resource is not localized for this culture, the lookup will fall back using the culture's  <a href="../../System.Globalization/types/CultureInfo.html#Parent">CultureInfo.Parent</a> property, stopping after checking in the neutral culture.<p> If this value is <b>null</b>, the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> is obtained using the culture's  <a href="../../System.Globalization/types/CultureInfo.html#CurrentUICulture">CultureInfo.CurrentUICulture</a> property.</p> The  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> object that represents the culture for which the resource is localized. Note that if the resource is not localized for this culture, the lookup will fall back using the culture's  <a href="../../System.Globalization/types/CultureInfo.html#Parent">CultureInfo.Parent</a> property, stopping after checking in the neutral culture.<p> If this value is <b>null</b>, the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> is obtained using the culture's  <a href="../../System.Globalization/types/CultureInfo.html#CurrentUICulture">CultureInfo.CurrentUICulture</a> property.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The value of the resource, localized for the specified culture. If a "best match" is not possible, <b>null</b> is returned.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>name</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Resources/types/MissingManifestResourceException.html">MissingManifestResourceException</a></td>
+<td> No usable set of resources have been found, and there are no neutral culture resources.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the resource has not been localized for the specified culture, the resource that is returned is localized for a best match (this is accomplished using the culture's  <a href="../../System.Globalization/types/CultureInfo.html#CurrentUICulture">CultureInfo.CurrentUICulture</a> property). Otherwise, <b>null</b> is returned.<p> If no usable set of resources has been found, the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> falls back on the neutral culture's resources, which are expected to be included in the main assembly. If an appropriate culture resource has not been found, a  <a href="../../System.Resources/types/MissingManifestResourceException.html">MissingManifestResourceException</a> is thrown.</p><br><br><b>Note </b> The  <a href="#GetObject(System.String)">ResourceManager.GetObject</a> method is thread-safe.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpcondesigningglobalapplications.asp">MSDN: designingglobalapplications</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetResourceFileNameTopic1"></a><a name="GetResourceFileName(System.Globalization.CultureInfo)">GetResourceFileName</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> <i>culture</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Generates the name for the resource file for the given  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual <a href="../../System/types/String.html">string</a> GetResourceFileName(<br>   <font color="#008080"><a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> <i>culture</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>culture</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> for which a resource file name is constructed.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The name that can be used for a resource file for the given  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method uses  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> 's  <a href="../../System.Globalization/types/CultureInfo.html#Name">CultureInfo.Name</a> property as part of the file name for all cultures other than the invariant culture. This method does not look in an assembly's manifest or touch the disk, and is used only to construct what a resource file name (suitable for passing to the  <a href="../../System.Resources/types/ResourceReader.html">ResourceReader</a> constructor) or a manifest resource blob name should be.<p> A derived class can override this method to look for a different extension, such as ".ResX", or a completely different scheme for naming files.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpcondesigningglobalapplications.asp">MSDN: designingglobalapplications</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetResourceSetTopic1"></a><a name="GetResourceSet(System.Globalization.CultureInfo,System.Boolean,System.Boolean)">GetResourceSet</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> <i>culture</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>createIfNotExists</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>tryParents</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> for a particular culture.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> GetResourceSet(<br>   <font color="#008080"><a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> <i>culture</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>createIfNotExists</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>tryParents</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>culture</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> to look for.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>createIfNotExists</i><br><dl>
+<dd>
+<param> If <b>true</b> and if the  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> has not been loaded yet, load it.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>tryParents</i><br><dl>
+<dd>
+<param> If the  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> cannot be loaded, try parent  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> objects to see if they exist.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The specified  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>culture</i> parameter is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> that is returned represents the resources localized for the specified culture. If the resources have not been localized for that culture and <i>tryParents</i> is <b>true</b>,  <a href="#GetResourceSet(System.Globalization.CultureInfo,System.Boolean,System.Boolean)">ResourceManager.GetResourceSet</a> falls back to a parent culture (this is accomplished using  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> 's  <a href="../../System.Globalization/types/CultureInfo.html#Parent">CultureInfo.Parent</a> property), and the parent  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> is returned. Otherwise, <b>null</b> is returned.<p> The parameters let you control whether the  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> is created if it hasn't been loaded yet, and whether parent  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> objects should be loaded as well for resource inheritance.</p><br><br><b>Note </b> The  <a href="#GetResourceSet(System.Globalization.CultureInfo,System.Boolean,System.Boolean)">ResourceManager.GetResourceSet</a> method is thread-safe.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpcondesigningglobalapplications.asp">MSDN: designingglobalapplications</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetSatelliteContractVersionTopic1"></a><a name="GetSatelliteContractVersion(System.Reflection.Assembly)">GetSatelliteContractVersion</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Reflection/types/Assembly.html">Assembly</a> <i>a</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the  <a href="../../System/types/Version.html">Version</a> specified by the  <a href="../../System.Resources/types/SatelliteContractVersionAttribute.html">SatelliteContractVersionAttribute</a> in the given assembly.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected static <a href="../../System/types/Version.html">Version</a> GetSatelliteContractVersion(<br>   <font color="#008080"><a href="../../System.Reflection/types/Assembly.html">Assembly</a> <i>a</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>a</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Reflection/types/Assembly.html">Assembly</a> for which to look up the  <a href="../../System.Resources/types/SatelliteContractVersionAttribute.html">SatelliteContractVersionAttribute</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The satellite contract  <a href="../../System/types/Version.html">Version</a> of the given assembly, or <b>null</b> if no version was found.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The  <a href="../../System/types/Version.html">Version</a> found in the assembly <i>a</i> is invalid.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For more information about satellite assembly versioning, see  <a href="../../System.Resources/types/SatelliteContractVersionAttribute.html">SatelliteContractVersionAttribute</a>.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Resources/types/SatelliteContractVersionAttribute.html">SatelliteContractVersionAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetStringTopic1"></a><a name="GetString(System.String)">GetString</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the value of the specified  <a href="../../System/types/String.html">String</a> resource.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/String.html">string</a> GetString(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the resource to get.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The value of the resource localized for the caller's current culture settings. If a match is not possible, <b>null</b> is returned.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>name</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The value of the specified resource is not a string.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Resources/types/MissingManifestResourceException.html">MissingManifestResourceException</a></td>
+<td> No usable set of resources has been found, and there are no neutral culture resources.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The resource that is returned is localized for the culture determined by the cultural settings of the current  <a href="../../System.Threading/types/Thread.html">Thread</a> (this is accomplished using the culture's  <a href="../../System.Globalization/types/CultureInfo.html#CurrentUICulture">CultureInfo.CurrentUICulture</a> property). If the resource has not been localized for that culture, the resource that is returned is localized for a best match (this is accomplished using the  <a href="../../System.Globalization/types/CultureInfo.html#Parent">CultureInfo.Parent</a> property). Otherwise, <b>null</b> is returned.<p> If no usable set of resources has been found, the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> falls back on the neutral culture's resources, which are expected to be in the main assembly. If an appropriate culture resource has not been found, a  <a href="../../System.Resources/types/MissingManifestResourceException.html">MissingManifestResourceException</a> is thrown.</p><br><br><b>Note </b> The  <a href="#GetString(System.String)">ResourceManager.GetString</a> method is thread-safe.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetStringTopic2"></a><a name="GetString(System.String,System.Globalization.CultureInfo)">GetString</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> <i>culture</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the value of the  <a href="../../System/types/String.html">String</a> resource localized for the specified culture.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/String.html">string</a> GetString(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> <i>culture</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the resource to get.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>culture</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> object that represents the culture for which the resource is localized. Note that if the resource is not localized for this culture, the lookup will fall back using the culture's  <a href="../../System.Globalization/types/CultureInfo.html#Parent">CultureInfo.Parent</a> property, stopping after looking in the neutral culture.<p> If this value is <b>null</b>, the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> is obtained using the culture's  <a href="../../System.Globalization/types/CultureInfo.html#CurrentUICulture">CultureInfo.CurrentUICulture</a> property.</p> The  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> object that represents the culture for which the resource is localized. Note that if the resource is not localized for this culture, the lookup will fall back using the culture's  <a href="../../System.Globalization/types/CultureInfo.html#Parent">CultureInfo.Parent</a> property, stopping after looking in the neutral culture.<p> If this value is <b>null</b>, the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> is obtained using the culture's  <a href="../../System.Globalization/types/CultureInfo.html#CurrentUICulture">CultureInfo.CurrentUICulture</a> property.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The value of the resource localized for the specified culture. If a best match is not possible, <b>null</b> is returned.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>name</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The value of the specified resource is not a  <a href="../../System/types/String.html">String</a>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Resources/types/MissingManifestResourceException.html">MissingManifestResourceException</a></td>
+<td> No usable set of resources has been found, and there are no neutral culture resources.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the resource has not been localized for that culture, the resource that is returned is localized for a best match (this is accomplished using the culture's  <a href="../../System.Globalization/types/CultureInfo.html#Parent">CultureInfo.Parent</a> property). Otherwise, <b>null</b> is returned.<p> If no usable set of resources has been found, the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> falls back on the neutral culture's resources, which are expected to be in the main assembly. If an appropriate culture resource has not been found, a  <a href="../../System.Resources/types/MissingManifestResourceException.html">MissingManifestResourceException</a> is thrown.</p><br><br><b>Note </b> The  <a href="#GetString(System.String)">ResourceManager.GetString</a> method is thread-safe.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpcondesigningglobalapplications.asp">MSDN: designingglobalapplications</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="InternalGetResourceSetTopic1"></a><a name="InternalGetResourceSet(System.Globalization.CultureInfo,System.Boolean,System.Boolean)">InternalGetResourceSet</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> <i>culture</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>createIfNotExists</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>tryParents</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides the implementation for finding a  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> InternalGetResourceSet(<br>   <font color="#008080"><a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> <i>culture</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>createIfNotExists</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>tryParents</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>culture</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> to look for.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>createIfNotExists</i><br><dl>
+<dd>
+<param> If <b>true</b> and if the  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> has not been loaded yet, load it.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>tryParents</i><br><dl>
+<dd>
+<param> If the  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> cannot be loaded, try parent  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> objects to see if they exist.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The specified  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Resources/types/MissingManifestResourceException.html">MissingManifestResourceException</a></td>
+<td> The main assembly does not contain a .resources file and it is required to look up a resource.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd><br><br><b>Notes to inheritors: </b> This method completes all the work necessary to find a  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a>, and can be recursive and reentrant. In other words, this method might load an assembly, triggering an  <a href="../../System/types/AppDomain.html#AssemblyLoad">AppDomain.AssemblyLoad</a><b></b> event, which then calls back into the not-completely-initialized  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a>. To avoid taking extra locks, it is not thread safe. <a href="#GetResourceSet(System.Globalization.CultureInfo,System.Boolean,System.Boolean)">ResourceManager.GetResourceSet</a>,  <a href="#GetString(System.String)">ResourceManager.GetString</a>, and  <a href="#GetObject(System.String)">ResourceManager.GetObject</a> do all the necessary synchronization.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpcondesigningglobalapplications.asp">MSDN: designingglobalapplications</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ReleaseAllResourcesTopic1"></a><a name="ReleaseAllResources">ReleaseAllResources</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Tells the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> to call  <a href="../../System.Resources/types/ResourceSet.html#Close">ResourceSet.Close</a> on all  <a href="../../System.Resources/types/ResourceSet.html">ResourceSet</a> objects and release all resources.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void ReleaseAllResources();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method will shrink the working set in a running application. Any future resource lookups on this  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> will be as extensive as the first lookup, since it will need to search and load resources again.<p> This can be useful in some complex threading scenarios, where creating a new  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> is the appropriate behavior.</p>
+<p> This method can also be used in situations where the .resources files opened by the current  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> have to be released deterministically, without waiting for the  <a href="../../System.Resources/types/ResourceManager.html">ResourceManager</a> to go completely out of scope and be garbage collected.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

@@ -1,0 +1,2239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Text.Encoding</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Text.Encoding Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Text<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Represents a character encoding.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public abstract class Encoding</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Thread Safety</b><br><dl>
+<dd> This type is safe for multithreaded operations.</dd>
+</dl><b>Remarks</b><dl>
+<dd> Methods are provided to convert arrays and strings of Unicode characters to and from arrays of bytes encoded for a target code page.<p> A number of  <a href="../../System.Text/types/Encoding.html">Encoding</a> implementations are provided in the  <a href="../../System.Text/System.Text.html">System.Text</a> namespace, including: </p>
+<p> The  <a href="../../System.Text/types/ASCIIEncoding.html">ASCIIEncoding</a> class encodes Unicode characters as single 7-bit ASCII characters. This encoding only supports character values between U+0000 and U+007F.</p>
+<p> The  <a href="../../System.Text/types/UnicodeEncoding.html">UnicodeEncoding</a> class encodes each Unicode character as two consecutive bytes. Both little-endian (code page 1200) and big-endian (code page 1201) byte orders are supported.</p>
+<p> The  <a href="../../System.Text/types/UTF7Encoding.html">UTF7Encoding</a> class encodes Unicode characters using the UTF-7 encoding (UTF-7 stands for UCS Transformation Format, 7-bit form). This encoding supports all Unicode character values, and can also be accessed as code page 65000.</p>
+<p> The  <a href="../../System.Text/types/UTF8Encoding.html">UTF8Encoding</a> class encodes Unicode characters using the UTF-8 encoding (UTF-8 stands for UCS Transformation Format, 8-bit form). This encoding supports all Unicode character values, and can also be accessed as code page 65001.</p>
+<p> Use the  <a href="#GetEncoding(System.Int32)">Encoding.GetEncoding</a> method with a code page or name parameter to obtain other encodings.</p>
+<p> When the data to be converted is only available in sequential blocks (such as data read from a stream), an application can use a  <a href="../../System.Text/types/Decoder.html">Decoder</a> or an  <a href="../../System.Text/types/Encoder.html">Encoder</a> to perform the conversion. This is also useful when the amount of data is so large that it needs to be divided into smaller blocks. Decoders and encoders are obtained using the  <a href="#GetDecoder">Encoding.GetDecoder</a> and  <a href="#GetEncoder">Encoding.GetEncoder</a> methods. An application can use the properties of this class such as  <a href="#ASCII">Encoding.ASCII</a>,  <a href="#Default">Encoding.Default</a>,  <a href="#Unicode">Encoding.Unicode</a>,  <a href="#UTF7">Encoding.UTF7</a>, and  <a href="#UTF8">Encoding.UTF8</a> to obtain encodings. Applications can initialize new instances of <b>Encoding</b> objects through the  <a href="../../System.Text/types/ASCIIEncoding.html">ASCIIEncoding</a>,  <a href="../../System.Text/types/UnicodeEncoding.html">UnicodeEncoding</a>,  <a href="../../System.Text/types/UTF7Encoding.html">UTF7Encoding</a>, and  <a href="../../System.Text/types/UTF8Encoding.html">UTF8Encoding</a> classes.</p>
+<p> Through an encoding, the  <a href="#GetBytes(System.Char[])">Encoding.GetBytes</a> method is used to convert arrays of Unicode characters to arrays of bytes, and the  <a href="#GetChars(System.Byte[])">Encoding.GetChars</a> method is used to convert arrays of bytes to arrays of Unicode characters. The  <a href="#GetBytes(System.Char[])">Encoding.GetBytes</a> and  <a href="#GetChars(System.Byte[])">Encoding.GetChars</a> methods maintain no state between conversions.</p>
+<p> When the data to be converted is only available in sequential blocks (such as data read from a stream) or when the amount of data is so large that it needs to be divided into smaller blocks, an application can use a  <a href="../../System.Text/types/Decoder.html">Decoder</a> or an  <a href="../../System.Text/types/Encoder.html">Encoder</a> to perform the conversion. Decoders and encoders allow sequential blocks of data to be converted and they maintain the state required to support conversions of data that spans adjacent blocks. Decoders and encoders are obtained using the  <a href="#GetDecoder">Encoding.GetDecoder</a> and  <a href="#GetEncoder">Encoding.GetEncoder</a> methods.</p>
+<p> The core  <a href="#GetBytes(System.Char[])">Encoding.GetBytes</a> and  <a href="#GetChars(System.Byte[])">Encoding.GetChars</a> methods require the caller to provide the destination buffer and ensure that the buffer is large enough to hold the entire result of the conversion. An application can use one of the following methods to calculate the required size of the destination buffer.</p>
+<OL>
+<li> The  <a href="#GetByteCount(System.Char[])">Encoding.GetByteCount</a> and  <a href="#GetCharCount(System.Byte[])">Encoding.GetCharCount</a> methods can be used to compute the exact size of the result of a particular conversion, and an appropriately sized buffer for that conversion can then be allocated.</li>
+<li> The  <a href="#GetMaxByteCount(System.Int32)">Encoding.GetMaxByteCount</a> and  <a href="#GetMaxCharCount(System.Int32)">Encoding.GetMaxCharCount</a> methods can be used to compute the maximum possible size of a conversion of a given number of bytes or characters, and a buffer of that size can then be reused for multiple conversions.</li>
+</OL>
+<p> The first method generally uses less memory, whereas the second method generally executes faster.</p>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Text/System.Text.html">System.Text Namespace</a></dd>
+</dl>
+<h3>System.Text.Encoding Member List: </h3>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ASCII">ASCII</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets an encoding for the ASCII (7 bit) character set.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#BigEndianUnicode">BigEndianUnicode</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets an encoding for the Unicode format in the big-endian byte order.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#BodyName">BodyName</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the name for this encoding that can be used with mail agent body tags.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CodePage">CodePage</a></td>
+<td width="55%"><b>Read-only</b><br><br> When overridden in a derived class, gets the code page identifier of this encoding.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Default">Default</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets an encoding for the system's current ANSI code page.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#EncodingName">EncodingName</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the human-readable description of the encoding.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#HeaderName">HeaderName</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the name for this encoding that can be used with mail agent header tags.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsBrowserDisplay">IsBrowserDisplay</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets an indication whether this encoding can be used for display by browser clients.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsBrowserSave">IsBrowserSave</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets an indication whether this encoding can be used for saving by browser clients.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsMailNewsDisplay">IsMailNewsDisplay</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets and indication whether this encoding can be used for display by mail and news clients.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsMailNewsSave">IsMailNewsSave</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets an indication whether this encoding can be used for saving by mail and news clients.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Unicode">Unicode</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets an encoding for the Unicode format in little-endian byte order.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#UTF7">UTF7</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets an encoding for the UTF-7 format.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#UTF8">UTF8</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets an encoding for the UTF-8 format.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WebName">WebName</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the name registered with the Internet Assigned Numbers Authority (IANA) for this encoding.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WindowsCodePage">WindowsCodePage</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the Windows operating system code page that most closely corresponds to this encoding.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Convert(System.Text.Encoding,System.Text.Encoding,System.Byte[])">Convert</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Convert(Encoding srcEncoding, Encoding dstEncoding, byte[] bytes)<br><br></code> Converts a byte array from one encoding to another.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Convert(System.Text.Encoding,System.Text.Encoding,System.Byte[],System.Int32,System.Int32)">Convert</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Convert(Encoding srcEncoding, Encoding dstEncoding, byte[] bytes, int index, int count)<br><br></code> Converts a range of bytes in a byte array from one encoding to another.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a></td>
+<td width="55%"><b>Overridden: </b><br> Determines whether the current instance and the specified  <a href="../../System/types/Object.html">Object</a> represent the same type and value.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetByteCount(System.Char[])">GetByteCount</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetByteCount(char[] chars)<br><br></code> Calculates the number of bytes required to encode a specified character array.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetByteCount(System.String)">GetByteCount</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetByteCount(string s)<br><br></code> Calculates the number of bytes required to encode the specified  <a href="../../System/types/String.html">String</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetByteCount(System.Char[],System.Int32,System.Int32)">GetByteCount</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetByteCount(char[] chars, int index, int count)<br><br></code> When overridden in a derived class, returns the number of bytes required to encode a range of characters in the specified character array.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetBytes(System.Char[])">GetBytes</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetBytes(char[] chars)<br><br></code> Encodes a specified character array into a byte array.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetBytes(System.String)">GetBytes</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetBytes(string s)<br><br></code> Encodes a specified  <a href="../../System/types/String.html">String</a> into an array of bytes.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetBytes(System.Char[],System.Int32,System.Int32)">GetBytes</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetBytes(char[] chars, int index, int count)<br><br></code> Encodes a range of characters from a character array into a byte array.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetBytes(System.Char[],System.Int32,System.Int32,System.Byte[],System.Int32)">GetBytes</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetBytes(char[] chars, int charIndex, int charCount, byte[] bytes, int byteIndex)<br><br></code> When overridden in a derived class, encodes a range of characters from a character array into a byte array.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetBytes(System.String,System.Int32,System.Int32,System.Byte[],System.Int32)">GetBytes</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetBytes(string s, int charIndex, int charCount, byte[] bytes, int byteIndex)<br><br></code> Encodes the specified range of a  <a href="../../System/types/String.html">String</a> into the specified range of a byte array.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetCharCount(System.Byte[])">GetCharCount</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetCharCount(byte[] bytes)<br><br></code> Calculates the number of characters produced by decoding an array of bytes.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetCharCount(System.Byte[],System.Int32,System.Int32)">GetCharCount</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetCharCount(byte[] bytes, int index, int count)<br><br></code> When overridden in a derived class, calculates the number of characters produced by decoding a specified range of elements in an array of bytes.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetChars(System.Byte[])">GetChars</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetChars(byte[] bytes)<br><br></code> Decodes a byte array into an array of characters.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetChars(System.Byte[],System.Int32,System.Int32)">GetChars</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetChars(byte[] bytes, int index, int count)<br><br></code> Decodes a range of bytes from a byte array into a character array.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetChars(System.Byte[],System.Int32,System.Int32,System.Char[],System.Int32)">GetChars</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetChars(byte[] bytes, int byteIndex, int byteCount, char[] chars, int charIndex)<br><br></code> When overridden in a derived class, decodes a range of bytes in a byte array into a range of characters in a character array.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetDecoder">GetDecoder</a></td>
+<td width="55%"> Returns a  <a href="../../System.Text/types/Decoder.html">Decoder</a> for this encoding.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetEncoder">GetEncoder</a></td>
+<td width="55%"> An  <a href="../../System.Text/types/Encoder.html">Encoder</a> for this encoding.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetEncoding(System.Int32)">GetEncoding</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetEncoding(int codepage)<br><br></code> Returns an  <a href="../../System.Text/types/Encoding.html">Encoding</a> that corresponds to the specified code page value.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetEncoding(System.String)">GetEncoding</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetEncoding(string name)<br><br></code> Returns an  <a href="../../System.Text/types/Encoding.html">Encoding</a> for the specified name.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a></td>
+<td width="55%"><b>Overridden: </b><br> Returns the hash code for this instance.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetMaxByteCount(System.Int32)">GetMaxByteCount</a></td>
+<td width="55%"> When overridden in a derived class, returns the maximum number of bytes required to encode a given number of characters.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetMaxCharCount(System.Int32)">GetMaxCharCount</a></td>
+<td width="55%"> When overridden in a derived class, returns the maximum number of characters produced by decoding a given number of bytes.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetPreamble">GetPreamble</a></td>
+<td width="55%"> Returns a set of bytes used at the beginning of a stream to determine which encoding a file was created with. This can include the Unicode byte order mark.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetString(System.Byte[])">GetString</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetString(byte[] bytes)<br><br></code> Returns a string containing the decoded representation of the specified byte array.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetString(System.Byte[],System.Int32,System.Int32)">GetString</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetString(byte[] bytes, int index, int count)<br><br></code> Returns a string containing the decoded representation of a range of bytes in a byte array.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor()<br><br></code>Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Initializes a new instance of the  <a href="../../System.Text/types/Encoding.html">Encoding</a> class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(int codePage)<br><br></code> Initializes a new instance of the  <a href="../../System.Text/types/Encoding.html">Encoding</a> class.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Text.Encoding</b><ul class="none">
+<li><a href="../../System.Text/types/ASCIIEncoding.html">System.Text.ASCIIEncoding</a></li>
+<li><a href="../../System.Text/types/UnicodeEncoding.html">System.Text.UnicodeEncoding</a></li>
+<li><a href="../../System.Text/types/UTF7Encoding.html">System.Text.UTF7Encoding</a></li>
+<li><a href="../../System.Text/types/UTF8Encoding.html">System.Text.UTF8Encoding</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Text.Encoding Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Text/types/Encoding.html">Encoding</a> class.</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected Encoding();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Text/types/Encoding.html">Encoding</a> class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected Encoding(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>codePage</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>codePage</i><br><dl>
+<dd>
+<param> A code page value that corresponds to the preferred encoding.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>codePage</i> is less than zero.</td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#CodePage">Encoding.CodePage</a> |  <a href="#GetEncoding(System.Int32)">Encoding.GetEncoding</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ASCIITopic1"></a><a name="ASCII">ASCII</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an encoding for the ASCII (7 bit) character set.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Text/types/Encoding.html">Encoding</a> ASCII {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> ASCII characters are limited to the lowest 128 Unicode characters, from U+0000 to U+007f.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="BigEndianUnicodeTopic1"></a><a name="BigEndianUnicode">BigEndianUnicode</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an encoding for the Unicode format in the big-endian byte order.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Text/types/Encoding.html">Encoding</a> BigEndianUnicode {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Unicode characters can be stored in two different byte orders: big-endian and little-endian. On little-endian platforms such as Intel machines, it is generally more efficient to store Unicode characters in little-endian order. However, many other platforms can store Unicode characters in big-endian order.<p> Unicode files can be distinguished by the presence of the byte order mark (U+FEFF), which is represented as hexadecimal 0xFE 0xFF on big-endian platforms and hexadecimal 0xFF 0xFE on little-endian platforms.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="BodyNameTopic1"></a><a name="BodyName">BodyName</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the name for this encoding that can be used with mail agent body tags.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/String.html">string</a> BodyName {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For example, if this encoding is equivalent to  <a href="../../System.Text/types/UTF8Encoding.html">UTF8Encoding</a>, this property returns "utf-8".<p> If the encoding cannot be used, the property value is the empty string ("").</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CodePageTopic1"></a><a name="CodePage">CodePage</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, gets the code page identifier of this encoding.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> CodePage {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property must be implemented or overridden.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#ctor1">Encoding.#ctor</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="DefaultTopic1"></a><a name="Default">Default</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an encoding for the system's current ANSI code page.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Text/types/Encoding.html">Encoding</a> Default {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> You can also retrieve your system's current ANSI code page with the Win32 API GetACP() method.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="EncodingNameTopic1"></a><a name="EncodingName">EncodingName</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the human-readable description of the encoding.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/String.html">string</a> EncodingName {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> An example of an  <a href="#EncodingName">Encoding.EncodingName</a> is Hebrew (DOS) for code page 862.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="HeaderNameTopic1"></a><a name="HeaderName">HeaderName</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the name for this encoding that can be used with mail agent header tags.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/String.html">string</a> HeaderName {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For example, if this encoding is equivalent to  <a href="../../System.Text/types/UTF8Encoding.html">UTF8Encoding</a>, this property returns "utf-8".<p> If the encoding cannot be used, the string is empty.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsBrowserDisplayTopic1"></a><a name="IsBrowserDisplay">IsBrowserDisplay</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an indication whether this encoding can be used for display by browser clients.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsBrowserDisplay {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For example, this property returns <b>true</b> for code page 1252 (windows-1252), but <b>false</b> for code page 437 (IBM-437).</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsBrowserSaveTopic1"></a><a name="IsBrowserSave">IsBrowserSave</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an indication whether this encoding can be used for saving by browser clients.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsBrowserSave {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For example, this property returns <b>true</b> for code page 1252 (windows-1252), but <b>false</b> for code page 437 (IBM-437).</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsMailNewsDisplayTopic1"></a><a name="IsMailNewsDisplay">IsMailNewsDisplay</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets and indication whether this encoding can be used for display by mail and news clients.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsMailNewsDisplay {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For example, this property returns <b>true</b> for code page 1252 (windows-1252), but <b>false</b> for code page 437 (IBM-437).</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsMailNewsSaveTopic1"></a><a name="IsMailNewsSave">IsMailNewsSave</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an indication whether this encoding can be used for saving by mail and news clients.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsMailNewsSave {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For example, this property returns <b>true</b> for code page 1252 (windows-1252), but <b>false</b> for code page 437 (IBM-437).</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="UnicodeTopic1"></a><a name="Unicode">Unicode</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an encoding for the Unicode format in little-endian byte order.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Text/types/Encoding.html">Encoding</a> Unicode {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Unicode characters can be stored in two different byte orders: big-endian and little-endian. On little-endian platforms such as Intel machines, it is generally more efficient to store Unicode characters in little-endian byte order. However, many other platforms can store Unicode characters in big-endian byte order.<p> Unicode files can be distinguished by the presence of the byte order mark (U+FEFF), which is represented as hexadecimal 0xFE 0xFF on big-endian platforms and hexadecimal 0xFF 0xFE on little-endian platforms.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="UTF7Topic1"></a><a name="UTF7">UTF7</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an encoding for the UTF-7 format.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Text/types/Encoding.html">Encoding</a> UTF7 {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="UTF8Topic1"></a><a name="UTF8">UTF8</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an encoding for the UTF-8 format.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Text/types/Encoding.html">Encoding</a> UTF8 {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="WebNameTopic1"></a><a name="WebName">WebName</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the name registered with the Internet Assigned Numbers Authority (IANA) for this encoding.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/String.html">string</a> WebName {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="WindowsCodePageTopic1"></a><a name="WindowsCodePage">WindowsCodePage</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the Windows operating system code page that most closely corresponds to this encoding.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> WindowsCodePage {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="ConvertTopic1"></a><a name="Convert(System.Text.Encoding,System.Text.Encoding,System.Byte[])">Convert</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Text/types/Encoding.html">Encoding</a> <i>srcEncoding</i>,</font><br>   <font color="#008080"><a href="../../System.Text/types/Encoding.html">Encoding</a> <i>dstEncoding</i>,</font><br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Converts a byte array from one encoding to another.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Byte.html">byte[]</a> Convert(<br>   <font color="#008080"><a href="../../System.Text/types/Encoding.html">Encoding</a> <i>srcEncoding</i>,</font><br>   <font color="#008080"><a href="../../System.Text/types/Encoding.html">Encoding</a> <i>dstEncoding</i>,</font><br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>srcEncoding</i><br><dl>
+<dd>
+<param> The encoding that <i>bytes</i> is in.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>dstEncoding</i><br><dl>
+<dd>
+<param> The encoding desired for the returned byte array.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>bytes</i><br><dl>
+<dd>
+<param> The bytes to convert.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An array of type  <a href="../../System/types/Byte.html">Byte</a> containing the result of the conversion.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>srcEncoding</i>, <i>dstEncoding</i>, or <i>bytes</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The bytes in the byte array are converted from <i>srcEncoding</i> to <i>dstEncoding</i>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="ConvertTopic2"></a><a name="Convert(System.Text.Encoding,System.Text.Encoding,System.Byte[],System.Int32,System.Int32)">Convert</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Text/types/Encoding.html">Encoding</a> <i>srcEncoding</i>,</font><br>   <font color="#008080"><a href="../../System.Text/types/Encoding.html">Encoding</a> <i>dstEncoding</i>,</font><br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Converts a range of bytes in a byte array from one encoding to another.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Byte.html">byte[]</a> Convert(<br>   <font color="#008080"><a href="../../System.Text/types/Encoding.html">Encoding</a> <i>srcEncoding</i>,</font><br>   <font color="#008080"><a href="../../System.Text/types/Encoding.html">Encoding</a> <i>dstEncoding</i>,</font><br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>srcEncoding</i><br><dl>
+<dd>
+<param> The source of encoding.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>dstEncoding</i><br><dl>
+<dd>
+<param> The destination of encoding.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>bytes</i><br><dl>
+<dd>
+<param> The byte array to convert.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The starting index of the byte array to convert.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>count</i><br><dl>
+<dd>
+<param> The number of bytes to convert.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An array of type  <a href="../../System/types/Byte.html">Byte</a> containing the result of the conversion.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>srcEncoding</i>, <i>dstEncoding</i>, or <i>bytes</i> arguments are <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>index</i> and <i>count</i> do not denote a valid range in the byte array.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method converts <i>count</i> bytes at the starting <i>index</i> from <i>srcEncoding</i> to <i>dstEncoding</i>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines whether the current instance and the specified  <a href="../../System/types/Object.html">Object</a> represent the same type and value.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Object.html">Object</a> to compare to the current instance.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if <i>value</i> represents the same type and value as the current instance; otherwise, <b>false</b>.<b>false</b> if <i>value</i> is <b>null</b> or is not an instance of  <a href="../../System.Text/types/Encoding.html">Encoding</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~Encoding();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetByteCountTopic1"></a><a name="GetByteCount(System.Char[])">GetByteCount</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Char.html">char[]</a> <i>chars</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Calculates the number of bytes required to encode a specified character array.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetByteCount(<br>   <font color="#008080"><a href="../../System/types/Char.html">char[]</a> <i>chars</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>chars</i><br><dl>
+<dd>
+<param> The character array to encode.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The number of bytes needed to encode <i>chars</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>chars</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#GetByteCount(System.Char[])">Encoding.GetByteCount</a> can be used to determine the exact the number of bytes that will be produced from encoding the given array of characters. An appropriately sized buffer for that conversion can then be allocated.<p> Alternatively,  <a href="#GetMaxByteCount(System.Int32)">Encoding.GetMaxByteCount</a> can be used to determine the maximum number of bytes that will be produced from converting a given number of characters. A buffer of that size can then be reused for multiple conversions.</p>
+<p> The  <a href="#GetByteCount(System.Char[])">Encoding.GetByteCount</a> method generally uses less memory, whereas the  <a href="#GetMaxByteCount(System.Int32)">Encoding.GetMaxByteCount</a> method generally executes faster.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetByteCountTopic2"></a><a name="GetByteCount(System.String)">GetByteCount</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>s</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Calculates the number of bytes required to encode the specified  <a href="../../System/types/String.html">String</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetByteCount(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>s</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>s</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/String.html">String</a> to encode.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The number of bytes required to encode <i>s</i>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#GetByteCount(System.Char[])">Encoding.GetByteCount</a> can be used to determine the exact the number of bytes that will be produced from encoding the given  <a href="../../System/types/String.html">String</a>. An appropriately sized buffer for that conversion can then be allocated.<p> Alternatively,  <a href="#GetMaxByteCount(System.Int32)">Encoding.GetMaxByteCount</a> can be used to determine the maximum number of bytes that will be produced from converting a given  <a href="../../System/types/String.html">String</a>. A buffer of that size can then be reused for multiple conversions.</p>
+<p> The  <a href="#GetByteCount(System.Char[])">Encoding.GetByteCount</a> method generally uses less memory, whereas the  <a href="#GetMaxByteCount(System.Int32)">Encoding.GetMaxByteCount</a> method generally executes faster.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetByteCountTopic3"></a><a name="GetByteCount(System.Char[],System.Int32,System.Int32)">GetByteCount</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Char.html">char[]</a> <i>chars</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, returns the number of bytes required to encode a range of characters in the specified character array.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public abstract <a href="../../System/types/Int32.html">int</a> GetByteCount(<br>   <font color="#008080"><a href="../../System/types/Char.html">char[]</a> <i>chars</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>chars</i><br><dl>
+<dd>
+<param> The character array to encode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The starting index of the character array to encode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>count</i><br><dl>
+<dd>
+<param> The number of characters to encode.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The number of bytes required to encode the specified range of characters.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>chars</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>index</i> and <i>count</i> do not denote a valid range in the character array.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#GetByteCount(System.Char[])">Encoding.GetByteCount</a> can be used to determine the exact the number of bytes that will be produced from encoding the given array of characters. An appropriately sized buffer for that conversion can then be allocated.<p> Alternatively,  <a href="#GetMaxByteCount(System.Int32)">Encoding.GetMaxByteCount</a> can be used to determine the maximum number of bytes that will be produced from converting a given number of characters. A buffer of that size can then be reused for multiple conversions.</p>
+<p> The  <a href="#GetByteCount(System.Char[])">Encoding.GetByteCount</a> method generally uses less memory, whereas the  <a href="#GetMaxByteCount(System.Int32)">Encoding.GetMaxByteCount</a> method generally executes faster.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetBytesTopic1"></a><a name="GetBytes(System.Char[])">GetBytes</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Char.html">char[]</a> <i>chars</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Encodes a specified character array into a byte array.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Byte.html">byte[]</a> GetBytes(<br>   <font color="#008080"><a href="../../System/types/Char.html">char[]</a> <i>chars</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>chars</i><br><dl>
+<dd>
+<param> The character array to encode.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A byte array containing the encoded representation of <i>chars</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>chars</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#GetByteCount(System.Char[])">Encoding.GetByteCount</a> |  <a href="#GetMaxByteCount(System.Int32)">Encoding.GetMaxByteCount</a> |  <a href="#GetDecoder">Encoding.GetDecoder</a> |  <a href="#GetEncoder">Encoding.GetEncoder</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetBytesTopic2"></a><a name="GetBytes(System.String)">GetBytes</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>s</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Encodes a specified  <a href="../../System/types/String.html">String</a> into an array of bytes.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Byte.html">byte[]</a> GetBytes(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>s</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>s</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/String.html">String</a> to encode.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A byte array containing the encoded representation of the specified string.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>s</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#GetBytes(System.Char[])">Encoding.GetBytes</a> method maintains no state between conversions. The method is intended for conversion of a complete block of characters in one operation.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#GetByteCount(System.Char[])">Encoding.GetByteCount</a> |  <a href="#GetMaxByteCount(System.Int32)">Encoding.GetMaxByteCount</a> |  <a href="#GetDecoder">Encoding.GetDecoder</a> |  <a href="#GetEncoder">Encoding.GetEncoder</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetBytesTopic3"></a><a name="GetBytes(System.Char[],System.Int32,System.Int32)">GetBytes</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Char.html">char[]</a> <i>chars</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Encodes a range of characters from a character array into a byte array.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Byte.html">byte[]</a> GetBytes(<br>   <font color="#008080"><a href="../../System/types/Char.html">char[]</a> <i>chars</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>chars</i><br><dl>
+<dd>
+<param> The character array to encode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The starting index of the character array to encode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>count</i><br><dl>
+<dd>
+<param> The number of characters to encode.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A byte array containing the encoded representation of the specified range of characters in <i>chars</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>chars</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The <i>index</i> and <i>count</i> parameters do not denote a valid range in <i>chars</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#GetByteCount(System.Char[])">Encoding.GetByteCount</a> |  <a href="#GetMaxByteCount(System.Int32)">Encoding.GetMaxByteCount</a> |  <a href="#GetDecoder">Encoding.GetDecoder</a> |  <a href="#GetEncoder">Encoding.GetEncoder</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetBytesTopic4"></a><a name="GetBytes(System.Char[],System.Int32,System.Int32,System.Byte[],System.Int32)">GetBytes</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Char.html">char[]</a> <i>chars</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>charIndex</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>charCount</i>,</font><br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>byteIndex</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, encodes a range of characters from a character array into a byte array.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public abstract <a href="../../System/types/Int32.html">int</a> GetBytes(<br>   <font color="#008080"><a href="../../System/types/Char.html">char[]</a> <i>chars</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>charIndex</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>charCount</i>,</font><br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>byteIndex</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>chars</i><br><dl>
+<dd>
+<param> The character array to encode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>charIndex</i><br><dl>
+<dd>
+<param> The starting index of the character array to encode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>charCount</i><br><dl>
+<dd>
+<param> The number of characters to encode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>bytes</i><br><dl>
+<dd>
+<param> The byte array where the resulting encoding is stored.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>byteIndex</i><br><dl>
+<dd>
+<param> The starting index of the resulting encoding in the byte array.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The number of bytes stored in array <i>bytes</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>chars</i> or <i>bytes</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>charIndex</i>, <i>charCount</i> or <i>byteIndex</i> is less than zero.<p> -or- </p>
+<p><i>charIndex</i> + <i>charCount</i> is greater than the length of <i>chars</i>.</p>
+<p> -or- </p>
+<p><i>byteIndex</i> + <i>charCount</i> is greater than the length of <i>bytes</i>.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Encodes a range of characters in a character array into a range of bytes in a byte array. An exception occurs if the byte array is not large enough to hold the complete encoding of the characters.<p> <a href="#GetByteCount(System.Char[])">Encoding.GetByteCount</a> can be used to determine the exact number of bytes that will be produced for a given range of characters. Alternatively,  <a href="#GetMaxByteCount(System.Int32)">Encoding.GetMaxByteCount</a> can be used to determine the maximum number of bytes that will be produced for a given number of characters, regardless of the actual character values.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#GetByteCount(System.Char[])">Encoding.GetByteCount</a> |  <a href="#GetMaxByteCount(System.Int32)">Encoding.GetMaxByteCount</a> |  <a href="#GetDecoder">Encoding.GetDecoder</a> |  <a href="#GetEncoder">Encoding.GetEncoder</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetBytesTopic5"></a><a name="GetBytes(System.String,System.Int32,System.Int32,System.Byte[],System.Int32)">GetBytes</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>s</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>charIndex</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>charCount</i>,</font><br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>byteIndex</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Encodes the specified range of a  <a href="../../System/types/String.html">String</a> into the specified range of a byte array.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetBytes(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>s</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>charIndex</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>charCount</i>,</font><br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>byteIndex</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>s</i><br><dl>
+<dd>
+<param> A  <a href="../../System/types/String.html">String</a> to encode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>charIndex</i><br><dl>
+<dd>
+<param> The first index of <i>s</i> from which to encode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>charCount</i><br><dl>
+<dd>
+<param> The number of characters of <i>s</i> to encode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>bytes</i><br><dl>
+<dd>
+<param> The byte array to encode into.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>byteIndex</i><br><dl>
+<dd>
+<param> The first index of <i>bytes</i> to encode into.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The number of encoded bytes in array <i>bytes</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>s</i> or <i>bytes</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>charIndex</i>, <i>charCount</i>, or <i>byteIndex</i> is less than zero.<p> -or- </p>
+<p><i>charIndex</i> and <i>charCount</i> do not specify a valid range in <i>s</i> (that is, (<i>charIndex</i> + <i>charCount</i>) is greater than the length of <i>s</i>).</p>
+<p> -or- </p>
+<p><i>byteIndex</i> and <i>charCount</i> do not specify a valid range in bytes (that is, (<i>byteIndex</i> + <i>charCount</i>) is greater than the length of <i>bytes</i>).</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetCharCountTopic1"></a><a name="GetCharCount(System.Byte[])">GetCharCount</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Calculates the number of characters produced by decoding an array of bytes.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetCharCount(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>bytes</i><br><dl>
+<dd>
+<param> The byte array to decode.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The number of characters produced by decoding the specified byte array.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>bytes</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#GetCharCount(System.Byte[])">Encoding.GetCharCount</a> method can be used to determine the exact the number of characters that will be produced from converting a given range of bytes. An appropriately sized buffer for that conversion can then be allocated.<p> Alternatively, the  <a href="#GetMaxCharCount(System.Int32)">Encoding.GetMaxCharCount</a> method can be used to determine the maximum number of characters that will produced for a given number of bytes. A buffer of that size can then be reused for multiple conversions.</p>
+<p> The  <a href="#GetCharCount(System.Byte[])">Encoding.GetCharCount</a> method generally uses less memory, whereas the  <a href="#GetMaxCharCount(System.Int32)">Encoding.GetMaxCharCount</a> method generally executes faster.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetCharCountTopic2"></a><a name="GetCharCount(System.Byte[],System.Int32,System.Int32)">GetCharCount</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, calculates the number of characters produced by decoding a specified range of elements in an array of bytes.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public abstract <a href="../../System/types/Int32.html">int</a> GetCharCount(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>bytes</i><br><dl>
+<dd>
+<param> The byte array to decode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The starting index where decoding begins.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>count</i><br><dl>
+<dd>
+<param> The number of bytes to decode.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The number of characters produced by decoding a range of bytes in the specified byte array.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>bytes</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>index</i> and <i>count</i> do not denote a valid range in the byte array.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#GetCharCount(System.Byte[])">Encoding.GetCharCount</a> method can be used to determine the exact the number of characters that will be produces from converting a given range of bytes. An appropriately sized buffer for that conversion can then be allocated.<p> Alternatively, the  <a href="#GetMaxCharCount(System.Int32)">Encoding.GetMaxCharCount</a> method can be used to determine the maximum number of characters that will produced for a given number of bytes. A buffer of that size can then be reused for multiple conversions.</p>
+<p> The  <a href="#GetCharCount(System.Byte[])">Encoding.GetCharCount</a> method generally uses less memory, whereas the  <a href="#GetMaxCharCount(System.Int32)">Encoding.GetMaxCharCount</a> method generally executes faster.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetCharsTopic1"></a><a name="GetChars(System.Byte[])">GetChars</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Decodes a byte array into an array of characters.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Char.html">char[]</a> GetChars(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>bytes</i><br><dl>
+<dd>
+<param> The byte array to decode.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A character array containing the decoded character representation from array <i>bytes</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>bytes</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#GetChars(System.Byte[])">Encoding.GetChars</a> assumes that the byte array contains all the bytes necessary to produce whole characters. If your bytes might be in multiple byte arrays (that is, the bytes corresponding to a single character might be at the end of one byte array and the beginning of another), use the  <a href="../../System.Text/types/Decoder.html">Decoder</a> class, which maintains state between multiple calls.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#GetCharCount(System.Byte[])">Encoding.GetCharCount</a> |  <a href="#GetMaxCharCount(System.Int32)">Encoding.GetMaxCharCount</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetCharsTopic2"></a><a name="GetChars(System.Byte[],System.Int32,System.Int32)">GetChars</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Decodes a range of bytes from a byte array into a character array.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Char.html">char[]</a> GetChars(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>bytes</i><br><dl>
+<dd>
+<param> The byte array to decode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The starting index of the byte array to decode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>count</i><br><dl>
+<dd>
+<param> The number of bytes to decode.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A character array containing the decoded character representation from a range of array <i>bytes</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>bytes</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>index</i> and <i>count</i> do not denote a valid range in the byte array.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#GetChars(System.Byte[])">Encoding.GetChars</a> assumes that the byte array contains all the bytes necessary to produce whole characters. If your bytes might be in multiple byte arrays (that is, the bytes corresponding to a single character might be at the end of one byte array and the beginning of another), use the  <a href="../../System.Text/types/Decoder.html">Decoder</a> class, which maintains state between multiple calls.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#GetCharCount(System.Byte[])">Encoding.GetCharCount</a> |  <a href="#GetMaxCharCount(System.Int32)">Encoding.GetMaxCharCount</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetCharsTopic3"></a><a name="GetChars(System.Byte[],System.Int32,System.Int32,System.Char[],System.Int32)">GetChars</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>byteIndex</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>byteCount</i>,</font><br>   <font color="#008080"><a href="../../System/types/Char.html">char[]</a> <i>chars</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>charIndex</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, decodes a range of bytes in a byte array into a range of characters in a character array.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public abstract <a href="../../System/types/Int32.html">int</a> GetChars(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>byteIndex</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>byteCount</i>,</font><br>   <font color="#008080"><a href="../../System/types/Char.html">char[]</a> <i>chars</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>charIndex</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>bytes</i><br><dl>
+<dd>
+<param> The byte array to decode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>byteIndex</i><br><dl>
+<dd>
+<param> The starting index of the byte array to decode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>byteCount</i><br><dl>
+<dd>
+<param> The number of bytes to decode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>chars</i><br><dl>
+<dd>
+<param> The character array where the resulting decoding is stored.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>charIndex</i><br><dl>
+<dd>
+<param> The starting index of the resulting decoding in the character array.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The number of characters stored in the character array.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>bytes</i> or <i>chars</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>byteIndex</i>, <i>byteCount</i>, or <i>charIndex</i> is less than zero.<p> -or- </p>
+<p><i>byteIndex</i> + <i>byteCount</i> is greater than the length of <i>bytes</i>.</p>
+<p> -or- </p>
+<p><i>charIndex</i> + <i>byteCount</i> is greater than the length of <i>chars</i>.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#GetChars(System.Byte[])">Encoding.GetChars</a> method maintains no state between conversions. The method is intended for conversions of complete blocks of bytes and characters in one operation. If your bytes might be in multiple byte arrays (that is, the bytes corresponding to a single character might be at the end of one byte array and the beginning of another), use the  <a href="../../System.Text/types/Decoder.html">Decoder</a> class, which will maintain state between multiple calls.<p> The  <a href="#GetChars(System.Byte[])">Encoding.GetChars</a> method requires the caller to provide the destination buffer and ensure that the buffer is large enough to hold the entire result of the conversion. An application can use  <a href="#GetCharCount(System.Byte[])">Encoding.GetCharCount</a> or  <a href="#GetMaxCharCount(System.Int32)">Encoding.GetMaxCharCount</a> to calculate the required size of the destination buffer.</p>
+<p> You can use this method to determine the exact number of characters that will be produced for a given range of bytes. Alternatively, the  <a href="#GetMaxCharCount(System.Int32)">Encoding.GetMaxCharCount</a> method can be used to determine the maximum number of characters that will be produced for a given number of bytes, regardless of the actual byte values.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#GetCharCount(System.Byte[])">Encoding.GetCharCount</a> |  <a href="#GetMaxCharCount(System.Int32)">Encoding.GetMaxCharCount</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetDecoderTopic1"></a><a name="GetDecoder">GetDecoder</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns a  <a href="../../System.Text/types/Decoder.html">Decoder</a> for this encoding.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System.Text/types/Decoder.html">Decoder</a> GetDecoder();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> Returns a  <a href="../../System.Text/types/Decoder.html">Decoder</a> for this encoding. The  <a href="../../System.Text/types/Decoder.html">Decoder</a> can be used to decode a sequence of bytes into characters.</dd>
+</dl><b>Remarks</b><dl>
+<dd> Contrary to the  <a href="#GetChars(System.Byte[])">Encoding.GetChars</a> methods, a  <a href="../../System.Text/types/Decoder.html">Decoder</a> can convert partial sequences of bytes into partial sequences of characters by maintaining the appropriate state between the conversions.<p> This default implementation returns a  <a href="../../System.Text/types/Decoder.html">Decoder</a> that forwards calls to the  <a href="#GetCharCount(System.Byte[])">Encoding.GetCharCount</a> and  <a href="#GetChars(System.Byte[])">Encoding.GetChars</a> methods to the corresponding methods of this encoding. Encodings that require state to be maintained between successive conversions can override this method and return an instance of an appropriate  <a href="../../System.Text/types/Decoder.html">Decoder</a> implementation.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#GetCharCount(System.Byte[])">Encoding.GetCharCount</a> |  <a href="#GetChars(System.Byte[])">Encoding.GetChars</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetEncoderTopic1"></a><a name="GetEncoder">GetEncoder</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> An  <a href="../../System.Text/types/Encoder.html">Encoder</a> for this encoding.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System.Text/types/Encoder.html">Encoder</a> GetEncoder();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An  <a href="../../System.Text/types/Encoder.html">Encoder</a> for this encoding. The  <a href="../../System.Text/types/Encoder.html">Encoder</a> can be used to encode a sequence of characters into bytes.</dd>
+</dl><b>Remarks</b><dl>
+<dd> Contrary to  <a href="#GetBytes(System.Char[])">Encoding.GetBytes</a>, an  <a href="../../System.Text/types/Encoder.html">Encoder</a> can convert partial sequences of characters into partial sequences of bytes by maintaining the appropriate state between the conversions.<p> This default implementation returns an  <a href="../../System.Text/types/Encoder.html">Encoder</a> that forwards calls to  <a href="#GetByteCount(System.Char[])">Encoding.GetByteCount</a> and  <a href="#GetBytes(System.Char[])">Encoding.GetBytes</a> to the corresponding methods of this encoding. Encodings that require state to be maintained between successive conversions can override this method and return an instance of an appropriate  <a href="../../System.Text/types/Encoder.html">Encoder</a> implementation.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetEncodingTopic1"></a><a name="GetEncoding(System.Int32)">GetEncoding</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>codepage</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns an  <a href="../../System.Text/types/Encoding.html">Encoding</a> that corresponds to the specified code page value.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Text/types/Encoding.html">Encoding</a> GetEncoding(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>codepage</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>codepage</i><br><dl>
+<dd>
+<param> A code page value that corresponds to the preferred encoding.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The requested encoding.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>codepage</i> is less than zero or greater than 65535.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td><i>codepage</i> is not supported by the current regional options of the computer executing this method.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#GetEncoding(System.Int32)">Encoding.GetEncoding</a> method relies on the underlying platform to support most code pages. However, system support is supplied for the following cases: Specify code page 0 for the default encoding, that is, the encoding specified in the regional settings for the computer executing this method; 1200 for little-endian Unicode (UTF-16LE); 1201 for big-endian Unicode (UTF-16BE); 1252 for Windows operating system (windows-1252); 65000 for UTF-7; 65001 for UTF-8; 20127 for ASCII, and 54936 for GB18030 (Chinese Simplified).<p> For example, the encoding for the windows-1252 code page (code page value 1252) can be created by the following C# code: </p>
+<p><code>
+                Encoding enc = Encoding.GetEncoding(1252);
+              </code></p>
+<p> A specific code page might not be supported by certain platforms. For example, the Japanese shift-jis code page (code page 932) might not be supported in the United States version of Windows 98. In that case, the  <a href="#GetEncoding(System.Int32)">Encoding.GetEncoding</a> method throws  <a href="../../System/types/NotSupportedException.html">NotSupportedException</a> when the following C# code is executed: </p>
+<p><code>
+                Encoding enc = Encoding.GetEncoding(932);
+              </code></p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetEncodingTopic2"></a><a name="GetEncoding(System.String)">GetEncoding</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns an  <a href="../../System.Text/types/Encoding.html">Encoding</a> for the specified name.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Text/types/Encoding.html">Encoding</a> GetEncoding(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of an  <a href="../../System.Text/types/Encoding.html">Encoding</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The requested encoding.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The <i>name</i> encoding is not supported by the current regional options of the computer executing this method.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#GetEncoding(System.Int32)">Encoding.GetEncoding</a> method relies on the underlying platform to support most code pages. However, system support is supplied for the following cases: The default encoding, that is, the encoding specified in the regional settings for the computer executing this method; little-endian Unicode (UTF-16LE); big-endian Unicode (UTF-16BE); Windows operating system (windows-1252); UTF-7; UTF-8; ASCII, and GB18030 (Chinese Simplified).<p> Specify one of the names listed in the following table to obtain the system supported encoding with the corresponding code page.</p><br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  code page
+                </TH>
+<TH>
+                  name
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+                  1200
+                </TD>
+<TD>
+                  "UTF-16LE", "utf-16", "ucs-2",
+                  "unicode", or "ISO-10646-UCS-2"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  1201
+                </TD>
+<TD>
+                  "UTF-16BE" or "unicodeFFFE"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  1252
+                </TD>
+<TD>
+                  "windows-1252"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  65000
+                </TD>
+<TD>
+                  "utf-7",
+                  "csUnicode11UTF7", "unicode-1-1-utf-7", "unicode-2-0-utf-7",
+                  "x-unicode-1-1-utf-7", or "x-unicode-2-0-utf-7"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  65001
+                </TD>
+<TD>
+                  "utf-8", "unicode-1-1-utf-8", "unicode-2-0-utf-8",
+                  "x-unicode-1-1-utf-8", or "x-unicode-2-0-utf-8"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  20127
+                </TD>
+<TD>
+                  "us-ascii", "us", "ascii", "ANSI_X3.4-1968",
+                  "ANSI_X3.4-1986", "cp367", "csASCII", "IBM367", "iso-ir-6",
+                  "ISO646-US", or "ISO_646.irv:1991"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  54936
+                </TD>
+<TD>
+                  "GB18030"
+                </TD>
+</TR>
+</table>
+<p> A specific code page might not be supported by certain platforms. For example, the Japanese shift-jis code page (code page 932) might not be supported in the United States version of Windows 98. In that case, the  <a href="#GetEncoding(System.Int32)">Encoding.GetEncoding</a> method throws  <a href="../../System/types/NotSupportedException.html">NotSupportedException</a> when the following C# code is executed: </p>
+<p><code>
+                Encoding enc = Encoding.GetEncoding("shift-jis");
+              </code></p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the hash code for this instance.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A 32-bit signed integer hash code.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetMaxByteCountTopic1"></a><a name="GetMaxByteCount(System.Int32)">GetMaxByteCount</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>charCount</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, returns the maximum number of bytes required to encode a given number of characters.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public abstract <a href="../../System/types/Int32.html">int</a> GetMaxByteCount(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>charCount</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>charCount</i><br><dl>
+<dd>
+<param> The number of characters to encode.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The maximum number of bytes required for encoding a given number of characters.</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#GetMaxByteCount(System.Int32)">Encoding.GetMaxByteCount</a> can be used to determine an appropriate buffer size for byte arrays passed to the  <a href="#GetBytes(System.Char[])">Encoding.GetBytes</a> of this encoding.<p> All encoding must guarantee that no buffer overflow exceptions will occur if buffers are sized according to the results of this method.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetMaxCharCountTopic1"></a><a name="GetMaxCharCount(System.Int32)">GetMaxCharCount</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>byteCount</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, returns the maximum number of characters produced by decoding a given number of bytes.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public abstract <a href="../../System/types/Int32.html">int</a> GetMaxCharCount(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>byteCount</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>byteCount</i><br><dl>
+<dd>
+<param> The number of bytes to encode.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The maximum number of characters produced by decoding a specified number of bytes.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method can be used to determine an appropriate buffer size for character arrays passed to  <a href="#GetChars(System.Byte[])">Encoding.GetChars</a> or a  <a href="../../System.Text/types/Decoder.html">Decoder</a> for this encoding. All encoding must guarantee that no buffer overflow exceptions will occur if buffers are sized according to the results of this method.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetPreambleTopic1"></a><a name="GetPreamble">GetPreamble</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns a set of bytes used at the beginning of a stream to determine which encoding a file was created with. This can include the Unicode byte order mark.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Byte.html">byte[]</a> GetPreamble();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The bytes at the beginning of a stream, which typically comprise the byte order mark.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The preamble can be the Unicode byte order mark (U+FEFF written in the appropriate encoding) or any other type of identifying marks. This method can return an empty byte array.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetStringTopic1"></a><a name="GetString(System.Byte[])">GetString</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns a string containing the decoded representation of the specified byte array.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/String.html">string</a> GetString(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>bytes</i><br><dl>
+<dd>
+<param> The byte array to decode.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A string containing the decoded representation of the specified byte array.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>bytes</i> parameter is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#GetString(System.Byte[])">Encoding.GetString</a> assumes that the byte array contains all the bytes necessary to produce whole characters. If your bytes might be in multiple byte arrays (that is, the bytes corresponding to a single character might be at the end of one byte array and the beginning of another), use the  <a href="../../System.Text/types/Decoder.html">Decoder</a> class, which will maintain state between multiple calls.</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example demonstrates how to read a UTF8 encoded string from binary file.<pre>
+    private string ReadAuthor(Stream binary_file) {
+      System.Text.Encoding encoding = System.Text.Encoding.UTF8;
+      // Read string from binary file with UTF8 encoding
+      byte[] buffer = new byte[30];
+      binary_file.Read(buffer, 0, 30);
+      return encoding.GetString(buffer);
+    }
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetStringTopic2"></a><a name="GetString(System.Byte[],System.Int32,System.Int32)">GetString</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns a string containing the decoded representation of a range of bytes in a byte array.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/String.html">string</a> GetString(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>bytes</i><br><dl>
+<dd>
+<param> The byte array to decode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The starting index of the byte array to decode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>count</i><br><dl>
+<dd>
+<param> The number of bytes to decode.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A string containing the decoded representation of a range of bytes in the specified byte array.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>bytes</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The <i>index</i> and <i>count</i> parameters do not denote a valid range in the byte array.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#GetString(System.Byte[])">Encoding.GetString</a> assumes that the byte array contains all the bytes necessary to produce whole characters. If your bytes might be in multiple byte arrays (that is, the bytes corresponding to a single character might be at the end of one byte array and the beginning of another), use the  <a href="../../System.Text/types/Decoder.html">Decoder</a> class, which will maintain state between multiple calls.</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example demonstrates how to read a UTF8 encoded string from binary file.<pre>
+    private string ReadAuthor(Stream binary_file) {
+      System.Text.Encoding encoding = System.Text.Encoding.UTF8;
+      // Read string from binary file with UTF8 encoding
+      byte[] buffer = new byte[30];
+      binary_file.Read(buffer, 0, 30);
+      return encoding.GetString(buffer);
+    }
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

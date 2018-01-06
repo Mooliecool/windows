@@ -1,0 +1,688 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Collections.Specialized.BitVector32</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Collections.Specialized.BitVector32 Structure</h2><b>Assembly: </b>System.dll<br><b>Namespace: </b>System.Collections.Specialized<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides a simple structure that stores Boolean values and small integers in 32 bits of memory.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public struct BitVector32
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> is more efficient than  <a href="../../System.Collections/types/BitArray.html">BitArray</a> for Boolean values and small integers that are used internally. A  <a href="../../System.Collections/types/BitArray.html">BitArray</a> can grow indefinitely as needed, but it has the memory and performance overhead that a class instance requires. In contrast, a  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> uses only 32 bits.<p> A  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> structure can be set up to contain either sections for small integers or bit flags for Booleans, but not both. A  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a> is a window into the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> and is composed of the smallest number of consecutive bits that can contain the maximum value specified in  <a href="#CreateSection(System.Int16)">BitVector32.CreateSection</a>. For example, a section with a maximum value of 1 is composed of only one bit, whereas a section with a maximum value of 5 is composed of three bits. You can create a  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a> with a maximum value of 1 to serve as a Boolean, thereby allowing you to store integers and Booleans in the same  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>.</p>
+<p> Some members can be used for a  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> that is set up as sections, while other members can be used for one that is set up as bit flags. For example, the  <a href="#Item(System.Int32)">BitVector32.Item</a> [Section] property is the indexer for a  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> that is set up as sections, and the  <a href="#Item(System.Int32)">BitVector32.Item</a> [int] property is the indexer for a  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> that is set up as bit flags. <a href="#CreateMask">BitVector32.CreateMask</a> creates a series of masks that can be used to access individual bits in a  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> that is set up as bit flags.</p>
+<p> Using a mask on a  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> that is set up as sections might cause unexpected results.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows the standard usage of a bit vector.<pre>
+using System;
+using System.Collections.Specialized;
+using System.Windows.Forms;
+
+public class Form1: Form
+{
+ protected TextBox textBox1;
+// Creates three sections for a bit vector.
+ private static readonly BitVector32.Section first = 
+    BitVector32.CreateSection(2);
+ private static readonly BitVector32.Section second = 
+    BitVector32.CreateSection(1, first);
+ private static readonly BitVector32.Section third = 
+    BitVector32.CreateSection(5, second);
+ 
+ // Creates two masks for the bit vector.
+ private static readonly int MaskOne = BitVector32.CreateMask();
+ private static readonly int MaskTwo = BitVector32.CreateMask(MaskOne);
+
+ private void MyMethod()
+ { 
+ // Creates a new bit vector, using the first and third sections.
+ // The first section has a maximum of two as defined above.
+ BitVector32 b = new BitVector32(); b[first] = 1;
+ // The third section has a maximum of five.
+ b[third] = 3; 
+ 
+ // Creates another bit vector, with Mask One.
+ BitVector32 anotherB = new BitVector32(); 
+ anotherB[MaskOne] = true;
+ }   
+}
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Collections.Specialized/System.Collections.Specialized.html">System.Collections.Specialized Namespace</a> |  <a href="../../System.Collections/types/BitArray.html">BitArray</a></dd>
+</dl>
+<h3>System.Collections.Specialized.BitVector32 Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(BitVector32 value)<br><br></code> Initializes a new instance of the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> structure containing the data represented in an existing  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> structure.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(int data)<br><br></code> Initializes a new instance of the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> structure containing the data represented in an integer.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Data">Data</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the value of the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> as an integer.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Item(System.Collections.Specialized.BitVector32.Section)">Item</a></td>
+<td width="55%"><b>Read-write</b><br><br><b>Overloaded:</b><br><code>Item[BitVector32.Section section] {get<br><br></code> Gets or sets the value stored in the specified  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Item(System.Int32)">Item</a></td>
+<td width="55%"><b>Read-write</b><br><br><b>Overloaded:</b><br><code>Item[int bit] {get<br><br></code> Gets or sets the state of the bit flag indicated by the specified mask.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#CreateMask">CreateMask</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>CreateMask()<br><br></code> Creates the first mask in a series of masks that can be used to retrieve individual bits in a  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> that is set up as bit flags.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CreateMask(System.Int32)">CreateMask</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>CreateMask(int previous)<br><br></code> Creates an additional mask following the specified mask in a series of masks that can be used to retrieve individual bits in a  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> that is set up as bit flags.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CreateSection(System.Int16)">CreateSection</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>CreateSection(short maxValue)<br><br></code> Creates the first  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a> in a series of sections that contain small integers.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CreateSection(System.Int16,System.Collections.Specialized.BitVector32.Section)">CreateSection</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>CreateSection(short maxValue, BitVector32.Section previous)<br><br></code> Creates a new  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a> following the specified  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a> in a series of sections that contain small integers.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a></td>
+<td width="55%"><b>Overridden: </b><br> Determines whether the specified object is equal to the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a></td>
+<td width="55%"><b>Overridden: </b><br> Serves as a hash function for the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>ToString()<br><br></code><b>Overridden: </b><br> Supports the Shared Source CLI infrastructure and is not intended to be used directly from your code </td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString(System.Collections.Specialized.BitVector32)">ToString</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>ToString(BitVector32 value)<br><br></code> Supports the Shared Source CLI infrastructure and is not intended to be used directly from your code </td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/ValueType.html">System.ValueType</a></li>
+<ul class="none">
+<li><b>System.Collections.Specialized.BitVector32</b></li>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Collections.Specialized.BitVector32 Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> structure containing the data represented in an existing  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> structure.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public BitVector32(BitVector32(<br>   <font color="#008080"><a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> A  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> structure that contains the data to copy.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> structure containing the data represented in an integer.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public BitVector32(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>data</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>data</i><br><dl>
+<dd>
+<param> An integer representing the data of the new  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="DataTopic1"></a><a name="Data">Data</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the value of the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> as an integer.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> Data {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> To access the value of the individual sections or bit flags, use the  <a href="#Item(System.Int32)">BitVector32.Item</a> property.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Item(System.Int32)">BitVector32.Item</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Property: <i><a name="ItemTopic1"></a><a name="Item(System.Collections.Specialized.BitVector32.Section)">Item</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the value stored in the specified  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> this[BitVector32.Section section] {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>section</i><br><dl>
+<dd>
+<param> A  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a> that contains the value to get or set.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#Item(System.Int32)">BitVector32.Item</a> [Section] property is the indexer for a  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> that is set up as sections, and the  <a href="#Item(System.Int32)">BitVector32.Item</a> [int] property is the indexer for a  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> that is set up as bit flags.<p> A  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a> is a window into the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> and is composed of the smallest number of consecutive bits that can contain the maximum value specified in  <a href="#CreateSection(System.Int16)">BitVector32.CreateSection</a>. For example, a section with a maximum value of 1 is composed of only one bit, whereas a section with a maximum value of 5 is composed of three bits. You can create a  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a> with a maximum value of 1 to serve as a Boolean, thereby allowing you to store integers and Booleans in the same  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#CreateSection(System.Int16)">BitVector32.CreateSection</a> |  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Property: <i><a name="ItemTopic2"></a><a name="Item(System.Int32)">Item</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the state of the bit flag indicated by the specified mask.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> this[int bit] {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>bit</i><br><dl>
+<dd>
+<param> A mask that indicates the bit to get or set.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#Item(System.Int32)">BitVector32.Item</a> [Section] property is the indexer for a  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> that is set up as sections, and the  <a href="#Item(System.Int32)">BitVector32.Item</a> [int] property is the indexer for a  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> that is set up as bit flags.<p> Using this property on a  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> that is set up as sections might cause unexpected results.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#CreateMask">BitVector32.CreateMask</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="CreateMaskTopic1"></a><a name="CreateMask">CreateMask</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates the first mask in a series of masks that can be used to retrieve individual bits in a  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> that is set up as bit flags.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Int32.html">int</a> CreateMask();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A mask that isolates the first bit flag in the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> Use <code>
+                CreateMask()
+              </code> to create the first mask in a series and <code>
+                CreateMask(int)
+              </code> for all subsequent masks.<p> Multiple masks can be created to refer to the same bit flag.</p>
+<p> The resulting mask isolates only one bit flag in the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>. You can combine masks using the bitwise OR operation to create a mask that isolates multiple bit flags in the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>.</p>
+<p> Using a mask on a  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> that is set up as sections might cause unexpected results.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="CreateMaskTopic2"></a><a name="CreateMask(System.Int32)">CreateMask</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>previous</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates an additional mask following the specified mask in a series of masks that can be used to retrieve individual bits in a  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> that is set up as bit flags.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Int32.html">int</a> CreateMask(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>previous</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>previous</i><br><dl>
+<dd>
+<param> The mask that indicates the previous bit flag.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A mask that isolates the bit flag following the one that <i>previous</i> points to in  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td><i>previous</i> indicates the last bit flag in the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Use <code>
+                CreateMask()
+              </code> to create the first mask in a series and <code>
+                CreateMask(int)
+              </code> for all subsequent masks.<p> Multiple masks can be created to refer to the same bit flag.</p>
+<p> The resulting mask isolates only one bit flag in the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>. You can combine masks using the bitwise OR operation to create a mask that isolates multiple bit flags in the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>.</p>
+<p> Using a mask on a  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> that is set up as sections might cause unexpected results.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="CreateSectionTopic1"></a><a name="CreateSection(System.Int16)">CreateSection</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int16.html">short</a> <i>maxValue</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates the first  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a> in a series of sections that contain small integers.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">Section</a> CreateSection(<br>   <font color="#008080"><a href="../../System/types/Int16.html">short</a> <i>maxValue</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>maxValue</i><br><dl>
+<dd>
+<param> A 16-bit signed integer that specifies the maximum value for the new  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a> that can hold a number from zero to <i>maxValue</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>maxValue</i> is less than 1.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> A  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a> is a window into the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> and is composed of the smallest number of consecutive bits that can contain the maximum value specified in  <a href="#CreateSection(System.Int16)">BitVector32.CreateSection</a>. For example, a section with a maximum value of 1 is composed of only one bit, whereas a section with a maximum value of 5 is composed of three bits. You can create a  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a> with a maximum value of 1 to serve as a Boolean, thereby allowing you to store integers and Booleans in the same  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>.<p> If sections already exist in the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>, those sections are still accessible; however, overlapping sections might cause unexpected results.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="CreateSectionTopic2"></a><a name="CreateSection(System.Int16,System.Collections.Specialized.BitVector32.Section)">CreateSection</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int16.html">short</a> <i>maxValue</i>,</font><br>   <font color="#008080"><a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a> <i>previous</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates a new  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a> following the specified  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a> in a series of sections that contain small integers.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">Section</a> CreateSection(<br>   <font color="#008080"><a href="../../System/types/Int16.html">short</a> <i>maxValue</i>,</font><br>   <font color="#008080"><a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a> <i>previous</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>maxValue</i><br><dl>
+<dd>
+<param> A 16-bit signed integer that specifies the maximum value for the new  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>previous</i><br><dl>
+<dd>
+<param> The previous  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a> in the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a> that can hold a number from zero to <i>maxValue</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>maxValue</i> is less than 1.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td><i>previous</i> includes the final bit in the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>.<p> -or- </p>
+<p><i>maxValue</i> is greater than the highest value that can be represented by the number of bits after <i>previous</i>.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> A  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a> is a window into the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> and is composed of the smallest number of consecutive bits that can contain the maximum value specified in  <a href="#CreateSection(System.Int16)">BitVector32.CreateSection</a>. For example, a section with a maximum value of 1 is composed of only one bit, whereas a section with a maximum value of 5 is composed of three bits. You can create a  <a href="../../System.Collections.Specialized/types/BitVector32.Section.html">BitVector32.Section</a> with a maximum value of 1 to serve as a Boolean, thereby allowing you to store integers and Booleans in the same  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>.<p> If sections already exist after <i>previous</i> in the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>, those sections are still accessible; however, overlapping sections might cause unexpected results.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>o</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines whether the specified object is equal to the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>o</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>o</i><br><dl>
+<dd>
+<param> The object to compare with the current  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the specified object is equal to the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The object <i>o</i> is considered equal to the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> if the type of <i>o</i> is compatible with the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> type and if the value of <i>o</i> is equal to the value of  <a href="#Data">BitVector32.Data</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~BitVector32();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Serves as a hash function for the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A hash code for the  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The hash code of a  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> is based on the value of  <a href="#Data">BitVector32.Data</a>. Two instances of  <a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> with the same value for  <a href="#Data">BitVector32.Data</a> will also generate the same hash code.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Supports the Shared Source CLI infrastructure and is not intended to be used directly from your code </dd>
+</dl>
+<dl>
+<dd>
+<font color="#FF0000"><b><i>
+								This type supports the Shared Source CLI infrastructure and is not intended to be used directly from your code.
+							</i></b></font>
+</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="ToStringTopic2"></a><a name="ToString(System.Collections.Specialized.BitVector32)">ToString</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Supports the Shared Source CLI infrastructure and is not intended to be used directly from your code </dd>
+</dl>
+<dl>
+<dd>
+<font color="#FF0000"><b><i>
+								This type supports the Shared Source CLI infrastructure and is not intended to be used directly from your code.
+							</i></b></font>
+</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static string ToString(<br>   <font color="#008080"><a href="../../System.Collections.Specialized/types/BitVector32.html">BitVector32</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

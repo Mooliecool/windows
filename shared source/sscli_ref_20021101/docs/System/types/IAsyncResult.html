@@ -1,0 +1,231 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.IAsyncResult</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.IAsyncResult Interface</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Represents the status of an asynchronous operation.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public interface IAsyncResult
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System/types/IAsyncResult.html">IAsyncResult</a> interface is implemented by classes containing methods that can operate asynchronously. It is the return type of methods that initiate an asynchronous operation, such as  <a href="../../System.IO/types/FileStream.html#BeginRead(System.Byte[],System.Int32,System.Int32,System.AsyncCallback,System.Object)">FileStream.BeginRead</a>, and is the type of the third parameter of methods that conclude an asynchronous operation, such as  <a href="../../System.IO/types/FileStream.html#EndRead(System.IAsyncResult)">FileStream.EndRead</a>. <a href="../../System/types/IAsyncResult.html">IAsyncResult</a> objects are also passed to methods invoked by  <a href="../../System/types/AsyncCallback.html">AsyncCallback</a> delegates when an asynchronous operation completes.<p> An object that supports the  <a href="../../System/types/IAsyncResult.html">IAsyncResult</a> interface stores state information for an asynchronous operation, and provides a synchronization object to allow threads to be signaled when the operation completes.</p>
+<p> For a detailed description of how the  <a href="../../System/types/IAsyncResult.html">IAsyncResult</a> interface is used, see the  topic.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following sample demonstrates using an  <a href="../../System/types/IAsyncResult.html">IAsyncResult</a> to obtain the return value of an asynchronous operation.<pre>
+    // Asynchronous Callback method.
+    public static void MyCallback(IAsyncResult ar) {
+
+        // Obtains the last parameter of the delegate call.
+        int value = Convert.ToInt32(ar.AsyncState);
+
+        // Obtains return value from the delegate call using EndInvoke.
+        AsyncResult aResult = (AsyncResult)ar;
+        SampSyncSqrDelegate temp = (SampSyncSqrDelegate)aResult.AsyncDelegate;
+        int result = temp.EndInvoke(ar);
+
+        Console.Write("Simple.SomeMethod (AsyncCallback): Result of ");
+        Console.WriteLine("{0} in SampleSynchronized.Square is {1} ", value, result);
+    }
+
+    </pre>
+<p> The following sample demonstrates waiting for an asynchronous operation to complete.</p>
+<pre>
+using System;
+using System.Threading;
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Contexts;
+using System.Runtime.Remoting.Messaging;
+
+//
+// Context-Bound type with Synchronization Context Attribute
+//
+[Synchronization()]
+public class SampleSyncronized : ContextBoundObject
+{
+    // A method that does some work - returns the square of the given number
+    public int Square(int i)
+    {
+        Console.Write("SampleSyncronized.Square called.  ");
+        Console.WriteLine("The hash of the current thread is: {0}", Thread.CurrentThread.GetHashCode());
+        return i*i;
+    }
+}
+
+
+//
+// Async delegate used to call a method with this signature asynchronously
+//
+public delegate int SampSyncSqrDelegate(int i);
+
+//Main sample class
+public class AsyncResultSample
+{
+    public static void Main()
+    {
+        int callParameter = 0;
+        int callResult = 0;
+
+        //Create an instance of a context-bound type SampleSynchronized
+        //Because SampleSynchronized is context-bound, the object sampSyncObj 
+        //is a transparent proxy
+        SampleSyncronized sampSyncObj = new SampleSyncronized();
+
+
+        //call the method synchronously
+        Console.Write("Making a synchronous call on the object.  ");
+        Console.WriteLine("The hash of the current thread is: {0}", Thread.CurrentThread.GetHashCode());
+        callParameter = 10;
+        callResult = sampSyncObj.Square(callParameter);
+        Console.WriteLine("Result of calling sampSyncObj.Square with {0} is {1}.\n\n", callParameter, callResult);
+
+
+        //call the method asynchronously
+        Console.Write("Making an asynchronous call on the object.  ");
+        Console.WriteLine("The hash of the current thread is: {0}", Thread.CurrentThread.GetHashCode());
+        SampSyncSqrDelegate sampleDelegate = new SampSyncSqrDelegate(sampSyncObj.Square);
+        callParameter = 17;
+
+        IAsyncResult aResult = sampleDelegate.BeginInvoke(callParameter, null, null);
+
+        //Wait for the call to complete
+        aResult.AsyncWaitHandle.WaitOne();
+
+        callResult = sampleDelegate.EndInvoke(aResult);
+        Console.WriteLine("Result of calling sampSyncObj.Square with {0} is {1}.", callParameter, callResult);
+    }
+}
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System/System.html">System Namespace</a></dd>
+</dl>
+<h3>System.IAsyncResult Member List: </h3>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#AsyncState">AsyncState</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a user-defined object that qualifies or contains information about an asynchronous operation.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AsyncWaitHandle">AsyncWaitHandle</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a  <a href="../../System.Threading/types/WaitHandle.html">WaitHandle</a> that is used to wait for an asynchronous operation to complete.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CompletedSynchronously">CompletedSynchronously</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets an indication of whether the asynchronous operation completed synchronously.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsCompleted">IsCompleted</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets an indication whether the asynchronous operation has completed.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<hr>
+<h3>System.IAsyncResult Member Details</h3><b>Property: <i><a name="AsyncStateTopic1"></a><a name="AsyncState">AsyncState</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a user-defined object that qualifies or contains information about an asynchronous operation.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System/types/Object.html">object</a> AsyncState {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property returns the object that is the last parameter of the method that initiates an asynchronous operation.<br><br><b>Notes to implementors: </b> Implement this property to allow the caller of an asynchronous operation to obtain an application-defined object specified at the start of the operation. This object can be used to pass state information for the asynchronous operation to an  <a href="../../System/types/AsyncCallback.html">AsyncCallback</a> that you provide.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/AsyncCallback.html">AsyncCallback</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="AsyncWaitHandleTopic1"></a><a name="AsyncWaitHandle">AsyncWaitHandle</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a  <a href="../../System.Threading/types/WaitHandle.html">WaitHandle</a> that is used to wait for an asynchronous operation to complete.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System.Threading/types/WaitHandle.html">WaitHandle</a> AsyncWaitHandle {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The return value allows the client to wait for an asynchronous operation to complete instead of polling  <a href="#IsCompleted">IAsyncResult.IsCompleted</a> until the operation concludes. The return value can be used to perform a  <a href="../../System.Threading/types/WaitHandle.html#WaitOne(System.Int32,System.Boolean)">WaitHandle.WaitOne</a>,  <a href="../../System.Threading/types/WaitHandle.html#WaitAny(System.Threading.WaitHandle[],System.Int32,System.Boolean)">WaitHandle.WaitAny</a>, or  <a href="../../System.Threading/types/WaitHandle.html#WaitAll(System.Threading.WaitHandle[],System.Int32,System.Boolean)">WaitHandle.WaitAll</a> operation.<p> The common language runtime supplies a number of waitable objects, such as  <a href="../../System.Threading/types/ManualResetEvent.html">ManualResetEvent</a>,  <a href="../../System.Threading/types/AutoResetEvent.html">AutoResetEvent</a>, and  <a href="../../System.Threading/types/Mutex.html">Mutex</a>, all of which mirror Win32 synchronization primitives.</p><br><br><b>Notes to implementors: </b> <a href="#AsyncWaitHandle">IAsyncResult.AsyncWaitHandle</a> can be allocated eagerly or on demand. It is the choice of the  <a href="../../System/types/IAsyncResult.html">IAsyncResult</a> implementer. Once allocated,  <a href="#AsyncWaitHandle">IAsyncResult.AsyncWaitHandle</a> should be kept alive until the user calls the method that concludes the asynchronous operation. At that time the object behind  <a href="#AsyncWaitHandle">IAsyncResult.AsyncWaitHandle</a> can be discarded. Clients that wait for the operation to complete (as opposed to polling) use this property to obtain a synchronization object to wait on.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CompletedSynchronouslyTopic1"></a><a name="CompletedSynchronously">CompletedSynchronously</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an indication of whether the asynchronous operation completed synchronously.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System/types/Boolean.html">bool</a> CompletedSynchronously {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the synchronous completion of the call is detected in the  <a href="../../System/types/AsyncCallback.html">AsyncCallback</a> delegate, it is probable that the thread that initiated the asynchronous operation is the current thread.<br><br><b>Notes to implementors: </b> Most implementers of the  <a href="../../System/types/IAsyncResult.html">IAsyncResult</a> interface will not use this property and should return <b>false</b>. Use this property to determine if the asynchronous operation completed synchronously. For example, this property can return <b>true</b> for an asynchronous I/O operation if the I/O request was small.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsCompletedTopic1"></a><a name="IsCompleted">IsCompleted</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an indication whether the asynchronous operation has completed.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System/types/Boolean.html">bool</a> IsCompleted {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> You can assume it is safe to discard any resources you allocate for use by the asynchronous operation when this property is true.<br><br><b>Notes to implementors: </b> Implementers will typically return the value of a private field or internal test as the value of this property. Clients that poll for operation status (as opposed to waiting on a synchronization object), use this property to determine the status of the operation.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

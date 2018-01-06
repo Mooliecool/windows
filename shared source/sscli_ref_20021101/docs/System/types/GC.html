@@ -1,0 +1,617 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.GC</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.GC Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Controls the system garbage collector, a service that automatically reclaims unused memory.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public sealed class GC
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The methods in this class influence when an object is garbage collected and when resources allocated by an object are released. Properties in this class provide information about the total amount of memory available in the system and the age category, or generation, of memory allocated to an object.<p> The garbage collector tracks and reclaims objects allocated in managed memory. Periodically, the garbage collector performs garbage collection to reclaim memory allocated to objects for which there are no valid references. Garbage collection happens automatically when a request for memory cannot be satisfied using available free memory. Alternatively, an application can force garbage collection using the  <a href="#Collect(System.Int32)">GC.Collect</a> method.</p>
+<p> Garbage collection consists of the following steps: </p>
+<OL>
+<li> The garbage collector searches for managed objects that are referenced in managed code.</li>
+<li> The garbage collector attempts to finalize objects that are not referenced.</li>
+<li> The garbage collector frees objects that are not referenced and reclaims their memory.</li>
+</OL>
+<p> During a collection, the garbage collector will not free an object if it finds one or more references to the object in managed code. However, the garbage collector does not recognize references to an object from unmanaged code, and might free objects that are being used exclusively in unmanaged code unless explicitly prevented from doing so. The  <a href="#KeepAlive(System.Object)">GC.KeepAlive</a> method provides a mechanism that prevents the garbage collector from collecting objects that are still in use in unmanaged code.</p>
+<p> Other than managed memory allocations, implementations of the garbage collector do not maintain information about resources held by an object, such as file handles or database connections. When a type uses unmanaged resources that must be released before instances of the type are reclaimed, the type can implement a finalizer.</p>
+<p> In most cases, finalizers are implemented by overriding the  <a href="../../System/types/Object.html#Finalize">Object.Finalize</a> method; however, types written in C# or C++ implement destructors, which compilers turn into an override of  <a href="../../System/types/Object.html#Finalize">Object.Finalize</a>. In most cases, if an object has a finalizer, the garbage collector calls it prior to freeing the object. However, the garbage collector is not required to call finalizers in all situations. Also, the garbage collector is not required to use a specific thread to finalize objects, or guarantee the order in which finalizers are called for objects that reference each other but are otherwise available for garbage collection.</p>
+<p> In scenarios where resources must be released at a specific time, classes can implement the  <a href="../../System/types/IDisposable.html">IDisposable</a> interface, which contains the  <a href="../../System/types/IDisposable.html#Dispose">IDisposable.Dispose</a> method that performs resource management and cleanup tasks. Classes that implement  <a href="../../System/types/IDisposable.html#Dispose">IDisposable.Dispose</a> must specify, as part of their class contract, if and when class consumers call the method to clean up the object. The garbage collector does not, by default, call the  <a href="../../System/types/IDisposable.html#Dispose">IDisposable.Dispose</a> method; however, implementations of the  <a href="../../System/types/IDisposable.html#Dispose">IDisposable.Dispose</a> method can call methods in the  <a href="../../System/types/GC.html">GC</a> class to customize the finalization behavior of the garbage collector.</p>
+<p> It is recommended, but not required, that garbage collectors support object aging using generations. A generation is a unit of measure of the relative age of objects in memory. The generation number, or age, of an object tells which generation an object belongs to. Objects created more recently are part of newer generations, and have lower generation numbers than objects created earlier in the application life cycle. Objects in the most recent generation are in generation zero.</p><br><br><b>Notes to implementors: </b> This implementation of the garbage collector supports three generations. <a href="#MaxGeneration">GC.MaxGeneration</a> is used to determine the maximum generation number supported by the system. Object aging allows applications to target garbage collection at a specific set of generations rather than requiring the garbage collector to evaluate all generations.</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System/System.html">System Namespace</a></dd>
+</dl>
+<h3>System.GC Member List: </h3>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#MaxGeneration">MaxGeneration</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the maximum number of generations the system currently supports.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Collect">Collect</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Collect()<br><br></code> Forces garbage collection of all generations.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Collect(System.Int32)">Collect</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Collect(int generation)<br><br></code> Forces garbage collection from generation zero through a specified generation.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetGeneration(System.Object)">GetGeneration</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetGeneration(object obj)<br><br></code> Returns the current generation number of the specified object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetGeneration(System.WeakReference)">GetGeneration</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetGeneration(WeakReference wo)<br><br></code> Returns the current generation number of the target of a specified weak reference.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetTotalMemory(System.Boolean)">GetTotalMemory</a></td>
+<td width="55%"> Retrieves the number of bytes currently thought to be allocated. A parameter indicates whether this method can wait a short interval before returning while the system collects garbage and finalizes objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#KeepAlive(System.Object)">KeepAlive</a></td>
+<td width="55%"> References the specified object, making it ineligible for garbage collection from the start of the current routine to the point where this method is called.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ReRegisterForFinalize(System.Object)">ReRegisterForFinalize</a></td>
+<td width="55%"> Requests that the system call the finalizer method for the specified object, for which  <a href="#SuppressFinalize(System.Object)">GC.SuppressFinalize</a> has previously been called.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SuppressFinalize(System.Object)">SuppressFinalize</a></td>
+<td width="55%"> Requests that the system not call the finalizer method for the specified object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WaitForPendingFinalizers">WaitForPendingFinalizers</a></td>
+<td width="55%"> Suspends the current thread until the thread processing the queue of finalizers has emptied that queue.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.GC</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.GC Member Details</h3><b>Property: <i><a name="MaxGenerationTopic1"></a><a name="MaxGeneration">MaxGeneration</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the maximum number of generations the system currently supports.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Int32.html">int</a> MaxGeneration {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The generation number, or age, of an object is an implementation-defined relative measure of an object's lifespan. The most recently created objects are in generation zero and the oldest objects are in a generation less than or equal to the generation returned by the  <a href="#MaxGeneration">GC.MaxGeneration</a> property.<p> The garbage collector assumes that newer memory is more likely to be eligible for garbage collection than older memory. Therefore, the garbage collector improves its performance by adjusting generation numbers each time it reclaims memory, and the  <a href="#MaxGeneration">GC.MaxGeneration</a> property value can grow over time.</p>
+<p> If object aging is implemented, the  <a href="#MaxGeneration">GC.MaxGeneration</a> property returns the maximum generation number used by the system; otherwise, this property returns zero.</p><br><br><b>Notes to implementors: </b> For this implementation, the value returned by the  <a href="#MaxGeneration">GC.MaxGeneration</a> property is guaranteed to remain constant for the lifetime of an executing application.<p> Use the  <a href="#MaxGeneration">GC.MaxGeneration</a> property to determine the maximum value you can specify when calling the  <a href="#Collect(System.Int32)">GC.Collect</a> method that takes a generation parameter.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#GetGeneration(System.Object)">GC.GetGeneration</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="CollectTopic1"></a><a name="Collect">Collect</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Forces garbage collection of all generations.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static void Collect();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Use this method to attempt to reclaim all memory that is inaccessible. However, the  <a href="#Collect(System.Int32)">GC.Collect</a> method does not guarantee that all inaccessible memory is reclaimed.<p> All objects, regardless of how long they have been in memory, are considered for collection; however, objects that are referenced in managed code are not collected. Use this method to force the system to attempt to reclaim the maximum amount of available memory.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="CollectTopic2"></a><a name="Collect(System.Int32)">Collect</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>generation</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Forces garbage collection from generation zero through a specified generation.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static void Collect(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>generation</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>generation</i><br><dl>
+<dd>
+<param> The maximum garbage-collected generation.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>generation</i> is less than zero or greater than the number of generations that exist.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Use this method to attempt to reclaim memory that is inaccessible. However, it does not guarantee that all inaccessible memory in the specified generation is reclaimed.<p> If object aging is implemented, the garbage collector does not collect objects with a generation number higher than the specified generation. If object aging is not implemented, the garbage collector considers all objects during the garbage collection.</p>
+<p> Use the  <a href="#MaxGeneration">GC.MaxGeneration</a> property to determine the maximum valid value of <i>generation</i>.</p>
+<p> To have the garbage collector consider all objects regardless of their generation, use the version of this method that takes no arguments.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~GC();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetGenerationTopic1"></a><a name="GetGeneration(System.Object)">GetGeneration</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the current generation number of the specified object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Int32.html">int</a> GetGeneration(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object for which generation information is retrieved.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The current generation number of <i>obj</i>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> Use this method to determine the age of an object, then use that information with the  <a href="#Collect(System.Int32)">GC.Collect</a> method to force the garbage collector to collect objects in the same generation. For example, use this method when you have a set of objects that are created as a group and become inaccessible at the same time.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#MaxGeneration">GC.MaxGeneration</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetGenerationTopic2"></a><a name="GetGeneration(System.WeakReference)">GetGeneration</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/WeakReference.html">WeakReference</a> <i>wo</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the current generation number of the target of a specified weak reference.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Int32.html">int</a> GetGeneration(<br>   <font color="#008080"><a href="../../System/types/WeakReference.html">WeakReference</a> <i>wo</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>wo</i><br><dl>
+<dd>
+<param> The weak reference of a target.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The current generation number of the target of <i>wo</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>wo</i> has already been garbage collected.</td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#MaxGeneration">GC.MaxGeneration</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTotalMemoryTopic1"></a><a name="GetTotalMemory(System.Boolean)">GetTotalMemory</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>forceFullCollection</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves the number of bytes currently thought to be allocated. A parameter indicates whether this method can wait a short interval before returning while the system collects garbage and finalizes objects.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Int64.html">long</a> GetTotalMemory(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>forceFullCollection</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>forceFullCollection</i><br><dl>
+<dd>
+<param> A Boolean value that, if <b>true</b>, indicates this method can wait awhile for garbage collection before returning.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A number that is the best available approximation of the number of bytes currently allocated in managed memory.</dd>
+</dl><b>Remarks</b><dl>
+<dd> If <i>forceFullCollection</i> is <b>true</b>, this method waits a short interval before returning while the system collects garbage and finalizes objects. The duration of the interval is an internally specified limit determined by the number of garbage collection cycles completed and the change in the amount of memory recovered between cycles. The garbage collector does not guarantee that all inaccessible memory is collected.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="KeepAliveTopic1"></a><a name="KeepAlive(System.Object)">KeepAlive</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> References the specified object, making it ineligible for garbage collection from the start of the current routine to the point where this method is called.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static void KeepAlive(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object to reference.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The purpose of the  <a href="#KeepAlive(System.Object)">GC.KeepAlive</a> method is to ensure the existence of a reference to an object that is at risk of being prematurely reclaimed by the garbage collector. A common scenario where this might happen is when there are no references to the object in managed code or data but the object is still in use in unmanaged code, such as Win32 APIs, unmanaged DLLs, or methods using COM.<p> This method references <i>obj</i>, making that object ineligible for garbage collection from the start of the routine to the point, in execution order, where this method is called. Code this method at the end, not the beginning, of the range of instructions where <i>obj</i> must be available.</p>
+<p> The implementation of the  <a href="#KeepAlive(System.Object)">GC.KeepAlive</a> method is intentionally hidden, which prevents mechanisms such as optimizing compilers from omitting this method from the compiled code, and garbage collection from determining whether <i>obj</i> is no longer in use. This method performs no operations and produces no side effects.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ReRegisterForFinalizeTopic1"></a><a name="ReRegisterForFinalize(System.Object)">ReRegisterForFinalize</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Requests that the system call the finalizer method for the specified object, for which  <a href="#SuppressFinalize(System.Object)">GC.SuppressFinalize</a> has previously been called.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static void ReRegisterForFinalize(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object for which a finalizer must be called.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>obj</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> This method is not called within a property, method, or constructor.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#ReRegisterForFinalize(System.Object)">GC.ReRegisterForFinalize</a> method adds <i>obj</i> to the list of objects that request finalization before the garbage collector frees the object. The <i>obj</i> parameter must be the caller of this method.<p> Calling the  <a href="#ReRegisterForFinalize(System.Object)">GC.ReRegisterForFinalize</a> method does not guarantee that the garbage collector will call an object's finalizer.</p>
+<p> By default, all objects that implement finalizers are added to the list of objects that require finalization; however, an object might have already been finalized, or might have disabled finalization by calling the  <a href="#SuppressFinalize(System.Object)">GC.SuppressFinalize</a> method.</p>
+<p> A finalizer can use this method to resurrect itself or an object it references.</p>
+</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/SecurityPermission.html">SecurityPermission</a> for calling unmanaged code. Associated enumeration:  <a href="../../System.Security.Permissions/types/SecurityPermissionFlag.html#UnmanagedCode">SecurityPermissionFlag.UnmanagedCode</a>.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#SuppressFinalize(System.Object)">GC.SuppressFinalize</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="SuppressFinalizeTopic1"></a><a name="SuppressFinalize(System.Object)">SuppressFinalize</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Requests that the system not call the finalizer method for the specified object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static void SuppressFinalize(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object for which a finalizer must not be called.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>obj</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ExecutionEngineException.html">ExecutionEngineException</a></td>
+<td> This method is not called within a property, method, or constructor.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The method removes <i>obj</i> from the set of objects that require finalization. The <i>obj</i> parameter is required to be the caller of this method.<p> Objects that implement the  <a href="../../System/types/IDisposable.html">IDisposable</a> interface can call this method from the  <a href="../../System/types/IDisposable.html#Dispose">IDisposable.Dispose</a> method to prevent the garbage collector from calling  <a href="../../System/types/Object.html#Finalize">Object.Finalize</a> on an object that does not require it.</p>
+</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/SecurityPermission.html">SecurityPermission</a> for calling unmanaged code. Associated enumeration:  <a href="../../System.Security.Permissions/types/SecurityPermissionFlag.html#UnmanagedCode">SecurityPermissionFlag.UnmanagedCode</a>.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#ReRegisterForFinalize(System.Object)">GC.ReRegisterForFinalize</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="WaitForPendingFinalizersTopic1"></a><a name="WaitForPendingFinalizers">WaitForPendingFinalizers</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Suspends the current thread until the thread processing the queue of finalizers has emptied that queue.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static void WaitForPendingFinalizers();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> When the garbage collector finds objects that can be reclaimed, it checks each object to determine the object's finalization requirements. If an object implements a finalizer and has not disabled finalization by calling  <a href="#SuppressFinalize(System.Object)">GC.SuppressFinalize</a>, the object is passed to the thread that handles finalization. This method blocks until all finalizers have run to completion.<p> Finalizers are run on a separate thread of execution, so there is no guarantee that this method will terminate. However, this thread can be interrupted by another thread while the  <a href="#WaitForPendingFinalizers">GC.WaitForPendingFinalizers</a> method is in progress. For example, you can start another thread that waits for a period of time then interrupts this thread if this thread is still suspended.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

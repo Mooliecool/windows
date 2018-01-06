@@ -1,0 +1,1338 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Xml.Serialization.SoapAttributeOverrides</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Xml.Serialization.SoapAttributeOverrides Class</h2><b>Assembly: </b>System.Xml.dll<br><b>Namespace: </b>System.Xml.Serialization<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Allows you to override property, field, and class attributes when you use an  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> to serialize or deserialize an object as encoded SOAP.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public class SoapAttributeOverrides
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> class enables an  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> to override the default way of serializing a set of objects. Overriding serialization in this way has two uses: first, you can control and augment the serialization of objects found in a DLL, even if you don't have access to the source; second, you can create one set of serializable classes, but serialize the objects in multiple ways. For example, instead of serializing members of a class instance as XML elements, you can serialize them as XML attributes, resulting in a more efficient document to transport.<p> After you create a  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a>, you create an  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a> using the  <a href="../../System.Xml.Serialization/types/SoapReflectionImporter.html#ImportTypeMapping(System.Type)">SoapReflectionImporter.ImportTypeMapping</a> method of the  <a href="../../System.Xml.Serialization/types/SoapReflectionImporter.html">SoapReflectionImporter</a> class. Pass the resulting object as an argument to the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#ctor1">XmlSerializer.#ctor</a> constructor. The resulting  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> uses the data contained by the  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> to override attributes that control how objects are serialized. To accomplish this goal, the  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> contains a collection of the object types that will be overridden, as well as a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> associated with each overridden object type. Each  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> contains an appropriate set of attribute objects that control how each field, property, or class is serialized.</p>
+<p> The process for creating and using a  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> is as follows: </p>
+<OL>
+<li> Create a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a>.</li>
+<li> Create an attribute object that is appropriate to the object being overridden. For example, to override a field or property, create a  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a>, using the new, derived type. You can optionally assign a new  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html#ElementName">SoapElementAttribute.ElementName</a> that will override the base class's attribute name or namespace.</li>
+<li> Add the attribute object to the appropriate  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> property or collection. For example, you would set the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html#SoapElement">SoapAttributes.SoapElement</a> property of the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> object to the  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a>, specifying the member name that is being overridden.</li>
+<li> Create a  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a>.</li>
+<li> Add the the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> to the  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> using the  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html#Add(System.Type,System.Xml.Serialization.XmlAttributes)">XmlAttributeOverrides.Add</a> method. If the object being overridden is a  <a href="../../System.Xml.Serialization/types/SoapTypeAttribute.html">SoapTypeAttribute</a>, you need only specify the type of the overridden object. But if you are overriding a field or property, you must also specify the name of the overridden member.</li>
+<li> Create an  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a> using the  <a href="../../System.Xml.Serialization/types/SoapReflectionImporter.html#ImportTypeMapping(System.Type)">SoapReflectionImporter.ImportTypeMapping</a> method of the  <a href="../../System.Xml.Serialization/types/SoapReflectionImporter.html">SoapReflectionImporter</a> class.</li>
+<li> When constructing the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>, pass the  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a> to the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#ctor1">XmlSerializer.#ctor</a> constructor.</li>
+<li> Use the resulting  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> to serialize or deserialize the class objects.</li>
+</OL>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes a class named <code>
+            Group
+          </code>. The serialization of the <code>
+            GroupName
+          </code> and <code>
+            IgnoreThis
+          </code> fields and the members of the <code>
+            GroupType
+          </code> enumeration are overridden. In the <code>
+            CreateOverrideSerializer
+          </code> method, a  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> is created, and for each overridden member or enumeration, a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> is created with the appropriate property set and added to the  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a>. An  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a> is created using the  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a>, and that  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a> is used to create the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> that overrides the default serialization.<pre>
+using System;
+using System.IO;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
+using System.Xml.Schema;
+
+public class Group
+{
+   [SoapAttribute (Namespace = "http://www.cpandl.com")]
+   public string GroupName;
+   
+   [SoapAttribute(DataType = "base64Binary")]
+   public Byte [] GroupNumber;
+
+   [SoapAttribute(DataType = "date", AttributeName = "CreationDate")]
+   public DateTime Today;
+   [SoapElement(DataType = "nonNegativeInteger", ElementName = "PosInt")]
+   public string PostitiveInt;
+   // This is ignored when serialized unless it's overridden.
+   [SoapIgnore] 
+   public bool IgnoreThis;
+   
+   public GroupType Grouptype;
+
+   public Vehicle MyVehicle;
+
+   // The SoapInclude allows the method to return a Car.
+   [SoapInclude(typeof(Car))]
+   public Vehicle myCar(string licNumber)
+   {
+      Vehicle v;
+      if(licNumber == "")
+         {
+            v = new Car();
+   	    v.licenseNumber = "!!!!!!";
+   	 }
+      else
+   	 {
+   	   v = new Car();
+   	   v.licenseNumber = licNumber;
+   	 }
+      return v;
+   }
+}
+  
+// SoapInclude allows Vehicle to accept Car type.
+[SoapInclude(typeof(Car))]
+public abstract class Vehicle
+{
+   public string licenseNumber;
+   public DateTime makeDate;
+}
+
+public class Car: Vehicle
+{
+}
+
+public enum GroupType
+{
+   // These enums can be overridden.
+   [SoapEnum("Small")]
+   A,
+   [SoapEnum("Large")]
+   B
+}
+ 
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.SerializeOriginal("SoapOriginal.xml");
+      test.SerializeOverride("SoapOverrides.xml");
+      test.DeserializeOriginal("SoapOriginal.xml");
+      test.DeserializeOverride("SoapOverrides.xml");
+   
+   }
+   public void SerializeOriginal(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlTypeMapping myMapping = 
+      (new SoapReflectionImporter().ImportTypeMapping(
+      typeof(Group)));
+      XmlSerializer mySerializer =  
+      new XmlSerializer(myMapping);
+      Group myGroup=MakeGroup();
+      // Writing the file requires a TextWriter.
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      // Serialize the class, and close the TextWriter.
+      mySerializer.Serialize(writer, myGroup);
+      writer.WriteEndElement();
+      writer.Close();
+   }
+
+   public void SerializeOverride(string filename)
+   {
+      // Create an instance of the XmlSerializer class
+      // that overrides the serialization.
+      XmlSerializer overRideSerializer = CreateOverrideSerializer();
+      Group myGroup=MakeGroup();
+      // Writing the file requires a TextWriter.
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      // Serialize the class, and close the TextWriter.
+      overRideSerializer.Serialize(writer, myGroup);
+      writer.WriteEndElement();
+      writer.Close();
+
+   }
+
+   private Group MakeGroup(){
+      // Create an instance of the class that will be serialized.
+      Group myGroup = new Group();
+
+      // Set the object properties.
+      myGroup.GroupName = ".NET";
+
+      Byte [] hexByte = new Byte[2]{Convert.ToByte(100),
+      Convert.ToByte(50)};
+      myGroup.GroupNumber = hexByte;
+
+      DateTime myDate = new DateTime(2002,5,2);
+      myGroup.Today = myDate;
+      myGroup.PostitiveInt= "10000";
+      myGroup.IgnoreThis=true;
+      myGroup.Grouptype= GroupType.B;
+      Car thisCar =(Car)  myGroup.myCar("1234566");
+      myGroup.MyVehicle=thisCar;
+      return myGroup;
+   }   	
+
+   public void DeserializeOriginal(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlTypeMapping myMapping = 
+      (new SoapReflectionImporter().ImportTypeMapping(
+      typeof(Group)));
+      XmlSerializer mySerializer =  
+      new XmlSerializer(myMapping);
+
+
+      // Reading the file requires an  XmlTextReader.
+      XmlTextReader reader= 
+      new XmlTextReader(filename);
+      reader.ReadStartElement("wrapper");
+
+      // Deserialize and cast the object.
+      Group myGroup; 
+      myGroup = (Group) mySerializer.Deserialize(reader);
+      reader.ReadEndElement();
+      reader.Close();
+
+   }
+
+   public void DeserializeOverride(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlSerializer overRideSerializer = CreateOverrideSerializer();
+
+      // Reading the file requires an  XmlTextReader.
+      XmlTextReader reader= 
+      new XmlTextReader(filename);
+      reader.ReadStartElement("wrapper");
+
+      // Deserialize and cast the object.
+      Group myGroup; 
+      myGroup = (Group) overRideSerializer.Deserialize(reader);
+      reader.ReadEndElement();
+      reader.Close();
+      ReadGroup(myGroup);
+   }
+
+   private void ReadGroup(Group myGroup){
+      Console.WriteLine(myGroup.GroupName);
+      Console.WriteLine(myGroup.GroupNumber[0]);
+      Console.WriteLine(myGroup.GroupNumber[1]);
+      Console.WriteLine(myGroup.Today);
+      Console.WriteLine(myGroup.PostitiveInt);
+      Console.WriteLine(myGroup.IgnoreThis);
+      Console.WriteLine();
+   }
+   private XmlSerializer CreateOverrideSerializer()
+   {
+      SoapAttributeOverrides mySoapAttributeOverrides = 
+      new SoapAttributeOverrides();
+      SoapAttributes soapAtts = new SoapAttributes();
+
+      SoapElementAttribute mySoapElement = new SoapElementAttribute();
+      mySoapElement.ElementName = "xxxx";
+      soapAtts.SoapElement = mySoapElement;
+      mySoapAttributeOverrides.Add(typeof(Group), "PostitiveInt", 
+      soapAtts);
+
+      // Override the IgnoreThis property.
+      SoapIgnoreAttribute myIgnore = new SoapIgnoreAttribute();
+      soapAtts = new SoapAttributes();
+      soapAtts.SoapIgnore = false;      
+      mySoapAttributeOverrides.Add(typeof(Group), "IgnoreThis", 
+      soapAtts);
+
+      // Override the GroupType enumeration.	
+      soapAtts = new SoapAttributes();
+      SoapEnumAttribute xSoapEnum = new SoapEnumAttribute();
+      xSoapEnum.Name = "Over1000";
+      soapAtts.SoapEnum = xSoapEnum;
+
+      // Add the SoapAttributes to the 
+      // mySoapAttributeOverridesrides object.
+      mySoapAttributeOverrides.Add(typeof(GroupType), "A", 
+      soapAtts);
+
+      // Create second enumeration and add it.
+      soapAtts = new SoapAttributes();
+      xSoapEnum = new SoapEnumAttribute();
+      xSoapEnum.Name = "ZeroTo1000";
+      soapAtts.SoapEnum = xSoapEnum;
+      mySoapAttributeOverrides.Add(typeof(GroupType), "B", 
+      soapAtts);
+
+      // Override the Group type.
+      soapAtts = new SoapAttributes();
+      SoapTypeAttribute soapType = new SoapTypeAttribute();
+      soapType.TypeName = "Team";
+      soapAtts.SoapType = soapType;
+      mySoapAttributeOverrides.Add(typeof(Group),soapAtts);
+
+      // Create an XmlTypeMapping that is used to create an instance 
+      // of the XmlSerializer. Then return the XmlSerializer object.
+      XmlTypeMapping myMapping = (new SoapReflectionImporter(
+      mySoapAttributeOverrides)).ImportTypeMapping(typeof(Group));
+	
+      XmlSerializer ser = new XmlSerializer(myMapping);
+      return ser;
+   }
+}
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Xml.Serialization/System.Xml.Serialization.html">System.Xml.Serialization Namespace</a> |  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconXMLSerializationUsingSOAPProtocol.asp">MSDN: xmlserializationusingsoapprotocol</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAttributesThatControlSOAPEncodedSerialization.asp">MSDN: attributesthatcontrolsoapencodedserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a></dd>
+</dl>
+<h3>System.Xml.Serialization.SoapAttributeOverrides Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%">Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Item(System.Type)">Item</a></td>
+<td width="55%"><b>Read-only</b><br><br><b>Overloaded:</b><br><code>Item[Type type] {get<br><br></code> Gets the object associated with the specified (base class) type.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Item(System.Type,System.String)">Item</a></td>
+<td width="55%"><b>Read-only</b><br><br><b>Overloaded:</b><br><code>Item[Type type, string member] {get<br><br></code> Gets the object associated with the specified (base class) type. The <i>member</i> parameter specifies the base class member that is overridden.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Add(System.Type,System.Xml.Serialization.SoapAttributes)">Add</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Add(Type type, SoapAttributes attributes)<br><br></code> Adds a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> to a collection of collection of  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> objects. The <i>type</i> parameter specifies an object to be overridden by the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Add(System.Type,System.String,System.Xml.Serialization.SoapAttributes)">Add</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Add(Type type, string member, SoapAttributes attributes)<br><br></code> Adds a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> to the collection of  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> objects contained by the  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a>. The <i>type</i> parameter specifies the object to be overridden by the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a>. The <i>member</i> parameter specifies the name of a member that will be overridden.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Xml.Serialization.SoapAttributeOverrides</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Xml.Serialization.SoapAttributeOverrides Member Details</h3><b><i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><br><dl>
+<dt><b>Summary:
+										</b></dt>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public SoapAttributeOverrides();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Property: <i><a name="ItemTopic1"></a><a name="Item(System.Type)">Item</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the object associated with the specified (base class) type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> this[Type type] {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param> The base class class  <a href="../../System/types/Type.html">Type</a> that is associated with the collection of attributes you want to retrieve.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Use this overload to return a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> that contains attributes for a  <a href="../../System.Xml.Serialization/types/SoapTypeAttribute.html">SoapTypeAttribute</a>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> which is used to override the serialization of an instance of the <code>
+                Group
+              </code> class. The example also uses the  <a href="#Item(System.Type)">SoapAttributeOverrides.Item</a> property to retrieve the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> that is used to specify how the serialization is being overridden.<pre>
+using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
+
+// The name of this type will be overridden using
+// the SoapTypeAttribute.
+public class Group
+{
+   public string GroupName;
+}
+  
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+
+      test.SerializeOverride("GetSoapAttributes2.xml");
+      
+   }
+   public void SerializeOverride(string filename)
+   {
+      // Create an instance of the XmlSerializer class
+      // that overrides the serialization.
+      XmlSerializer overRideSerializer = CreateOverrideSerializer();
+
+      // Writing the file requires a TextWriter.
+      TextWriter writer = new StreamWriter(filename);
+
+      // Create an instance of the class that will be serialized.
+      Group myGroup = new Group();
+
+      // Set the object properties.
+      myGroup.GroupName = ".NET";
+
+      // Serialize the class, and close the TextWriter.
+      overRideSerializer.Serialize(writer, myGroup);
+       writer.Close();
+   }
+
+   private XmlSerializer CreateOverrideSerializer()
+   {
+      SoapAttributeOverrides mySoapAttributeOverrides = 
+      new SoapAttributeOverrides();
+      SoapAttributes mySoapAttributes = new SoapAttributes();
+
+      SoapTypeAttribute mySoapType = new SoapTypeAttribute();
+      mySoapType.TypeName= "Team";
+      mySoapAttributes.SoapType = mySoapType;
+      // Add the SoapAttributes to the 
+      // mySoapAttributeOverridesrides object.
+      mySoapAttributeOverrides.Add(typeof(Group), mySoapAttributes);
+      // Get the SoapAttributes with the Item property.
+      SoapAttributes thisSoapAtts = 
+      mySoapAttributeOverrides[typeof(Group)];
+      Console.WriteLine("New serialized type name: " + 
+      thisSoapAtts.SoapType.TypeName);
+
+      // Create an XmlTypeMapping that is used to create an instance 
+      // of the XmlSerializer. Then return the XmlSerializer object.
+      XmlTypeMapping myMapping = (new SoapReflectionImporter(
+      mySoapAttributeOverrides)).ImportTypeMapping(typeof(Group));
+	
+      XmlSerializer ser = new XmlSerializer(myMapping);
+      return ser;
+   }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Property: <i><a name="ItemTopic2"></a><a name="Item(System.Type,System.String)">Item</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the object associated with the specified (base class) type. The <i>member</i> parameter specifies the base class member that is overridden.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> this[Type type, string member] {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param> The base class class  <a href="../../System/types/Type.html">Type</a> that is associated with the collection of attributes you want to override.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>member</i><br><dl>
+<dd>
+<param> The name of the overridden member that specifies the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> to return.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Use this overload to return a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> that contains attributes that override a  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a>,  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a>,  <a href="../../System.Xml.Serialization/types/SoapIgnoreAttribute.html">SoapIgnoreAttribute</a>, or  <a href="../../System.Xml.Serialization/types/SoapEnumAttribute.html">SoapEnumAttribute</a>. You can also return a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> that contains the override of a default value (specified using a  <a href="../../System.ComponentModel/types/DefaultValueAttribute.html">DefaultValueAttribute</a>).<p> If the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> contains a  <a href="../../System.Xml.Serialization/types/SoapTypeAttribute.html">SoapTypeAttribute</a>, you must use the overload that specifies only the overridden type.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> used to override the serialization of an instance of the <code>
+                Group
+              </code> class. The example also uses the  <a href="#Item(System.Type)">SoapAttributeOverrides.Item</a> property to retrieve the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> that is used to specify how the serialization is being overridden.<pre>
+using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
+
+public class Group
+{
+   // Override the serialization of this member. 
+   public string GroupName;
+}
+  
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+
+      test.SerializeOverride("GetSoapAttributes.xml");
+      
+   }
+   public void SerializeOverride(string filename)
+   {
+      // Create an instance of the XmlSerializer class
+      // that overrides the serialization.
+      XmlSerializer overRideSerializer = CreateOverrideSerializer();
+
+      // Writing the file requires a TextWriter.
+      TextWriter writer = new StreamWriter(filename);
+
+      // Create an instance of the class that will be serialized.
+      Group myGroup = new Group();
+
+      // Set the object properties.
+      myGroup.GroupName = ".NET";
+
+      // Serialize the class, and close the TextWriter.
+      overRideSerializer.Serialize(writer, myGroup);
+       writer.Close();
+   }
+
+   private XmlSerializer CreateOverrideSerializer()
+   {
+      SoapAttributeOverrides mySoapAttributeOverrides = 
+      new SoapAttributeOverrides();
+      SoapAttributes mySoapAttributes = new SoapAttributes();
+
+      SoapElementAttribute mySoapElement = new SoapElementAttribute();
+      mySoapElement.ElementName = "TeamName";
+      mySoapAttributes.SoapElement = mySoapElement;
+      // Add the SoapAttributes to the 
+      // mySoapAttributeOverridesrides object.
+      mySoapAttributeOverrides.Add(typeof(Group), "GroupName", 
+      mySoapAttributes);
+      // Get the SoapAttributes with the Item property.
+      SoapAttributes thisSoapAtts = 
+      mySoapAttributeOverrides[typeof(Group), "GroupName"];
+      Console.WriteLine("New serialized element name: " + 
+      thisSoapAtts.SoapElement.ElementName);
+
+      // Create an XmlTypeMapping that is used to create an instance 
+      // of the XmlSerializer. Then return the XmlSerializer object.
+      XmlTypeMapping myMapping = (new SoapReflectionImporter(
+      mySoapAttributeOverrides)).ImportTypeMapping(typeof(Group));
+	
+      XmlSerializer ser = new XmlSerializer(myMapping);
+      return ser;
+   }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddTopic1"></a><a name="Add(System.Type,System.Xml.Serialization.SoapAttributes)">Add</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> <i>attributes</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> to a collection of collection of  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> objects. The <i>type</i> parameter specifies an object to be overridden by the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void Add(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> <i>attributes</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Type.html">Type</a> of the object that will be overridden.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>attributes</i><br><dl>
+<dd>
+<param> A  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> that represents the overriding attributes.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> contains a union of attribute objects that cause the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> to override its default serialization behavior for a set of objects. You choose the attribute objects to place in the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a>, depending on the particular behaviors you want to override. For example, the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes a class member as an XML element by default. If you want the member to be serialized as an XML attribute instead, you would create a  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a>, assign it to the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html#SoapAttribute">SoapAttributes.SoapAttribute</a> property of a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a>, and add the  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> to the  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a>. Use the  <a href="#Add(System.Type,System.Xml.Serialization.SoapAttributes)">SoapAttributeOverrides.Add</a> method to add the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> to the  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a>.<p> Use this overload to add a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> that contains a  <a href="../../System.Xml.Serialization/types/SoapTypeAttribute.html">SoapTypeAttribute</a>. Because the  <a href="../../System.Xml.Serialization/types/SoapTypeAttribute.html">SoapTypeAttribute</a> overrides the serialization of a class, you need not specify a member of the class to override, only the type of the class.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes a class named <code>
+                Group
+              </code>. The serialization of the <code>
+                GroupName
+              </code> and <code>
+                IgnoreThis
+              </code> fields and the members of the <code>
+                GroupType
+              </code> enumeration are overridden. In the <code>
+                CreateOverrideSerializer
+              </code> method, a  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> is created, and for each overridden member or enumeration, a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> is created with the appropriate property set and added to the  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a>. An  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a> is created using the  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a>, and that  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a> is used to create the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> that overrides the default serialization.<pre>
+using System;
+using System.IO;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
+using System.Xml.Schema;
+
+public class Group
+{
+   [SoapAttribute (Namespace = "http://www.cpandl.com")]
+   public string GroupName;
+   
+   [SoapAttribute(DataType = "base64Binary")]
+   public Byte [] GroupNumber;
+
+   [SoapAttribute(DataType = "date", AttributeName = "CreationDate")]
+   public DateTime Today;
+   [SoapElement(DataType = "nonNegativeInteger", ElementName = "PosInt")]
+   public string PostitiveInt;
+   // This is ignored when serialized unless it's overridden.
+   [SoapIgnore] 
+   public bool IgnoreThis;
+   
+   public GroupType Grouptype;
+
+   public Vehicle MyVehicle;
+
+   // The SoapInclude allows the method to return a Car.
+   [SoapInclude(typeof(Car))]
+   public Vehicle myCar(string licNumber)
+   {
+      Vehicle v;
+      if(licNumber == "")
+         {
+            v = new Car();
+   	    v.licenseNumber = "!!!!!!";
+   	 }
+      else
+   	 {
+   	   v = new Car();
+   	   v.licenseNumber = licNumber;
+   	 }
+      return v;
+   }
+}
+  
+// SoapInclude allows Vehicle to accept Car type.
+[SoapInclude(typeof(Car))]
+public abstract class Vehicle
+{
+   public string licenseNumber;
+   public DateTime makeDate;
+}
+
+public class Car: Vehicle
+{
+}
+
+public enum GroupType
+{
+   // These enums can be overridden.
+   [SoapEnum("Small")]
+   A,
+   [SoapEnum("Large")]
+   B
+}
+ 
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.SerializeOriginal("SoapOriginal.xml");
+      test.SerializeOverride("SoapOverrides.xml");
+      test.DeserializeOriginal("SoapOriginal.xml");
+      test.DeserializeOverride("SoapOverrides.xml");
+   
+   }
+   public void SerializeOriginal(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlTypeMapping myMapping = 
+      (new SoapReflectionImporter().ImportTypeMapping(
+      typeof(Group)));
+      XmlSerializer mySerializer =  
+      new XmlSerializer(myMapping);
+      Group myGroup=MakeGroup();
+      // Writing the file requires a TextWriter.
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      // Serialize the class, and close the TextWriter.
+      mySerializer.Serialize(writer, myGroup);
+      writer.WriteEndElement();
+      writer.Close();
+   }
+
+   public void SerializeOverride(string filename)
+   {
+      // Create an instance of the XmlSerializer class
+      // that overrides the serialization.
+      XmlSerializer overRideSerializer = CreateOverrideSerializer();
+      Group myGroup=MakeGroup();
+      // Writing the file requires a TextWriter.
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      // Serialize the class, and close the TextWriter.
+      overRideSerializer.Serialize(writer, myGroup);
+      writer.WriteEndElement();
+      writer.Close();
+
+   }
+
+   private Group MakeGroup(){
+      // Create an instance of the class that will be serialized.
+      Group myGroup = new Group();
+
+      // Set the object properties.
+      myGroup.GroupName = ".NET";
+
+      Byte [] hexByte = new Byte[2]{Convert.ToByte(100),
+      Convert.ToByte(50)};
+      myGroup.GroupNumber = hexByte;
+
+      DateTime myDate = new DateTime(2002,5,2);
+      myGroup.Today = myDate;
+      myGroup.PostitiveInt= "10000";
+      myGroup.IgnoreThis=true;
+      myGroup.Grouptype= GroupType.B;
+      Car thisCar =(Car)  myGroup.myCar("1234566");
+      myGroup.MyVehicle=thisCar;
+      return myGroup;
+   }   	
+
+   public void DeserializeOriginal(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlTypeMapping myMapping = 
+      (new SoapReflectionImporter().ImportTypeMapping(
+      typeof(Group)));
+      XmlSerializer mySerializer =  
+      new XmlSerializer(myMapping);
+
+
+      // Reading the file requires an  XmlTextReader.
+      XmlTextReader reader= 
+      new XmlTextReader(filename);
+      reader.ReadStartElement("wrapper");
+
+      // Deserialize and cast the object.
+      Group myGroup; 
+      myGroup = (Group) mySerializer.Deserialize(reader);
+      reader.ReadEndElement();
+      reader.Close();
+
+   }
+
+   public void DeserializeOverride(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlSerializer overRideSerializer = CreateOverrideSerializer();
+
+      // Reading the file requires an  XmlTextReader.
+      XmlTextReader reader= 
+      new XmlTextReader(filename);
+      reader.ReadStartElement("wrapper");
+
+      // Deserialize and cast the object.
+      Group myGroup; 
+      myGroup = (Group) overRideSerializer.Deserialize(reader);
+      reader.ReadEndElement();
+      reader.Close();
+      ReadGroup(myGroup);
+   }
+
+   private void ReadGroup(Group myGroup){
+      Console.WriteLine(myGroup.GroupName);
+      Console.WriteLine(myGroup.GroupNumber[0]);
+      Console.WriteLine(myGroup.GroupNumber[1]);
+      Console.WriteLine(myGroup.Today);
+      Console.WriteLine(myGroup.PostitiveInt);
+      Console.WriteLine(myGroup.IgnoreThis);
+      Console.WriteLine();
+   }
+   private XmlSerializer CreateOverrideSerializer()
+   {
+      SoapAttributeOverrides mySoapAttributeOverrides = 
+      new SoapAttributeOverrides();
+      SoapAttributes soapAtts = new SoapAttributes();
+
+      SoapElementAttribute mySoapElement = new SoapElementAttribute();
+      mySoapElement.ElementName = "xxxx";
+      soapAtts.SoapElement = mySoapElement;
+      mySoapAttributeOverrides.Add(typeof(Group), "PostitiveInt", 
+      soapAtts);
+
+      // Override the IgnoreThis property.
+      SoapIgnoreAttribute myIgnore = new SoapIgnoreAttribute();
+      soapAtts = new SoapAttributes();
+      soapAtts.SoapIgnore = false;      
+      mySoapAttributeOverrides.Add(typeof(Group), "IgnoreThis", 
+      soapAtts);
+
+      // Override the GroupType enumeration.	
+      soapAtts = new SoapAttributes();
+      SoapEnumAttribute xSoapEnum = new SoapEnumAttribute();
+      xSoapEnum.Name = "Over1000";
+      soapAtts.SoapEnum = xSoapEnum;
+
+      // Add the SoapAttributes to the 
+      // mySoapAttributeOverridesrides object.
+      mySoapAttributeOverrides.Add(typeof(GroupType), "A", 
+      soapAtts);
+
+      // Create second enumeration and add it.
+      soapAtts = new SoapAttributes();
+      xSoapEnum = new SoapEnumAttribute();
+      xSoapEnum.Name = "ZeroTo1000";
+      soapAtts.SoapEnum = xSoapEnum;
+      mySoapAttributeOverrides.Add(typeof(GroupType), "B", 
+      soapAtts);
+
+      // Override the Group type.
+      soapAtts = new SoapAttributes();
+      SoapTypeAttribute soapType = new SoapTypeAttribute();
+      soapType.TypeName = "Team";
+      soapAtts.SoapType = soapType;
+      mySoapAttributeOverrides.Add(typeof(Group),soapAtts);
+
+      // Create an XmlTypeMapping that is used to create an instance 
+      // of the XmlSerializer. Then return the XmlSerializer object.
+      XmlTypeMapping myMapping = (new SoapReflectionImporter(
+      mySoapAttributeOverrides)).ImportTypeMapping(typeof(Group));
+	
+      XmlSerializer ser = new XmlSerializer(myMapping);
+      return ser;
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddTopic2"></a><a name="Add(System.Type,System.String,System.Xml.Serialization.SoapAttributes)">Add</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>member</i>,</font><br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> <i>attributes</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> to the collection of  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> objects contained by the  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a>. The <i>type</i> parameter specifies the object to be overridden by the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a>. The <i>member</i> parameter specifies the name of a member that will be overridden.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void Add(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>member</i>,</font><br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> <i>attributes</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Type.html">Type</a> of the object to override.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>member</i><br><dl>
+<dd>
+<param> The name of the member to override.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>attributes</i><br><dl>
+<dd>
+<param> A  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> that represents the overriding attributes.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> contains a union of attribute objects that cause the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> to override its default serialization behavior for a set of objects. You choose the attribute objects to place in the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a>, depending on the particular behaviors you want to override. For example, the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes a class member as an XML element by default. If you want the member to be serialized as a SOAP attribute instead, you would create a  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a>, assign it to the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html#SoapAttribute">SoapAttributes.SoapAttribute</a> property of a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a>, and add the  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> to the  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a>. Use the  <a href="#Add(System.Type,System.Xml.Serialization.SoapAttributes)">SoapAttributeOverrides.Add</a> method to add the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> to the  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a>.<p> Use this method when the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> contains either a  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a>,  <a href="../../System.ComponentModel/types/DefaultValueAttribute.html">DefaultValueAttribute</a> <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a>,  <a href="../../System.Xml.Serialization/types/SoapEnumAttribute.html">SoapEnumAttribute</a>, or  <a href="../../System.Xml.Serialization/types/SoapIgnoreAttribute.html">SoapIgnoreAttribute</a>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes a class named <code>
+                Group
+              </code>. The serialization of the <code>
+                GroupName
+              </code> and <code>
+                IgnoreThis
+              </code> fields and the members of the <code>
+                GroupType
+              </code> enumeration are overridden. In the <code>
+                CreateOverrideSerializer
+              </code> method, a  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> is created, and for each overridden member or enumeration, a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> is created with the appropriate property set and added to the  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a>. An  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a> is created using the  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a>, and that  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a> is used to create the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> that overrides the default serialization.<pre>
+using System;
+using System.IO;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
+using System.Xml.Schema;
+
+public class Group
+{
+   [SoapAttribute (Namespace = "http://www.cpandl.com")]
+   public string GroupName;
+   
+   [SoapAttribute(DataType = "base64Binary")]
+   public Byte [] GroupNumber;
+
+   [SoapAttribute(DataType = "date", AttributeName = "CreationDate")]
+   public DateTime Today;
+   [SoapElement(DataType = "nonNegativeInteger", ElementName = "PosInt")]
+   public string PostitiveInt;
+   // This is ignored when serialized unless it's overridden.
+   [SoapIgnore] 
+   public bool IgnoreThis;
+   
+   public GroupType Grouptype;
+
+   public Vehicle MyVehicle;
+
+   // The SoapInclude allows the method to return a Car.
+   [SoapInclude(typeof(Car))]
+   public Vehicle myCar(string licNumber)
+   {
+      Vehicle v;
+      if(licNumber == "")
+         {
+            v = new Car();
+   	    v.licenseNumber = "!!!!!!";
+   	 }
+      else
+   	 {
+   	   v = new Car();
+   	   v.licenseNumber = licNumber;
+   	 }
+      return v;
+   }
+}
+  
+// SoapInclude allows Vehicle to accept Car type.
+[SoapInclude(typeof(Car))]
+public abstract class Vehicle
+{
+   public string licenseNumber;
+   public DateTime makeDate;
+}
+
+public class Car: Vehicle
+{
+}
+
+public enum GroupType
+{
+   // These enums can be overridden.
+   [SoapEnum("Small")]
+   A,
+   [SoapEnum("Large")]
+   B
+}
+ 
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.SerializeOriginal("SoapOriginal.xml");
+      test.SerializeOverride("SoapOverrides.xml");
+      test.DeserializeOriginal("SoapOriginal.xml");
+      test.DeserializeOverride("SoapOverrides.xml");
+   
+   }
+   public void SerializeOriginal(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlTypeMapping myMapping = 
+      (new SoapReflectionImporter().ImportTypeMapping(
+      typeof(Group)));
+      XmlSerializer mySerializer =  
+      new XmlSerializer(myMapping);
+      Group myGroup=MakeGroup();
+      // Writing the file requires a TextWriter.
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      // Serialize the class, and close the TextWriter.
+      mySerializer.Serialize(writer, myGroup);
+      writer.WriteEndElement();
+      writer.Close();
+   }
+
+   public void SerializeOverride(string filename)
+   {
+      // Create an instance of the XmlSerializer class
+      // that overrides the serialization.
+      XmlSerializer overRideSerializer = CreateOverrideSerializer();
+      Group myGroup=MakeGroup();
+      // Writing the file requires a TextWriter.
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      // Serialize the class, and close the TextWriter.
+      overRideSerializer.Serialize(writer, myGroup);
+      writer.WriteEndElement();
+      writer.Close();
+
+   }
+
+   private Group MakeGroup(){
+      // Create an instance of the class that will be serialized.
+      Group myGroup = new Group();
+
+      // Set the object properties.
+      myGroup.GroupName = ".NET";
+
+      Byte [] hexByte = new Byte[2]{Convert.ToByte(100),
+      Convert.ToByte(50)};
+      myGroup.GroupNumber = hexByte;
+
+      DateTime myDate = new DateTime(2002,5,2);
+      myGroup.Today = myDate;
+      myGroup.PostitiveInt= "10000";
+      myGroup.IgnoreThis=true;
+      myGroup.Grouptype= GroupType.B;
+      Car thisCar =(Car)  myGroup.myCar("1234566");
+      myGroup.MyVehicle=thisCar;
+      return myGroup;
+   }   	
+
+   public void DeserializeOriginal(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlTypeMapping myMapping = 
+      (new SoapReflectionImporter().ImportTypeMapping(
+      typeof(Group)));
+      XmlSerializer mySerializer =  
+      new XmlSerializer(myMapping);
+
+
+      // Reading the file requires an  XmlTextReader.
+      XmlTextReader reader= 
+      new XmlTextReader(filename);
+      reader.ReadStartElement("wrapper");
+
+      // Deserialize and cast the object.
+      Group myGroup; 
+      myGroup = (Group) mySerializer.Deserialize(reader);
+      reader.ReadEndElement();
+      reader.Close();
+
+   }
+
+   public void DeserializeOverride(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlSerializer overRideSerializer = CreateOverrideSerializer();
+
+      // Reading the file requires an  XmlTextReader.
+      XmlTextReader reader= 
+      new XmlTextReader(filename);
+      reader.ReadStartElement("wrapper");
+
+      // Deserialize and cast the object.
+      Group myGroup; 
+      myGroup = (Group) overRideSerializer.Deserialize(reader);
+      reader.ReadEndElement();
+      reader.Close();
+      ReadGroup(myGroup);
+   }
+
+   private void ReadGroup(Group myGroup){
+      Console.WriteLine(myGroup.GroupName);
+      Console.WriteLine(myGroup.GroupNumber[0]);
+      Console.WriteLine(myGroup.GroupNumber[1]);
+      Console.WriteLine(myGroup.Today);
+      Console.WriteLine(myGroup.PostitiveInt);
+      Console.WriteLine(myGroup.IgnoreThis);
+      Console.WriteLine();
+   }
+   private XmlSerializer CreateOverrideSerializer()
+   {
+      SoapAttributeOverrides mySoapAttributeOverrides = 
+      new SoapAttributeOverrides();
+      SoapAttributes soapAtts = new SoapAttributes();
+
+      SoapElementAttribute mySoapElement = new SoapElementAttribute();
+      mySoapElement.ElementName = "xxxx";
+      soapAtts.SoapElement = mySoapElement;
+      mySoapAttributeOverrides.Add(typeof(Group), "PostitiveInt", 
+      soapAtts);
+
+      // Override the IgnoreThis property.
+      SoapIgnoreAttribute myIgnore = new SoapIgnoreAttribute();
+      soapAtts = new SoapAttributes();
+      soapAtts.SoapIgnore = false;      
+      mySoapAttributeOverrides.Add(typeof(Group), "IgnoreThis", 
+      soapAtts);
+
+      // Override the GroupType enumeration.	
+      soapAtts = new SoapAttributes();
+      SoapEnumAttribute xSoapEnum = new SoapEnumAttribute();
+      xSoapEnum.Name = "Over1000";
+      soapAtts.SoapEnum = xSoapEnum;
+
+      // Add the SoapAttributes to the 
+      // mySoapAttributeOverridesrides object.
+      mySoapAttributeOverrides.Add(typeof(GroupType), "A", 
+      soapAtts);
+
+      // Create second enumeration and add it.
+      soapAtts = new SoapAttributes();
+      xSoapEnum = new SoapEnumAttribute();
+      xSoapEnum.Name = "ZeroTo1000";
+      soapAtts.SoapEnum = xSoapEnum;
+      mySoapAttributeOverrides.Add(typeof(GroupType), "B", 
+      soapAtts);
+
+      // Override the Group type.
+      soapAtts = new SoapAttributes();
+      SoapTypeAttribute soapType = new SoapTypeAttribute();
+      soapType.TypeName = "Team";
+      soapAtts.SoapType = soapType;
+      mySoapAttributeOverrides.Add(typeof(Group),soapAtts);
+
+      // Create an XmlTypeMapping that is used to create an instance 
+      // of the XmlSerializer. Then return the XmlSerializer object.
+      XmlTypeMapping myMapping = (new SoapReflectionImporter(
+      mySoapAttributeOverrides)).ImportTypeMapping(typeof(Group));
+	
+      XmlSerializer ser = new XmlSerializer(myMapping);
+      return ser;
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~SoapAttributeOverrides();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

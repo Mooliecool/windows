@@ -1,0 +1,679 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Xml.Serialization.XmlNodeEventArgs</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Xml.Serialization.XmlNodeEventArgs Class</h2><b>Assembly: </b>System.Xml.dll<br><b>Namespace: </b>System.Xml.Serialization<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides data for the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#UnknownNode">XmlSerializer.UnknownNode</a> event.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public class XmlNodeEventArgs : EventArgs
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For more information about handling events, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconEventsOverview.asp">MSDN: eventsoverview</a>.<p> The  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#UnknownNode">XmlSerializer.UnknownNode</a> event can occur only when you call the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> method.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example uses the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#UnknownNode">XmlSerializer.UnknownNode</a> event of the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> to print various properties of an unknown XML node that is encountered when calling the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> class's  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> method.<pre>
+using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
+
+public class Group{
+   // Only the GroupName field will be known.
+   public string GroupName;
+}
+
+public class Test{
+   static void Main(){
+      Test t = new Test();
+      t.DeserializeObject("UnknownNodes.xml");
+   }
+
+   private void DeserializeObject(string filename){
+      XmlSerializer mySerializer = new XmlSerializer(typeof(Group));
+      FileStream fs = new FileStream(filename, FileMode.Open);
+      mySerializer.UnknownNode += new 
+      XmlNodeEventHandler(serializer_UnknownNode);
+      Group myGroup = (Group) mySerializer.Deserialize(fs);
+      fs.Close();
+   }
+   protected void serializer_UnknownNode
+   (object sender, XmlNodeEventArgs e){
+      Console.WriteLine
+      ("UnknownNode Name: {0}", e.Name);
+      Console.WriteLine
+      ("UnknownNode LocalName: {0}" ,e.LocalName);
+      Console.WriteLine
+      ("UnknownNode Namespace URI: {0}", e.NamespaceURI);
+      Console.WriteLine
+      ("UnknownNode Text: {0}", e.Text);
+
+      XmlNodeType myNodeType = e.NodeType;
+      Console.WriteLine("NodeType: {0}", myNodeType);
+ 
+      Group myGroup = (Group) e.ObjectBeingDeserialized;
+      Console.WriteLine("GroupName: {0}", myGroup.GroupName);
+      Console.WriteLine();
+   }
+}
+/* Paste this XML into a file named UnknownNodes:
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+
+xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:coho = "http://www.cohowinery.com" 
+
+xmlns:cp="http://www.cpandl.com"&gt;
+   &lt;coho:GroupName&gt;MyGroup&lt;/coho:GroupName&gt;
+   &lt;cp:GroupSize&gt;Large&lt;/cp:GroupSize&gt;
+   &lt;cp:GroupNumber&gt;444&lt;/cp:GroupNumber&gt;
+   &lt;coho:GroupBase&gt;West&lt;/coho:GroupBase&gt;
+   &lt;coho:ThingInfo&gt;
+      &lt;Number&gt;1&lt;/Number&gt;
+      &lt;Name&gt;Thing1&lt;/Name&gt;
+      &lt;Elmo&gt;
+         &lt;Glue&gt;element&lt;/Glue&gt;
+      &lt;/Elmo&gt;
+   &lt;/coho:ThingInfo&gt;
+&lt;/Group&gt;
+*/   
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Xml.Serialization/System.Xml.Serialization.html">System.Xml.Serialization Namespace</a> |  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> |  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> |  <a href="../../System.Xml.Serialization/types/XmlAttributeEventArgs.html">XmlAttributeEventArgs</a></dd>
+</dl>
+<h3>System.Xml.Serialization.XmlNodeEventArgs Member List: </h3>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#LineNumber">LineNumber</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the line number of the unknown XML node.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#LinePosition">LinePosition</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the position in the line of the unknown XML node.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#LocalName">LocalName</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the XML local name of the XML node being deserialized.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Name">Name</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the name of the XML node being deserialized.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#NamespaceURI">NamespaceURI</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the namespace URI that is associated with the XML node being deserialized.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#NodeType">NodeType</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the type of the XML node being deserialized.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ObjectBeingDeserialized">ObjectBeingDeserialized</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the object being deserialized.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Text">Text</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the text of the XML node being deserialized.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/EventArgs.html">System.EventArgs</a></li>
+<ul class="none">
+<li><b>System.Xml.Serialization.XmlNodeEventArgs</b></li>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Xml.Serialization.XmlNodeEventArgs Member Details</h3><b>Property: <i><a name="LineNumberTopic1"></a><a name="LineNumber">LineNumber</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the line number of the unknown XML node.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> LineNumber {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
+
+public class Group{
+   // Only the GroupName field will be known.
+   public string GroupName;
+}
+
+public class Test{
+   static void Main(){
+      Test t = new Test();
+      t.DeserializeObject("UnknownNodes.xml");
+   }
+
+   private void DeserializeObject(string filename){
+      XmlSerializer mySerializer = new XmlSerializer(typeof(Group));
+      FileStream fs = new FileStream(filename, FileMode.Open);
+      mySerializer.UnknownNode += new 
+      XmlNodeEventHandler(serializer_UnknownNode);
+      Group myGroup = (Group) mySerializer.Deserialize(fs);
+      fs.Close();
+   }
+   protected void serializer_UnknownNode
+   (object sender, XmlNodeEventArgs e){
+      Console.WriteLine
+      ("UnknownNode Name: {0}", e.Name);
+      Console.WriteLine
+      ("UnknownNode LocalName: {0}" ,e.LocalName);
+      Console.WriteLine
+      ("UnknownNode Namespace URI: {0}", e.NamespaceURI);
+      Console.WriteLine
+      ("UnknownNode Text: {0}", e.Text);
+
+      XmlNodeType myNodeType = e.NodeType;
+      Console.WriteLine("NodeType: {0}", myNodeType);
+ 
+      Group myGroup = (Group) e.ObjectBeingDeserialized;
+      Console.WriteLine("GroupName: {0}", myGroup.GroupName);
+      Console.WriteLine();
+   }
+}
+/* Paste this XML into a file named UnknownNodes:
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+
+xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:coho = "http://www.cohowinery.com" 
+
+xmlns:cp="http://www.cpandl.com"&gt;
+   &lt;coho:GroupName&gt;MyGroup&lt;/coho:GroupName&gt;
+   &lt;cp:GroupSize&gt;Large&lt;/cp:GroupSize&gt;
+   &lt;cp:GroupNumber&gt;444&lt;/cp:GroupNumber&gt;
+   &lt;coho:GroupBase&gt;West&lt;/coho:GroupBase&gt;
+   &lt;coho:ThingInfo&gt;
+      &lt;Number&gt;1&lt;/Number&gt;
+      &lt;Name&gt;Thing1&lt;/Name&gt;
+      &lt;Elmo&gt;
+         &lt;Glue&gt;element&lt;/Glue&gt;
+      &lt;/Elmo&gt;
+   &lt;/coho:ThingInfo&gt;
+&lt;/Group&gt;
+*/   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="LinePositionTopic1"></a><a name="LinePosition">LinePosition</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the position in the line of the unknown XML node.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> LinePosition {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
+
+public class Group{
+   // Only the GroupName field will be known.
+   public string GroupName;
+}
+
+public class Test{
+   static void Main(){
+      Test t = new Test();
+      t.DeserializeObject("UnknownNodes.xml");
+   }
+
+   private void DeserializeObject(string filename){
+      XmlSerializer mySerializer = new XmlSerializer(typeof(Group));
+      FileStream fs = new FileStream(filename, FileMode.Open);
+      mySerializer.UnknownNode += new 
+      XmlNodeEventHandler(serializer_UnknownNode);
+      Group myGroup = (Group) mySerializer.Deserialize(fs);
+      fs.Close();
+   }
+   protected void serializer_UnknownNode
+   (object sender, XmlNodeEventArgs e){
+      Console.WriteLine
+      ("UnknownNode Name: {0}", e.Name);
+      Console.WriteLine
+      ("UnknownNode LocalName: {0}" ,e.LocalName);
+      Console.WriteLine
+      ("UnknownNode Namespace URI: {0}", e.NamespaceURI);
+      Console.WriteLine
+      ("UnknownNode Text: {0}", e.Text);
+
+      XmlNodeType myNodeType = e.NodeType;
+      Console.WriteLine("NodeType: {0}", myNodeType);
+ 
+      Group myGroup = (Group) e.ObjectBeingDeserialized;
+      Console.WriteLine("GroupName: {0}", myGroup.GroupName);
+      Console.WriteLine();
+   }
+}
+/* Paste this XML into a file named UnknownNodes:
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+
+xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:coho = "http://www.cohowinery.com" 
+
+xmlns:cp="http://www.cpandl.com"&gt;
+   &lt;coho:GroupName&gt;MyGroup&lt;/coho:GroupName&gt;
+   &lt;cp:GroupSize&gt;Large&lt;/cp:GroupSize&gt;
+   &lt;cp:GroupNumber&gt;444&lt;/cp:GroupNumber&gt;
+   &lt;coho:GroupBase&gt;West&lt;/coho:GroupBase&gt;
+   &lt;coho:ThingInfo&gt;
+      &lt;Number&gt;1&lt;/Number&gt;
+      &lt;Name&gt;Thing1&lt;/Name&gt;
+      &lt;Elmo&gt;
+         &lt;Glue&gt;element&lt;/Glue&gt;
+      &lt;/Elmo&gt;
+   &lt;/coho:ThingInfo&gt;
+&lt;/Group&gt;
+*/   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="LocalNameTopic1"></a><a name="LocalName">LocalName</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the XML local name of the XML node being deserialized.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> LocalName {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#LocalName">XmlNodeEventArgs.LocalName</a> property returns the local name (also known as a local part) of an XML qualified name. The  <a href="#LocalName">XmlNodeEventArgs.LocalName</a> property conforms to the 1999 http://www.w3.org specification <i>Namespaces in XML</i>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example prints the  <a href="#LocalName">XmlNodeEventArgs.LocalName</a> of an unknown node of an unknown XML node that is encountered when calling the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> class's  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> method.<pre>
+protected void serializer_UnknownNode
+(object sender, XmlNodeEventArgs e)
+{
+   Console.WriteLine
+   ("UnknownNode LocalName: " + e.LocalName);
+}
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> |  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NameTopic1"></a><a name="Name">Name</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the name of the XML node being deserialized.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> Name {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example prints the name of the unknown node that caused the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#UnknownNode">XmlSerializer.UnknownNode</a> event to occur.<pre>
+protected void serializer_UnknownNode
+(object sender, XmlNodeEventArgs e)
+{
+   Console.WriteLine
+   ("UnknownNode Name: " + e.Name);
+}
+   
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> |  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NamespaceURITopic1"></a><a name="NamespaceURI">NamespaceURI</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the namespace URI that is associated with the XML node being deserialized.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> NamespaceURI {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example prints the URI of the unknown XML node that caused the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#UnknownNode">XmlSerializer.UnknownNode</a> event to occur.<pre>
+protected void serializer_UnknownNode
+(object sender, XmlNodeEventArgs e)
+{
+   Console.WriteLine
+   ("UnknownNode Namespace URI: " + e.NamespaceURI);
+}
+   
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> |  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NodeTypeTopic1"></a><a name="NodeType">NodeType</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the type of the XML node being deserialized.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml/types/XmlNodeType.html">XmlNodeType</a> NodeType {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Xml/types/XmlNodeType.html">XmlNodeType</a> enumeration returns a description of the node being deserialized. For example, it returns "Comment" if the node is a comment.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example prints a description of the unknown node that caused the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#UnknownNode">XmlSerializer.UnknownNode</a> event to occur.<pre>
+protected void serializer_UnknownNode
+(object sender, XmlNodeEventArgs e)
+{
+   XmlNodeType myNodeType = e.NodeType;
+   Console.WriteLine(myNodeType);
+}
+   
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> |  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ObjectBeingDeserializedTopic1"></a><a name="ObjectBeingDeserialized">ObjectBeingDeserialized</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the object being deserialized.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> ObjectBeingDeserialized {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example prints the value returned by the  <a href="../../System/types/Object.html#ToString">Object.ToString</a> method when the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> method encounters an unknown XML node.<pre>
+protected void serializer_UnknownNode
+(object sender, XmlNodeEventArgs e)
+{
+   object o = e.ObjectBeingDeserialized;
+   Console.WriteLine("Object being deserialized: " 
+   + o.ToString());
+       
+}
+   
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> |  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="TextTopic1"></a><a name="Text">Text</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the text of the XML node being deserialized.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> Text {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example prints the text of the unknown XML node that caused the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#UnknownNode">XmlSerializer.UnknownNode</a> event to occur.<pre>
+protected void serializer_UnknownNode
+(object sender, XmlNodeEventArgs e)
+{
+   Console.WriteLine
+   ("UnknownNode Text: " + e.Text);
+}
+   
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> |  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~XmlNodeEventArgs();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

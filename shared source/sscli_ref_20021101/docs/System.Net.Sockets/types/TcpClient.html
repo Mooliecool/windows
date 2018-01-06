@@ -1,0 +1,1181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Net.Sockets.TcpClient</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Net.Sockets.TcpClient Class</h2><b>Assembly: </b>System.dll<br><b>Namespace: </b>System.Net.Sockets<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides client connections for TCP network services.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public class TcpClient : IDisposable
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> class builds upon the  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> class to provide TCP services at a higher level of abstraction. <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> provides simple methods for connecting, sending, and receiving data over a network. You can connect with a remote host using one of the following two ways: <UL>
+<li> Create an instance of the  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> class using either no parameters, or using a local  <a href="../../System.Net/types/IPEndPoint.html">IPEndPoint</a>, and then call one of the three available  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> <a href="#Connect(System.String,System.Int32)">TcpClient.Connect</a> methods.</li>
+<li> Create an instance of the  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> class using the host name and port number of the device to which you intend to connect. This constructor will automatically establish your connection.</li>
+</UL>
+<p> To send and receive data, use the  <a href="#GetStream">TcpClient.GetStream</a> method to obtain a  <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a> that can send and receive data on the underlying connected  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>. After utilizing the write and read methods available through the  <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a>, use the  <a href="#Close">TcpClient.Close</a> method to release all resources associated with the  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a>.</p>
+<p> <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> provides a set of convenient properties that you can use to adjust common  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> settings. If you need to set  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> options not addressed with these properties, use the  <a href="#Client">TcpClient.Client</a> property to retrieve the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>.</p><br><br><b>Notes to inheritors: </b> You can use the  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> accessed through the  <a href="#Client">TcpClient.Client</a> to facilitate any functionality not available using the simplified interface of  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> property. Specifically, you can call  <a href="../../System.Net.Sockets/types/Socket.html#SetSocketOption(System.Net.Sockets.SocketOptionLevel,System.Net.Sockets.SocketOptionName,System.Int32)">Socket.SetSocketOption</a> to set your desired option.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example establishes a  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> connection using the host name www.contoso.com on port 11000. You use the underlying  <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a> instance to send and receive simple string statements.<pre>
+TcpClient tcpClient = new TcpClient();
+    try{
+        tcpClient.Connect("www.contoso.com", 11000);
+        NetworkStream networkStream = tcpClient.GetStream();
+
+        if(networkStream.CanWrite &amp;&amp; networkStream.CanRead){
+
+            // Does a simple write.
+            Byte[] sendBytes = Encoding.ASCII.GetBytes("Is anybody there");
+            networkStream.Write(sendBytes, 0, sendBytes.Length);
+      
+            // Reads the NetworkStream into a byte buffer.
+            byte[] bytes = new byte[tcpClient.ReceiveBufferSize];
+            networkStream.Read(bytes, 0, (int) tcpClient.ReceiveBufferSize);
+  
+           // Returns the data received from the host to the console.
+           string returndata = Encoding.ASCII.GetString(bytes);
+           Console.WriteLine("This is what the host returned to you: " + returndata);
+
+          }
+          else if (!networkStream.CanRead){
+              Console.WriteLine("You can not write data to this stream");
+              tcpClient.Close();
+          }
+          else if (!networkStream.CanWrite){             
+              Console.WriteLine("You can not read data from this stream");
+              tcpClient.Close();
+          }
+       }
+       catch (Exception e ) {
+                  Console.WriteLine(e.ToString());
+       }
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Net.Sockets/System.Net.Sockets.html">System.Net.Sockets Namespace</a> |  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> |  <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpcontcpudp.asp">MSDN: tcpudp</a></dd>
+</dl>
+<h3>System.Net.Sockets.TcpClient Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor()<br><br></code>Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Initializes a new instance of the  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(IPEndPoint localEP)<br><br></code> Initializes a new instance of  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> bound to the specified local endpoint.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor3">ctor #3</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(string hostname, int port)<br><br></code> Initializes a new instance of the  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> class and connects to the specified port on the specified host.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#LingerState">LingerState</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets information about the sockets linger time.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#NoDelay">NoDelay</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets a value that enables a delay when send or receive buffers are not full.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ReceiveBufferSize">ReceiveBufferSize</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the size of the receive buffer.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ReceiveTimeout">ReceiveTimeout</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the amount of time a  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> will wait to receive data once initiated.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SendBufferSize">SendBufferSize</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the size of the send buffer.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SendTimeout">SendTimeout</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the amount of time a  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> will wait to receive confirmation after you initiate a send.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Close">Close</a></td>
+<td width="55%"> Closes the TCP connection.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Connect(System.Net.IPEndPoint)">Connect</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Connect(IPEndPoint remoteEP)<br><br></code> Connects the client to a remote TCP host using the specified remote network endpoint.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Connect(System.Net.IPAddress,System.Int32)">Connect</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Connect(IPAddress address, int port)<br><br></code> Connects the client to a remote TCP host using the specified IP address and port number.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Connect(System.String,System.Int32)">Connect</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Connect(string hostname, int port)<br><br></code> Connects the client to the specified port on the specified host.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetStream">GetStream</a></td>
+<td width="55%"> Returns the stream used to send and receive data.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Active">Active</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or set a value that indicates whether a connection has been made.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Client">Client</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Dispose(System.Boolean)">Dispose</a></td>
+<td width="55%"> Releases the unmanaged resources used by the  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> and optionally releases the managed resources.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a></td>
+<td width="55%"><b>Overridden: </b><br> Frees resources used by the  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Net.Sockets.TcpClient</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Net.Sockets.TcpClient Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> class.</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public TcpClient();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The default constructor initializes a new  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a>. You must call the  <a href="#Connect(System.String,System.Int32)">TcpClient.Connect</a> method to establish a remote host connection.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example demonstrates how to use the default constructor to create a new  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a>.<pre>
+           //Creates a TCPClient using the default constructor.
+           TcpClient tcpClientC = new TcpClient();
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> bound to the specified local endpoint.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public TcpClient(<br>   <font color="#008080"><a href="../../System.Net/types/IPEndPoint.html">IPEndPoint</a> <i>localEP</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>localEP</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Net/types/IPEndPoint.html">IPEndPoint</a> to which you bind the TCP  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>localEP</i> parameter is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The <i>localEP</i> parameter specifies the local  <a href="../../System.Net/types/IPEndPoint.html">IPEndPoint</a>. This constructor creates an underlying socket and binds that socket to <i>localEp</i>. You must call the  <a href="#Connect(System.String,System.Int32)">TcpClient.Connect</a> method to establish a remote host connection.<br><br><b>Note </b> Use this constructor if you want to specify which local network interface (IP address), and port number to use when establishing a remote host connection.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example demonstrates how to create an instance of the  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> class using a local endpoint.<pre>
+           //Creates a TCPClient using a localend point.
+           IPAddress ipAddress = Dns.Resolve(Dns.GetHostName()).AddressList[0];
+           IPEndPoint ipLocalEndPoint = new IPEndPoint(ipAddress, 11000);
+           try{
+                    TcpClient tcpClientA = new TcpClient(ipLocalEndPoint);
+           }  
+           catch (Exception e ) {
+                     Console.WriteLine(e.ToString());
+             }
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Net/types/IPEndPoint.html">IPEndPoint</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic3"></a><a name="ctor3">ctor #3</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> class and connects to the specified port on the specified host.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public TcpClient(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>hostname</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>port</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>hostname</i><br><dl>
+<dd>
+<param> DNS name of the remote host to which you intend to connect.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>port</i><br><dl>
+<dd>
+<param> Port number of the remote host to which you intend to connect.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>hostname</i> parameter is null.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The <i>port</i> parameter is not between  <a href="../../System.Net/types/IPEndPoint.html#MinPort">IPEndPoint.MinPort</a> and  <a href="../../System.Net/types/IPEndPoint.html#MaxPort">IPEndPoint.MaxPort</a>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Net.Sockets/types/SocketException.html">SocketException</a></td>
+<td> An error occurred while connecting to the remote host.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This constructor initializes a new  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> and establishes a remote host connection by calling  <a href="#Connect(System.String,System.Int32)">TcpClient.Connect</a> using the provided <i>hostname</i> and <i>port</i> parameters. This constructor allows you to initialize, resolve the DNS host name, and connect in one convenient step.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example demonstrates how to create an instance of  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> class using a host name and port number.<pre>
+           //Creates a TCPClient using hostname and port.
+           try{
+                TcpClient tcpClientB = new TcpClient("www.contoso.com", 11000);
+           }
+           catch (Exception e ) {
+                      Console.WriteLine(e.ToString());
+           }
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemNetSocketsTCPClientmemberstopic.asp#ctor1">TCPClient.#ctor</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ActiveTopic1"></a><a name="Active">Active</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or set a value that indicates whether a connection has been made.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Boolean.html">bool</a> Active {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Classes deriving from  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> can use this property to keep track of the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> connection state.<br><br><b>Note </b> <a href="#Active">TcpClient.Active</a> can be used to avoid redundant connection attempts, or to validate operations that require a particular connection state as a pre condition.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example demonstrates a derived class using the protected property  <a href="#Active">TcpClient.Active</a>. In this example, <code>
+                MyTcpClientDerivedClass
+              </code> verifies that the connection is active before obtaining the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>.<pre>
+// This derived class demonstrates the use of three protected methods belonging to the TcpClient class
+public class MyTcpClientDerivedClass : TcpClient{
+
+// Constructor for the derived class.
+public MyTcpClientDerivedClass() : base(){
+}
+public void UsingProtectedMethods(){
+
+  // Uses the protected 'Active' property belonging to the TcpClient base class 
+  // to determine if a connection is established. 
+  if (this.Active){
+      // Calls the protected 'Client' property belonging to the TcpClient base class.
+      Socket s = this.Client;
+      // Uses the Socket returned by Client to set an option that is not available using TcpClient.
+      s.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
+  }
+  // To free all resources, calls the protected virtual method Dispose belonging to the TcpClient base class.
+ this.Dispose(true);
+ GC.SuppressFinalize(this);
+
+}
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ClientTopic1"></a><a name="Client">Client</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> Client {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> creates a  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> to send and receive data over a network. Classes deriving from  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> can use this property to get or set this  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>. Use the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> returned from  <a href="#Client">TcpClient.Client</a>, if you require access beyond that which  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> provides. You can also use  <a href="#Client">TcpClient.Client</a> to set the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> to an existing  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>. This might be useful if you want to take advantage of the simplicity of  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> using a pre-existing  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example demonstrates a derived class using the protected property  <a href="#Client">TcpClient.Client</a>. In this example, <code>
+                MyTcpClientDerivedClass
+              </code> obtains the underlying socket to enable broadcasting.<pre>
+// This derived class demonstrates the use of three protected methods belonging to the TcpClient class
+public class MyTcpClientDerivedClass : TcpClient{
+
+// Constructor for the derived class.
+public MyTcpClientDerivedClass() : base(){
+}
+public void UsingProtectedMethods(){
+
+  // Uses the protected 'Active' property belonging to the TcpClient base class 
+  // to determine if a connection is established. 
+  if (this.Active){
+      // Calls the protected 'Client' property belonging to the TcpClient base class.
+      Socket s = this.Client;
+      // Uses the Socket returned by Client to set an option that is not available using TcpClient.
+      s.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
+  }
+  // To free all resources, calls the protected virtual method Dispose belonging to the TcpClient base class.
+ this.Dispose(true);
+ GC.SuppressFinalize(this);
+
+}
+
+}
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Net.Sockets/types/Socket.html">Socket</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="LingerStateTopic1"></a><a name="LingerState">LingerState</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets information about the sockets linger time.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Net.Sockets/types/LingerOption.html">LingerOption</a> LingerState {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property controls the length of time that the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> will remain open after a call to  <a href="#Close">TcpClient.Close</a>, when data remains to be sent. If the  <a href="../../System.Net.Sockets/types/LingerOption.html#Enabled">LingerOption.Enabled</a> property of the  <a href="../../System.Net.Sockets/types/LingerOption.html">LingerOption</a> is <b>true</b><i>,</i> then data will continue to be sent to the network with a time out of  <a href="../../System.Net.Sockets/types/LingerOption.html#LingerTime">LingerOption.LingerTime</a> seconds. Once the data is sent, or if the time-out expires, the connection is closed and any unsent data is lost. If the  <a href="../../System.Net.Sockets/types/LingerOption.html#Enabled">LingerOption.Enabled</a> property of the  <a href="../../System.Net.Sockets/types/LingerOption.html">LingerOption</a> is <b>false</b><i>,</i> then the connection will close, even if data remains to be sent.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example sets and gets the sockets linger time.<pre>
+      // sets the amount of time to linger after closing, using the LingerOption public property.
+      LingerOption lingerOption = new LingerOption(true, 10);
+      tcpClient.LingerState = lingerOption;
+
+      // gets the amount of linger time set, using the LingerOption public property.
+      if (tcpClient.LingerState.LingerTime == 10)
+   	    Console.WriteLine("The linger state setting was successfully set to " +
+   	    tcpClient.LingerState.LingerTime.ToString());
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Net.Sockets/types/LingerOption.html">LingerOption</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NoDelayTopic1"></a><a name="NoDelay">NoDelay</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets a value that enables a delay when send or receive buffers are not full.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> NoDelay {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> When  <a href="#NoDelay">TcpClient.NoDelay</a> is <b>false</b>, TCP does not send a packet over the network until it has collected a significant amount of outgoing data. Because of the amount of overhead in a TCP segment, sending small amounts of data would be very inefficient. However, situations do exist where you might want to send very small amounts of data or expect immediate responses from each packet you send. Your decision should weigh the relative importance of network efficiency versus application requirements.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example enables the delay. It then checks the value of  <a href="#NoDelay">TcpClient.NoDelay</a> to verify that it was successfully set.<pre>
+      // Sends data immediately upon calling NetworkStream.Write.
+      tcpClient.NoDelay = true;
+
+      // Determines if the delay is enabled by using the NoDelay property.
+      if (tcpClient.NoDelay == true)
+   	    Console.WriteLine("The delay was set successfully to " +
+   	    tcpClient.NoDelay.ToString());
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ReceiveBufferSizeTopic1"></a><a name="ReceiveBufferSize">ReceiveBufferSize</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the size of the receive buffer.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> ReceiveBufferSize {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#ReceiveBufferSize">TcpClient.ReceiveBufferSize</a> property gets or sets the number of bytes that you are expecting to store in the receive buffer for each read operation.<br><br><b>Note </b> Setting this property does not limit the amount of data you can store from a single read operation. The receive buffer dynamically grows in size as space is needed to accommodate varying packet sizes. This property simply allows you to save the overhead associated with dynamic reallocation by specifying a buffer size up front.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example sets and gets the receive buffer size.<pre>
+      // sets the receive buffer size using the ReceiveBufferSize public property.
+      tcpClient.ReceiveBufferSize = 1024;
+   
+      // gets the receive buffer size using the ReceiveBufferSize public property.
+      if (tcpClient.ReceiveBufferSize == 1024)
+   	   Console.WriteLine("The receive buffer was successfully set to " + 
+   	   tcpClient.ReceiveBufferSize.ToString());
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#SendBufferSize">TcpClient.SendBufferSize</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ReceiveTimeoutTopic1"></a><a name="ReceiveTimeout">ReceiveTimeout</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the amount of time a  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> will wait to receive data once initiated.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> ReceiveTimeout {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#ReceiveTimeout">TcpClient.ReceiveTimeout</a> property determines the amount of time a  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> will wait to receive data after a read is initiated. This time is measured in milliseconds. The underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> will throw a  <a href="../../System.Net.Sockets/types/SocketException.html">SocketException</a> if a read is initiated, and the  <a href="#ReceiveTimeout">TcpClient.ReceiveTimeout</a> expires.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example sets and gets the receive time out.<pre>
+      // Sets the receive time out using the ReceiveTimeout public property.
+      tcpClient.ReceiveTimeout = 5;
+
+      // Gets the receive time out using the ReceiveTimeout public property.
+      if (tcpClient.ReceiveTimeout == 5)
+   	    Console.WriteLine("The receive time out limit was successfully set " +
+   	    tcpClient.ReceiveTimeout.ToString());
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="SendBufferSizeTopic1"></a><a name="SendBufferSize">SendBufferSize</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the size of the send buffer.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> SendBufferSize {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#SendBufferSize">TcpClient.SendBufferSize</a> property gets or sets the number of bytes to store in the send buffer for each send operation.<br><br><b>Note </b> Setting this property does not limit the amount of data you can store for a single send operation. You specify the number of outgoing data bytes when using one of the underlying  <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a> send operations. <a href="#SendBufferSize">TcpClient.SendBufferSize</a> simply allows you to save the overhead associated with dynamic reallocation by specifying a buffer size up front.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example sets and gets the send buffer size.<pre>
+      //sets the send buffer size using the SendBufferSize public property.
+      tcpClient.SendBufferSize = 1024;  
+
+      // gets the send buffer size using the SendBufferSize public property.
+      if (tcpClient.SendBufferSize == 1024)
+          Console.WriteLine("The send buffer was successfully set to " +
+           tcpClient.SendBufferSize.ToString());
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#ReceiveBufferSize">TcpClient.ReceiveBufferSize</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="SendTimeoutTopic1"></a><a name="SendTimeout">SendTimeout</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the amount of time a  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> will wait to receive confirmation after you initiate a send.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> SendTimeout {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> After you initiate a send, the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> returns the number of bytes actually sent to the host. The  <a href="#SendTimeout">TcpClient.SendTimeout</a> property determines the amount of time a  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> will wait before receiving the number of bytes returned by the  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> class. The underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> will throw a  <a href="../../System.Net.Sockets/types/SocketException.html">SocketException</a> if a send is initiated and the  <a href="#SendTimeout">TcpClient.SendTimeout</a> expires.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example sets and gets the  <a href="#SendTimeout">TcpClient.SendTimeout</a> value.<pre>
+      // sets the send time out using the SendTimeout public property.
+      tcpClient.SendTimeout = 5;
+
+      // gets the send time out using the SendTimeout public property.
+      if (tcpClient.SendTimeout == 5)
+           Console.WriteLine("The send time out limit was successfully set " +
+   	    tcpClient.SendTimeout.ToString());
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CloseTopic1"></a><a name="Close">Close</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Closes the TCP connection.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void Close();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Net.Sockets/types/SocketException.html">SocketException</a></td>
+<td> An error occurs while closing the socket.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example demonstrates closing  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> by calling  <a href="#Close">TcpClient.Close</a>.<pre>
+   // Uses the Close public method to close the network stream and socket.
+   tcpClient.Close();
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Net.Sockets/types/Socket.html#Close">Socket.Close</a> |  <a href="../../System.Net.Sockets/types/NetworkStream.html#Close">NetworkStream.Close</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="ConnectTopic1"></a><a name="Connect(System.Net.IPEndPoint)">Connect</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Net/types/IPEndPoint.html">IPEndPoint</a> <i>remoteEP</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Connects the client to a remote TCP host using the specified remote network endpoint.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void Connect(<br>   <font color="#008080"><a href="../../System.Net/types/IPEndPoint.html">IPEndPoint</a> <i>remoteEP</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>remoteEP</i><br><dl>
+<dd>
+<param> The IP endpoint to which you intend to connect.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>remoteEp</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Net.Sockets/types/SocketException.html">SocketException</a></td>
+<td> An error occurred while connecting to the remote host.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#Connect(System.String,System.Int32)">TcpClient.Connect</a> establishes a TCP connection using the specified network endpoint. Before you call  <a href="#Connect(System.String,System.Int32)">TcpClient.Connect</a>, you must first create an instance of the  <a href="../../System.Net/types/IPEndPoint.html">IPEndPoint</a> class using an IP address and a port number. This is your network endpoint. You can then call  <a href="#Connect(System.String,System.Int32)">TcpClient.Connect</a> and pass the  <a href="../../System.Net/types/IPEndPoint.html">IPEndPoint</a> as its parameter. <a href="#Connect(System.String,System.Int32)">TcpClient.Connect</a> then establishes a connection with the remote host by calling the  <a href="../../System.Net.Sockets/types/Socket.html#Connect(System.Net.EndPoint)">Socket.Connect</a> method of the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>. After establishing a connection, you can use  <a href="#GetStream">TcpClient.GetStream</a> to obtain the underlying  <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a>. Use the underlying  <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a> to send and receive data.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example uses an  <a href="../../System.Net/types/IPEndPoint.html">IPEndPoint</a> to connect with a remote host.<pre>
+   //Uses a remote end point to establish a socket connection.
+   TcpClient tcpClient = new TcpClient();
+   IPAddress ipAddress = Dns.Resolve("www.contoso.com").AddressList[0];
+   IPEndPoint ipEndPoint = new IPEndPoint(ipAddress, 11004);
+   try{
+   	tcpClient.Connect(ipEndPoint);
+   }
+   catch (Exception e ) {
+              Console.WriteLine(e.ToString());
+          }
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Connect(System.String,System.Int32)">TcpClient.Connect</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="ConnectTopic2"></a><a name="Connect(System.Net.IPAddress,System.Int32)">Connect</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Net/types/IPAddress.html">IPAddress</a> <i>address</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>port</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Connects the client to a remote TCP host using the specified IP address and port number.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void Connect(<br>   <font color="#008080"><a href="../../System.Net/types/IPAddress.html">IPAddress</a> <i>address</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>port</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>address</i><br><dl>
+<dd>
+<param> The IP address of the host to which you intend to connect.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>port</i><br><dl>
+<dd>
+<param> The port number to which you intend to connect.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>address</i> parameter is null.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The <i>port</i> parameter is not between  <a href="../../System.Net/types/IPEndPoint.html#MinPort">IPEndPoint.MinPort</a> and  <a href="../../System.Net/types/IPEndPoint.html#MaxPort">IPEndPoint.MaxPort</a>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Net.Sockets/types/SocketException.html">SocketException</a></td>
+<td> An error occurred while connecting to the remote host.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#Connect(System.String,System.Int32)">TcpClient.Connect</a> establishes a TCP connection using the specified port and IP address by calling the  <a href="../../System.Net.Sockets/types/Socket.html#Connect(System.Net.EndPoint)">Socket.Connect</a> method of the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>. After establishing a connection, you can use  <a href="#GetStream">TcpClient.GetStream</a> to obtain the underlying  <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a>. Use the underlying  <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a> to send and receive data.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example uses an IP Address and port number to connect with a remote host.<pre>
+      //Uses the IP address and port number to establish a socket connection.
+      TcpClient tcpClient = new TcpClient();
+      IPAddress ipAddress = Dns.Resolve("www.contoso.com").AddressList[0];
+      try{
+          tcpClient.Connect(ipAddress, 11003);
+      }
+      catch (Exception e ) {
+                 Console.WriteLine(e.ToString());
+      }
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Net.Sockets/types/Socket.html#Connect(System.Net.EndPoint)">Socket.Connect</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="ConnectTopic3"></a><a name="Connect(System.String,System.Int32)">Connect</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>hostname</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>port</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Connects the client to the specified port on the specified host.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void Connect(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>hostname</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>port</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>hostname</i><br><dl>
+<dd>
+<param> The DNS name of the remote host to which you intend to connect.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>port</i><br><dl>
+<dd>
+<param> The port number of the remote host to which you intend to connect.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>hostname</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The <i>port</i> parameter is not between  <a href="../../System.Net/types/IPEndPoint.html#MinPort">IPEndPoint.MinPort</a> and  <a href="../../System.Net/types/IPEndPoint.html#MaxPort">IPEndPoint.MaxPort</a>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Net.Sockets/types/SocketException.html">SocketException</a></td>
+<td> An operating system error occurred while accessing the socket.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#Connect(System.String,System.Int32)">TcpClient.Connect</a> establishes a TCP connection to the host device <i></i> by calling the  <a href="../../System.Net.Sockets/types/Socket.html#Connect(System.Net.EndPoint)">Socket.Connect</a> method of the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> using the specified <i>hostname</i> and <i>port</i> number. After establishing the connection, you can use  <a href="#GetStream">TcpClient.GetStream</a> to obtain the underlying  <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a>. Use the underlying  <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a> to send and receive data.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example uses the host name and port number to connect with a remote host.<pre>
+     //Uses a host name and port number to establish a socket connection.
+    TcpClient tcpClient = new TcpClient();
+    try{
+        tcpClient.Connect("www.contoso.com", 11002);
+    }
+    catch (Exception e ) {
+               Console.WriteLine(e.ToString());
+           }
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Net.Sockets/types/Socket.html#Connect(System.Net.EndPoint)">Socket.Connect</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="DisposeTopic1"></a><a name="Dispose(System.Boolean)">Dispose</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>disposing</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Releases the unmanaged resources used by the  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> and optionally releases the managed resources.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual void Dispose(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>disposing</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>disposing</i><br><dl>
+<dd>
+<param><b>true,</b> to release both managed and unmanaged resources; <b>false,</b> to release only unmanaged resources.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method is called by the <b>Dispose()</b> method and the  <a href="../../System/types/Object.html#Finalize">Object.Finalize</a> method.<b>Dispose()</b> invokes this method with the <i>disposing</i> parameter set to <b>true</b>. <a href="../../System/types/Object.html#Finalize">Object.Finalize</a> invokes this method with <i>disposing</i> set to <b>false</b>.<p> When the <i>disposing</i> parameter is <b>true</b>, this method releases all resources held by any managed objects that this  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> references. It does this by invoking the <b>Dispose()</b> method of each referenced object.</p><br><br><b>Notes to inheritors: </b><b>Dispose</b> can be called multiple times by other objects. When overriding <b>Dispose(Boolean)</b>, be careful not to reference objects that have been previously disposed of in an earlier call to <b>Dispose</b>. For more information about how to implement <b>Dispose(Boolean)</b>, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconImplementingDisposeMethod.asp">MSDN: implementingdisposemethod</a>.<p> For more information about <b>Dispose</b> and  <a href="../../System/types/Object.html#Finalize">Object.Finalize</a>, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconCleaningUpUnmanagedResources.asp">MSDN: cleaningupunmanagedresources</a> and  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconOverridingFinalizeMethod.asp">MSDN: overridingfinalizemethod</a>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example uses a derived class to demonstrate the  <a href="#Dispose(System.Boolean)">TcpClient.Dispose</a> method. Specifying <b>true</b> causes both managed and unmanaged resources to be released.<pre>
+// This derived class demonstrates the use of three protected methods belonging to the TcpClient class
+public class MyTcpClientDerivedClass : TcpClient{
+
+// Constructor for the derived class.
+public MyTcpClientDerivedClass() : base(){
+}
+public void UsingProtectedMethods(){
+
+  // Uses the protected 'Active' property belonging to the TcpClient base class 
+  // to determine if a connection is established. 
+  if (this.Active){
+      // Calls the protected 'Client' property belonging to the TcpClient base class.
+      Socket s = this.Client;
+      // Uses the Socket returned by Client to set an option that is not available using TcpClient.
+      s.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
+  }
+  // To free all resources, calls the protected virtual method Dispose belonging to the TcpClient base class.
+ this.Dispose(true);
+ GC.SuppressFinalize(this);
+
+}
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Frees resources used by the  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~TcpClient();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> class finalizer calls the  <a href="#Close">TcpClient.Close</a> method to close the TCP connection, the  <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a>, and the  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetStreamTopic1"></a><a name="GetStream">GetStream</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the stream used to send and receive data.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a> GetStream();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The underlying  <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> is not connected to a remote host.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ObjectDisposedException.html">ObjectDisposedException</a></td>
+<td> The  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> has been closed.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#GetStream">TcpClient.GetStream</a> returns the underlying  <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a> used to send and receive data. <a href="#GetStream">TcpClient.GetStream</a> creates an instance of the  <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a> class using the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> as its constructor parameter. <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a> inherits from the  <a href="../../System.IO/types/Stream.html">Stream</a>, which provides a rich collection of methods and properties used to facilitate network communications.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example uses  <a href="#GetStream">TcpClient.GetStream</a> to obtain the underlying  <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a>. After obtaining the  <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a>, it sends and receives using its  <a href="../../System.Net.Sockets/types/NetworkStream.html#Write(System.Byte[],System.Int32,System.Int32)">NetworkStream.Write</a> and  <a href="../../System.Net.Sockets/types/NetworkStream.html#Read(System.Byte[],System.Int32,System.Int32)">NetworkStream.Read</a> methods.<pre>
+   TcpClient tcpClient = new TcpClient();
+   // Uses the GetStream public method to return the NetworkStream.
+   try{
+       NetworkStream networkStream = tcpClient.GetStream();
+       if(networkStream.CanWrite){
+           Byte[] sendBytes = Encoding.ASCII.GetBytes("Is anybody there?");
+           networkStream.Write(sendBytes, 0, sendBytes.Length);
+       }
+       else{
+           Console.WriteLine("You cannot write data to this stream.");
+           tcpClient.Close();
+           return;
+       }
+       if(networkStream.CanRead){
+        
+         // Reads NetworkStream into a byte buffer.
+         byte[] bytes = new byte[tcpClient.ReceiveBufferSize];
+         // Read can return anything from 0 to numBytesToRead. 
+         // This method blocks until at least one byte is read.
+         networkStream.Read(bytes, 0, (int) tcpClient.ReceiveBufferSize);
+                
+        // Returns the data received from the host to the console.
+        string returndata = Encoding.ASCII.GetString(bytes);
+        Console.WriteLine("This is what the host returned to you: " + returndata);
+       }
+       else{
+            Console.WriteLine("You cannot read data from this stream.");
+            tcpClient.Close();
+            return;
+       }
+  }
+   catch (Exception e ) {
+                 Console.WriteLine(e.ToString());
+          }
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a> |  <a href="../../System.IO/types/Stream.html">Stream</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

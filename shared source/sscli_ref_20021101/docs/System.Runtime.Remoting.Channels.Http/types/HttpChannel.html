@@ -1,0 +1,1659 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Runtime.Remoting.Channels.Http.HttpChannel</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Runtime.Remoting.Channels.Http.HttpChannel Class</h2><b>Assembly: </b>System.Runtime.Remoting.dll<br><b>Namespace: </b>System.Runtime.Remoting.Channels.Http<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides an implementation for a sender-receiver channel that uses the HTTP protocol to transmit messages.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public class HttpChannel : BaseChannelWithProperties, IChannelReceiver, IChannel, IChannelSender, IChannelReceiverHook
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpChannel.html">HttpChannel</a> class is a combined channel, which combines the  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpServerChannel.html">HttpServerChannel</a> and  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpClientChannel.html">HttpClientChannel</a> for convenience. The  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpChannel.html">HttpChannel</a> transports messages to and from remote objects using the SOAP protocol. All outbound messages are passed through the SOAP formatter, where the message is changed into XML and serialized, and the required SOAP headers are added to the stream. The binary formatter can also be specified, which results in a binary data stream. The data stream is then transported to the URI using the HTTP protocol. For inbound messages the process is reversed.<p> Channels transport messages between applications across remoting boundaries (for example application domains, processes, and machines). These crossings include both inbound and outbound. The current channel listens on an endpoint for inbound messages and sends the outbound messages to the endpoint. The  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpChannel.html">HttpChannel</a> converts the messages sent along it to and from the XML format, receiving and sending them using the HTTP protocol.</p>
+<p> On the client side, messages are handed off to the client channel sink chain after they traverse the client  <a href="../../System.Runtime.Remoting.Contexts/types/Context.html">Context</a> chain. The first channel sink is typically an  <a href="../../System.Runtime.Remoting.Channels/types/IClientFormatterSink.html">IClientFormatterSink</a> which serializes the message into a stream that is passed down the channel sink chain to the client transport sink. The client transport sink then writes this stream out to the wire.</p>
+<p> On the server side, the server transport sink reads requests off of the wire and passes the request stream to the server channel sink chain. The server formatter sink at the end of this chain will deserialize the request into a message. It will then hand this message off to the Remoting infrastructure which will dispatch it to the server  <a href="../../System.Runtime.Remoting.Contexts/types/Context.html">Context</a> chain.</p>
+<p> <a href="../../System.Runtime.Remoting.Channels/types/IChannel.html">IChannel</a> implementations use channel configuration properties to configure the channel at run time. Channel properties can be specified in a configuration file, or programmatically, inside of an  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a>. In a configuration file all values are represented by strings, but when building a property  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> programatically, value types can be specified with their native values or with strings.</p>
+<p> The following table shows the channel configuration properties that can be specified for the current channel.</p><br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+              Property
+            </TH>
+<TH>
+              Description
+            </TH>
+</THEAD>
+<TR valign="top">
+<TD><b>name</b></TD>
+<TD>
+              Indicates the name of the channel. This
+              property is used to retrieve a specific channel when calling
+               <a href="../../System.Runtime.Remoting.Channels/types/ChannelServices.html#GetChannel(System.String)">ChannelServices.GetChannel</a>
+              . If this
+              property is not set, the system defaults to "http". If you want to
+              register more than one
+               <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpChannel.html">HttpChannel</a>
+              , each must have a
+              unique name. Set this property to the
+               <a href="../../System/types/String.html#Empty">String.Empty</a>
+              string ("") if you want to
+              ignore names, but avoid naming collisions. The system will allow any
+              number of channels with the
+               <a href="../../System/types/String.html#Empty">String.Empty</a>
+              name.
+            </TD>
+</TR>
+<TR valign="top">
+<TD><b>priority</b></TD>
+<TD>
+              An
+              integer representing the priority assigned to this channel. Higher numbers indicate a higher chance of being
+              chosen to connect first. The default priority is 1, and negative numbers
+              are allowed.
+            </TD>
+</TR>
+<TR valign="top">
+<TD><b>clientConnectionLimit</b></TD>
+<TD>
+              An integer indicating how many connections can be simultaneously
+              opened to a given server. The default is 2.
+            </TD>
+</TR>
+<TR valign="top">
+<TD><b>proxyName</b></TD>
+<TD>
+              The name of the proxy computer.
+            </TD>
+</TR>
+<TR valign="top">
+<TD><b>proxyPort</b></TD>
+<TD>
+              An integer specifying the proxy port.
+            </TD>
+</TR>
+<TR valign="top">
+<TD><b>port</b></TD>
+<TD>
+              An integer specifying the port on which the channel will listen.
+            </TD>
+</TR>
+<TR valign="top">
+<TD><b>supressChannelData</b></TD>
+<TD><b>true</b>
+              or
+              <b>false</b>
+              . Specifies that the
+              channel will not contribute to the
+               <a href="#ChannelData">HttpChannel.ChannelData</a>
+              .
+            </TD>
+</TR>
+<TR valign="top">
+<TD><b>useIpAddress</b></TD>
+<TD><b>true</b>
+              or
+              <b>false</b>
+              . Specifies whether the
+              channel shall use the IP address in the publication URL instead of the
+              computer name.
+            </TD>
+</TR>
+<TR valign="top">
+<TD><b>listen</b></TD>
+<TD><b>true</b>
+              or
+              <b>false</b>
+              . Specifies whether to allow activation to
+              hook into the outside listener
+              service.
+            </TD>
+</TR>
+<TR valign="top">
+<TD><b>bindTo</b></TD>
+<TD>
+              An
+              IP address resolving to the current computer that specifies which NIC
+              to bind the current channel
+              to.
+            </TD>
+</TR>
+<TR valign="top">
+<TD><b>machineName</b></TD>
+<TD>
+              A
+              string that specifies the machine name used with the current
+              channel. Overrides the
+              <b>useIpAddress</b>
+              configuration property
+              and the machine name channel
+              data.
+            </TD>
+</TR>
+</table>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Runtime.Remoting.Channels.Http/System.Runtime.Remoting.Channels.Http.html">System.Runtime.Remoting.Channels.Http Namespace</a> |  <a href="../../System.Runtime.Serialization.Formatters.Soap/types/SoapFormatter.html">SoapFormatter</a> |  <a href="../../System.Runtime.Serialization.Formatters.Binary/types/BinaryFormatter.html">BinaryFormatter</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconchannelformatterconfigurationproperties.asp">MSDN: channelformatterconfigurationproperties</a></dd>
+</dl>
+<h3>System.Runtime.Remoting.Channels.Http.HttpChannel Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor()<br><br></code>Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Initializes a new instance of the  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpChannel.html">HttpChannel</a> class, activating the client and server channels with default values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(int port)<br><br></code> Initializes a new instance of the  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpChannel.html">HttpChannel</a> class, activating the underlying  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpServerChannel.html">HttpServerChannel</a> on the specified port.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor3">ctor #3</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(IDictionary properties, IClientChannelSinkProvider clientSinkProvider, IServerChannelSinkProvider serverSinkProvider)<br><br></code> Initializes a new instance of the  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpChannel.html">HttpChannel</a> class with the given channel properties and specified  <a href="../../System.Runtime.Remoting.Channels/types/IClientChannelSinkProvider.html">IClientChannelSinkProvider</a> and  <a href="../../System.Runtime.Remoting.Channels/types/IServerChannelSinkProvider.html">IServerChannelSinkProvider</a>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ChannelData">ChannelData</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the channel-specific data.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ChannelName">ChannelName</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the name of the current channel.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ChannelPriority">ChannelPriority</a></td>
+<td width="55%"><b>Read-only</b><br><br> Returns the priority of the current channel.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ChannelScheme">ChannelScheme</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the type of listener to hook into (for example "http").</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ChannelSinkChain">ChannelSinkChain</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the channel sink chain that the current channel is using.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Count">Count</a><br>(inherited from <b>System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#Count">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.Count</a></font></b><br><br><br> Gets the number of properties associated with the current channel object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsFixedSize">IsFixedSize</a><br>(inherited from <b>System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#IsFixedSize">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.IsFixedSize</a></font></b><br><br><br> Gets a Boolean value indicating whether the number of properties that can be entered into the current channel object is fixed.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsReadOnly">IsReadOnly</a><br>(inherited from <b>System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#IsReadOnly">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.IsReadOnly</a></font></b><br><br><br> Gets a Boolean value indicating whether the collection of properties in the current channel object is read-only.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsSynchronized">IsSynchronized</a><br>(inherited from <b>System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#IsSynchronized">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.IsSynchronized</a></font></b><br><br><br> Gets a value indicating whether the current dictionary of channel object properties is synchronized.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Item(System.Object)">Item</a></td>
+<td width="55%"><b>Read-write</b><br><br><b>Overridden: </b><br> Gets or sets a channel property associated with the specified key.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Keys">Keys</a></td>
+<td width="55%"><b>Read-only</b><br><br><b>Overridden: </b><br> Gets an  <a href="../../System.Collections/types/ICollection.html">ICollection</a> of keys with which the channel properties are associated.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Properties">Properties</a></td>
+<td width="55%"><b>Read-only</b><br><br><b>Overridden: </b><br> Gets an  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> of the channel properties associated with the current channel.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SyncRoot">SyncRoot</a><br>(inherited from <b>System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#SyncRoot">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.SyncRoot</a></font></b><br><br><br> Gets an object that is used to synchronize access to the  <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html">BaseChannelObjectWithProperties</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Values">Values</a><br>(inherited from <b>System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#Values">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.Values</a></font></b><br><br><br> Gets an  <a href="../../System.Collections/types/ICollection.html">ICollection</a> of the values of the properties associated with the current channel object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WantsToListen">WantsToListen</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets a Boolean value indicating whether the current instance wants to be hooked into the outside listener service.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Add(System.Object,System.Object)">Add</a><br>(inherited from <b>System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#Add(System.Object,System.Object)">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.Add</a></font></b><br><br><br> The current method must not be implemented because it does not apply to the way  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> is being used in this case, and because  <a href="#IsFixedSize">BaseChannelObjectWithProperties.IsFixedSize</a> returns <b>true</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AddHookChannelUri(System.String)">AddHookChannelUri</a></td>
+<td width="55%"> Adds a URI on which the channel hook should listen.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Clear">Clear</a><br>(inherited from <b>System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#Clear">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.Clear</a></font></b><br><br><br> The current method must not be implemented because it does not apply to the way  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> is being used in this case, and because  <a href="#IsFixedSize">BaseChannelObjectWithProperties.IsFixedSize</a> returns <b>true</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Contains(System.Object)">Contains</a><br>(inherited from <b>System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#Contains(System.Object)">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.Contains</a></font></b><br><br><br> Returns a Boolean value indicating whether the current channel object contains a property associated with the specified key.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CopyTo(System.Array,System.Int32)">CopyTo</a><br>(inherited from <b>System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#CopyTo(System.Array,System.Int32)">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.CopyTo</a></font></b><br><br><br> The current method is not supported by the  <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html">BaseChannelObjectWithProperties</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CreateMessageSink(System.String,System.Object,System.String)">CreateMessageSink</a></td>
+<td width="55%"> Returns a channel message sink that delivers messages to the specified URL or channel data object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetEnumerator">GetEnumerator</a><br>(inherited from <b>System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#GetEnumerator">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.GetEnumerator</a></font></b><br><br><br> Returns an  <a href="../../System.Collections/types/IDictionaryEnumerator.html">IDictionaryEnumerator</a> that enumerates over all the properties associated with the current channel object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetUrlsForUri(System.String)">GetUrlsForUri</a></td>
+<td width="55%"> Returns an array of all the URLs for an object with the specified URI, hosted on the current  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpChannel.html">HttpChannel</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Parse(System.String,System.String)">Parse</a></td>
+<td width="55%"> Extracts the channel URI and the remote well known object URI from the specified URL.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Remove(System.Object)">Remove</a><br>(inherited from <b>System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#Remove(System.Object)">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.Remove</a></font></b><br><br><br> The current method must not be implemented because it does not apply to the way  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> is being used in this case, and because  <a href="#IsFixedSize">BaseChannelObjectWithProperties.IsFixedSize</a> returns <b>true</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#StartListening(System.Object)">StartListening</a></td>
+<td width="55%"> Instructs the current channel to start listening for requests.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#StopListening(System.Object)">StopListening</a></td>
+<td width="55%"> Instructs the current channel to stop listening for requests.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Fields</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#SinksWithProperties">SinksWithProperties</a><br>(inherited from <b>System.Runtime.Remoting.Channels.BaseChannelWithProperties)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelWithProperties.html#SinksWithProperties">System.Runtime.Remoting.Channels.BaseChannelWithProperties.SinksWithProperties</a></font></b><br><br><br> Indicates the top channel sink in the channel sink stack.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties</a></li>
+<ul class="none">
+<li><a href="../../System.Runtime.Remoting.Channels/types/BaseChannelWithProperties.html">System.Runtime.Remoting.Channels.BaseChannelWithProperties</a></li>
+<ul class="none">
+<li><b>System.Runtime.Remoting.Channels.Http.HttpChannel</b></li>
+</ul>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Runtime.Remoting.Channels.Http.HttpChannel Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpChannel.html">HttpChannel</a> class, activating the client and server channels with default values.</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public HttpChannel();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The default constructor initializes all fields to their default values. If the default constructor is used, the channel functions only as a client channel, and does not listen on any ports.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpChannel.html">HttpChannel</a> class, activating the underlying  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpServerChannel.html">HttpServerChannel</a> on the specified port.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public HttpChannel(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>port</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>port</i><br><dl>
+<dd>
+<param> The port on which to activate the underlying  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpServerChannel.html">HttpServerChannel</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd></dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic3"></a><a name="ctor3">ctor #3</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpChannel.html">HttpChannel</a> class with the given channel properties and specified  <a href="../../System.Runtime.Remoting.Channels/types/IClientChannelSinkProvider.html">IClientChannelSinkProvider</a> and  <a href="../../System.Runtime.Remoting.Channels/types/IServerChannelSinkProvider.html">IServerChannelSinkProvider</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public HttpChannel(<br>   <font color="#008080"><a href="../../System.Collections/types/IDictionary.html">IDictionary</a> <i>properties</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Channels/types/IClientChannelSinkProvider.html">IClientChannelSinkProvider</a> <i>clientSinkProvider</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Channels/types/IServerChannelSinkProvider.html">IServerChannelSinkProvider</a> <i>serverSinkProvider</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>properties</i><br><dl>
+<dd>
+<param> The channel properties with which the new instance of  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpChannel.html">HttpChannel</a> should be initialized.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>clientSinkProvider</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Runtime.Remoting.Channels/types/IClientChannelSinkProvider.html">IClientChannelSinkProvider</a> that creates the client channel sinks for the underlying  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpClientChannel.html">HttpClientChannel</a> through which remoting messages flow through.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>serverSinkProvider</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Runtime.Remoting.Channels/types/IServerChannelSinkProvider.html">IServerChannelSinkProvider</a> that creates server channel sinks for the underlying  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpServerChannel.html">HttpServerChannel</a> through which remoting messages flow through.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The provided channel properties are not in the correct format.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Channel sinks provide a plug-in point that allows access to the underlying messages flowing through the channel as well as the stream used by the transport mechanism to send messages to a remote object. Channel sinks are also responsible for transporting messages between the client and the server. Channel sinks are linked together in a chain, and all channel messages flow through this chain of sinks before the message is finally serialized and transported.<p> When the  <a href="../../System.Runtime.Remoting.Channels/types/IClientChannelSinkProvider.html#CreateSink(System.Runtime.Remoting.Channels.IChannelSender,System.String,System.Object)">IClientChannelSinkProvider.CreateSink</a> method is called on a sink provider, it should create its own channel sink, forward the <b>CreateSink</b> call to the next sink provider in the chain, and ensure that the next sink and the current one are linked together. The provider then returns its sink to the caller. Channel sinks are responsible for forwarding all calls made on them to the next sink in the chain.</p><br><br><b>Note </b> Channel properties are used to configure the channel at run time. For a list of possible channel properties and an example, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconchannelformatterconfigurationproperties.asp">MSDN: channelformatterconfigurationproperties</a>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example demonstrates initialization of an  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpChannel.html">HttpChannel</a> class with an  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> of configuration properties, an  <a href="../../System.Runtime.Remoting.Channels/types/IClientChannelSinkProvider.html">IClientChannelSinkProvider</a>, and an  <a href="../../System.Runtime.Remoting.Channels/types/IServerChannelSinkProvider.html">IServerChannelSinkProvider</a>.<pre>
+        ListDictionary channelProperties = new ListDictionary();
+
+        channelProperties.Add("port", 9000);
+        
+        HttpChannel channel = new HttpChannel(channelProperties,
+                                              new SoapClientFormatterSinkProvider(),
+                                              new SoapServerFormatterSinkProvider());
+
+        ChannelServices.RegisterChannel(channel);
+
+        RemotingConfiguration.RegisterWellKnownServiceType(typeof(SampleService), 
+							"MySampleService/SampleService.soap",
+							WellKnownObjectMode.Singleton);
+        
+        Console.WriteLine("** Press enter to end the server process. **");
+        Console.ReadLine();
+
+    </pre>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconchannelformatterconfigurationproperties.asp">MSDN: channelformatterconfigurationproperties</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="SinksWithPropertiesTopic1"></a><a name="SinksWithProperties">SinksWithProperties</a></i></b><b><i></i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelWithProperties.html#SinksWithProperties">System.Runtime.Remoting.Channels.BaseChannelWithProperties.SinksWithProperties</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Indicates the top channel sink in the channel sink stack.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">IChannelSinkBase</a> SinksWithProperties;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Channel sinks provide a plug-in point that allows access to the underlying messages flowing through the channel as well as the stream used by the transport mechanism to send messages to a remote object. Channel sinks are linked together in a chain of channel sink providers, and all channel messages flow through this chain of sinks before the messages are serialized and transported.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ChannelDataTopic1"></a><a name="ChannelData">ChannelData</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the channel-specific data.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> ChannelData {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Remoting.Channels/types/IChannelReceiver.html#ChannelData">IChannelReceiver.ChannelData</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The current property is used when  <a href="../../System.Runtime.Remoting/types/RemotingServices.html#Marshal(System.MarshalByRefObject)">RemotingServices.Marshal</a> is called and an  <a href="../../System.Runtime.Remoting/types/ObjRef.html">ObjRef</a> is created.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ChannelNameTopic1"></a><a name="ChannelName">ChannelName</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the name of the current channel.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> ChannelName {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Remoting.Channels/types/IChannel.html#ChannelName">IChannel.ChannelName</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> This property is used to retrieve a specific channel when calling  <a href="../../System.Runtime.Remoting.Channels/types/ChannelServices.html#GetChannel(System.String)">ChannelServices.GetChannel</a>. If this property is not set, the system defaults to "http". If you want to register more than one  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpChannel.html">HttpChannel</a>, each must have a unique name. Set this property to the  <a href="../../System/types/String.html#Empty">String.Empty</a> string ("") if you want to ignore names, but avoid naming collisions. The system will allow any number of channels with the  <a href="../../System/types/String.html#Empty">String.Empty</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ChannelPriorityTopic1"></a><a name="ChannelPriority">ChannelPriority</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the priority of the current channel.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> ChannelPriority {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Remoting.Channels/types/IChannel.html#ChannelPriority">IChannel.ChannelPriority</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> Higher numbers indicate a higher chance of being chosen to connect first. The default priority is 1, and negative numbers are allowed.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ChannelSchemeTopic1"></a><a name="ChannelScheme">ChannelScheme</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the type of listener to hook into (for example "http").</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> ChannelScheme {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Remoting.Channels/types/IChannelReceiverHook.html#ChannelScheme">IChannelReceiverHook.ChannelScheme</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The value of the current property is not case-sensitive.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ChannelSinkChainTopic1"></a><a name="ChannelSinkChain">ChannelSinkChain</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the channel sink chain that the current channel is using.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Runtime.Remoting.Channels/types/IServerChannelSink.html">IServerChannelSink</a> ChannelSinkChain {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Remoting.Channels/types/IChannelReceiverHook.html#ChannelSinkChain">IChannelReceiverHook.ChannelSinkChain</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> Channel sinks provide a plug-in point that allows access to the underlying messages flowing through the channel as well as the stream used by the transport mechanism to send messages to a remote object. Channel sinks are linked together in a chain of <b>ChannelSinkProviders</b> and all channel messages flow through this chain of sinks before the message is finally serialized and transported.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CountTopic1"></a><a name="Count">Count</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#Count">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.Count</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the number of properties associated with the current channel object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> Count {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/ICollection.html#Count">ICollection.Count</a></dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsFixedSizeTopic1"></a><a name="IsFixedSize">IsFixedSize</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#IsFixedSize">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.IsFixedSize</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a Boolean value indicating whether the number of properties that can be entered into the current channel object is fixed.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsFixedSize {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#IsFixedSize">IDictionary.IsFixedSize</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> In the current implementation  <a href="#IsFixedSize">BaseChannelObjectWithProperties.IsFixedSize</a> returns <b>true</b>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsReadOnlyTopic1"></a><a name="IsReadOnly">IsReadOnly</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#IsReadOnly">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.IsReadOnly</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a Boolean value indicating whether the collection of properties in the current channel object is read-only.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsReadOnly {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#IsReadOnly">IDictionary.IsReadOnly</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> In the current implementation  <a href="#IsReadOnly">BaseChannelObjectWithProperties.IsReadOnly</a> returns <b>false</b>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsSynchronizedTopic1"></a><a name="IsSynchronized">IsSynchronized</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#IsSynchronized">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.IsSynchronized</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether the current dictionary of channel object properties is synchronized.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsSynchronized {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/ICollection.html#IsSynchronized">ICollection.IsSynchronized</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The current implementation of  <a href="#IsSynchronized">BaseChannelObjectWithProperties.IsSynchronized</a> returns <b>false</b>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Property: <i><a name="ItemTopic1"></a><a name="Item(System.Object)">Item</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets a channel property associated with the specified key.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Object.html">object</a> this[object key] {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>key</i><br><dl>
+<dd>
+<param> The key with which the requested property is associated.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Item">IDictionary.Item</a></dd>
+</dl><b>Remarks</b><dl>
+<dd><br><br><b>Note </b> Channel properties are used to configure the channel at run time. For a list of possible channel properties and an example, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconchannelformatterconfigurationproperties.asp">MSDN: channelformatterconfigurationproperties</a>.</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+			System.Runtime.Remoting.Channels.Http.HttpChannel channel =
+				new System.Runtime.Remoting.Channels.Http.HttpChannel(8085);
+
+			string proxyName = channel["proxyname"].ToString();
+			string proxyPort = channel["proxyport"].ToString();
+
+			System.Console.WriteLine("proxyname = {0}", proxyName);
+			System.Console.WriteLine("proxyport = {0}", proxyPort);
+
+    </pre>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconchannelformatterconfigurationproperties.asp">MSDN: channelformatterconfigurationproperties</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Property: <i><a name="KeysTopic1"></a><a name="Keys">Keys</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an  <a href="../../System.Collections/types/ICollection.html">ICollection</a> of keys with which the channel properties are associated.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System.Collections/types/ICollection.html">ICollection</a> Keys {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Keys">IDictionary.Keys</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The current property returns the keys of channel properties of both  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpServerChannel.html">HttpServerChannel</a> and  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpClientChannel.html">HttpClientChannel</a>. For a list of possible channel properties and an example, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconchannelformatterconfigurationproperties.asp">MSDN: channelformatterconfigurationproperties</a>.</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconchannelformatterconfigurationproperties.asp">MSDN: channelformatterconfigurationproperties</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Property: <i><a name="PropertiesTopic1"></a><a name="Properties">Properties</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> of the channel properties associated with the current channel.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> Properties {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Channels properties are used to configure the channel at run time. The  <a href="#Properties">HttpChannel.Properties</a> property returns channel properties of the underlying  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpServerChannel.html">HttpServerChannel</a> and  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpClientChannel.html">HttpClientChannel</a>. For a list of possible channel properties and an example, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconchannelformatterconfigurationproperties.asp">MSDN: channelformatterconfigurationproperties</a>.</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconchannelformatterconfigurationproperties.asp">MSDN: channelformatterconfigurationproperties</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="SyncRootTopic1"></a><a name="SyncRoot">SyncRoot</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#SyncRoot">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.SyncRoot</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an object that is used to synchronize access to the  <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html">BaseChannelObjectWithProperties</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> SyncRoot {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/ICollection.html#SyncRoot">ICollection.SyncRoot</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The current implementation of  <a href="#SyncRoot">BaseChannelObjectWithProperties.SyncRoot</a> returns a reference to the current instance of  <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html">BaseChannelObjectWithProperties</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ValuesTopic1"></a><a name="Values">Values</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#Values">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.Values</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an  <a href="../../System.Collections/types/ICollection.html">ICollection</a> of the values of the properties associated with the current channel object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System.Collections/types/ICollection.html">ICollection</a> Values {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Values">IDictionary.Values</a></dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="WantsToListenTopic1"></a><a name="WantsToListen">WantsToListen</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a Boolean value indicating whether the current instance wants to be hooked into the outside listener service.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> WantsToListen {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Remoting.Channels/types/IChannelReceiverHook.html#WantsToListen">IChannelReceiverHook.WantsToListen</a></dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+			System.Runtime.Remoting.Channels.Http.HttpChannel channelWithPort =
+				new System.Runtime.Remoting.Channels.Http.HttpChannel(8085);
+
+			System.Runtime.Remoting.Channels.Http.HttpChannel channelNoPort =
+				new System.Runtime.Remoting.Channels.Http.HttpChannel();
+
+			// channelWithPort.WantsToListen is false. It is already listening.
+			if (channelWithPort.WantsToListen) {
+				System.Console.WriteLine("channelWithPort wants to listen.");
+			}
+			else {
+				System.Console.WriteLine(
+								"channelWithPort doesn't want to listen.");
+			}
+			
+			// channelNoPort.WantsToListen is true.
+			if (channelNoPort.WantsToListen) {
+				System.Console.WriteLine("channelNoPort wants to listen.");
+			}
+			else {
+				System.Console.WriteLine(
+								"channelNoPort doesn't want to listen.");
+			}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="AddTopic1"></a><a name="Add(System.Object,System.Object)">Add</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#Add(System.Object,System.Object)">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.Add</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> The current method must not be implemented because it does not apply to the way  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> is being used in this case, and because  <a href="#IsFixedSize">BaseChannelObjectWithProperties.IsFixedSize</a> returns <b>true</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void Add(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>key</i><br><dl>
+<dd>
+<param> Indicates the key associated with the object contained in the <i>value</i> parameter.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> Indicates the value to add.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The method was called.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Add(System.Object,System.Object)">IDictionary.Add</a></dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="AddHookChannelUriTopic1"></a><a name="AddHookChannelUri(System.String)">AddHookChannelUri</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>channelUri</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds a URI on which the channel hook should listen.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void AddHookChannelUri(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>channelUri</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>channelUri</i><br><dl>
+<dd>
+<param> The channel URI on which the channel hook is listening.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Remoting.Channels/types/IChannelReceiverHook.html#AddHookChannelUri(System.String)">IChannelReceiverHook.AddHookChannelUri</a></dd>
+</dl><b>Remarks</b><dl>
+<dd><br><br><b>Note </b> Client code should not call the  <a href="#AddHookChannelUri(System.String)">HttpChannel.AddHookChannelUri</a> method directly.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example demonstrates the functionality of the  <a href="#AddHookChannelUri(System.String)">HttpChannel.AddHookChannelUri</a> method. Because client code should not call this method directly, the example demonstrates an implementation of the method in a class that mimics the behavior of the  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpChannel.html">HttpChannel</a> class.<pre>
+   class CustomChannel : BaseChannelWithProperties, IChannelReceiverHook,
+                         IChannelReceiver, IChannel, IChannelSender {
+
+      public void AddHookChannelUri(string channelUri) {
+
+         if (channelUri != null) {
+            string [] uris = dataStore.ChannelUris;
+				
+            // This implementation only allows one URI to be hooked in.
+            if (uris == null) {
+               string [] newUris = new string[1];
+               newUris[0] = channelUri;
+               dataStore.ChannelUris = newUris;
+               wantsToListen = false;
+            } else {
+               string msg = "This channel is already listening for " +
+                  "data, and can't be hooked into at this stage.";
+               throw new System.Runtime.Remoting.RemotingException(msg);
+            }
+         }
+      }
+      // The rest of CustomChannel's implementation.
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ClearTopic1"></a><a name="Clear">Clear</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#Clear">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.Clear</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> The current method must not be implemented because it does not apply to the way  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> is being used in this case, and because  <a href="#IsFixedSize">BaseChannelObjectWithProperties.IsFixedSize</a> returns <b>true</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void Clear();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The method was called.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Clear">IDictionary.Clear</a></dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ContainsTopic1"></a><a name="Contains(System.Object)">Contains</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#Contains(System.Object)">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.Contains</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns a Boolean value indicating whether the current channel object contains a property associated with the specified key.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Contains(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>key</i><br><dl>
+<dd>
+<param> The key the requested property is associated with.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A Boolean value indicating whether the current channel object contains a property associated with the specified key.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Contains(System.Object)">IDictionary.Contains</a></dd>
+</dl><b>Remarks</b><dl>
+<dd></dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CopyToTopic1"></a><a name="CopyTo(System.Array,System.Int32)">CopyTo</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Array.html">Array</a> <i>array</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#CopyTo(System.Array,System.Int32)">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.CopyTo</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> The current method is not supported by the  <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html">BaseChannelObjectWithProperties</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void CopyTo(<br>   <font color="#008080"><a href="../../System/types/Array.html">Array</a> <i>array</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>array</i><br><dl>
+<dd>
+<param> The array to copy the properties to.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The index where to begin copying.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The method was called.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/ICollection.html#CopyTo(System.Array,System.Int32)">ICollection.CopyTo</a></dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CreateMessageSinkTopic1"></a><a name="CreateMessageSink(System.String,System.Object,System.String)">CreateMessageSink</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>url</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>remoteChannelData</i>,</font><br>   <font color="#008080"><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">out</a> <i>string objectURI</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns a channel message sink that delivers messages to the specified URL or channel data object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Runtime.Remoting.Messaging/types/IMessageSink.html">IMessageSink</a> CreateMessageSink(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>url</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>remoteChannelData</i>,</font><br>   <font color="#008080"><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">out</a> <i>string objectURI</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>url</i><br><dl>
+<dd>
+<param> The URL to which the new sink should deliver messages. Can be <b>null</b>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>remoteChannelData</i><br><dl>
+<dd>
+<param> The channel data object of the remote host to which the new sink should deliver messages. Can be <b>null</b>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>objectURI</i><br><dl>
+<dd>
+<param> When this method returns, contains a URI of the new channel message sink that delivers messages to the specified URL or channel data object. This parameter is passed uninitialized.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A channel message sink that delivers messages to the specified URL or channel data object.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Remoting.Channels/types/IChannelSender.html#CreateMessageSink(System.String,System.Object,System.String@)">IChannelSender.CreateMessageSink</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#CreateMessageSink(System.String,System.Object,System.String@)">HttpChannel.CreateMessageSink</a> method returns a channel message sink that delivers messages to either the specified URL or channel data object. If the <i>uri</i> parameter is <b>null</b>, <b></b><i>remoteChannelData</i> is used as a target for the sink. Either the <i>url</i> or <i>remoteChannelData</i> parameters can be <b>null</b>, but not both.<p> Channel sinks provide a plug-in point that allows access to the underlying messages flowing through the channel as well as the stream used by the transport mechanism to send messages to a remote object. Channel sinks are linked together in a chain of <b>ChannelSinkProviders</b> and all channel messages flow through this chain of sinks before the message is finally serialized and transported.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+using System;
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Channels.Http;
+using System.Runtime.Remoting.Messaging;
+
+class Class1 {
+   static void Main() {
+      
+      // Create a remotable object.
+      HttpChannel channel = new HttpChannel(8085);
+      ChannelServices.RegisterChannel(channel);
+
+      WellKnownServiceTypeEntry WKSTE = 
+            new WellKnownServiceTypeEntry(typeof(HelloService),
+                                          "Service", 
+                                          WellKnownObjectMode.Singleton);
+      RemotingConfiguration.RegisterWellKnownServiceType(WKSTE);
+
+      RemotingConfiguration.ApplicationName = "HelloServer";
+
+      // Create a message sink for TempConverter.
+      string objURI;
+      IMessageSink sink = 
+         channel.CreateMessageSink("http://localhost:8085/HelloServer",
+                                   channel,
+                                   out objURI);
+
+      // Do processing on messsage sink...
+      
+      Console.WriteLine("Press &lt;enter&gt; to exit");
+      Console.ReadLine();
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~HttpChannel();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetEnumeratorTopic1"></a><a name="GetEnumerator">GetEnumerator</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#GetEnumerator">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.GetEnumerator</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns an  <a href="../../System.Collections/types/IDictionaryEnumerator.html">IDictionaryEnumerator</a> that enumerates over all the properties associated with the current channel object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System.Collections/types/IDictionaryEnumerator.html">IDictionaryEnumerator</a> GetEnumerator();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An  <a href="../../System.Collections/types/IDictionaryEnumerator.html">IDictionaryEnumerator</a> that enumerates over all the properties associated with the current channel object.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#GetEnumerator">IDictionary.GetEnumerator</a></dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetUrlsForUriTopic1"></a><a name="GetUrlsForUri(System.String)">GetUrlsForUri</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>objectURI</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns an array of all the URLs for an object with the specified URI, hosted on the current  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpChannel.html">HttpChannel</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string[]</a> GetUrlsForUri(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>objectURI</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>objectURI</i><br><dl>
+<dd>
+<param> The URI of the object for which URL's are required.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An array of the URLs for an object with the specified URI, hosted on the current  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpChannel.html">HttpChannel</a>.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Remoting.Channels/types/IChannelReceiver.html#GetUrlsForUri(System.String)">IChannelReceiver.GetUrlsForUri</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> This method is used by  <a href="../../System.Runtime.Remoting.Channels/types/ChannelServices.html#GetUrlsForObject(System.MarshalByRefObject)">ChannelServices.GetUrlsForObject</a>.</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+using System;
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Channels.Http;
+
+class Class1 {
+   public static void Main() {
+
+      // Create a remotable object.
+      HttpChannel httpChannel = new HttpChannel(8085);
+
+      WellKnownServiceTypeEntry WKSTE = 
+         new WellKnownServiceTypeEntry(typeof(HelloService),
+                                       "Service", 
+                                       WellKnownObjectMode.Singleton);
+      RemotingConfiguration.RegisterWellKnownServiceType(WKSTE);
+
+      RemotingConfiguration.ApplicationName = "HelloServer";
+
+      // Print out the urls for HelloServer.
+      string[] urls = httpChannel.GetUrlsForUri("HelloServer");
+      
+      foreach (string url in urls)
+         System.Console.WriteLine("{0}", url);
+      
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ParseTopic1"></a><a name="Parse(System.String,System.String)">Parse</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>url</i>,</font><br>   <font color="#008080"><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">out</a> <i>string objectURI</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Extracts the channel URI and the remote well known object URI from the specified URL.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> Parse(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>url</i>,</font><br>   <font color="#008080"><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">out</a> <i>string objectURI</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>url</i><br><dl>
+<dd>
+<param> The URL from which to extract the URI of the remote well known object.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>objectURI</i><br><dl>
+<dd>
+<param> When this method returns, contains a  <a href="../../System/types/String.html">String</a> that holds the URI of the remote well known object. This parameter is passed uninitialized.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The URI of the current channel.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Remoting.Channels/types/IChannel.html#Parse(System.String,System.String@)">IChannel.Parse</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> A URI of an object is a value that uniquely identifies a specific object instance.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/Uri.html">Uri</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="RemoveTopic1"></a><a name="Remove(System.Object)">Remove</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Runtime.Remoting.Channels/types/BaseChannelObjectWithProperties.html#Remove(System.Object)">System.Runtime.Remoting.Channels.BaseChannelObjectWithProperties.Remove</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> The current method must not be implemented because it does not apply to the way  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> is being used in this case, and because  <a href="#IsFixedSize">BaseChannelObjectWithProperties.IsFixedSize</a> returns <b>true</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void Remove(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>key</i><br><dl>
+<dd>
+<param> The key that the object being removed is associated with.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The method was called.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Remove(System.Object)">IDictionary.Remove</a></dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="StartListeningTopic1"></a><a name="StartListening(System.Object)">StartListening</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>data</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Instructs the current channel to start listening for requests.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void StartListening(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>data</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>data</i><br><dl>
+<dd>
+<param> Should always be <b>null</b> for  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpChannel.html">HttpChannel</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Remoting.Channels/types/IChannelReceiver.html#StartListening(System.Object)">IChannelReceiver.StartListening</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The data object can be used to pass a specific initialization state to the channel.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="StopListeningTopic1"></a><a name="StopListening(System.Object)">StopListening</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>data</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Instructs the current channel to stop listening for requests.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void StopListening(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>data</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>data</i><br><dl>
+<dd>
+<param> Should always be <b>null</b> for  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpChannel.html">HttpChannel</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Remoting.Channels/types/IChannelReceiver.html#StopListening(System.Object)">IChannelReceiver.StopListening</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The data object can be used to pass a specific state to the channel.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

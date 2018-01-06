@@ -1,0 +1,258 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.ComponentModel.IComponent</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.ComponentModel.IComponent Interface</h2><b>Assembly: </b>System.dll<br><b>Namespace: </b>System.ComponentModel<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides functionality required by all components. <a href="../../System.ComponentModel/types/Component.html">Component</a> is the default implementation of  <a href="../../System.ComponentModel/types/IComponent.html">IComponent</a> and serves as the base class for all components in the common language runtime.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public interface IComponent : IDisposable
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> You can contain components in a container. In this context, containment refers to logical containment, not visual containment. You can use components and containers in a variety of scenarios, both visual and non visual.<p> <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemWindowsFormsControlmemberstopic.asp">Control</a> inherits from  <a href="../../System.ComponentModel/types/Component.html">Component</a>, the default implementation of  <a href="../../System.ComponentModel/types/IComponent.html">IComponent</a>.</p>
+<p> A component interacts with its container primarily through a container-provided  <a href="../../System.ComponentModel/types/ISite.html">ISite</a>, which is a repository of container-specific per-component information.</p><br><br><b>Notes to implementors: </b> To be a component, a class must implement the  <a href="../../System.ComponentModel/types/IComponent.html">IComponent</a> interface and provide a basic constructor that requires no parameters or a single parameter of type IContainer. For more information about implementing  <a href="../../System.ComponentModel/types/IComponent.html">IComponent</a>, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconcomponentprogrammingessentials.asp">MSDN: componentprogrammingessentials</a>.</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+	/// &lt;summary&gt;
+	/// The following example demonstrates the implementation of 
+	/// ISite, IComponent, and IContainer for use in a simple library container.
+	///
+	/// This example uses the System, System.ComponentModel, and System.Collections
+	/// namespaces.
+	/// &lt;/summary&gt;
+
+	//This code segment implements the ISite and IComponent interfaces.
+	//The implementation of the IContainer interface can be seen in the documentation 
+	//of IContainer.
+
+	//Implement the ISite interface.
+
+	// The ISBNSite class represents the ISBN name of the book component
+	class ISBNSite : ISite
+	{
+		private IComponent m_curComponent;
+		private IContainer m_curContainer;
+		private bool m_bDesignMode;
+		private string m_ISBNCmpName;
+
+		public ISBNSite(IContainer actvCntr, IComponent prntCmpnt)
+		{
+			m_curComponent = prntCmpnt;
+			m_curContainer = actvCntr;
+			m_bDesignMode = false;
+			m_ISBNCmpName = null;
+		}
+
+		//Support the ISite interface.
+		public virtual IComponent Component
+		{
+			get
+			{
+				return m_curComponent;
+			}
+		}
+
+		public virtual IContainer Container
+		{
+			get
+			{
+				return m_curContainer;
+			}
+		}
+		
+		public virtual bool DesignMode
+		{
+			get
+			{
+				return m_bDesignMode;
+			}
+		}
+
+		public virtual string Name
+		{
+			get
+			{
+				return m_ISBNCmpName;
+			}
+
+			set
+			{
+				m_ISBNCmpName = value;
+			}
+		}
+
+		//Support the IServiceProvider interface.
+		public virtual object GetService(Type serviceType)
+		{
+			// we are not using any service objects in this example.
+			return null;
+		}
+
+	}
+
+	// The BookComponent class represents the book component of the library container.
+	
+	// This class implements the IComponent interface.
+	
+	class BookComponent : IComponent
+	{
+		public event EventHandler Disposed;
+		private ISite m_curISBNSite;
+		private string m_bookTitle;
+		private string m_bookAuthor;
+
+		public BookComponent(string Title, string Author)
+		{
+			m_curISBNSite = null;
+			Disposed = null;
+			m_bookTitle = Title;
+			m_bookAuthor = Author;
+		}
+
+		public string Title
+		{
+			get
+			{
+				return m_bookTitle;
+			}
+		}
+
+		public string Author
+		{
+			get
+			{
+				return m_bookAuthor;
+			}
+		}
+
+		public virtual void Dispose()
+		{	
+			//There is nothing to clean.
+			if(Disposed != null)
+				Disposed(this,EventArgs.Empty);
+		}
+
+		public virtual ISite Site
+		{
+			get
+			{
+				return m_curISBNSite;
+			}
+			set
+			{
+				m_curISBNSite = value;
+			}
+		}
+
+		public override bool Equals(object cmp)
+		{
+			BookComponent cmpObj = (BookComponent)cmp;
+			if(this.Title.Equals(cmpObj.Title) &amp;&amp; this.Author.Equals(cmpObj.Author))
+				return true;
+
+			return false;
+		}
+
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
+		}
+	}
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.ComponentModel/System.ComponentModel.html">System.ComponentModel Namespace</a> |  <a href="../../System.ComponentModel/types/Container.html">Container</a> |  <a href="../../System.ComponentModel/types/IContainer.html">IContainer</a> |  <a href="../../System.ComponentModel/types/ISite.html">ISite</a> |  <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemWindowsFormsControlmemberstopic.asp">Control</a></dd>
+</dl>
+<h3>System.ComponentModel.IComponent Member List: </h3>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Site">Site</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the  <a href="../../System.ComponentModel/types/ISite.html">ISite</a> associated with the  <a href="../../System.ComponentModel/types/IComponent.html">IComponent</a>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Events</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Disposed">Disposed</a></td>
+<td width="55%"> Represents the method that handles the  <a href="#Disposed">IComponent.Disposed</a> event of a component.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/IDisposable.html">System.IDisposable</a></li>
+<ul class="none">
+<li><b>System.ComponentModel.IComponent</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.ComponentModel.IComponent Member Details</h3><b>Property: <i><a name="SiteTopic1"></a><a name="Site">Site</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the  <a href="../../System.ComponentModel/types/ISite.html">ISite</a> associated with the  <a href="../../System.ComponentModel/types/IComponent.html">IComponent</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System.ComponentModel/types/ISite.html">ISite</a> Site {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Sites can also serve as a repository for container-specific, per-component information, such as the component name.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.ComponentModel/types/ISite.html">ISite</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Event: <i><a name="DisposedTopic1"></a><a name="Disposed">Disposed</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Represents the method that handles the  <a href="#Disposed">IComponent.Disposed</a> event of a component.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            event EventHandler Disposed;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> When you create a  <a href="../../System.ComponentModel/types/IComponent.html">IComponent</a> delegate, you identify the method that handles the event. To associate the event with your event handler, add an instance of the delegate to the event. The event handler is called whenever the event occurs, unless you remove the delegate. For more information about event handler delegates, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconEventsDelegates.asp">MSDN: eventsdelegates</a>.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/EventHandler.html">EventHandler</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Runtime.Serialization.IObjectReference</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Runtime.Serialization.IObjectReference Interface</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Runtime.Serialization<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Indicates that the current interface implementer is a reference to another object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public interface IObjectReference
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd><br><br><b>Notes to implementors: </b> Implement this interface on objects that are references to a different object, which cannot be resolved until the current object is completely restored. During the fixup stage, any object implementing  <a href="../../System.Runtime.Serialization/types/IObjectReference.html">IObjectReference</a> is queried for its real object and that object is inserted into the graph. Fixup refers to the process of finalizing references not already completed during the object deserialization process.</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Runtime.Serialization/System.Runtime.Serialization.html">System.Runtime.Serialization Namespace</a></dd>
+</dl>
+<h3>System.Runtime.Serialization.IObjectReference Member List: </h3>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#GetRealObject(System.Runtime.Serialization.StreamingContext)">GetRealObject</a></td>
+<td width="55%"> Returns the real object that should be deserialized, rather than the object that the serialized stream specifies.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<hr>
+<h3>System.Runtime.Serialization.IObjectReference Member Details</h3><b>Method: <i><a name="GetRealObjectTopic1"></a><a name="GetRealObject(System.Runtime.Serialization.StreamingContext)">GetRealObject</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> <i>context</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the real object that should be deserialized, rather than the object that the serialized stream specifies.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System/types/Object.html">object</a> GetRealObject(<br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> <i>context</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>context</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> from which the current object is deserialized.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> Returns the actual object that is put into the graph.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method is useful in a remoting situation where you serialize a proxy-creator object, not an actual object. When the proxy-creator object is deserialized, deserialization calls its  <a href="#GetRealObject(System.Runtime.Serialization.StreamingContext)">IObjectReference.GetRealObject</a> method. At this point, the proxy-creator object creates a new instance of the proxy object that refers back to the original actual object, perhaps on a remote computer. Finally, the proxy-creator object is discarded and reclaimed later by garbage collection.<p> For example, consider how  <a href="../../System/types/Type.html">Type</a> objects are serialized. Instead of transmitting the data from the  <a href="../../System/types/Type.html">Type</a> object, the system transmits a holder object with the name of the type object and information on the assembly where it is found in an object implementing  <a href="../../System.Runtime.Serialization/types/IObjectReference.html">IObjectReference</a>. When both the type name and assembly name are available, the deserialization infrastructure calls  <a href="#GetRealObject(System.Runtime.Serialization.StreamingContext)">IObjectReference.GetRealObject</a> on the holder object that has been transmitted. This holder returns the  <a href="../../System/types/Type.html">Type</a> object that is inserted into the graph.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.ComponentModel.ISite</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.ComponentModel.ISite Interface</h2><b>Assembly: </b>System.dll<br><b>Namespace: </b>System.ComponentModel<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides functionality required by sites.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public interface ISite : IServiceProvider
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Sites bind a  <a href="../../System.ComponentModel/types/Component.html">Component</a> to a  <a href="../../System.ComponentModel/types/Container.html">Container</a> and enable communication between them, as well as provide a way for the container to manage its components.<p> Sites can also serve as a repository for container-specific, per-component information, such as the component name.</p><br><br><b>Notes to implementors: </b> To be a site, a class must implement the  <a href="../../System.ComponentModel/types/ISite.html">ISite</a> interface.</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+	/// &lt;summary&gt;
+	/// The following example demonstrates the implementation of 
+	/// ISite, IComponent, and IContainer for use in a simple library container.
+	///
+	/// This example uses the System, System.ComponentModel, and System.Collections
+	/// namespaces.
+	/// &lt;/summary&gt;
+
+	//This code segment implements the ISite and IComponent interfaces.
+	//The implementation of the IContainer interface can be seen in the documentation 
+	//of IContainer.
+
+	//Implement the ISite interface.
+
+	// The ISBNSite class represents the ISBN name of the book component
+	class ISBNSite : ISite
+	{
+		private IComponent m_curComponent;
+		private IContainer m_curContainer;
+		private bool m_bDesignMode;
+		private string m_ISBNCmpName;
+
+		public ISBNSite(IContainer actvCntr, IComponent prntCmpnt)
+		{
+			m_curComponent = prntCmpnt;
+			m_curContainer = actvCntr;
+			m_bDesignMode = false;
+			m_ISBNCmpName = null;
+		}
+
+		//Support the ISite interface.
+		public virtual IComponent Component
+		{
+			get
+			{
+				return m_curComponent;
+			}
+		}
+
+		public virtual IContainer Container
+		{
+			get
+			{
+				return m_curContainer;
+			}
+		}
+		
+		public virtual bool DesignMode
+		{
+			get
+			{
+				return m_bDesignMode;
+			}
+		}
+
+		public virtual string Name
+		{
+			get
+			{
+				return m_ISBNCmpName;
+			}
+
+			set
+			{
+				m_ISBNCmpName = value;
+			}
+		}
+
+		//Support the IServiceProvider interface.
+		public virtual object GetService(Type serviceType)
+		{
+			// we are not using any service objects in this example.
+			return null;
+		}
+
+	}
+
+	// The BookComponent class represents the book component of the library container.
+	
+	// This class implements the IComponent interface.
+	
+	class BookComponent : IComponent
+	{
+		public event EventHandler Disposed;
+		private ISite m_curISBNSite;
+		private string m_bookTitle;
+		private string m_bookAuthor;
+
+		public BookComponent(string Title, string Author)
+		{
+			m_curISBNSite = null;
+			Disposed = null;
+			m_bookTitle = Title;
+			m_bookAuthor = Author;
+		}
+
+		public string Title
+		{
+			get
+			{
+				return m_bookTitle;
+			}
+		}
+
+		public string Author
+		{
+			get
+			{
+				return m_bookAuthor;
+			}
+		}
+
+		public virtual void Dispose()
+		{	
+			//There is nothing to clean.
+			if(Disposed != null)
+				Disposed(this,EventArgs.Empty);
+		}
+
+		public virtual ISite Site
+		{
+			get
+			{
+				return m_curISBNSite;
+			}
+			set
+			{
+				m_curISBNSite = value;
+			}
+		}
+
+		public override bool Equals(object cmp)
+		{
+			BookComponent cmpObj = (BookComponent)cmp;
+			if(this.Title.Equals(cmpObj.Title) &amp;&amp; this.Author.Equals(cmpObj.Author))
+				return true;
+
+			return false;
+		}
+
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
+		}
+	}
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.ComponentModel/System.ComponentModel.html">System.ComponentModel Namespace</a> |  <a href="../../System.ComponentModel/types/Component.html">Component</a> |  <a href="../../System.ComponentModel/types/IComponent.html">IComponent</a> |  <a href="../../System.ComponentModel/types/Container.html">Container</a> |  <a href="../../System.ComponentModel/types/IContainer.html">IContainer</a></dd>
+</dl>
+<h3>System.ComponentModel.ISite Member List: </h3>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Component">Component</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the component associated with the  <a href="../../System.ComponentModel/types/ISite.html">ISite</a> when implemented by a class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Container">Container</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the  <a href="../../System.ComponentModel/types/IContainer.html">IContainer</a> associated with the  <a href="../../System.ComponentModel/types/ISite.html">ISite</a> when implemented by a class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#DesignMode">DesignMode</a></td>
+<td width="55%"><b>Read-only</b><br><br> Determines whether the component is in design mode when implemented by a class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Name">Name</a></td>
+<td width="55%"><b>Read-write</b><br><br></td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/IServiceProvider.html">System.IServiceProvider</a></li>
+<ul class="none">
+<li><b>System.ComponentModel.ISite</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.ComponentModel.ISite Member Details</h3><b>Property: <i><a name="ComponentTopic1"></a><a name="Component">Component</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the component associated with the  <a href="../../System.ComponentModel/types/ISite.html">ISite</a> when implemented by a class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System.ComponentModel/types/IComponent.html">IComponent</a> Component {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> A valid value for this property (that is, the value is not <b>null</b>) indicates that the component has been added to a container.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ContainerTopic1"></a><a name="Container">Container</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the  <a href="../../System.ComponentModel/types/IContainer.html">IContainer</a> associated with the  <a href="../../System.ComponentModel/types/ISite.html">ISite</a> when implemented by a class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System.ComponentModel/types/IContainer.html">IContainer</a> Container {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd><b>null</b> for the  <a href="#Container">ISite.Container</a> property indicates that the  <a href="../../System.ComponentModel/types/IComponent.html">IComponent</a> instance does not have an  <a href="../../System.ComponentModel/types/ISite.html">ISite</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="DesignModeTopic1"></a><a name="DesignMode">DesignMode</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines whether the component is in design mode when implemented by a class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System/types/Boolean.html">bool</a> DesignMode {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The design mode indicator is stored in the  <a href="../../System.ComponentModel/types/ISite.html">ISite</a>; therefore, if the  <a href="../../System.ComponentModel/types/Component.html">Component</a> does not have an  <a href="../../System.ComponentModel/types/ISite.html">ISite</a> associated with it, this property is always <b>false</b>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NameTopic1"></a><a name="Name">Name</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the name of the component associated with the  <a href="../../System.ComponentModel/types/ISite.html">ISite</a> when implemented by a class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System/types/String.html">string</a> Name {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The components within a container might or might not be named. If a component is given a name, the name must be unique among all the components within the container.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

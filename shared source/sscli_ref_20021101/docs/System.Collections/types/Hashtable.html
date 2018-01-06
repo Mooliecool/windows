@@ -1,0 +1,2595 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Collections.Hashtable</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Collections.Hashtable Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Collections<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Represents a collection of key-and-value pairs that are organized based on the hash code of the key.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public class Hashtable : IDictionary, ICollection, IEnumerable, ISerializable, IDeserializationCallback, ICloneable</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Thread Safety</b><br><dl>
+<dd> A  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> can safely support one writer and multiple readers concurrently. To support multiple writers, all operations must be done through the wrapper returned by the  <a href="#Synchronized(System.Collections.Hashtable)">Hashtable.Synchronized</a> method.<p> Enumerating through a collection is intrinsically not a thread-safe procedure. Even when a collection is synchronized, other threads could still modify the collection, which causes the enumerator to throw an exception. To guarantee thread safety during enumeration, you can either lock the collection during the entire enumeration or catch the exceptions resulting from changes made by other threads.</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Each element is a key-and-value pair stored in a  <a href="../../System.Collections/types/DictionaryEntry.html">DictionaryEntry</a> object.<p> The objects used as keys in a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> must implement or inherit the  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a> and  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a> methods. If key equality were simply reference equality, the inherited implementation of these methods would suffice. Furthermore, these methods must produce the same results when called with the same parameters while the key exists in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>. Key objects must be immutable as long as they are used as keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</p>
+<p> When an element is added to the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>, the element is placed into a bucket based on the hash code of the key. Subsequent lookups of the key use the hash code of the key to search in only one particular bucket, thus substantially reducing the number of key comparisons required to find an element.</p>
+<p> The load factor of a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> determines the maximum ratio of elements to buckets. Smaller load factors cause faster average lookup times at the cost of increased memory consumption. The default load factor of 1.0 generally provides the best balance between speed and size. A different load factor can also be specified when the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> is created.</p>
+<p> As elements are added to a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>, the actual load factor of the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> increases. When the actual load factor reaches the load factor, the number of buckets in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> is automatically increased to the smallest prime number that is larger than twice the current number of  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> buckets.</p>
+<p> Each key object in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> must provide its own hash function, which can be accessed by calling  <a href="#GetHash(System.Object)">Hashtable.GetHash</a>. However, any object implementing  <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> can be passed to a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> constructor, and that hash function is used for all objects in the table.</p>
+<p> The <b>foreach</b> statement of the C# language requires the type of each element in the collection. Since each element of the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> is a key-and-value pair, the element type is not the type of the key or the type of the value. Instead, the element type is  <a href="../../System.Collections/types/DictionaryEntry.html">DictionaryEntry</a>. For example: <code>
+            foreach (DictionaryEntry myEntry in myHashtable) {...}
+          </code></p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to create and initialize a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> and how to print out its keys and values.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesHashtable  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new Hashtable.
+       Hashtable myHT = new Hashtable();
+       myHT.Add("First", "Hello");
+       myHT.Add("Second", "World");
+       myHT.Add("Third", "!");
+ 
+       // Displays the properties and values of the Hashtable.
+       Console.WriteLine( "myHT" );
+       Console.WriteLine( "  Count:    {0}", myHT.Count );
+       Console.WriteLine( "  Keys and Values:" );
+       PrintKeysAndValues( myHT );
+    }
+ 
+ 
+    public static void PrintKeysAndValues( Hashtable myList )  {
+       IDictionaryEnumerator myEnumerator = myList.GetEnumerator();
+       Console.WriteLine( "\t-KEY-\t-VALUE-" );
+       while ( myEnumerator.MoveNext() )
+          Console.WriteLine("\t{0}:\t{1}", myEnumerator.Key, myEnumerator.Value);
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ myHT
+   Count:    3
+   Keys and Values:
+     -KEY-    -VALUE-
+     Third:    !
+     Second:    World
+     First:    Hello
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Collections/System.Collections.html">System.Collections Namespace</a> |  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> |  <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> |  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a> |  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a> |  <a href="../../System.Collections/types/DictionaryEntry.html">DictionaryEntry</a></dd>
+</dl>
+<h3>System.Collections.Hashtable Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor()<br><br></code>Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Creates an empty  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> with the default initial capacity and using the default load factor, the default hash code provider and the default comparer.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(IDictionary d)<br><br></code> Copies the elements from the specified dictionary to a new  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> with the same initial capacity as the number of elements copied and using the default load factor, the default hash code provider and the default comparer.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor3">ctor #3</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(int capacity)<br><br></code> Creates an empty  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> with the specified initial capacity and using the default load factor, the default hash code provider and the default comparer.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor4">ctor #4</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(IDictionary d, float loadFactor)<br><br></code> Copies the elements from the specified dictionary to a new  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> with the same initial capacity as the number of elements copied and using the specified load factor, the default hash code provider and the default comparer.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor5">ctor #5</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(IHashCodeProvider hcp, IComparer comparer)<br><br></code> Creates an empty  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> with the default initial capacity and using the default load factor, the specified hash code provider and the specified comparer.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor6">ctor #6</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(int capacity, float loadFactor)<br><br></code> Creates an empty  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> with the specified initial capacity and using the specified load factor, the default hash code provider and the default comparer.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor8">ctor #8</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(IDictionary d, IHashCodeProvider hcp, IComparer comparer)<br><br></code> Copies the elements from the specified dictionary to a new  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> with the same initial capacity as the number of elements copied and using the default load factor, the specified hash code provider and the specified comparer.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor9">ctor #9</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(int capacity, IHashCodeProvider hcp, IComparer comparer)<br><br></code> Creates an empty  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> with the specified initial capacity and using the default load factor, the specified hash code provider and the specified comparer.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor10">ctor #10</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(IDictionary d, float loadFactor, IHashCodeProvider hcp, IComparer comparer)<br><br></code> Copies the elements from the specified dictionary to a new  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> with the same initial capacity as the number of elements copied and using the specified load factor, the specified hash code provider and the specified comparer.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor11">ctor #11</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(int capacity, float loadFactor, IHashCodeProvider hcp, IComparer comparer)<br><br></code> Creates an empty  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> with the specified initial capacity and using the specified load factor, the specified hash code provider and the specified comparer.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Count">Count</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the number of key-and-value pairs contained in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsFixedSize">IsFixedSize</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a value indicating whether the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> has a fixed size.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsReadOnly">IsReadOnly</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a value indicating whether the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> is read-only.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsSynchronized">IsSynchronized</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a value indicating whether access to the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> is synchronized (thread-safe).</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Item(System.Object)">Item</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the value associated with the specified key.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Keys">Keys</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets an  <a href="../../System.Collections/types/ICollection.html">ICollection</a> containing the keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SyncRoot">SyncRoot</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets an object that can be used to synchronize access to the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Values">Values</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets an  <a href="../../System.Collections/types/ICollection.html">ICollection</a> containing the values in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Add(System.Object,System.Object)">Add</a></td>
+<td width="55%"> Adds an element with the specified key and value into the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Clear">Clear</a></td>
+<td width="55%"> Removes all elements from the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Clone">Clone</a></td>
+<td width="55%"> Creates a shallow copy of the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Contains(System.Object)">Contains</a></td>
+<td width="55%"> Determines whether the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> contains a specific key.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ContainsKey(System.Object)">ContainsKey</a></td>
+<td width="55%"> Determines whether the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> contains a specific key.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ContainsValue(System.Object)">ContainsValue</a></td>
+<td width="55%"> Determines whether the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> contains a specific value.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CopyTo(System.Array,System.Int32)">CopyTo</a></td>
+<td width="55%"> Copies the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> elements to a one-dimensional  <a href="../../System/types/Array.html">Array</a> instance at the specified index.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetEnumerator">GetEnumerator</a></td>
+<td width="55%"> Returns an  <a href="../../System.Collections/types/IDictionaryEnumerator.html">IDictionaryEnumerator</a> that can iterate through the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">GetObjectData</a></td>
+<td width="55%"> Implements the  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> interface and returns the data needed to serialize the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#OnDeserialization(System.Object)">OnDeserialization</a></td>
+<td width="55%"> Implements the  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> interface and raises the deserialization event when the deserialization is complete.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Remove(System.Object)">Remove</a></td>
+<td width="55%"> Removes the element with the specified key from the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Synchronized(System.Collections.Hashtable)">Synchronized</a></td>
+<td width="55%"> Returns a synchronized (thread-safe) wrapper for the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor7">ctor #7</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(SerializationInfo info, StreamingContext context)<br><br></code> Creates an empty  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> that is serializable with the specified  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> and  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#comparer">comparer</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the comparer to use for the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#hcp">hcp</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the object that can dispense hash codes.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHash(System.Object)">GetHash</a></td>
+<td width="55%"> Returns the hash code for the specified key.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#KeyEquals(System.Object,System.Object)">KeyEquals</a></td>
+<td width="55%"> Compares a specific  <a href="../../System/types/Object.html">Object</a> with a specific key in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Explicit Interface Implementations </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#IEnumerable.GetEnumerator">IEnumerable.GetEnumerator</a></td>
+<td width="55%"> Returns an  <a href="../../System.Collections/types/IEnumerator.html">IEnumerator</a> that can iterate through the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Collections.Hashtable</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Collections.Hashtable Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates an empty  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> with the default initial capacity and using the default load factor, the default hash code provider and the default comparer.</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public Hashtable();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> A hashtable's capacity is used to calculate the optimal number of hashtable buckets based on the load factor. The default initial capacity is zero. Capacity is automatically increased as required.<p> The load factor is the maximum ratio of elements to buckets. A smaller load factor means faster lookup at the cost of increased memory consumption. The default load factor is 1.0, which is the best balance between speed and size.</p>
+<p> When the actual load factor reaches the load factor, the number of buckets is automatically increased to the smallest prime number that is larger than twice the current number of buckets.</p>
+<p> The hash code provider dispenses hash codes for keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>. The default hash code provider is the key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p>
+<p> The comparer determines whether two keys are equal. Every key in a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> must be unique. The default comparer is the key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a> |  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Copies the elements from the specified dictionary to a new  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> with the same initial capacity as the number of elements copied and using the default load factor, the default hash code provider and the default comparer.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public Hashtable(<br>   <font color="#008080"><a href="../../System.Collections/types/IDictionary.html">IDictionary</a> <i>d</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>d</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> to copy to a new  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>d</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The initial capacity is set to the number of elements in the source dictionary. Capacity is automatically increased as required based on the load factor.<p> The load factor is the maximum ratio of elements to buckets. A smaller load factor means faster lookup at the cost of increased memory consumption. The default load factor is 1.0, which is the best balance between speed and size.</p>
+<p> When the actual load factor reaches the load factor, the number of buckets is automatically increased to the smallest prime number that is larger than twice the current number of buckets.</p>
+<p> The hash code provider dispenses hash codes for keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>. The default hash code provider is the key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p>
+<p> The comparer determines whether two keys are equal. Every key in a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> must be unique. The default comparer is the key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p>
+<p> The elements of the new  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> are sorted in the same order in which the enumerator iterates through the  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> |  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a> |  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic3"></a><a name="ctor3">ctor #3</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates an empty  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> with the specified initial capacity and using the default load factor, the default hash code provider and the default comparer.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public Hashtable(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>capacity</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>capacity</i><br><dl>
+<dd>
+<param> The approximate number of elements that the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> can initially contain.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>capacity</i> is less than zero.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Specifying the initial capacity eliminates the need to perform a number of resizing operations while adding elements to the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>. Capacity is automatically increased as required based on the load factor.<p> The load factor is the maximum ratio of elements to buckets. A smaller load factor means faster lookup at the cost of increased memory consumption. The default load factor is 1.0, which is the best balance between speed and size.</p>
+<p> When the actual load factor reaches the load factor, the number of buckets is automatically increased to the smallest prime number that is larger than twice the current number of buckets.</p>
+<p> The hash code provider dispenses hash codes for keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>. The default hash code provider is the key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p>
+<p> The comparer determines whether two keys are equal. Every key in a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> must be unique. The default comparer is the key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a> |  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic4"></a><a name="ctor4">ctor #4</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Copies the elements from the specified dictionary to a new  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> with the same initial capacity as the number of elements copied and using the specified load factor, the default hash code provider and the default comparer.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public Hashtable(<br>   <font color="#008080"><a href="../../System.Collections/types/IDictionary.html">IDictionary</a> <i>d</i>,</font><br>   <font color="#008080"><a href="../../System/types/Single.html">float</a> <i>loadFactor</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>d</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> to copy to a new  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>loadFactor</i><br><dl>
+<dd>
+<param> A number in the range from 0.1 through 1.0 indicating the maximum ratio of elements to buckets.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>d</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>loadFactor</i> is less than 0.1.<p> -or- </p>
+<p><i>loadFactor</i> is greater than 1.0.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The initial capacity is set to the number of elements in the source dictionary. Capacity is automatically increased as required based on the load factor.<p> The load factor is the maximum ratio of elements to buckets. A smaller load factor means faster lookup at the cost of increased memory consumption. A load factor of 1.0 is the best balance between speed and size.</p>
+<p> When the actual load factor reaches the load factor, the number of buckets is automatically increased to the smallest prime number that is larger than twice the current number of buckets.</p>
+<p> The hash code provider dispenses hash codes for keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>. The default hash code provider is the key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p>
+<p> The comparer determines whether two keys are equal. Every key in a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> must be unique. The default comparer is the key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p>
+<p> The elements of the new  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> are sorted in the same order in which the enumerator iterates through the  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> |  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a> |  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic5"></a><a name="ctor5">ctor #5</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates an empty  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> with the default initial capacity and using the default load factor, the specified hash code provider and the specified comparer.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public Hashtable(<br>   <font color="#008080"><a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> <i>hcp</i>,</font><br>   <font color="#008080"><a href="../../System.Collections/types/IComparer.html">IComparer</a> <i>comparer</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>hcp</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> that supplies the hash codes for all keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.<p> -or- </p>
+<p><b>null</b> to use the default hash code provider, which is each key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p> The  <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> that supplies the hash codes for all keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.<p> -or- </p>
+<p><b>null</b> to use the default hash code provider, which is each key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>comparer</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/IComparer.html">IComparer</a> to use to determine whether two keys are equal.<p> -or- </p>
+<p><b>null</b> to use the default comparer, which is each key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p> The  <a href="../../System.Collections/types/IComparer.html">IComparer</a> to use to determine whether two keys are equal.<p> -or- </p>
+<p><b>null</b> to use the default comparer, which is each key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> A hashtable's capacity is used to calculate the optimal number of hashtable buckets based on the load factor. The default initial capacity is zero. Capacity is automatically increased as required.<p> The load factor is the maximum ratio of elements to buckets. A smaller load factor means faster lookup at the cost of increased memory consumption. The default load factor is 1.0, which is the best balance between speed and size.</p>
+<p> When the actual load factor reaches the load factor, the number of buckets is automatically increased to the smallest prime number that is larger than twice the current number of buckets.</p>
+<p> The hash code provider dispenses hash codes for keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>. The default hash code provider is the key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p>
+<p> The comparer determines whether two keys are equal. Every key in a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> must be unique. The default comparer is the key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p>
+<p> The custom hash code provider and the custom comparer enable such scenarios as doing lookups with case-insensitive strings.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> |  <a href="../../System.Collections/types/IComparer.html">IComparer</a> |  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a> |  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic6"></a><a name="ctor6">ctor #6</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates an empty  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> with the specified initial capacity and using the specified load factor, the default hash code provider and the default comparer.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public Hashtable(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>capacity</i>,</font><br>   <font color="#008080"><a href="../../System/types/Single.html">float</a> <i>loadFactor</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>capacity</i><br><dl>
+<dd>
+<param> The approximate number of elements that the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> can initially contain.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>loadFactor</i><br><dl>
+<dd>
+<param> A number in the range from 0.1 through 1.0 indicating the maximum ratio of elements to buckets.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>capacity</i> is less than zero.<p> -or- </p>
+<p><i>loadFactor</i> is less than 0.1.</p>
+<p> -or- </p>
+<p><i>loadFactor</i> is greater than 1.0.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Specifying the initial capacity eliminates the need to perform a number of resizing operations while adding elements to the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>. Capacity is automatically increased as required based on the load factor.<p> The load factor is the maximum ratio of elements to buckets. A smaller load factor means faster lookup at the cost of increased memory consumption. A load factor of 1.0 is the best balance between speed and size.</p>
+<p> When the actual load factor reaches the load factor, the number of buckets is automatically increased to the smallest prime number that is larger than twice the current number of buckets.</p>
+<p> The hash code provider dispenses hash codes for keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>. The default hash code provider is the key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p>
+<p> The comparer determines whether two keys are equal. Every key in a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> must be unique. The default comparer is the key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a> |  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic7"></a><a name="ctor7">ctor #7</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates an empty  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> that is serializable with the specified  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> and  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected Hashtable(<br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> <i>info</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> <i>context</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>info</i><br><dl>
+<dd>
+<param> A  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> object containing the information required to serialize the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>context</i><br><dl>
+<dd>
+<param> A  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> object containing the source and destination of the serialized stream associated with the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>info</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> A hashtable's capacity is used to calculate the optimal number of hashtable buckets based on the load factor. The default initial capacity is zero. Capacity is automatically increased as required.<p> The load factor is the maximum ratio of elements to buckets. A smaller load factor means faster lookup at the cost of increased memory consumption. The default load factor is 1.0, which is the best balance between speed and size.</p>
+<p> When the actual load factor reaches the load factor, the number of buckets is automatically increased to the smallest prime number that is larger than twice the current number of buckets.</p>
+<p> The hash code provider dispenses hash codes for keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>. The default hash code provider is the key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p>
+<p> The comparer determines whether two keys are equal. Every key in a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> must be unique. The default comparer is the key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> |  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> |  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> |  <a href="#OnDeserialization(System.Object)">Hashtable.OnDeserialization</a> |  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a> |  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic8"></a><a name="ctor8">ctor #8</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Copies the elements from the specified dictionary to a new  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> with the same initial capacity as the number of elements copied and using the default load factor, the specified hash code provider and the specified comparer.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public Hashtable(<br>   <font color="#008080"><a href="../../System.Collections/types/IDictionary.html">IDictionary</a> <i>d</i>,</font><br>   <font color="#008080"><a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> <i>hcp</i>,</font><br>   <font color="#008080"><a href="../../System.Collections/types/IComparer.html">IComparer</a> <i>comparer</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>d</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> to copy to a new  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>hcp</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> that supplies the hash codes for all keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.<p> -or- </p>
+<p><b>null</b> to use the default hash code provider, which is each key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p> The  <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> that supplies the hash codes for all keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.<p> -or- </p>
+<p><b>null</b> to use the default hash code provider, which is each key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>comparer</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/IComparer.html">IComparer</a> to use to determine whether two keys are equal.<p> -or- </p>
+<p><b>null</b> to use the default comparer, which is each key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p> The  <a href="../../System.Collections/types/IComparer.html">IComparer</a> to use to determine whether two keys are equal.<p> -or- </p>
+<p><b>null</b> to use the default comparer, which is each key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>d</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The initial capacity is set to the number of elements in the source dictionary. Capacity is automatically increased as required based on the load factor.<p> The load factor is the maximum ratio of elements to buckets. A smaller load factor means faster lookup at the cost of increased memory consumption. The default load factor is 1.0, which is the best balance between speed and size.</p>
+<p> When the actual load factor reaches the load factor, the number of buckets is automatically increased to the smallest prime number that is larger than twice the current number of buckets.</p>
+<p> The hash code provider dispenses hash codes for keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>. The default hash code provider is the key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p>
+<p> The comparer determines whether two keys are equal. Every key in a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> must be unique. The default comparer is the key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p>
+<p> The custom hash code provider and the custom comparer enables scenarios such as doing lookups with case-insensitive strings.</p>
+<p> The elements of the new  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> are sorted in the same order in which the enumerator iterates through the  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> |  <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> |  <a href="../../System.Collections/types/IComparer.html">IComparer</a> |  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a> |  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic9"></a><a name="ctor9">ctor #9</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates an empty  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> with the specified initial capacity and using the default load factor, the specified hash code provider and the specified comparer.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public Hashtable(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>capacity</i>,</font><br>   <font color="#008080"><a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> <i>hcp</i>,</font><br>   <font color="#008080"><a href="../../System.Collections/types/IComparer.html">IComparer</a> <i>comparer</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>capacity</i><br><dl>
+<dd>
+<param> The approximate number of elements that the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> can initially contain.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>hcp</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> that supplies the hash codes for all keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.<p> -or- </p>
+<p><b>null</b> to use the default hash code provider, which is each key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p> The  <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> that supplies the hash codes for all keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.<p> -or- </p>
+<p><b>null</b> to use the default hash code provider, which is each key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>comparer</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/IComparer.html">IComparer</a> to use to determine whether two keys are equal.<p> -or- </p>
+<p><b>null</b> to use the default comparer, which is each key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p> The  <a href="../../System.Collections/types/IComparer.html">IComparer</a> to use to determine whether two keys are equal.<p> -or- </p>
+<p><b>null</b> to use the default comparer, which is each key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Specifying the initial capacity eliminates the need to perform a number of resizing operations while adding elements to the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>. Capacity is automatically increased as required based on the load factor.<p> The load factor is the maximum ratio of elements to buckets. A smaller load factor means faster lookup at the cost of increased memory consumption. The default load factor is 1.0, which is the best balance between speed and size.</p>
+<p> When the actual load factor reaches the load factor, the number of buckets is automatically increased to the smallest prime number that is larger than twice the current number of buckets.</p>
+<p> The hash code provider dispenses hash codes for keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>. The default hash code provider is the key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p>
+<p> The comparer determines whether two keys are equal. Every key in a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> must be unique. The default comparer is the key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p>
+<p> The custom hash code provider and the custom comparer enable such scenarios as doing lookups with case-insensitive strings.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> |  <a href="../../System.Collections/types/IComparer.html">IComparer</a> |  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a> |  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic10"></a><a name="ctor10">ctor #10</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Copies the elements from the specified dictionary to a new  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> with the same initial capacity as the number of elements copied and using the specified load factor, the specified hash code provider and the specified comparer.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public Hashtable(<br>   <font color="#008080"><a href="../../System.Collections/types/IDictionary.html">IDictionary</a> <i>d</i>,</font><br>   <font color="#008080"><a href="../../System/types/Single.html">float</a> <i>loadFactor</i>,</font><br>   <font color="#008080"><a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> <i>hcp</i>,</font><br>   <font color="#008080"><a href="../../System.Collections/types/IComparer.html">IComparer</a> <i>comparer</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>d</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> to copy to a new  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>loadFactor</i><br><dl>
+<dd>
+<param> A number in the range from 0.1 through 1.0 indicating the maximum ratio of elements to buckets.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>hcp</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> that supplies the hash codes for all keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.<p> -or- </p>
+<p><b>null</b> to use the default hash code provider, which is each key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p> The  <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> that supplies the hash codes for all keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.<p> -or- </p>
+<p><b>null</b> to use the default hash code provider, which is each key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>comparer</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/IComparer.html">IComparer</a> to use to determine whether two keys are equal.<p> -or- </p>
+<p><b>null</b> to use the default comparer, which is each key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p> The  <a href="../../System.Collections/types/IComparer.html">IComparer</a> to use to determine whether two keys are equal.<p> -or- </p>
+<p><b>null</b> to use the default comparer, which is each key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>d</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>loadFactor</i> is less than 0.1.<p> -or- </p>
+<p><i>loadFactor</i> is greater than 1.0.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The initial capacity is set to the number of elements in the source dictionary. Capacity is automatically increased as required based on the load factor.<p> The load factor is the maximum ratio of elements to buckets. A smaller load factor means faster lookup at the cost of increased memory consumption. A load factor of 1.0 is the best balance between speed and size.</p>
+<p> When the actual load factor reaches the load factor, the number of buckets is automatically increased to the smallest prime number that is larger than twice the current number of buckets.</p>
+<p> The hash code provider dispenses hash codes for keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>. The default hash code provider is the key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p>
+<p> The comparer determines whether two keys are equal. Every key in a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> must be unique. The default comparer is the key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p> The custom hash code provider and the custom comparer enable such scenarios as doing lookups with case-insensitive strings.<p> The elements of the new  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> are sorted in the same order in which the enumerator iterates through the  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a>.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic11"></a><a name="ctor11">ctor #11</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates an empty  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> with the specified initial capacity and using the specified load factor, the specified hash code provider and the specified comparer.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public Hashtable(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>capacity</i>,</font><br>   <font color="#008080"><a href="../../System/types/Single.html">float</a> <i>loadFactor</i>,</font><br>   <font color="#008080"><a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> <i>hcp</i>,</font><br>   <font color="#008080"><a href="../../System.Collections/types/IComparer.html">IComparer</a> <i>comparer</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>capacity</i><br><dl>
+<dd>
+<param> The approximate number of elements that the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> can initially contain.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>loadFactor</i><br><dl>
+<dd>
+<param> A number in the range from 0.1 through 1.0 indicating the maximum ratio of elements to buckets.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>hcp</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> that supplies the hash codes for all keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.<p> -or- </p>
+<p><b>null</b> to use the default hash code provider, which is each key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p> The  <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> that supplies the hash codes for all keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.<p> -or- </p>
+<p><b>null</b> to use the default hash code provider, which is each key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>comparer</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/IComparer.html">IComparer</a> to use to determine whether two keys are equal.<p> -or- </p>
+<p><b>null</b> to use the default comparer, which is each key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p> The  <a href="../../System.Collections/types/IComparer.html">IComparer</a> to use to determine whether two keys are equal.<p> -or- </p>
+<p><b>null</b> to use the default comparer, which is each key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>capacity</i> is less than zero.<p> -or- </p>
+<p><i>loadFactor</i> is less than 0.1.</p>
+<p> -or- </p>
+<p><i>loadFactor</i> is greater than 1.0.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Specifying the initial capacity eliminates the need to perform a number of resizing operations while adding elements to the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>. Capacity is automatically increased as required based on the load factor.<p> The load factor is the maximum ratio of elements to buckets. A smaller load factor means faster lookup at the cost of increased memory consumption. A load factor of 1.0 is the best balance between speed and size.</p>
+<p> When the actual load factor reaches the load factor, the number of buckets is automatically increased to the smallest prime number that is larger than twice the current number of buckets.</p>
+<p> The hash code provider dispenses hash codes for keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>. The default hash code provider is the key's implementation of  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a>.</p>
+<p> The comparer determines whether two keys are equal. Every key in a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> must be unique. The default comparer is the key's implementation of  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a>.</p>
+<p> The custom hash code provider and the custom comparer enable such scenarios as doing lookups with case-insensitive strings.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> |  <a href="../../System.Collections/types/IComparer.html">IComparer</a> |  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a> |  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="comparerTopic1"></a><a name="comparer">comparer</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the comparer to use for the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System.Collections/types/IComparer.html">IComparer</a> comparer {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/IComparer.html">IComparer</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CountTopic1"></a><a name="Count">Count</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the number of key-and-value pairs contained in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> Count {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/ICollection.html#Count">ICollection.Count</a></dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="hcpTopic1"></a><a name="hcp">hcp</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the object that can dispense hash codes.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> hcp {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsFixedSizeTopic1"></a><a name="IsFixedSize">IsFixedSize</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> has a fixed size.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsFixedSize {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#IsFixedSize">IDictionary.IsFixedSize</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> A collection with a fixed size does not allow the addition or removal of elements after the collection is created, but it allows the modification of existing elements.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsReadOnlyTopic1"></a><a name="IsReadOnly">IsReadOnly</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> is read-only.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsReadOnly {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#IsReadOnly">IDictionary.IsReadOnly</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> A collection that is read-only does not allow the addition, removal, or modification of elements after the collection is created.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsSynchronizedTopic1"></a><a name="IsSynchronized">IsSynchronized</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether access to the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> is synchronized (thread-safe).</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsSynchronized {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/ICollection.html#IsSynchronized">ICollection.IsSynchronized</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> A  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> can safely support one writer and multiple readers concurrently. To support multiple writers, all operations must be done through the wrapper returned by the  <a href="#Synchronized(System.Collections.Hashtable)">Hashtable.Synchronized</a> method.<p> Enumerating through a collection is intrinsically not a thread-safe procedure. Even when a collection is synchronized, other threads could still modify the collection, which causes the enumerator to throw an exception. To guarantee thread safety during enumeration, you can either lock the collection during the entire enumeration or catch the exceptions resulting from changes made by other threads.</p>
+<p> The following code example shows how to lock the collection using the  <a href="#SyncRoot">Hashtable.SyncRoot</a> during the entire enumeration: </p>
+<pre>
+              Hashtable myCollection = new Hashtable();
+               lock( myCollection.SyncRoot ) {
+               foreach ( Object item in myCollection ) {
+               // Insert your code here.
+               }
+              }
+            </pre>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to synchronize a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>, determine if a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> is synchronized and use a synchronized  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesHashtable  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new Hashtable.
+       Hashtable myHT = new Hashtable();
+       myHT.Add( 0, "zero" );
+       myHT.Add( 1, "one" );
+       myHT.Add( 2, "two" );
+       myHT.Add( 3, "three" );
+       myHT.Add( 4, "four" );
+ 
+       // Creates a synchronized wrapper around the Hashtable.
+       Hashtable mySyncdHT = Hashtable.Synchronized( myHT );
+ 
+       // Displays the sychronization status of both Hashtables.
+       Console.WriteLine( "myHT is {0}.", myHT.IsSynchronized ? "synchronized" : "not synchronized" );
+       Console.WriteLine( "mySyncdHT is {0}.", mySyncdHT.IsSynchronized ? "synchronized" : "not synchronized" );
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ myHT is not synchronized.
+ mySyncdHT is synchronized.
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Synchronized(System.Collections.Hashtable)">Hashtable.Synchronized</a> |  <a href="#SyncRoot">Hashtable.SyncRoot</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ItemTopic1"></a><a name="Item(System.Object)">Item</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the value associated with the specified key.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> this[object key] {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>key</i><br><dl>
+<dd>
+<param> The key whose value to get or set.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>key</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The property is set and the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> is read-only.<p> -or- </p>
+<p> The property is set, <i>key</i> does not exist in the collection, and the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> has a fixed size.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Item">IDictionary.Item</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> This property provides the ability to access a specific element in the collection by using the following syntax: <code>
+                myCollection[key]
+              </code>.<p> When setting this property, if the specified key already exists in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>, the value is replaced; otherwise, a new element is created. In contrast, the  <a href="#Add(System.Object,System.Object)">Hashtable.Add</a> method does not modify existing elements.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Add(System.Object,System.Object)">Hashtable.Add</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="KeysTopic1"></a><a name="Keys">Keys</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an  <a href="../../System.Collections/types/ICollection.html">ICollection</a> containing the keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System.Collections/types/ICollection.html">ICollection</a> Keys {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Keys">IDictionary.Keys</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The order of the keys in the  <a href="../../System.Collections/types/ICollection.html">ICollection</a> is unspecified, but it is the same order as the associated values in the  <a href="../../System.Collections/types/ICollection.html">ICollection</a> returned by the  <a href="#Values">Hashtable.Values</a> method.<p> The returned  <a href="../../System.Collections/types/ICollection.html">ICollection</a> is a reference to the original  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>, not a static copy. Therefore, changes to the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> continue to be reflected in the  <a href="../../System.Collections/types/ICollection.html">ICollection</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/ICollection.html">ICollection</a> |  <a href="#Values">Hashtable.Values</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="SyncRootTopic1"></a><a name="SyncRoot">SyncRoot</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an object that can be used to synchronize access to the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> SyncRoot {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/ICollection.html#SyncRoot">ICollection.SyncRoot</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> To create a synchronized version of the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>, use the  <a href="#Synchronized(System.Collections.Hashtable)">Hashtable.Synchronized</a> method. However, derived classes can provide their own synchronized version of the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> using the  <a href="#SyncRoot">Hashtable.SyncRoot</a> property. The synchronizing code must perform operations on the  <a href="#SyncRoot">Hashtable.SyncRoot</a> of the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>, not directly on the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>. This ensures proper operation of collections that are derived from other objects. Specifically, it maintains proper synchronization with other threads that might be simultaneously modifying the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> object.<p> Enumerating through a collection is intrinsically not a thread-safe procedure. Even when a collection is synchronized, other threads could still modify the collection, which causes the enumerator to throw an exception. To guarantee thread safety during enumeration, you can either lock the collection during the entire enumeration or catch the exceptions resulting from changes made by other threads.</p>
+<p> The following code example shows how to lock the collection using the  <a href="#SyncRoot">Hashtable.SyncRoot</a> during the entire enumeration: </p>
+<pre>
+              Hashtable myCollection = new Hashtable();
+               lock( myCollection.SyncRoot ) {
+               foreach ( Object item in myCollection ) {
+               // Insert your code here.
+               }
+              }
+            </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#IsSynchronized">Hashtable.IsSynchronized</a> |  <a href="#Synchronized(System.Collections.Hashtable)">Hashtable.Synchronized</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ValuesTopic1"></a><a name="Values">Values</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an  <a href="../../System.Collections/types/ICollection.html">ICollection</a> containing the values in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System.Collections/types/ICollection.html">ICollection</a> Values {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Values">IDictionary.Values</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The order of the values in the  <a href="../../System.Collections/types/ICollection.html">ICollection</a> is unspecified, but it is the same order as the associated keys in the  <a href="../../System.Collections/types/ICollection.html">ICollection</a> returned by the  <a href="#Keys">Hashtable.Keys</a> method.<p> The returned  <a href="../../System.Collections/types/ICollection.html">ICollection</a> is a reference to the original  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>, not a static copy. Therefore, changes to the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> continue to be reflected in the  <a href="../../System.Collections/types/ICollection.html">ICollection</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/ICollection.html">ICollection</a> |  <a href="#Keys">Hashtable.Keys</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="AddTopic1"></a><a name="Add(System.Object,System.Object)">Add</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds an element with the specified key and value into the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void Add(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>key</i><br><dl>
+<dd>
+<param> The key of the element to add.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The value of the element to add.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>key</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> An element with the same key already exists in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> is read-only.<p> -or- </p>
+<p> The  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> has a fixed size.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Add(System.Object,System.Object)">IDictionary.Add</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> An object that has no correlation between its state and its hash code value should typically not be used as the key. For example, String objects are better than StringBuilder objects for use as keys.<p> The  <a href="#Item(System.Object)">Hashtable.Item</a> property can also be used to add new elements by setting the value of a key that does not exist in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>. For example: <code>
+                myCollection["myNonexistentKey"] = myValue
+              </code>. However, if the specified key already exists in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>, setting the  <a href="#Item(System.Object)">Hashtable.Item</a> property overwrites the old value. In contrast, the  <a href="#Add(System.Object,System.Object)">Hashtable.Add</a> method does not modify existing elements.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to add elements to the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesHashtable  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new Hashtable.
+       Hashtable myHT = new Hashtable();
+       myHT.Add( "one", "The" );
+       myHT.Add( "two", "quick" );
+       myHT.Add( "three", "brown" );
+       myHT.Add( "four", "fox" );
+ 
+       // Displays the Hashtable.
+       Console.WriteLine( "The Hashtable contains the following:" );
+       PrintKeysAndValues( myHT );
+    }
+ 
+ 
+    public static void PrintKeysAndValues( Hashtable myList )  {
+       IDictionaryEnumerator myEnumerator = myList.GetEnumerator();
+       Console.WriteLine( "\t-KEY-\t-VALUE-" );
+       while ( myEnumerator.MoveNext() )
+          Console.WriteLine( "\t{0}:\t{1}", myEnumerator.Key, myEnumerator.Value );
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ The Hashtable contains the following:
+     -KEY-    -VALUE-
+     three:    brown
+     four:    fox
+     two:    quick
+     one:    The
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Remove(System.Object)">Hashtable.Remove</a> |  <a href="#Item(System.Object)">Hashtable.Item</a> |  <a href="../../System.Collections/types/IDictionary.html#Add(System.Object,System.Object)">IDictionary.Add</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ClearTopic1"></a><a name="Clear">Clear</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Removes all elements from the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void Clear();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Clear">IDictionary.Clear</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#Count">Hashtable.Count</a> is set to zero. The capacity remains unchanged.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to clear the values of the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesHashtable  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new Hashtable.
+       Hashtable myHT = new Hashtable();
+       myHT.Add( "one", "The" );
+       myHT.Add( "two", "quick" );
+       myHT.Add( "three", "brown" );
+       myHT.Add( "four", "fox" );
+       myHT.Add( "five", "jumped" );
+ 
+       // Displays the count and values of the Hashtable.
+       Console.WriteLine( "Initially," );
+       Console.WriteLine( "   Count    : {0}", myHT.Count );
+       Console.WriteLine( "   Values:" );
+       PrintKeysAndValues( myHT );
+ 
+       // Clears the Hashtable.
+       myHT.Clear();
+ 
+       // Displays the count and values of the Hashtable.
+       Console.WriteLine( "After Clear," );
+       Console.WriteLine( "   Count    : {0}", myHT.Count );
+       Console.WriteLine( "   Values:" );
+       PrintKeysAndValues( myHT );
+    }
+ 
+ 
+    public static void PrintKeysAndValues( Hashtable myList )  {
+       IDictionaryEnumerator myEnumerator = myList.GetEnumerator();
+       Console.WriteLine( "\t-KEY-\t-VALUE-" );
+       while ( myEnumerator.MoveNext() )
+          Console.WriteLine( "\t{0}:\t{1}", myEnumerator.Key, myEnumerator.Value );
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ Initially,
+    Count    : 5
+    Values:
+     -KEY-    -VALUE-
+     five:    jumped
+     three:    brown
+     four:    fox
+     two:    quick
+     one:    The
+ 
+ After Clear,
+    Count    : 0
+    Values:
+     -KEY-    -VALUE-
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/IDictionary.html#Clear">IDictionary.Clear</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CloneTopic1"></a><a name="Clone">Clone</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates a shallow copy of the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> Clone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A shallow copy of the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System/types/ICloneable.html#Clone">ICloneable.Clone</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> A shallow copy of a collection copies only the elements of the collection, whether they are reference types or value types, but it does not copy the objects that the references refer to. The references in the new collection point to the same objects that the references in the original collection point to.<p> In contrast, a deep copy of a collection copies the elements and everything directly or indirectly referenced by the elements.</p>
+<p> The  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> clone has the same count, the same capacity, the same  <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> implementation, and the same  <a href="../../System.Collections/types/IComparer.html">IComparer</a> implementation as the original  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#CopyTo(System.Array,System.Int32)">Hashtable.CopyTo</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ContainsTopic1"></a><a name="Contains(System.Object)">Contains</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines whether the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> contains a specific key.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Contains(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>key</i><br><dl>
+<dd>
+<param> The key to locate in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> contains an element with the specified key; otherwise, <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>key</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Contains(System.Object)">IDictionary.Contains</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> This implementation is close to O(1) in most cases.<p> <a href="#Contains(System.Object)">Hashtable.Contains</a> implements  <a href="../../System.Collections/types/IDictionary.html#Contains(System.Object)">IDictionary.Contains</a>. It behaves exactly as  <a href="#ContainsKey(System.Object)">Hashtable.ContainsKey</a>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to determine whether the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> contains a specific element.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesHashtable  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new Hashtable.
+       Hashtable myHT = new Hashtable();
+       myHT.Add( 0, "zero" );
+       myHT.Add( 1, "one" );
+       myHT.Add( 2, "two" );
+       myHT.Add( 3, "three" );
+       myHT.Add( 4, "four" );
+ 
+       // Displays the values of the Hashtable.
+       Console.WriteLine( "The Hashtable contains the following values:" );
+       PrintIndexAndKeysAndValues( myHT );
+ 
+       // Searches for a specific key.
+       int myKey = 2;
+       Console.WriteLine( "The key \"{0}\" is {1}.", myKey, myHT.ContainsKey( myKey ) ? "in the Hashtable" : "NOT in the Hashtable" );
+       myKey = 6;
+       Console.WriteLine( "The key \"{0}\" is {1}.", myKey, myHT.ContainsKey( myKey ) ? "in the Hashtable" : "NOT in the Hashtable" );
+ 
+       // Searches for a specific value.
+       String myValue = "three";
+       Console.WriteLine( "The value \"{0}\" is {1}.", myValue, myHT.ContainsValue( myValue ) ? "in the Hashtable" : "NOT in the Hashtable" );
+       myValue = "nine";
+       Console.WriteLine( "The value \"{0}\" is {1}.", myValue, myHT.ContainsValue( myValue ) ? "in the Hashtable" : "NOT in the Hashtable" );
+    }
+ 
+ 
+    public static void PrintIndexAndKeysAndValues( Hashtable myList )  {
+       IDictionaryEnumerator myEnumerator = myList.GetEnumerator();
+       int i = 0;
+       Console.WriteLine( "\t-INDEX-\t-KEY-\t-VALUE-" );
+       while ( myEnumerator.MoveNext() )
+          Console.WriteLine( "\t[{0}]:\t{1}\t{2}", i++, myEnumerator.Key, myEnumerator.Value );
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ The Hashtable contains the following values:
+     -INDEX-    -KEY-    -VALUE-
+     [0]:    4    four
+     [1]:    3    three
+     [2]:    2    two
+     [3]:    1    one
+     [4]:    0    zero
+ 
+ The key "2" is in the Hashtable.
+ The key "6" is NOT in the Hashtable.
+ The value "three" is in the Hashtable.
+ The value "nine" is NOT in the Hashtable.
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#ContainsKey(System.Object)">Hashtable.ContainsKey</a> |  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ContainsKeyTopic1"></a><a name="ContainsKey(System.Object)">ContainsKey</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines whether the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> contains a specific key.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> ContainsKey(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>key</i><br><dl>
+<dd>
+<param> The key to locate in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> contains an element with the specified key; otherwise, <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>key</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This implementation is close to O(1) in most cases.<p> This method behaves exactly as  <a href="#Contains(System.Object)">Hashtable.Contains</a>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to determine whether the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> contains a specific element.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesHashtable  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new Hashtable.
+       Hashtable myHT = new Hashtable();
+       myHT.Add( 0, "zero" );
+       myHT.Add( 1, "one" );
+       myHT.Add( 2, "two" );
+       myHT.Add( 3, "three" );
+       myHT.Add( 4, "four" );
+ 
+       // Displays the values of the Hashtable.
+       Console.WriteLine( "The Hashtable contains the following values:" );
+       PrintIndexAndKeysAndValues( myHT );
+ 
+       // Searches for a specific key.
+       int myKey = 2;
+       Console.WriteLine( "The key \"{0}\" is {1}.", myKey, myHT.ContainsKey( myKey ) ? "in the Hashtable" : "NOT in the Hashtable" );
+       myKey = 6;
+       Console.WriteLine( "The key \"{0}\" is {1}.", myKey, myHT.ContainsKey( myKey ) ? "in the Hashtable" : "NOT in the Hashtable" );
+ 
+       // Searches for a specific value.
+       String myValue = "three";
+       Console.WriteLine( "The value \"{0}\" is {1}.", myValue, myHT.ContainsValue( myValue ) ? "in the Hashtable" : "NOT in the Hashtable" );
+       myValue = "nine";
+       Console.WriteLine( "The value \"{0}\" is {1}.", myValue, myHT.ContainsValue( myValue ) ? "in the Hashtable" : "NOT in the Hashtable" );
+    }
+ 
+ 
+    public static void PrintIndexAndKeysAndValues( Hashtable myList )  {
+       IDictionaryEnumerator myEnumerator = myList.GetEnumerator();
+       int i = 0;
+       Console.WriteLine( "\t-INDEX-\t-KEY-\t-VALUE-" );
+       while ( myEnumerator.MoveNext() )
+          Console.WriteLine( "\t[{0}]:\t{1}\t{2}", i++, myEnumerator.Key, myEnumerator.Value );
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ The Hashtable contains the following values:
+     -INDEX-    -KEY-    -VALUE-
+     [0]:    4    four
+     [1]:    3    three
+     [2]:    2    two
+     [3]:    1    one
+     [4]:    0    zero
+ 
+ The key "2" is in the Hashtable.
+ The key "6" is NOT in the Hashtable.
+ The value "three" is in the Hashtable.
+ The value "nine" is NOT in the Hashtable.
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Contains(System.Object)">Hashtable.Contains</a> |  <a href="#ContainsValue(System.Object)">Hashtable.ContainsValue</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ContainsValueTopic1"></a><a name="ContainsValue(System.Object)">ContainsValue</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines whether the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> contains a specific value.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> ContainsValue(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The value to locate in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> contains an element with the specified <i>value</i>; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method performs a linear search; therefore, the average execution time is proportional to  <a href="#Count">Hashtable.Count</a>. That is, this method is an O(<i>n</i>) operation, where <i>n</i> is  <a href="#Count">Hashtable.Count</a>.<p> The values of the elements of the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> are compared to the specified value using the  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a> method.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to determine whether the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> contains a specific element.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesHashtable  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new Hashtable.
+       Hashtable myHT = new Hashtable();
+       myHT.Add( 0, "zero" );
+       myHT.Add( 1, "one" );
+       myHT.Add( 2, "two" );
+       myHT.Add( 3, "three" );
+       myHT.Add( 4, "four" );
+ 
+       // Displays the values of the Hashtable.
+       Console.WriteLine( "The Hashtable contains the following values:" );
+       PrintIndexAndKeysAndValues( myHT );
+ 
+       // Searches for a specific key.
+       int myKey = 2;
+       Console.WriteLine( "The key \"{0}\" is {1}.", myKey, myHT.ContainsKey( myKey ) ? "in the Hashtable" : "NOT in the Hashtable" );
+       myKey = 6;
+       Console.WriteLine( "The key \"{0}\" is {1}.", myKey, myHT.ContainsKey( myKey ) ? "in the Hashtable" : "NOT in the Hashtable" );
+ 
+       // Searches for a specific value.
+       String myValue = "three";
+       Console.WriteLine( "The value \"{0}\" is {1}.", myValue, myHT.ContainsValue( myValue ) ? "in the Hashtable" : "NOT in the Hashtable" );
+       myValue = "nine";
+       Console.WriteLine( "The value \"{0}\" is {1}.", myValue, myHT.ContainsValue( myValue ) ? "in the Hashtable" : "NOT in the Hashtable" );
+    }
+ 
+ 
+    public static void PrintIndexAndKeysAndValues( Hashtable myList )  {
+       IDictionaryEnumerator myEnumerator = myList.GetEnumerator();
+       int i = 0;
+       Console.WriteLine( "\t-INDEX-\t-KEY-\t-VALUE-" );
+       while ( myEnumerator.MoveNext() )
+          Console.WriteLine( "\t[{0}]:\t{1}\t{2}", i++, myEnumerator.Key, myEnumerator.Value );
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ The Hashtable contains the following values:
+     -INDEX-    -KEY-    -VALUE-
+     [0]:    4    four
+     [1]:    3    three
+     [2]:    2    two
+     [3]:    1    one
+     [4]:    0    zero
+ 
+ The key "2" is in the Hashtable.
+ The key "6" is NOT in the Hashtable.
+ The value "three" is in the Hashtable.
+ The value "nine" is NOT in the Hashtable.
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#ContainsKey(System.Object)">Hashtable.ContainsKey</a> |  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CopyToTopic1"></a><a name="CopyTo(System.Array,System.Int32)">CopyTo</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Array.html">Array</a> <i>array</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>arrayIndex</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Copies the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> elements to a one-dimensional  <a href="../../System/types/Array.html">Array</a> instance at the specified index.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void CopyTo(<br>   <font color="#008080"><a href="../../System/types/Array.html">Array</a> <i>array</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>arrayIndex</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>array</i><br><dl>
+<dd>
+<param> The one-dimensional  <a href="../../System/types/Array.html">Array</a> that is the destination of the  <a href="../../System.Collections/types/DictionaryEntry.html">DictionaryEntry</a> objects copied from  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>. The  <a href="../../System/types/Array.html">Array</a> must have zero-based indexing.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>arrayIndex</i><br><dl>
+<dd>
+<param> The zero-based index in <i>array</i> at which copying begins.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>array</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>arrayIndex</i> is less than zero.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>array</i> is multidimensional.<p> -or- </p>
+<p><i>arrayIndex</i> is equal to or greater than the length of <i>array</i>.</p>
+<p> -or- </p>
+<p> The number of elements in the source  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> is greater than the available space from <i>arrayIndex</i> to the end of the destination <i>array</i>.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td> The type of the source  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> cannot be cast automatically to the type of the destination <i>array</i>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/ICollection.html#CopyTo(System.Array,System.Int32)">ICollection.CopyTo</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The elements are copied to the  <a href="../../System/types/Array.html">Array</a> in the same order in which the enumerator iterates through the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.<p> To copy only the keys in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>, use <code>
+                Hashtable.Keys.CopyTo
+              </code>.</p>
+<p> To copy only the values in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>, use <code>
+                Hashtable.Values.CopyTo
+              </code>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to copy the list of keys or the list of values in a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> into a one-dimensional  <a href="../../System/types/Array.html">Array</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesHashtable  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes the source Hashtable.
+       Hashtable mySourceHT = new Hashtable();
+       mySourceHT.Add( "A", "alpha" );
+       mySourceHT.Add( "B", "beta" );
+ 
+       // Creates and initializes the one-dimensional target Array.
+       Array myTargetArray=Array.CreateInstance( typeof(String), 15 );
+       myTargetArray.SetValue( "The", 0 );
+       myTargetArray.SetValue( "quick", 1 );
+       myTargetArray.SetValue( "brown", 2 );
+       myTargetArray.SetValue( "fox", 3 );
+       myTargetArray.SetValue( "jumped", 4 );
+       myTargetArray.SetValue( "over", 5 );
+       myTargetArray.SetValue( "the", 6 );
+       myTargetArray.SetValue( "lazy", 7 );
+       myTargetArray.SetValue( "dog", 8 );
+ 
+       // Displays the values of the target Array.
+       Console.WriteLine( "The target Array contains the following before:" );
+       PrintValues( myTargetArray, ' ' );
+ 
+       // Copies the keys in the source Hashtable to the target Hashtable, starting at index 6.
+       Console.WriteLine( "After copying the keys, starting at index 6:" );
+       mySourceHT.Keys.CopyTo( myTargetArray, 6 );
+ 
+       // Displays the values of the target Array.
+       PrintValues( myTargetArray, ' ' );
+ 
+       // Copies the values in the source Hashtable to the target Hashtable, starting at index 6.
+       Console.WriteLine( "After copying the values, starting at index 6:" );
+       mySourceHT.Values.CopyTo( myTargetArray, 6 );
+ 
+       // Displays the values of the target Array.
+       PrintValues( myTargetArray, ' ' );
+    }
+ 
+    public static void PrintValues( Array myArr, char mySeparator )  {
+       System.Collections.IEnumerator myEnumerator = myArr.GetEnumerator();
+       int i = 0;
+       int cols = myArr.GetLength( myArr.Rank - 1 );
+       while ( myEnumerator.MoveNext() )  {
+          if ( i &lt; cols )  {
+             i++;
+          } else  {
+             Console.WriteLine();
+             i = 1;
+          }
+          Console.Write( "{0}{1}", mySeparator, myEnumerator.Current );
+       }
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ The target Array contains the following before:
+  The quick brown fox jumped over the lazy dog
+ After copying the keys, starting at index 6:
+  The quick brown fox jumped over A B dog
+ After copying the values, starting at index 6:
+  The quick brown fox jumped over alpha beta dog
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/Array.html">Array</a> |  <a href="../../System.Collections/types/DictionaryEntry.html">DictionaryEntry</a> |  <a href="#GetEnumerator">Hashtable.GetEnumerator</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~Hashtable();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetEnumeratorTopic1"></a><a name="GetEnumerator">GetEnumerator</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns an  <a href="../../System.Collections/types/IDictionaryEnumerator.html">IDictionaryEnumerator</a> that can iterate through the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System.Collections/types/IDictionaryEnumerator.html">IDictionaryEnumerator</a> GetEnumerator();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An  <a href="../../System.Collections/types/IDictionaryEnumerator.html">IDictionaryEnumerator</a> for the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#GetEnumerator">IDictionary.GetEnumerator</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> Enumerators only allow reading the data in the collection. Enumerators cannot be used to modify the underlying collection.<p> Initially, the enumerator is positioned before the first element in the collection. <a href="../../System.Collections/types/IEnumerator.html#Reset">IEnumerator.Reset</a> also brings the enumerator back to this position. At this position, calling  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> throws an exception. Therefore, you must call  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> to advance the enumerator to the first element of the collection before reading the value of  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a>.</p>
+<p> <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> returns the same object until either  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> or  <a href="../../System.Collections/types/IEnumerator.html#Reset">IEnumerator.Reset</a> is called. <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> sets  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> to the next element.</p>
+<p> After the end of the collection is passed, the enumerator is positioned after the last element in the collection, and calling  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> returns <b>false</b>. If the last call to  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> returned <b>false</b>, calling  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> throws an exception. To set  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> to the first element of the collection again, you can call  <a href="../../System.Collections/types/IEnumerator.html#Reset">IEnumerator.Reset</a> followed by  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a>.</p>
+<p> An enumerator remains valid as long as the collection remains unchanged. If changes are made to the collection, such as adding, modifying or deleting elements, the enumerator is irrecoverably invalidated and the next call to  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> or  <a href="../../System.Collections/types/IEnumerator.html#Reset">IEnumerator.Reset</a> throws an  <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a>. If the collection is modified between  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> and  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a>,  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> will return the element that it is set to, even if the enumerator is already invalidated.</p>
+<p> The enumerator does not have exclusive access to the collection; therefore, enumerating through a collection is intrinsically not a thread-safe procedure. Even when a collection is synchronized, other threads could still modify the collection, which causes the enumerator to throw an exception. To guarantee thread safety during enumeration, you can either lock the collection during the entire enumeration or catch the exceptions resulting from changes made by other threads.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/IDictionaryEnumerator.html">IDictionaryEnumerator</a> |  <a href="../../System.Collections/types/IEnumerator.html">IEnumerator</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashTopic1"></a><a name="GetHash(System.Object)">GetHash</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the hash code for the specified key.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual <a href="../../System/types/Int32.html">int</a> GetHash(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>key</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Object.html">Object</a> for which a hash code is to be returned.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The hash code for <i>key</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>key</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the hashtable was created with a specific  <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a> implementation, this method uses that hash code provider; otherwise, it uses the  <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a> implementation of <i>key</i>.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a> |  <a href="../../System/types/Object.html">Object</a> |  <a href="../../System.Collections/types/IHashCodeProvider.html">IHashCodeProvider</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetObjectDataTopic1"></a><a name="GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">GetObjectData</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> <i>info</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> <i>context</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Implements the  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> interface and returns the data needed to serialize the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void GetObjectData(<br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> <i>info</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> <i>context</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>info</i><br><dl>
+<dd>
+<param> A  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> object containing the information required to serialize the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>context</i><br><dl>
+<dd>
+<param> A  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> object containing the source and destination of the serialized stream associated with the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>info</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Serialization/types/ISerializable.html#GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">ISerializable.GetObjectData</a></dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> |  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> |  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> |  <a href="#OnDeserialization(System.Object)">Hashtable.OnDeserialization</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="KeyEqualsTopic1"></a><a name="KeyEquals(System.Object,System.Object)">KeyEquals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>item</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Compares a specific  <a href="../../System/types/Object.html">Object</a> with a specific key in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual <a href="../../System/types/Boolean.html">bool</a> KeyEquals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>item</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>item</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Object.html">Object</a> to compare with <i>key</i>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>key</i><br><dl>
+<dd>
+<param> The key in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> to compare with <i>item</i>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if <i>item</i> and <i>key</i> are equal; otherwise, <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>item</i> is <b>null</b>.<p> -or- </p>
+<p><i>key</i> is <b>null</b>.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the hashtable was created with a specific  <a href="../../System.Collections/types/IComparer.html">IComparer</a> implementation, this method uses that comparer; that is,  <a href="../../System.Collections/types/IComparer.html#Compare(System.Object,System.Object)">IComparer.Compare</a> (<i>item</i>, <i>key</i>). Otherwise, it uses <code>
+                item.Equals(key)
+              </code>.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/Object.html">Object</a> |  <a href="../../System.Collections/types/IComparer.html#Compare(System.Object,System.Object)">IComparer.Compare</a> |  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="OnDeserializationTopic1"></a><a name="OnDeserialization(System.Object)">OnDeserialization</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>sender</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Implements the  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> interface and raises the deserialization event when the deserialization is complete.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void OnDeserialization(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>sender</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>sender</i><br><dl>
+<dd>
+<param> The source of the deserialization event.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> The  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> object associated with the current  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> is invalid.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Serialization/types/IDeserializationCallback.html#OnDeserialization(System.Object)">IDeserializationCallback.OnDeserialization</a></dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> |  <a href="#GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">Hashtable.GetObjectData</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="RemoveTopic1"></a><a name="Remove(System.Object)">Remove</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Removes the element with the specified key from the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void Remove(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>key</i><br><dl>
+<dd>
+<param> The key of the element to remove.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>key</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> is read-only.<p> -or- </p>
+<p> The  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> has a fixed size.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Remove(System.Object)">IDictionary.Remove</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> If the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> does not contain an element with the specified key, the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> remains unchanged. No exception is thrown.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to remove elements from the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesHashtable  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new Hashtable.
+       Hashtable myHT = new Hashtable();
+       myHT.Add( "1a", "The" );
+       myHT.Add( "1b", "quick" );
+       myHT.Add( "1c", "brown" );
+       myHT.Add( "2a", "fox" );
+       myHT.Add( "2b", "jumped" );
+       myHT.Add( "2c", "over" );
+       myHT.Add( "3a", "the" );
+       myHT.Add( "3b", "lazy" );
+       myHT.Add( "3c", "dog" );
+ 
+       // Displays the Hashtable.
+       Console.WriteLine( "The Hashtable initially contains the following:" );
+       PrintKeysAndValues( myHT );
+ 
+       // Removes the element with the key "3b".
+       myHT.Remove( "3b" );
+ 
+       // Displays the current state of the Hashtable.
+       Console.WriteLine( "After removing \"lazy\":" );
+       PrintKeysAndValues( myHT );
+    }
+ 
+ 
+    public static void PrintKeysAndValues( Hashtable myList )  {
+       IDictionaryEnumerator myEnumerator = myList.GetEnumerator();
+       Console.WriteLine( "\t-KEY-\t-VALUE-" );
+       while ( myEnumerator.MoveNext() )
+          Console.WriteLine( "\t{0}:\t{1}", myEnumerator.Key, myEnumerator.Value );
+       Console.WriteLine();
+    }
+ }
+ /*
+ This code produces the following output.
+ 
+ The Hashtable initially contains the following:
+     -KEY-    -VALUE-
+     3a:    the
+     3c:    dog
+     3b:    lazy
+     1c:    brown
+     1b:    quick
+     1a:    The
+     2a:    fox
+     2b:    jumped
+     2c:    over
+ 
+ After removing "lazy":
+     -KEY-    -VALUE-
+     3a:    the
+     3c:    dog
+     1c:    brown
+     1b:    quick
+     1a:    The
+     2a:    fox
+     2b:    jumped
+     2c:    over
+ */
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Add(System.Object,System.Object)">Hashtable.Add</a> |  <a href="../../System.Collections/types/IDictionary.html#Remove(System.Object)">IDictionary.Remove</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="SynchronizedTopic1"></a><a name="Synchronized(System.Collections.Hashtable)">Synchronized</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Collections/types/Hashtable.html">Hashtable</a> <i>table</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns a synchronized (thread-safe) wrapper for the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> Synchronized(<br>   <font color="#008080"><a href="../../System.Collections/types/Hashtable.html">Hashtable</a> <i>table</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>table</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> to synchronize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A synchronized (thread-safe) wrapper for the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>table</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> A  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> can safely support one writer and multiple readers concurrently. To support multiple writers, all operations must be done through this wrapper only.<p> Enumerating through a collection is intrinsically not a thread-safe procedure. Even when a collection is synchronized, other threads could still modify the collection, which causes the enumerator to throw an exception. To guarantee thread safety during enumeration, you can either lock the collection during the entire enumeration or catch the exceptions resulting from changes made by other threads.</p>
+<p> The following code example shows how to lock the collection using the  <a href="#SyncRoot">Hashtable.SyncRoot</a> during the entire enumeration: </p>
+<pre>
+              Hashtable myCollection = new Hashtable();
+               lock( myCollection.SyncRoot ) {
+               foreach ( Object item in myCollection ) {
+               // Insert your code here.
+               }
+              }
+            </pre>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to synchronize a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>, determine if a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> is synchronized and use a synchronized  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesHashtable  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new Hashtable.
+       Hashtable myHT = new Hashtable();
+       myHT.Add( 0, "zero" );
+       myHT.Add( 1, "one" );
+       myHT.Add( 2, "two" );
+       myHT.Add( 3, "three" );
+       myHT.Add( 4, "four" );
+ 
+       // Creates a synchronized wrapper around the Hashtable.
+       Hashtable mySyncdHT = Hashtable.Synchronized( myHT );
+ 
+       // Displays the sychronization status of both Hashtables.
+       Console.WriteLine( "myHT is {0}.", myHT.IsSynchronized ? "synchronized" : "not synchronized" );
+       Console.WriteLine( "mySyncdHT is {0}.", mySyncdHT.IsSynchronized ? "synchronized" : "not synchronized" );
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ myHT is not synchronized.
+ mySyncdHT is synchronized.
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#IsSynchronized">Hashtable.IsSynchronized</a> |  <a href="#SyncRoot">Hashtable.SyncRoot</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IEnumerable.GetEnumeratorTopic1"></a><a name="IEnumerable.GetEnumerator">IEnumerable.GetEnumerator</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns an  <a href="../../System.Collections/types/IEnumerator.html">IEnumerator</a> that can iterate through the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System.Collections/types/IEnumerator.html">IEnumerator</a> IEnumerable.GetEnumerator();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An  <a href="../../System.Collections/types/IEnumerator.html">IEnumerator</a> for the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IEnumerable.html#GetEnumerator">IEnumerable.GetEnumerator</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> Enumerators only allow reading the data in the collection. Enumerators cannot be used to modify the underlying collection.<p> Initially, the enumerator is positioned before the first element in the collection. <a href="../../System.Collections/types/IEnumerator.html#Reset">IEnumerator.Reset</a> also brings the enumerator back to this position. At this position, calling  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> throws an exception. Therefore, you must call  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> to advance the enumerator to the first element of the collection before reading the value of  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a>.</p>
+<p> <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> returns the same object until either  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> or  <a href="../../System.Collections/types/IEnumerator.html#Reset">IEnumerator.Reset</a> is called. <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> sets  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> to the next element.</p>
+<p> After the end of the collection is passed, the enumerator is positioned after the last element in the collection, and calling  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> returns <b>false</b>. If the last call to  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> returned <b>false</b>, calling  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> throws an exception. To set  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> to the first element of the collection again, you can call  <a href="../../System.Collections/types/IEnumerator.html#Reset">IEnumerator.Reset</a> followed by  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a>.</p>
+<p> An enumerator remains valid as long as the collection remains unchanged. If changes are made to the collection, such as adding, modifying or deleting elements, the enumerator is irrecoverably invalidated and the next call to  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> or  <a href="../../System.Collections/types/IEnumerator.html#Reset">IEnumerator.Reset</a> throws an  <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a>. If the collection is modified between  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> and  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a>,  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> will return the element that it is set to, even if the enumerator is already invalidated.</p>
+<p> The enumerator does not have exclusive access to the collection; therefore, enumerating through a collection is intrinsically not a thread-safe procedure. Even when a collection is synchronized, other threads could still modify the collection, which causes the enumerator to throw an exception. To guarantee thread safety during enumeration, you can either lock the collection during the entire enumeration or catch the exceptions resulting from changes made by other threads.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/IDictionaryEnumerator.html">IDictionaryEnumerator</a> |  <a href="../../System.Collections/types/IEnumerator.html">IEnumerator</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

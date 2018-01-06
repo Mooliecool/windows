@@ -1,0 +1,954 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Runtime.Serialization.ObjectManager</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Runtime.Serialization.ObjectManager Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Runtime.Serialization<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Keeps track of objects as they are deserialized.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public class ObjectManager
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> During deserialization, the  <a href="../../System.Runtime.Serialization/types/Formatter.html">Formatter</a> queries the  <a href="../../System.Runtime.Serialization/types/ObjectManager.html">ObjectManager</a> to determine whether a reference to an object in the serialized stream refers to an object that has already been deserialized (a backward reference), or to an object that has not yet been deserialized (a forward reference). If the reference in the serialized stream is a forward reference, then the  <a href="../../System.Runtime.Serialization/types/Formatter.html">Formatter</a> can register a fixup with the  <a href="../../System.Runtime.Serialization/types/ObjectManager.html">ObjectManager</a>. If the reference in the serialized stream is a backward reference, the  <a href="../../System.Runtime.Serialization/types/Formatter.html">Formatter</a> immediately completes the reference. Fixup refers to the process of finalizing object references not already completed during the object deserialization process. After the required object has been deserialized, the  <a href="../../System.Runtime.Serialization/types/ObjectManager.html">ObjectManager</a> will complete the reference.<p> The  <a href="../../System.Runtime.Serialization/types/ObjectManager.html">ObjectManager</a> follows a set of rules that dictate the fixup order. All objects that implement  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> or have an  <a href="../../System.Runtime.Serialization/types/ISerializationSurrogate.html">ISerializationSurrogate</a> can expect to have all the objects that they transmitted through  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> available when the object tree is deserialized. However, a parent object cannot presume that all its child objects will be fully completed when it is fully deserialized. All child objects will be present but not all the grandchild objects will necessarily be present. If an object needs to take certain actions that depend on executing code on its child objects, it can delay these actions, implement the  <a href="../../System.Runtime.Serialization/types/IDeserializationCallback.html">IDeserializationCallback</a> interface, and execute the code only when it is called back on this interface.</p>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Runtime.Serialization/System.Runtime.Serialization.html">System.Runtime.Serialization Namespace</a></dd>
+</dl>
+<h3>System.Runtime.Serialization.ObjectManager Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"> Initializes a new instance of the  <a href="../../System.Runtime.Serialization/types/ObjectManager.html">ObjectManager</a> class.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#DoFixups">DoFixups</a></td>
+<td width="55%"> Performs all the recorded fixups.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetObject(System.Int64)">GetObject</a></td>
+<td width="55%"> Returns the object with the specified object ID.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#RaiseDeserializationEvent">RaiseDeserializationEvent</a></td>
+<td width="55%"> Raises the deserialization event to any registered object that implements  <a href="../../System.Runtime.Serialization/types/IDeserializationCallback.html">IDeserializationCallback</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#RecordArrayElementFixup(System.Int64,System.Int32,System.Int64)">RecordArrayElementFixup</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>RecordArrayElementFixup(long arrayToBeFixed, int index, long objectRequired)<br><br></code> Records a fixup for one element in an array.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#RecordArrayElementFixup(System.Int64,System.Int32[],System.Int64)">RecordArrayElementFixup</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>RecordArrayElementFixup(long arrayToBeFixed, int[] indices, long objectRequired)<br><br></code> Records fixups for the specified elements in an array to be executed later.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#RecordDelayedFixup(System.Int64,System.String,System.Int64)">RecordDelayedFixup</a></td>
+<td width="55%"> Records a fixup for an object member to be executed later.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#RecordFixup(System.Int64,System.Reflection.MemberInfo,System.Int64)">RecordFixup</a></td>
+<td width="55%"> Records a fixup for a member of an object to be executed later.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#RegisterObject(System.Object,System.Int64)">RegisterObject</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>RegisterObject(object obj, long objectID)<br><br></code> Registers an object as it is deserialized, associating it with <i>objectID</i>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#RegisterObject(System.Object,System.Int64,System.Runtime.Serialization.SerializationInfo)">RegisterObject</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>RegisterObject(object obj, long objectID, SerializationInfo info)<br><br></code> Registers an object as it is deserialized, associating it with <i>objectID</i>, and recording the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> used with it.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#RegisterObject(System.Object,System.Int64,System.Runtime.Serialization.SerializationInfo,System.Int64,System.Reflection.MemberInfo)">RegisterObject</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>RegisterObject(object obj, long objectID, SerializationInfo info, long idOfContainingObj, MemberInfo member)<br><br></code> Registers a member of an object as it is deserialized, associating it with <i>objectID</i>, and recording the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#RegisterObject(System.Object,System.Int64,System.Runtime.Serialization.SerializationInfo,System.Int64,System.Reflection.MemberInfo,System.Int32[])">RegisterObject</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>RegisterObject(object obj, long objectID, SerializationInfo info, long idOfContainingObj, MemberInfo member, int[] arrayIndex)<br><br></code> Registers a member of an array contained in an object while it is deserialized, associating it with <i>objectID</i>, and recording the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Runtime.Serialization.ObjectManager</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Runtime.Serialization.ObjectManager Member Details</h3><b><i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Runtime.Serialization/types/ObjectManager.html">ObjectManager</a> class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public ObjectManager(<br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/ISurrogateSelector.html">ISurrogateSelector</a> <i>selector</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> <i>context</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>selector</i><br><dl>
+<dd>
+<param> The surrogate selector to use. The  <a href="../../System.Runtime.Serialization/types/ISurrogateSelector.html">ISurrogateSelector</a> determines the correct surrogate to use when deserializing objects of a given type. At deserialization time, the surrogate selector creates a new instance of the object from the information transmitted on the stream.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>context</i><br><dl>
+<dd>
+<param> The streaming context. The  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> is not used by the ObjectManager, but is passed as a parameter to any objects implementing  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> or having a  <a href="../../System.Runtime.Serialization/types/ISerializationSurrogate.html">ISerializationSurrogate</a>. These objects can take specific actions depending on the source of the information to deserialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="DoFixupsTopic1"></a><a name="DoFixups">DoFixups</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Performs all the recorded fixups.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void DoFixups();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> A fixup was not successfully completed.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The fixups are carried out by any appropriate surrogate, the object itself (if it implements  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a>), or the default implementation.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~ObjectManager();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetObjectTopic1"></a><a name="GetObject(System.Int64)">GetObject</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectID</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the object with the specified object ID.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> GetObject(<br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectID</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>objectID</i><br><dl>
+<dd>
+<param> The ID of the requested object.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The object with the specified object ID if it has been previously stored, or <b>null</b> if no such object has been registered.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The <i>objectID</i> parameter is less than or equal to zero.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> An object can be registered and issued an object ID with a call to the  <a href="#RegisterObject(System.Object,System.Int64)">ObjectManager.RegisterObject</a> method.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="RaiseDeserializationEventTopic1"></a><a name="RaiseDeserializationEvent">RaiseDeserializationEvent</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Raises the deserialization event to any registered object that implements  <a href="../../System.Runtime.Serialization/types/IDeserializationCallback.html">IDeserializationCallback</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void RaiseDeserializationEvent();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="RecordArrayElementFixupTopic1"></a><a name="RecordArrayElementFixup(System.Int64,System.Int32,System.Int64)">RecordArrayElementFixup</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>arrayToBeFixed</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectRequired</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Records a fixup for one element in an array.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void RecordArrayElementFixup(<br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>arrayToBeFixed</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectRequired</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>arrayToBeFixed</i><br><dl>
+<dd>
+<param> The ID of the array used to record a fixup.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The index within <i>arrayFixup </i> that a fixup is requested for.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>objectRequired</i><br><dl>
+<dd>
+<param> The ID of the object that the current array element will point to after fixup is completed.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The <i>arrayToBeFixed</i> or <i>objectRequired</i> parameter is less than or equal to zero.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>index</i> parameter is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The fixup is for a specified element of a specified array. The value used during the fixup process is provided in the <i>objectRequired</i> parameter.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="RecordArrayElementFixupTopic2"></a><a name="RecordArrayElementFixup(System.Int64,System.Int32[],System.Int64)">RecordArrayElementFixup</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>arrayToBeFixed</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int[]</a> <i>indices</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectRequired</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Records fixups for the specified elements in an array to be executed later.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void RecordArrayElementFixup(<br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>arrayToBeFixed</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int[]</a> <i>indices</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectRequired</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>arrayToBeFixed</i><br><dl>
+<dd>
+<param> The ID of the array used to record a fixup.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>indices</i><br><dl>
+<dd>
+<param> The indexes within the multidimensional array that a fixup is requested for.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>objectRequired</i><br><dl>
+<dd>
+<param> The ID of the object the array elements will point to after fixup is completed.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The <i>arrayToBeFixed</i> or <i>objectRequired</i> parameter is less than or equal to zero.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>indices</i> parameter is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The fixup is for specified elements of a specified array. The value used during the fixup process is provided in the <i>objectRequired</i> parameter.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="RecordDelayedFixupTopic1"></a><a name="RecordDelayedFixup(System.Int64,System.String,System.Int64)">RecordDelayedFixup</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectToBeFixed</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>memberName</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectRequired</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Records a fixup for an object member to be executed later.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void RecordDelayedFixup(<br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectToBeFixed</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>memberName</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectRequired</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>objectToBeFixed</i><br><dl>
+<dd>
+<param> The ID of the object that needs the reference to <i>objectRequired</i>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>memberName</i><br><dl>
+<dd>
+<param> The member name of <i>objectToBeFixed</i> where the fixup will be performed.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>objectRequired</i><br><dl>
+<dd>
+<param> The ID of the object required by <i>objectToBeFixed</i>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>objectToBeFixed</i> or <i>objectRequired</i> parameter is less than or equal to zero.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>memberName</i> parameter is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The fixup is for a specified member of a specified object. The value to be used during the fixup process is provided as the <i>objectRequired</i> argument.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="RecordFixupTopic1"></a><a name="RecordFixup(System.Int64,System.Reflection.MemberInfo,System.Int64)">RecordFixup</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectToBeFixed</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/MemberInfo.html">MemberInfo</a> <i>member</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectRequired</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Records a fixup for a member of an object to be executed later.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void RecordFixup(<br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectToBeFixed</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/MemberInfo.html">MemberInfo</a> <i>member</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectRequired</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>objectToBeFixed</i><br><dl>
+<dd>
+<param> The ID of the object that needs the reference to the <i>objectRequired</i> object.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>member</i><br><dl>
+<dd>
+<param> The member of <i>objectToBeFixed</i> where the fixup will be performed.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>objectRequired</i><br><dl>
+<dd>
+<param> The ID of the object required by <i>objectToBeFixed</i>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The <i>objectToBeFixed</i> or <i>objectRequired</i> parameter is less than or equal to zero.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>member</i> parameter is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The fixup is for a specified member of a specified object. The value to be used during the fixup process is provided as the <i>objectRequired</i> parameter.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="RegisterObjectTopic1"></a><a name="RegisterObject(System.Object,System.Int64)">RegisterObject</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectID</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Registers an object as it is deserialized, associating it with <i>objectID</i>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void RegisterObject(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectID</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object to register.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>objectID</i><br><dl>
+<dd>
+<param> The ID of the object to register.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>obj</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The <i>objectID</i> parameter is less than or equal to zero.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> The <i>objectID</i> has already been registered for an object other than <i>obj.</i></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="../../System.Runtime.Serialization/types/ObjectManager.html">ObjectManager</a> retains information about both the object and its ID. Later during deserialization,  <a href="#GetObject(System.Int64)">ObjectManager.GetObject</a> can be used to determine whether a particular object ID has already been deserialized, or whether it is a forward reference to an object that has not yet been deserialized.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="RegisterObjectTopic2"></a><a name="RegisterObject(System.Object,System.Int64,System.Runtime.Serialization.SerializationInfo)">RegisterObject</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectID</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> <i>info</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Registers an object as it is deserialized, associating it with <i>objectID</i>, and recording the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> used with it.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void RegisterObject(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectID</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> <i>info</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object to register.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>objectID</i><br><dl>
+<dd>
+<param> The ID of the object to register.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>info</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> used if <i>obj</i> implements  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> or has an  <a href="../../System.Runtime.Serialization/types/ISerializationSurrogate.html">ISerializationSurrogate</a>.<i>info</i> will be completed with any required fixup information and then passed to the required object when that object is completed.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>obj</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The <i>objectID</i> parameter is less than or equal to zero.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> The <i>objectID</i> has already been registered for an object other than <i>obj.</i></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="../../System.Runtime.Serialization/types/ObjectManager.html">ObjectManager</a> retains the information about both the object and its ID. Later during deserialization, you can use  <a href="#GetObject(System.Int64)">ObjectManager.GetObject</a> to discover whether a particular object ID has already been deserialized, or if it is a forward reference to an object that has not yet been deserialized.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="RegisterObjectTopic3"></a><a name="RegisterObject(System.Object,System.Int64,System.Runtime.Serialization.SerializationInfo,System.Int64,System.Reflection.MemberInfo)">RegisterObject</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectID</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> <i>info</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>idOfContainingObj</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/MemberInfo.html">MemberInfo</a> <i>member</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Registers a member of an object as it is deserialized, associating it with <i>objectID</i>, and recording the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void RegisterObject(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectID</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> <i>info</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>idOfContainingObj</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/MemberInfo.html">MemberInfo</a> <i>member</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object to register.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>objectID</i><br><dl>
+<dd>
+<param> The ID of the object to register.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>info</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> used if <i>obj</i> implements  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> or has an  <a href="../../System.Runtime.Serialization/types/ISerializationSurrogate.html">ISerializationSurrogate</a>.<i>info</i> will be completed with any required fixup information and then passed to the required object when that object is completed.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>idOfContainingObj</i><br><dl>
+<dd>
+<param> The ID of the object that contains <i>obj</i>. This parameter is required only if <i>obj</i> is a value type.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>member</i><br><dl>
+<dd>
+<param> The field in the containing object where <i>obj</i> exists. This parameter has meaning only if <i>obj</i> is a value type.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>obj</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The <i>objectID</i> parameter is less than or equal to zero.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> The <i>objectID</i> has already been registered for an object other than <i>obj</i>, or <i>member</i> is not a  <a href="../../System.Reflection/types/FieldInfo.html">FieldInfo</a> and <i>member</i> is not <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> You need to provide the <i>member</i> and <i>idOfContainingObj</i> parameters if <i>obj</i> is a  <a href="../../System/types/ValueType.html">ValueType</a> because of the way fixups are performed on  <a href="../../System/types/ValueType.html">ValueType</a> objects. The space to store the information for a  <a href="../../System/types/ValueType.html">ValueType</a> is allocated inline with its containing object. However, when the  <a href="../../System/types/ValueType.html">ValueType</a> is boxed to be registered with the  <a href="../../System.Runtime.Serialization/types/ObjectManager.html">ObjectManager</a>, it loses the connection with its containing object. To guarantee that fixups occur in the instance of the  <a href="../../System/types/ValueType.html">ValueType</a> stored in the containing object and not in the boxed instance, the  <a href="../../System.Runtime.Serialization/types/ObjectManager.html">ObjectManager</a> retains some additional information.<p> <a href="../../System.Runtime.Serialization/types/ObjectManager.html">ObjectManager</a> retains information about both the object and its ID. Later during deserialization,  <a href="#GetObject(System.Int64)">ObjectManager.GetObject</a> can be used to discover whether a particular object ID has already been deserialized, or whether it is a forward reference to an object not yet deserialized.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="RegisterObjectTopic4"></a><a name="RegisterObject(System.Object,System.Int64,System.Runtime.Serialization.SerializationInfo,System.Int64,System.Reflection.MemberInfo,System.Int32[])">RegisterObject</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectID</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> <i>info</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>idOfContainingObj</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/MemberInfo.html">MemberInfo</a> <i>member</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int[]</a> <i>arrayIndex</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Registers a member of an array contained in an object while it is deserialized, associating it with <i>objectID</i>, and recording the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void RegisterObject(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>objectID</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> <i>info</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>idOfContainingObj</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/MemberInfo.html">MemberInfo</a> <i>member</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int[]</a> <i>arrayIndex</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object to register.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>objectID</i><br><dl>
+<dd>
+<param> The ID of the object to register.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>info</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> used if <i>obj</i> implements  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> or has an  <a href="../../System.Runtime.Serialization/types/ISerializationSurrogate.html">ISerializationSurrogate</a>.<i>info</i> will be completed with any required fixup information and then passed to the required object when that object is completed.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>idOfContainingObj</i><br><dl>
+<dd>
+<param> The ID of the object that contains <i>obj</i>. This parameter is required only if <i>obj</i> is a value type.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>member</i><br><dl>
+<dd>
+<param> The field in the containing object where <i>obj</i> exists. This parameter has meaning only if <i>obj</i> is a value type.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>arrayIndex</i><br><dl>
+<dd>
+<param> If <i>obj</i> is a  <a href="../../System/types/ValueType.html">ValueType</a> and a member of an array, <i>arrayIndex</i> contains the index within that array where <i>obj</i> exists.<i>arrayIndex</i> is ignored if <i>obj</i> is not both a  <a href="../../System/types/ValueType.html">ValueType</a> and a member of an array.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>obj</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The <i>objectID</i> parameter is less than or equal to zero.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> The <i>objectID</i> has already been registered for an object other than <i>obj</i>, or <i>member</i> is not a  <a href="../../System.Reflection/types/FieldInfo.html">FieldInfo</a> and <i>member</i> isn't <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> You need to provide the <i>member</i> and <i>idOfContainingObj</i> parameters if <i>obj</i> is a  <a href="../../System/types/ValueType.html">ValueType</a> because of the way fixups are performed on  <a href="../../System/types/ValueType.html">ValueType</a> objects. The space to store the information for a  <a href="../../System/types/ValueType.html">ValueType</a> is allocated inline with its containing object. However, when the  <a href="../../System/types/ValueType.html">ValueType</a> is boxed to be registered with the  <a href="../../System.Runtime.Serialization/types/ObjectManager.html">ObjectManager</a>, it loses the connection with its containing object. To guarantee that fixups occur in the instance of the  <a href="../../System/types/ValueType.html">ValueType</a> stored in the containing object and not in the boxed instance, the  <a href="../../System.Runtime.Serialization/types/ObjectManager.html">ObjectManager</a> retains some additional information.<p> <a href="../../System.Runtime.Serialization/types/ObjectManager.html">ObjectManager</a> retains information about both the object and its ID. Later during deserialization,  <a href="#GetObject(System.Int64)">ObjectManager.GetObject</a> can be used to discover whether a particular object ID has already been deserialized, or whether it is a forward reference to an object not yet deserialized.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

@@ -1,0 +1,1277 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Xml.Serialization.SoapElementAttribute</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Xml.Serialization.SoapElementAttribute Class</h2><b>Assembly: </b>System.Xml.dll<br><b>Namespace: </b>System.Xml.Serialization<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Specifies that the public member value be serialized by the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> as an encoded SOAP XML element.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.ReturnValue)]<br><b>public class SoapElementAttribute : Attribute</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> class belongs to a family of attributes that controls how the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes, or deserializes, an object as encoded SOAP XML. The resulting XML conforms to section 5 of the World Wide Web Consortium (www.w3.org) document, "Simple Object Access Protocol (SOAP) 1.1". For a complete list of similar attributes, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAttributesThatControlSOAPEncodedSerialization.asp">MSDN: attributesthatcontrolsoapencodedserialization</a>.<p> To serialize an object as an encoded SOAP message, you must construct the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> using an  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a> created with the  <a href="../../System.Xml.Serialization/types/SoapReflectionImporter.html#ImportTypeMapping(System.Type)">SoapReflectionImporter.ImportTypeMapping</a> method of the  <a href="../../System.Xml.Serialization/types/SoapReflectionImporter.html">SoapReflectionImporter</a> class.</p>
+<p> Apply the  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> to a public field to direct the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> to serialize the field as an encoded SOAP XML element. You can specify an alternative name for the attribute by setting the  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html#AttributeName">SoapAttributeAttribute.AttributeName</a> property. Set the  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html#DataType">SoapAttributeAttribute.DataType</a> property if the attribute must be given a specific XML schema definition (XSD) data type. If the attribute belongs to a specific XML namespace, set the  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html#Namespace">SoapAttributeAttribute.Namespace</a> property.</p>
+<p> For more information about using attributes, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconExtendingMetadataUsingAttributes.asp">MSDN: extendingmetadatausingattributes</a>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes an instance of a class named <code>
+            Transportation
+          </code> that contains a field named <code>
+            Vehicle
+          </code>. A  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> is applied to the field. When the field is serialized, the XML element name is "Wheels" instead of "Vehicle". The <code>
+            SerializeOverride
+          </code> method creates a  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> and sets the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html#SoapElement">SoapAttributes.SoapElement</a> property of a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> to the  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a>. The  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> is added to a  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> that is used to create an  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a>. An  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> is constructed with the  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a>, and an instance of the <code>
+            Transportation
+          </code> class is again serialized. Because the  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> is used to override the serialization, the generated XML element name is now "Truck" instead of "Wheels".<pre>
+using System;
+using System.IO;
+using System.Xml.Serialization;
+using System.Collections;
+using System.Xml;
+using System.Text;
+public class Transportation
+{
+   // The SoapElementAttribute specifies that the
+   // generated XML element name will be "Wheels"
+   // instead of "Vehicle".
+   [SoapElement("Wheels")]
+   public string Vehicle;
+   [SoapElement(DataType = "dateTime")]
+   public DateTime CreationDate;
+   [SoapElement(IsNullable = true)]
+   public Thing thing;
+   
+}
+
+public class Thing{ 
+   [SoapElement(IsNullable=true)] public string ThingName;
+}
+
+public class Test
+{
+   public static void Main()
+   {
+      Test t = new Test();
+      t.SerializeObject("SoapElementOriginal.xml");
+      t.SerializeOverride("SoapElementOverride.xml");
+      Console.WriteLine("Finished writing two XML files.");
+   }
+
+   // Return an XmlSerializer used for overriding.
+   public XmlSerializer CreateSoapOverrider()
+   {
+      // Create the SoapAttributes and SoapAttributeOverrides objects.
+      SoapAttributes soapAttrs = new SoapAttributes();
+
+      SoapAttributeOverrides soapOverrides = 
+      new SoapAttributeOverrides();
+            
+      /* Create an SoapElementAttribute to override 
+      the Vehicles property. */
+      SoapElementAttribute soapElement1 = 
+      new SoapElementAttribute("Truck");
+      // Set the SoapElement to the object.
+      soapAttrs.SoapElement= soapElement1;
+
+      /* Add the SoapAttributes to the SoapAttributeOverrides,
+      specifying the member to override. */
+      soapOverrides.Add(typeof(Transportation), "Vehicle", soapAttrs);
+      
+      // Create the XmlSerializer, and return it.
+      XmlTypeMapping myTypeMapping = (new SoapReflectionImporter
+      (soapOverrides)).ImportTypeMapping(typeof(Transportation));
+      return new XmlSerializer(myTypeMapping);
+   }
+
+   public void SerializeOverride(string filename)
+   {
+      // Create an XmlSerializer instance.
+      XmlSerializer ser = CreateSoapOverrider();
+
+      // Create the object and serialize it.
+      Transportation myTransportation = 
+      new Transportation();
+
+      myTransportation.Vehicle = "MyCar";
+      myTransportation.CreationDate=DateTime.Now;
+      myTransportation.thing = new Thing();
+
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      ser.Serialize(writer, myTransportation);
+      writer.WriteEndElement();
+      writer.Close();
+   }
+   public void SerializeObject(string filename){
+      // Create an XmlSerializer instance.
+      XmlSerializer ser = new XmlSerializer(typeof(Transportation));
+      Transportation myTransportation = 
+      new Transportation();
+      myTransportation.Vehicle = "MyCar";
+      myTransportation.CreationDate = DateTime.Now;
+      myTransportation.thing = new Thing();
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      ser.Serialize(writer, myTransportation);
+      writer.WriteEndElement();
+      writer.Close();
+   }
+}
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Xml.Serialization/System.Xml.Serialization.html">System.Xml.Serialization Namespace</a></dd>
+</dl>
+<h3>System.Xml.Serialization.SoapElementAttribute Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor()<br><br></code>Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(string elementName)<br><br></code> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> class and specifies the name of the XML element.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#DataType">DataType</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the XML Schema definition language (XSD) data type of the generated XML element.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ElementName">ElementName</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the name of the generated XML element.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsNullable">IsNullable</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets a value indicating whether the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> should serialize a member that is set to <b>null</b> into the <b>xsi:nil</b> attribute set to <b>true</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#TypeId">TypeId</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#TypeId">System.Attribute.TypeId</a></font></b><br><br><br> When implemented in a derived class, gets a unique identifier for this <b>Attribute</b>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#GetHashCode">System.Attribute.GetHashCode</a></font></b><br><br><br> Returns the hash code for this instance.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsDefaultAttribute">IsDefaultAttribute</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#IsDefaultAttribute">System.Attribute.IsDefaultAttribute</a></font></b><br><br><br> When overridden in a derived class, returns an indication whether the value of this instance is the default value for the derived class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Match(System.Object)">Match</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#Match(System.Object)">System.Attribute.Match</a></font></b><br><br><br> When overridden in a derived class, returns a value indicating whether this instance equals a specified object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/Attribute.html">System.Attribute</a></li>
+<ul class="none">
+<li><b>System.Xml.Serialization.SoapElementAttribute</b></li>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Xml.Serialization.SoapElementAttribute Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> class.</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public SoapElementAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes an instance of a class named <code>
+                Transportation
+              </code> that contains a field named <code>
+                Vehicle
+              </code>. A  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> is applied to the field. When the field is serialized, the XML element name is "Wheels" instead of "Vehicle". The <code>
+                SerializeOverride
+              </code> method creates a  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> and sets the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html#SoapElement">SoapAttributes.SoapElement</a> property of a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> to the  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a>. The  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> is added to a  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> that is used to create an  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a>. An  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> is constructed with the  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a>, and an instance of the <code>
+                Transportation
+              </code> class is again serialized. Because the  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> is used to override the serialization, the generated XML element name is now "Truck" instead of "Wheels".<pre>
+using System;
+using System.IO;
+using System.Xml.Serialization;
+using System.Collections;
+using System.Xml;
+using System.Text;
+public class Transportation
+{
+   // The SoapElementAttribute specifies that the
+   // generated XML element name will be "Wheels"
+   // instead of "Vehicle".
+   [SoapElement("Wheels")]
+   public string Vehicle;
+   [SoapElement(DataType = "dateTime")]
+   public DateTime CreationDate;
+   [SoapElement(IsNullable = true)]
+   public Thing thing;
+   
+}
+
+public class Thing{ 
+   [SoapElement(IsNullable=true)] public string ThingName;
+}
+
+public class Test
+{
+   public static void Main()
+   {
+      Test t = new Test();
+      t.SerializeObject("SoapElementOriginal.xml");
+      t.SerializeOverride("SoapElementOverride.xml");
+      Console.WriteLine("Finished writing two XML files.");
+   }
+
+   // Return an XmlSerializer used for overriding.
+   public XmlSerializer CreateSoapOverrider()
+   {
+      // Create the SoapAttributes and SoapAttributeOverrides objects.
+      SoapAttributes soapAttrs = new SoapAttributes();
+
+      SoapAttributeOverrides soapOverrides = 
+      new SoapAttributeOverrides();
+            
+      /* Create an SoapElementAttribute to override 
+      the Vehicles property. */
+      SoapElementAttribute soapElement1 = 
+      new SoapElementAttribute("Truck");
+      // Set the SoapElement to the object.
+      soapAttrs.SoapElement= soapElement1;
+
+      /* Add the SoapAttributes to the SoapAttributeOverrides,
+      specifying the member to override. */
+      soapOverrides.Add(typeof(Transportation), "Vehicle", soapAttrs);
+      
+      // Create the XmlSerializer, and return it.
+      XmlTypeMapping myTypeMapping = (new SoapReflectionImporter
+      (soapOverrides)).ImportTypeMapping(typeof(Transportation));
+      return new XmlSerializer(myTypeMapping);
+   }
+
+   public void SerializeOverride(string filename)
+   {
+      // Create an XmlSerializer instance.
+      XmlSerializer ser = CreateSoapOverrider();
+
+      // Create the object and serialize it.
+      Transportation myTransportation = 
+      new Transportation();
+
+      myTransportation.Vehicle = "MyCar";
+      myTransportation.CreationDate=DateTime.Now;
+      myTransportation.thing = new Thing();
+
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      ser.Serialize(writer, myTransportation);
+      writer.WriteEndElement();
+      writer.Close();
+   }
+   public void SerializeObject(string filename){
+      // Create an XmlSerializer instance.
+      XmlSerializer ser = new XmlSerializer(typeof(Transportation));
+      Transportation myTransportation = 
+      new Transportation();
+      myTransportation.Vehicle = "MyCar";
+      myTransportation.CreationDate = DateTime.Now;
+      myTransportation.thing = new Thing();
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      ser.Serialize(writer, myTransportation);
+      writer.WriteEndElement();
+      writer.Close();
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> class and specifies the name of the XML element.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public SoapElementAttribute(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>elementName</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>elementName</i><br><dl>
+<dd>
+<param> The XML element name of the serialized member.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes an instance of a class named <code>
+                Transportation
+              </code> that contains a field named <code>
+                Vehicle
+              </code>. A  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> is applied to the field. When the field is serialized, the XML element name is "Wheels" instead of "Vehicle". The <code>
+                SerializeOverride
+              </code> method creates a  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> and sets the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html#SoapElement">SoapAttributes.SoapElement</a> property of a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> to the  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a>. The  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> is added to a  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> that is used to create an  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a>. An  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> is constructed with the  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a>, and an instance of the <code>
+                Transportation
+              </code> class is again serialized. Because the  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> is used to override the serialization, the generated XML element name is now "Truck" instead of "Wheels".<pre>
+using System;
+using System.IO;
+using System.Xml.Serialization;
+using System.Collections;
+using System.Xml;
+using System.Text;
+public class Transportation
+{
+   // The SoapElementAttribute specifies that the
+   // generated XML element name will be "Wheels"
+   // instead of "Vehicle".
+   [SoapElement("Wheels")]
+   public string Vehicle;
+   [SoapElement(DataType = "dateTime")]
+   public DateTime CreationDate;
+   [SoapElement(IsNullable = true)]
+   public Thing thing;
+   
+}
+
+public class Thing{ 
+   [SoapElement(IsNullable=true)] public string ThingName;
+}
+
+public class Test
+{
+   public static void Main()
+   {
+      Test t = new Test();
+      t.SerializeObject("SoapElementOriginal.xml");
+      t.SerializeOverride("SoapElementOverride.xml");
+      Console.WriteLine("Finished writing two XML files.");
+   }
+
+   // Return an XmlSerializer used for overriding.
+   public XmlSerializer CreateSoapOverrider()
+   {
+      // Create the SoapAttributes and SoapAttributeOverrides objects.
+      SoapAttributes soapAttrs = new SoapAttributes();
+
+      SoapAttributeOverrides soapOverrides = 
+      new SoapAttributeOverrides();
+            
+      /* Create an SoapElementAttribute to override 
+      the Vehicles property. */
+      SoapElementAttribute soapElement1 = 
+      new SoapElementAttribute("Truck");
+      // Set the SoapElement to the object.
+      soapAttrs.SoapElement= soapElement1;
+
+      /* Add the SoapAttributes to the SoapAttributeOverrides,
+      specifying the member to override. */
+      soapOverrides.Add(typeof(Transportation), "Vehicle", soapAttrs);
+      
+      // Create the XmlSerializer, and return it.
+      XmlTypeMapping myTypeMapping = (new SoapReflectionImporter
+      (soapOverrides)).ImportTypeMapping(typeof(Transportation));
+      return new XmlSerializer(myTypeMapping);
+   }
+
+   public void SerializeOverride(string filename)
+   {
+      // Create an XmlSerializer instance.
+      XmlSerializer ser = CreateSoapOverrider();
+
+      // Create the object and serialize it.
+      Transportation myTransportation = 
+      new Transportation();
+
+      myTransportation.Vehicle = "MyCar";
+      myTransportation.CreationDate=DateTime.Now;
+      myTransportation.thing = new Thing();
+
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      ser.Serialize(writer, myTransportation);
+      writer.WriteEndElement();
+      writer.Close();
+   }
+   public void SerializeObject(string filename){
+      // Create an XmlSerializer instance.
+      XmlSerializer ser = new XmlSerializer(typeof(Transportation));
+      Transportation myTransportation = 
+      new Transportation();
+      myTransportation.Vehicle = "MyCar";
+      myTransportation.CreationDate = DateTime.Now;
+      myTransportation.thing = new Thing();
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      ser.Serialize(writer, myTransportation);
+      writer.WriteEndElement();
+      writer.Close();
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="DataTypeTopic1"></a><a name="DataType">DataType</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the XML Schema definition language (XSD) data type of the generated XML element.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> DataType {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The following table lists the XML Schema simple data types with their .NET equivalents.<p> For the XML Schema <b>base64Binary</b> and <b>hexBinary</b> data types, use an array of  <a href="../../System/types/Byte.html">Byte</a> structures, and apply a  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> with the  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html#DataType">SoapAttributeAttribute.DataType</a> set to "base64Binary" or "hexBinary", as appropriate. For the XML Schema <b>time</b> and <b>date</b> data types, use the  <a href="../../System/types/DateTime.html">DateTime</a> type and apply the  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> with the  <a href="#DataType">SoapElementAttribute.DataType</a> set to "date" or "time".</p>
+<p> For every XML Schema data type that is mapped to a string, apply the  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> with its  <a href="#DataType">SoapElementAttribute.DataType</a> property set to the XML Schema type. Note that this will not change the serialization format, only the schema for the member.</p><br><br><b>Note </b> The property is case-sensitive, so you must set it exactly to one of the XML Schema data types.<br><br><b>Note </b> Passing binary data as an XML element is more efficient then passing it as an XML attribute.<p> For more information about XML data types, see the World Wide Web Consortium (www.w3.org) document, "XML Schema Part 2: Datatypes".</p><br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  XSD data type
+                </TH>
+<TH>
+                  .NET data type
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+                  anyURI
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  base64Binary
+                </TD>
+<TD> Array of  <a href="../../System/types/Byte.html">Byte</a> objects </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  boolean
+                </TD>
+<TD> <a href="../../System/types/Boolean.html">Boolean</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  byte
+                </TD>
+<TD> <a href="../../System/types/SByte.html">SByte</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  date
+                </TD>
+<TD> <a href="../../System/types/DateTime.html">DateTime</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  dateTime
+                </TD>
+<TD> <a href="../../System/types/DateTime.html">DateTime</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  decimal
+                </TD>
+<TD> <a href="../../System/types/Decimal.html">Decimal</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  double
+                </TD>
+<TD> <a href="../../System/types/Double.html">Double</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  ENTITY
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  ENTITIES
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  float
+                </TD>
+<TD> <a href="../../System/types/Single.html">Single</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  gDay
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  gMonth
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  gMonthDay
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  gYear
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  gYearMonth
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  hexBinary
+                </TD>
+<TD> Array of  <a href="../../System/types/Byte.html">Byte</a> objects </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  ID
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  IDREF
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  IDREFS
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  int
+                </TD>
+<TD> <a href="../../System/types/Int32.html">Int32</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  long
+                </TD>
+<TD> <a href="../../System/types/Int64.html">Int64</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Name
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  NCName
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  negativeInteger
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  NMTOKEN
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  NMTOKENS
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  normalizedString
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  nonNegativeInteger
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  nonPositiveInteger
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  NOTATION
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  positiveInteger
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  QName
+                </TD>
+<TD> <a href="../../System.Xml/types/XmlQualifiedName.html">XmlQualifiedName</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  recurringDate
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  duration
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  string
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  short
+                </TD>
+<TD> <a href="../../System/types/Int16.html">Int16</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  time
+                </TD>
+<TD> <a href="../../System/types/DateTime.html">DateTime</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  token
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  unsignedByte
+                </TD>
+<TD> <a href="../../System/types/Byte.html">Byte</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  unsignedInt
+                </TD>
+<TD> <a href="../../System/types/UInt32.html">UInt32</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  unsignedLong
+                </TD>
+<TD> <a href="../../System/types/UInt64.html">UInt64</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  unsignedShort
+                </TD>
+<TD> <a href="../../System/types/UInt16.html">UInt16</a></TD>
+</TR>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes an instance of a class named <code>
+                Transportation
+              </code> that contains a field named <code>
+                Vehicle
+              </code>. A  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> is applied to the field. When the field is serialized, the XML element name is "Wheels" instead of "Vehicle". The <code>
+                SerializeOverride
+              </code> method creates a  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> and sets the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html#SoapElement">SoapAttributes.SoapElement</a> property of a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> to the  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a>. The  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> is added to a  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> that is used to create an  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a>. An  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> is constructed with the  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a>, and an instance of the <code>
+                Transportation
+              </code> class is again serialized. Because the  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> is used to override the serialization, the generated XML element name is now "Truck" instead of "Wheels".<pre>
+using System;
+using System.IO;
+using System.Xml.Serialization;
+using System.Collections;
+using System.Xml;
+using System.Text;
+public class Transportation
+{
+   // The SoapElementAttribute specifies that the
+   // generated XML element name will be "Wheels"
+   // instead of "Vehicle".
+   [SoapElement("Wheels")]
+   public string Vehicle;
+   [SoapElement(DataType = "dateTime")]
+   public DateTime CreationDate;
+   [SoapElement(IsNullable = true)]
+   public Thing thing;
+   
+}
+
+public class Thing{ 
+   [SoapElement(IsNullable=true)] public string ThingName;
+}
+
+public class Test
+{
+   public static void Main()
+   {
+      Test t = new Test();
+      t.SerializeObject("SoapElementOriginal.xml");
+      t.SerializeOverride("SoapElementOverride.xml");
+      Console.WriteLine("Finished writing two XML files.");
+   }
+
+   // Return an XmlSerializer used for overriding.
+   public XmlSerializer CreateSoapOverrider()
+   {
+      // Create the SoapAttributes and SoapAttributeOverrides objects.
+      SoapAttributes soapAttrs = new SoapAttributes();
+
+      SoapAttributeOverrides soapOverrides = 
+      new SoapAttributeOverrides();
+            
+      /* Create an SoapElementAttribute to override 
+      the Vehicles property. */
+      SoapElementAttribute soapElement1 = 
+      new SoapElementAttribute("Truck");
+      // Set the SoapElement to the object.
+      soapAttrs.SoapElement= soapElement1;
+
+      /* Add the SoapAttributes to the SoapAttributeOverrides,
+      specifying the member to override. */
+      soapOverrides.Add(typeof(Transportation), "Vehicle", soapAttrs);
+      
+      // Create the XmlSerializer, and return it.
+      XmlTypeMapping myTypeMapping = (new SoapReflectionImporter
+      (soapOverrides)).ImportTypeMapping(typeof(Transportation));
+      return new XmlSerializer(myTypeMapping);
+   }
+
+   public void SerializeOverride(string filename)
+   {
+      // Create an XmlSerializer instance.
+      XmlSerializer ser = CreateSoapOverrider();
+
+      // Create the object and serialize it.
+      Transportation myTransportation = 
+      new Transportation();
+
+      myTransportation.Vehicle = "MyCar";
+      myTransportation.CreationDate=DateTime.Now;
+      myTransportation.thing = new Thing();
+
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      ser.Serialize(writer, myTransportation);
+      writer.WriteEndElement();
+      writer.Close();
+   }
+   public void SerializeObject(string filename){
+      // Create an XmlSerializer instance.
+      XmlSerializer ser = new XmlSerializer(typeof(Transportation));
+      Transportation myTransportation = 
+      new Transportation();
+      myTransportation.Vehicle = "MyCar";
+      myTransportation.CreationDate = DateTime.Now;
+      myTransportation.thing = new Thing();
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      ser.Serialize(writer, myTransportation);
+      writer.WriteEndElement();
+      writer.Close();
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ElementNameTopic1"></a><a name="ElementName">ElementName</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the name of the generated XML element.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> ElementName {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes an instance of a class named <code>
+                Transportation
+              </code> that contains a field named <code>
+                Vehicle
+              </code>. A  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> is applied to the field. When the field is serialized, the XML element name is "Wheels" instead of "Vehicle". The <code>
+                SerializeOverride
+              </code> method creates a  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> and sets the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html#SoapElement">SoapAttributes.SoapElement</a> property of a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> to the  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a>. The  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> is added to a  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> that is used to create an  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a>. An  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> is constructed with the  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a>, and an instance of the <code>
+                Transportation
+              </code> class is again serialized. Because the  <a href="../../System.Xml.Serialization/types/SoapElementAttribute.html">SoapElementAttribute</a> is used to override the serialization, the generated XML element name is now "Truck" instead of "Wheels".<pre>
+using System;
+using System.IO;
+using System.Xml.Serialization;
+using System.Collections;
+using System.Xml;
+using System.Text;
+public class Transportation
+{
+   // The SoapElementAttribute specifies that the
+   // generated XML element name will be "Wheels"
+   // instead of "Vehicle".
+   [SoapElement("Wheels")]
+   public string Vehicle;
+   [SoapElement(DataType = "dateTime")]
+   public DateTime CreationDate;
+   [SoapElement(IsNullable = true)]
+   public Thing thing;
+   
+}
+
+public class Thing{ 
+   [SoapElement(IsNullable=true)] public string ThingName;
+}
+
+public class Test
+{
+   public static void Main()
+   {
+      Test t = new Test();
+      t.SerializeObject("SoapElementOriginal.xml");
+      t.SerializeOverride("SoapElementOverride.xml");
+      Console.WriteLine("Finished writing two XML files.");
+   }
+
+   // Return an XmlSerializer used for overriding.
+   public XmlSerializer CreateSoapOverrider()
+   {
+      // Create the SoapAttributes and SoapAttributeOverrides objects.
+      SoapAttributes soapAttrs = new SoapAttributes();
+
+      SoapAttributeOverrides soapOverrides = 
+      new SoapAttributeOverrides();
+            
+      /* Create an SoapElementAttribute to override 
+      the Vehicles property. */
+      SoapElementAttribute soapElement1 = 
+      new SoapElementAttribute("Truck");
+      // Set the SoapElement to the object.
+      soapAttrs.SoapElement= soapElement1;
+
+      /* Add the SoapAttributes to the SoapAttributeOverrides,
+      specifying the member to override. */
+      soapOverrides.Add(typeof(Transportation), "Vehicle", soapAttrs);
+      
+      // Create the XmlSerializer, and return it.
+      XmlTypeMapping myTypeMapping = (new SoapReflectionImporter
+      (soapOverrides)).ImportTypeMapping(typeof(Transportation));
+      return new XmlSerializer(myTypeMapping);
+   }
+
+   public void SerializeOverride(string filename)
+   {
+      // Create an XmlSerializer instance.
+      XmlSerializer ser = CreateSoapOverrider();
+
+      // Create the object and serialize it.
+      Transportation myTransportation = 
+      new Transportation();
+
+      myTransportation.Vehicle = "MyCar";
+      myTransportation.CreationDate=DateTime.Now;
+      myTransportation.thing = new Thing();
+
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      ser.Serialize(writer, myTransportation);
+      writer.WriteEndElement();
+      writer.Close();
+   }
+   public void SerializeObject(string filename){
+      // Create an XmlSerializer instance.
+      XmlSerializer ser = new XmlSerializer(typeof(Transportation));
+      Transportation myTransportation = 
+      new Transportation();
+      myTransportation.Vehicle = "MyCar";
+      myTransportation.CreationDate = DateTime.Now;
+      myTransportation.thing = new Thing();
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      ser.Serialize(writer, myTransportation);
+      writer.WriteEndElement();
+      writer.Close();
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsNullableTopic1"></a><a name="IsNullable">IsNullable</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets a value indicating whether the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> should serialize a member that is set to <b>null</b> into the <b>xsi:nil</b> attribute set to <b>true</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> IsNullable {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The XML schema specification for structures allows an XML document to explicitly signal that an element's content is missing. Such an element contains the attribute <b>xsi:nil</b> set to <b>true</b>. For more information, see the World Wide Web Consortium (www.w3.org) specification named "XML Schema Part 1: Structures".<p> If the  <a href="#IsNullable">SoapElementAttribute.IsNullable</a> property is set to <b>true</b>, the <b>xsi:nil</b> attribute is generated for class members that have been set to <b>null</b>. For example, if you set a field named <code>
+                MyStringArray
+              </code> to <b>null</b>, the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> generates the following XML code.</p>
+<pre>
+              &lt;MyStringArray xsi:nil = "true" /&gt;
+            </pre>
+<p> If the  <a href="../../System.Xml.Serialization/types/XmlElementAttribute.html#IsNullable">XmlElementAttribute.IsNullable</a> property is <b>false</b>, no XML element is generated.</p><br><br><b>Note </b> You cannot apply the  <a href="../../System.Xml.Serialization/types/XmlElementAttribute.html#IsNullable">XmlElementAttribute.IsNullable</a> property to a member typed as a value type because a value type cannot contain <b>null</b>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="TypeIdTopic1"></a><a name="TypeId">TypeId</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#TypeId">System.Attribute.TypeId</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When implemented in a derived class, gets a unique identifier for this <b>Attribute</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> TypeId {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> As implemented, this identifier is merely the  <a href="../../System/types/Type.html">Type</a> of the attribute. However, it is intended that the unique identifier be used to identify two attributes of the same type.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~SoapElementAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#GetHashCode">System.Attribute.GetHashCode</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the hash code for this instance.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A 32-bit signed integer hash code.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IsDefaultAttributeTopic1"></a><a name="IsDefaultAttribute">IsDefaultAttribute</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#IsDefaultAttribute">System.Attribute.IsDefaultAttribute</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, returns an indication whether the value of this instance is the default value for the derived class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsDefaultAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if this instance is the default attribute for the class; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The default implementation of this class returns <b>false</b>, and must be implemented in the derived class to be useful to that class.<p> The implementation of this method in a derived class compares the value of this instance to a standard, default value obtained by some means, then returns a Boolean value that indicates whether the value of this instance is equal to the standard. The standard value is typically coded as a constant in the implementation, or stored programmatically in a field used by the implementation.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MatchTopic1"></a><a name="Match(System.Object)">Match</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#Match(System.Object)">System.Attribute.Match</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, returns a value indicating whether this instance equals a specified object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Match(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> An  <a href="../../System/types/Object.html">Object</a> to compare with this instance of <b>Attribute</b>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if this instance equals <i>obj</i>; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method determines if one <b>Attribute</b> equals another. Its default implementation is the same as  <a href="#Equals(System.Object)">Attribute.Equals</a>, which performs a value and reference comparison. Override this method to implement support for attribute values, such as flags or bitfields, that consist of components that are meaningful in themselves. For example, consider an attribute whose value is a binary field divided into a bitfield of flags. Two instances of this attribute have one flag in set in common while all the other flags differ. The <b>Equal</b> method cannot determine that the two instances have the same flag set, but the <b>Match</b> method can.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

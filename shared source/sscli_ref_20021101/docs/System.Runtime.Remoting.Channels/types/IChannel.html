@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Runtime.Remoting.Channels.IChannel</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Runtime.Remoting.Channels.IChannel Interface</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Runtime.Remoting.Channels<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides conduits for messages that cross remoting boundaries.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public interface IChannel
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Remoting boundaries can be  <a href="../../System.Runtime.Remoting.Contexts/types/Context.html">Context</a> s,  <a href="../../System/types/AppDomain.html">AppDomain</a> s, processes, or computers. An application can cross these boundaries only by using channels. These crossings can be inbound and outbound. A channel can listen on an endpoint for inbound messages, send to an endpoint for outbound messages, or both. This provides an extensibility point in the runtime to plug in a wide range protocols, even though the runtime might not be at the other end of the channel.<p> Run-time objects can be used to represent a wide and rich set of semantics and entities. The channel provides the extensibility point to convert the messages to and from the specific protocols. If there are runtimes at both ends of the channel, a virtual channel is created between the two ends, in order to connect the client and server sink chains on either side of the boundary.</p>
+<p> The client part of the channel is located at the end of a client context sink chain. The server part of the channel is located at the start of the server context sink chain. Messages are delivered to the client channel using the  <a href="../../System.Runtime.Remoting.Messaging/types/IMessageSink.html">IMessageSink</a> interface, travel through the channel, and are then received by the server channel. The server channel delivers the message to the first server context sink.</p>
+<p> Channels must expose the  <a href="../../System.Runtime.Remoting.Channels/types/IChannel.html">IChannel</a> interface, which provides informational properties such as the  <a href="#ChannelName">IChannel.ChannelName</a> and  <a href="#ChannelPriority">IChannel.ChannelPriority</a> properties. Channels can be registered using the  <a href="../../System.Runtime.Remoting.Channels/types/ChannelServices.html#RegisterChannel(System.Runtime.Remoting.Channels.IChannel)">ChannelServices.RegisterChannel</a> method.</p>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Runtime.Remoting.Channels/System.Runtime.Remoting.Channels.html">System.Runtime.Remoting.Channels Namespace</a></dd>
+</dl>
+<h3>System.Runtime.Remoting.Channels.IChannel Member List: </h3>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ChannelName">ChannelName</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the name of the channel.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ChannelPriority">ChannelPriority</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the priority of the channel.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Parse(System.String,System.String)">Parse</a></td>
+<td width="55%"> Returns the object URI as an out parameter, and the URI of the current channel as the return value.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<hr>
+<h3>System.Runtime.Remoting.Channels.IChannel Member Details</h3><b>Property: <i><a name="ChannelNameTopic1"></a><a name="ChannelName">ChannelName</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the name of the channel.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System/types/String.html">string</a> ChannelName {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ChannelPriorityTopic1"></a><a name="ChannelPriority">ChannelPriority</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the priority of the channel.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System/types/Int32.html">int</a> ChannelPriority {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Higher numbers indicate higher priority, so a channel with priority of 50 has a higher priority than a channel with priority 25. The cross appdomain channel has a priority of 100.<p> Client channels with higher priority are given the first chance to connect to a remote object specified by a URL or a particular channel data entry from an  <a href="../../System.Runtime.Remoting/types/ObjRef.html">ObjRef</a>.</p>
+<p> For server channels, the priority indicates the order in which their channel data will appear in an  <a href="../../System.Runtime.Remoting/types/ObjRef.html">ObjRef</a>, which in turn affects the order in which clients will try to connect to the server object. If the server is listening on an HTTP channel with priority 50 and a TCP channel with priority 25 and the client has registered both an HTTP and TCP channel, then the client will use the HTTP channel to talk to the server.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpChannel.html">HttpChannel</a> |  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpServerChannel.html">HttpServerChannel</a> |  <a href="../../System.Runtime.Remoting.Channels.Http/types/HttpClientChannel.html">HttpClientChannel</a> |  <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemRuntimeRemotingChannelsTCPTcpChannelmemberstopic.asp">TcpChannel</a> |  <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemRuntimeRemotingChannelsTCPTcpServerChannelmemberstopic.asp">TcpServerChannel</a> |  <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemRuntimeRemotingChannelsTCPTcpClientChannelmemberstopic.asp">TcpClientChannel</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ParseTopic1"></a><a name="Parse(System.String,System.String)">Parse</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>url</i>,</font><br>   <font color="#008080"><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">out</a> <i>string objectURI</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the object URI as an out parameter, and the URI of the current channel as the return value.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System/types/String.html">string</a> Parse(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>url</i>,</font><br>   <font color="#008080"><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">out</a> <i>string objectURI</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>url</i><br><dl>
+<dd>
+<param> The URL of the object.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>objectURI</i><br><dl>
+<dd>
+<param> When this method returns, contains a  <a href="../../System/types/String.html">String</a> that holds the object URI. This parameter is passed uninitialized.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The URI of the current channel, or <b>null</b> if the URI does not belong to this channel.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/Uri.html">Uri</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

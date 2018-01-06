@@ -1,0 +1,769 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Security.Permissions.PrincipalPermission</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Security.Permissions.PrincipalPermission Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Security.Permissions<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Allows checks against the active principal (see  <a href="../../System.Security.Principal/types/IPrincipal.html">IPrincipal</a>) using the language constructs defined for both declarative and imperative security actions. This class cannot be inherited.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public sealed class PrincipalPermission : IPermission, ISecurityEncodable, IUnrestrictedPermission</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By passing identity information (user name and role) to the constructor,  <a href="../../System.Security.Permissions/types/PrincipalPermission.html">PrincipalPermission</a> can be used to demand that the identity of the active principal matches this information.<p> To match the active  <a href="../../System.Security.Principal/types/IPrincipal.html">IPrincipal</a> and associated  <a href="../../System.Security.Principal/types/IIdentity.html">IIdentity</a>, both the specified identity and role must match. If <b>null</b> identity string is used, it is interpreted as a request to match any identity. Use of <b>null</b> role string will match any role. By implication, passing <b>null</b> parameter for <i>name</i> or <i>role</i> to  <a href="../../System.Security.Permissions/types/PrincipalPermission.html">PrincipalPermission</a> will match the identity and roles in any  <a href="../../System.Security.Principal/types/IPrincipal.html">IPrincipal</a>. It is also possible to construct a  <a href="../../System.Security.Permissions/types/PrincipalPermission.html">PrincipalPermission</a> that only determines whether the  <a href="../../System.Security.Principal/types/IIdentity.html">IIdentity</a> represents an authenticated or unauthenticated entity. In this case, <i>name</i> and <i>role</i> are ignored.</p>
+<p> Unlike most other permissions,  <a href="../../System.Security.Permissions/types/PrincipalPermission.html">PrincipalPermission</a> does not extend  <a href="../../System.Security/types/CodeAccessPermission.html">CodeAccessPermission</a>. It does, however, implement the  <a href="../../System.Security/types/IPermission.html">IPermission</a> interface. This is because  <a href="../../System.Security.Permissions/types/PrincipalPermission.html">PrincipalPermission</a> is not a code access permission; that is, it is not granted based on the identity of the executing assembly. Instead, it allows code to perform actions ( <a href="#Demand">PrincipalPermission.Demand</a>,  <a href="#Union(System.Security.IPermission)">PrincipalPermission.Union</a>,  <a href="#Intersect(System.Security.IPermission)">PrincipalPermission.Intersect</a>, and so on) against the current user identity in a manner consistent with the way those actions are performed for code access and code identity permissions.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates two  <a href="../../System.Security.Permissions/types/PrincipalPermission.html">PrincipalPermission</a> objects representing two different administrative users, forms the union of the two, and makes a demand. <a href="#Demand">PrincipalPermission.Demand</a> will succeed only if the active implementation of  <a href="../../System.Security.Principal/types/IPrincipal.html">IPrincipal</a> represents either user Bob in the role of Manager or user Louise in the role of Supervisor.<pre>
+ String id1 = "Bob";
+ String role1 = "Manager";
+ PrincipalPermission PrincipalPerm1 = new PrincipalPermission(id1, role1);
+ 
+ String id2 = "Louise";
+ String role2 = "Supervisor";
+ PrincipalPermission PrincipalPerm2 = new PrincipalPermission(id2, role2);
+ 
+ (PrincipalPerm1.Union(PrincipalPerm2)).Demand();
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Security.Permissions/System.Security.Permissions.html">System.Security.Permissions Namespace</a><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconpermissions.asp">MSDN: permissions</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconrequestingpermissions.asp">MSDN: requestingpermissions</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconprincipal.asp">MSDN: principal</a> |  <a href="../../System.Security.Permissions/types/PrincipalPermissionAttribute.html">PrincipalPermissionAttribute</a></dd>
+</dl>
+<h3>System.Security.Permissions.PrincipalPermission Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(PermissionState state)<br><br></code> Initializes a new instance of the  <a href="../../System.Security.Permissions/types/PrincipalPermission.html">PrincipalPermission</a> class with the specified  <a href="../../System.Security.Permissions/types/PermissionState.html">PermissionState</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(string name, string role)<br><br></code> Initializes a new instance of the  <a href="../../System.Security.Permissions/types/PrincipalPermission.html">PrincipalPermission</a> class for the specified <i>name</i> and <i>role</i>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor3">ctor #3</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(string name, string role, bool isAuthenticated)<br><br></code> Initializes a new instance of the  <a href="../../System.Security.Permissions/types/PrincipalPermission.html">PrincipalPermission</a> class for the specified <i>name</i>, <i>role</i>, and authentication status.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Copy">Copy</a></td>
+<td width="55%"> Creates and returns an identical copy of the current permission.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Demand">Demand</a></td>
+<td width="55%"> Determines at run time whether the current principal matches that specified by the current permission.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#FromXml(System.Security.SecurityElement)">FromXml</a></td>
+<td width="55%"> Reconstructs a permission with a specified state from an XML encoding.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Intersect(System.Security.IPermission)">Intersect</a></td>
+<td width="55%"> Creates and returns a permission that is the intersection of the current permission and the specified permission.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsSubsetOf(System.Security.IPermission)">IsSubsetOf</a></td>
+<td width="55%"> Determines whether the current permission is a subset of the specified permission.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsUnrestricted">IsUnrestricted</a></td>
+<td width="55%"> Returns a value indicating whether the current permission is unrestricted.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a></td>
+<td width="55%"><b>Overridden: </b><br> Creates and returns a string representing the current permission.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToXml">ToXml</a></td>
+<td width="55%"> Creates an XML encoding of the permission and its current state.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Union(System.Security.IPermission)">Union</a></td>
+<td width="55%"> Creates a permission that is the union of the current permission and the specified permission.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Security.Permissions.PrincipalPermission</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Security.Permissions.PrincipalPermission Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Security.Permissions/types/PrincipalPermission.html">PrincipalPermission</a> class with the specified  <a href="../../System.Security.Permissions/types/PermissionState.html">PermissionState</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public PrincipalPermission(<br>   <font color="#008080"><a href="../../System.Security.Permissions/types/PermissionState.html">PermissionState</a> <i>state</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>state</i><br><dl>
+<dd>
+<param> One of the  <a href="../../System.Security.Permissions/types/PermissionState.html">PermissionState</a> values.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The <i>state</i> parameter is not a valid  <a href="../../System.Security.Permissions/types/PermissionState.html">PermissionState</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd><b>None</b> matches only the unauthenticated principal ( <a href="../../System.Security.Permissions/types/PrincipalPermissionAttribute.html#Name">PrincipalPermissionAttribute.Name</a> is the empty string (""), no  <a href="../../System.Security.Permissions/types/PrincipalPermissionAttribute.html#Role">PrincipalPermissionAttribute.Role</a>,  <a href="../../System.Security.Permissions/types/PrincipalPermissionAttribute.html#Authenticated">PrincipalPermissionAttribute.Authenticated</a> is <b>false</b>).<b>Unrestricted</b> matches all principals ( <a href="../../System.Security.Permissions/types/PrincipalPermissionAttribute.html#Name">PrincipalPermissionAttribute.Name</a> is <b>null</b>,  <a href="../../System.Security.Permissions/types/PrincipalPermissionAttribute.html#Role">PrincipalPermissionAttribute.Role</a> is <b>null</b>).<br><br><b>Note </b> This constructor is included for consistency with the design of other permissions, but is not useful in practice.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Security.Permissions/types/PrincipalPermission.html">PrincipalPermission</a> class for the specified <i>name</i> and <i>role</i>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public PrincipalPermission(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>role</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the  <a href="../../System.Security.Principal/types/IPrincipal.html">IPrincipal</a> object's user.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>role</i><br><dl>
+<dd>
+<param> The role of the  <a href="../../System.Security.Principal/types/IPrincipal.html">IPrincipal</a> object's user (for example, Administrator).
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Both the <i>name</i> parameter and the <i>role</i> parameter must match for this permission to match the active  <a href="../../System.Security.Principal/types/IPrincipal.html">IPrincipal</a> and associated  <a href="../../System.Security.Principal/types/IIdentity.html">IIdentity</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic3"></a><a name="ctor3">ctor #3</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Security.Permissions/types/PrincipalPermission.html">PrincipalPermission</a> class for the specified <i>name</i>, <i>role</i>, and authentication status.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public PrincipalPermission(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>role</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>isAuthenticated</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the  <a href="../../System.Security.Principal/types/IPrincipal.html">IPrincipal</a> object's user.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>role</i><br><dl>
+<dd>
+<param> The role of the  <a href="../../System.Security.Principal/types/IPrincipal.html">IPrincipal</a> object's user (for example, Administrator).
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>isAuthenticated</i><br><dl>
+<dd>
+<param><b>true</b> to signify that the user is authenticated; otherwise, <b>false</b>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Both the <i>name</i> parameter and the <i>role</i> parameter must match for this permission to match the active  <a href="../../System.Security.Principal/types/IPrincipal.html">IPrincipal</a> and associated  <a href="../../System.Security.Principal/types/IIdentity.html">IIdentity</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CopyTopic1"></a><a name="Copy">Copy</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates and returns an identical copy of the current permission.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Security/types/IPermission.html">IPermission</a> Copy();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A copy of the current permission.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Security/types/IPermission.html#Copy">IPermission.Copy</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> A copy of the permission represents the same principal and identity as the original permission.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="DemandTopic1"></a><a name="Demand">Demand</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines at run time whether the current principal matches that specified by the current permission.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void Demand();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td> The current principal does not pass the security check for the principal specified by the current permission.<p> -or- </p>
+<p> The current  <a href="../../System.Security.Principal/types/IPrincipal.html">IPrincipal</a> is <b>null</b>.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Security/types/IPermission.html#Demand">IPermission.Demand</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> If no  <a href="../../System.Security/types/SecurityException.html">SecurityException</a> is raised,  <a href="#Demand">PrincipalPermission.Demand</a><b></b> succeeds.<p> This method acts against the principal attached to the calling thread.</p>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconmakingsecuritydemands.asp">MSDN: makingsecuritydemands</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~PrincipalPermission();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FromXmlTopic1"></a><a name="FromXml(System.Security.SecurityElement)">FromXml</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Security/types/SecurityElement.html">SecurityElement</a> <i>elem</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Reconstructs a permission with a specified state from an XML encoding.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void FromXml(<br>   <font color="#008080"><a href="../../System.Security/types/SecurityElement.html">SecurityElement</a> <i>elem</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>elem</i><br><dl>
+<dd>
+<param> The XML encoding to use to reconstruct the permission.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>elem</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The <i>elem</i> parameter is not a valid permission element.<p> -or- </p>
+<p> The <i>elem</i> parameter's version number is not valid.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Security/types/ISecurityEncodable.html#FromXml(System.Security.SecurityElement)">ISecurityEncodable.FromXml</a></dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IntersectTopic1"></a><a name="Intersect(System.Security.IPermission)">Intersect</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Security/types/IPermission.html">IPermission</a> <i>target</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates and returns a permission that is the intersection of the current permission and the specified permission.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Security/types/IPermission.html">IPermission</a> Intersect(<br>   <font color="#008080"><a href="../../System.Security/types/IPermission.html">IPermission</a> <i>target</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>target</i><br><dl>
+<dd>
+<param> A permission to intersect with the current permission. It must be of the same type as the current permission.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A new permission that represents the intersection of the current permission and the specified permission. This new permission will be <b>null</b> if the intersection is empty.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The <i>target</i> parameter is not <b>null</b> and is not an instance of the same class as the current permission.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Security/types/IPermission.html#Intersect(System.Security.IPermission)">IPermission.Intersect</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> Because two users never intersect, this method is not useful for  <a href="../../System.Security.Permissions/types/PrincipalPermission.html">PrincipalPermission</a>. For example, <pre>
+              PrincipalPermission ppBob = new PrincipalPermission("Bob", "Administrator");
+              PrincipalPermission ppLouise = new PrincipalPermission("Louise", "Administrator");
+              PrincipalPermission pp1 = ppBob.Intersect(ppLouise);
+            </pre>
+<p> is equivalent to </p>
+<pre>
+              PrincipalPermission pp1 = new PrincipalPermission("", "Administrator");
+            </pre>
+<p> because no identity can simultaneously represent both Bob and Louise. In effect, <code>
+                pp1.Demand()
+              </code> only succeeds if an unauthenticated principal (with name equal to the empty string ("")) is allowed to act in the Administrator role.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IsSubsetOfTopic1"></a><a name="IsSubsetOf(System.Security.IPermission)">IsSubsetOf</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Security/types/IPermission.html">IPermission</a> <i>target</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines whether the current permission is a subset of the specified permission.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> IsSubsetOf(<br>   <font color="#008080"><a href="../../System.Security/types/IPermission.html">IPermission</a> <i>target</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>target</i><br><dl>
+<dd>
+<param> A permission that is to be tested for the subset relationship. This permission must be of the same type as the current permission.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the current permission is a subset of the specified permission; otherwise, <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The <i>target</i> parameter is an object that is not of the same type as the current permission.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Security/types/IPermission.html#IsSubsetOf(System.Security.IPermission)">IPermission.IsSubsetOf</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The current permission is a subset of the specified permission if all demands that succeed for the current permission also succeed for the specified permission.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example defines instances of  <a href="../../System.Security.Permissions/types/PrincipalPermission.html">PrincipalPermission</a> corresponding to three distinct users. Two additional instances are then created as groups of users.<code>
+                pp1
+              </code> represents Bob and Louise, <code>
+                pp2
+              </code> represents Bob, Louise, and Greg.<pre>
+//Define users and roles.
+PrincipalPermission ppBob = new PrincipalPermission("Bob", "Manager");
+PrincipalPermission ppLouise = new PrincipalPermission("Louise", "Supervisor");
+PrincipalPermission ppGreg = new PrincipalPermission("Greg", "Employee");
+
+//Define groups of users.
+PrincipalPermission pp1 = (PrincipalPermission)ppBob.Union(ppLouise);
+PrincipalPermission pp2 = (PrincipalPermission)ppGreg.Union(pp1);
+
+    </pre>
+<p> With the preceding declarations, <code>
+                pp1.IsSubsetOf(pp2)
+              </code> returns <b>true</b>, and <code>
+                pp2.IsSubsetOf(pp1)
+              </code> returns <b>false</b>.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IsUnrestrictedTopic1"></a><a name="IsUnrestricted">IsUnrestricted</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns a value indicating whether the current permission is unrestricted.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> IsUnrestricted();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the current permission is unrestricted; otherwise, <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Security.Permissions/types/IUnrestrictedPermission.html#IsUnrestricted">IUnrestrictedPermission.IsUnrestricted</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> An unrestricted  <a href="../../System.Security.Permissions/types/PrincipalPermission.html">PrincipalPermission</a> matches any principal.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates and returns a string representing the current permission.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/String.html">string</a> ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A representation of the current permission.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToXmlTopic1"></a><a name="ToXml">ToXml</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates an XML encoding of the permission and its current state.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Security/types/SecurityElement.html">SecurityElement</a> ToXml();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An XML encoding of the permission, including any state information.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Security/types/ISecurityEncodable.html#ToXml">ISecurityEncodable.ToXml</a></dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="UnionTopic1"></a><a name="Union(System.Security.IPermission)">Union</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Security/types/IPermission.html">IPermission</a> <i>other</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates a permission that is the union of the current permission and the specified permission.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Security/types/IPermission.html">IPermission</a> Union(<br>   <font color="#008080"><a href="../../System.Security/types/IPermission.html">IPermission</a> <i>other</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>other</i><br><dl>
+<dd>
+<param> A permission to combine with the current permission. It must be of the same type as the current permission.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A new permission that represents the union of the current permission and the specified permission.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The <i>other</i> parameter is an object that is not of the same type as the current permission.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Security/types/IPermission.html#Union(System.Security.IPermission)">IPermission.Union</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#Union(System.Security.IPermission)">PrincipalPermission.Union</a> creates a permission representing the criteria of a given set of individual  <a href="../../System.Security.Permissions/types/PrincipalPermission.html">PrincipalPermission</a> objects. It is useful for compactly representing a set of conditions to test. For example, with the declarations <pre>
+              PrincipalPermission ppBob = new PrincipalPermission("Bob", "Administrator");
+              PrincipalPermission ppLouise = new PrincipalPermission("Louise", "Administrator");
+            </pre>
+<p><code>
+                (ppBob.Union(ppLouise)).Demand()
+              </code> will succeed if the current principal represents Bob in the role of Administrator or Louise in the role of Administrator.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

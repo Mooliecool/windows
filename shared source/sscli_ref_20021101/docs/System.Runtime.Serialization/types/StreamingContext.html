@@ -1,0 +1,397 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Runtime.Serialization.StreamingContext</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Runtime.Serialization.StreamingContext Structure</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Runtime.Serialization<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Describes the source and destination of a given serialized stream, as well as a means for serialization to retain that context and an additional caller-defined context.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public struct StreamingContext</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Indicates the source or destination of the bits that the formatter is using. Classes with surrogates or implementing  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> can serialize or ignore fields and values based on the information stored in the streaming context. For example, a window handle is still valid if  <a href="#State">StreamingContext.State</a> has the  <a href="#State">StreamingContext.State</a> <a href="../../System.Runtime.Serialization/types/StreamingContextStates.html#CrossProcess">StreamingContextStates.CrossProcess</a> value set, but not with the  <a href="../../System.Runtime.Serialization/types/StreamingContextStates.html#CrossMachine">StreamingContextStates.CrossMachine</a> or  <a href="../../System.Runtime.Serialization/types/StreamingContextStates.html#File">StreamingContextStates.File</a> value set.</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example demonstrates the  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> struct.<pre>
+ using System;
+ using System.Runtime.Serialization;
+ 
+ [Serializable()]
+ public class MyClass: ISerializable {
+
+    public static void Main() {}
+ 
+    // A handle to a window that has meaning only at this time and on this computer.
+    public int winhandle;
+    public double value = 3.14159265;
+ 
+    // Serialization constructor.
+    public MyClass (SerializationInfo info, StreamingContext context)  {
+ 
+       // If this is a serialization to another process, winhandle must be deserialized.
+       if(context.State == StreamingContextStates.CrossProcess) {
+          winhandle = (int)info.GetValue("winhandle", typeof(int));
+       }
+       else {
+          // If this is a serialization from anywhere else, set winhandle to a default value.
+          winhandle = -1;
+    }
+ 
+       // Deserializes the value.
+       value = (double)info.GetValue("MyClass_value", typeof(double));
+    }
+ 
+    // Serializes the object.
+    public void GetObjectData(SerializationInfo info, StreamingContext context) {  
+       // Serializes the value.
+       info.AddValue("MyClass_value", value);
+ 
+       // If this object is going not to another process but to a different computer,
+       // winhandle has no meaning, and does not need to be serialized.
+       if(context.State == StreamingContextStates.CrossProcess) {
+          info.AddValue("winhandle", winhandle);
+       }
+    }
+ }
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Runtime.Serialization/System.Runtime.Serialization.html">System.Runtime.Serialization Namespace</a> |  <a href="#State">StreamingContext.State</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconserialization.asp">MSDN: serialization</a></dd>
+</dl>
+<h3>System.Runtime.Serialization.StreamingContext Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(StreamingContextStates state)<br><br></code> Initializes a new instance of the  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> class with a given context state.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(StreamingContextStates state, object additional)<br><br></code> Initializes a new instance of the  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> class with a given context state, and some additional information.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Context">Context</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets context specified as part of the additional context.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#State">State</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the source or destination of the transmitted data.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a></td>
+<td width="55%"><b>Overridden: </b><br> Determines whether two  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> instances contain the same values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a></td>
+<td width="55%"><b>Overridden: </b><br> Returns a hash code of this object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.ValueType)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/ValueType.html#ToString">System.ValueType.ToString</a></font></b><br><br><br> Returns the fully qualified type name of this instance.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/ValueType.html">System.ValueType</a></li>
+<ul class="none">
+<li><b>System.Runtime.Serialization.StreamingContext</b></li>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Runtime.Serialization.StreamingContext Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> class with a given context state.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public StreamingContext(StreamingContext(<br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/StreamingContextStates.html">StreamingContextStates</a> <i>state</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>state</i><br><dl>
+<dd>
+<param> A bitwise combination of the  <a href="../../System.Runtime.Serialization/types/StreamingContextStates.html">StreamingContextStates</a> values that specify the source or destination context for this  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/FlagsAttribute.html">FlagsAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> class with a given context state, and some additional information.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public StreamingContext(StreamingContext(<br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/StreamingContextStates.html">StreamingContextStates</a> <i>state</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>additional</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>state</i><br><dl>
+<dd>
+<param> A bitwise combination of the  <a href="../../System.Runtime.Serialization/types/StreamingContextStates.html">StreamingContextStates</a> values that specify the source or destination context for this  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>additional</i><br><dl>
+<dd>
+<param> Any additional information to be associated with the  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a>. This information will be available to any object implementing  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> or any Serialization Surrogate. Most users will not need to set this parameter.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/FlagsAttribute.html">FlagsAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ContextTopic1"></a><a name="Context">Context</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets context specified as part of the additional context.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> Context {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Can be <b>null</b>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="StateTopic1"></a><a name="State">State</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the source or destination of the transmitted data.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Runtime.Serialization/types/StreamingContextStates.html">StreamingContextStates</a> State {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> During serialization, the current property specifies the destination of the transmitted data. For example, when serializing data from Cross AppDomain Remoting, the  <a href="../../System.Runtime.Serialization/types/StreamingContextStates.html">StreamingContextStates</a> will be  <a href="../../System.Runtime.Serialization/types/StreamingContextStates.html#CrossProcess">StreamingContextStates.CrossProcess</a>. During deserialization, the state indicates the source of the deserialized stream.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines whether two  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> instances contain the same values.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> An object to compare with the current instance.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the specified object is an instance of  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> and equals the value of the current instance; otherwise, <b>false</b>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~StreamingContext();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns a hash code of this object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The  <a href="../../System.Runtime.Serialization/types/StreamingContextStates.html">StreamingContextStates</a> value that contains the source or destination of the serialization for this  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/ValueType.html#ToString">System.ValueType.ToString</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the fully qualified type name of this instance.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/String.html">string</a> ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System/types/String.html">String</a> containing a fully qualified type name.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

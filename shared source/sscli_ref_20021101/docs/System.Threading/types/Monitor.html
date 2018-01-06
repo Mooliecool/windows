@@ -1,0 +1,1470 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Threading.Monitor</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Threading.Monitor Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Threading<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides a mechanism that synchronizes access to objects.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public sealed class Monitor
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The <b>Monitor</b> class controls access to objects by granting a lock for an object to a single thread. Object locks provide the ability to restrict access to a block of code, commonly called a critical section. While a thread owns the lock for an object, no other thread can acquire that lock. You can also use <b>Monitor</b> to ensure that no other thread is allowed to access a section of application code being executed by the lock owner, unless the other thread is executing the code using a different locked object.<p><b>Monitor</b> has the following features: </p>
+<UL>
+<li> It is associated with an object on demand.</li>
+<li> It is unbound, which means it can be called directly from any context.</li>
+<li> An instance of the <b>Monitor</b> class cannot be created.</li>
+</UL>
+<p> The following information is maintained for each synchronized object: </p>
+<UL>
+<li> A reference to the thread that currently holds the lock.</li>
+<li> A reference to a ready queue, which contains the threads that are ready to obtain the lock.</li>
+<li> A reference to a waiting queue, which contains the threads that are waiting for notification of a change in the state of the locked object.</li>
+</UL>
+<p> The following table describes the actions that can be taken by threads that access synchronized objects: </p><br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+              Action
+            </TH>
+<TH>
+              Description
+            </TH>
+</THEAD>
+<TR valign="top">
+<TD> <a href="#Enter(System.Object)">Monitor.Enter</a>
+              ,
+               <a href="#TryEnter(System.Object)">Monitor.TryEnter</a></TD>
+<TD>
+              Acquires a lock for an object. This action also
+              marks the beginning of a critical section. No other thread can enter
+              the critical section unless it is executing the instructions in the
+              critical section using a different locked object.
+            </TD>
+</TR>
+<TR valign="top">
+<TD> <a href="#Wait(System.Object,System.Int32,System.Boolean)">Monitor.Wait</a></TD>
+<TD>
+              Releases the lock on an object in order to permit other threads to
+              lock and access the object. The calling thread waits while another thread
+              accesses the object. Pulse signals are used to notify waiting threads
+              about changes to an object's state.
+            </TD>
+</TR>
+<TR valign="top">
+<TD> <a href="#Pulse(System.Object)">Monitor.Pulse</a>
+              (signal),
+               <a href="#PulseAll(System.Object)">Monitor.PulseAll</a></TD>
+<TD>
+              Sends a signal to one or more waiting threads. The signal notifies a
+              waiting thread that the state of the locked object has changed, and the
+              owner of the lock is ready to release the lock. The waiting thread is
+              placed in the object's ready queue so that it may eventually receive the
+              lock for the object. Once the thread has the lock, it can check the new
+              state of the object to see if the required state has been reached.
+            </TD>
+</TR>
+<TR valign="top">
+<TD> <a href="#Exit(System.Object)">Monitor.Exit</a></TD>
+<TD>
+              Releases the lock on an object. This action also marks the end of a critical
+              section protected by the locked object.
+            </TD>
+</TR>
+</table>
+<p> Use the <b>Enter</b> and <b>Exit</b> methods to mark the beginning and end of a critical section. If the critical section is a set of contiguous instructions, then the lock acquired by the <b>Enter</b> method guarantees that only a single thread can execute the enclosed code with the locked object. In this case, it is recommended you place those instructions in a <b>try</b> block and place the <b>Exit</b> instruction in a <b>finally</b> block. This facility is typically used to synchronize access to a static or instance method of a class. If an instance method requires synchronized thread access, it invokes the <b>Enter</b> and corresponding <b>Exit</b> methods using the current instance as the object to lock. Since only one thread can hold the lock on the current instance, the method can only be executed by one thread at a time. Static methods are protected in a similar fashion using the  <a href="../../System/types/Type.html">Type</a> of the current instance as the locked object. The functionality provided by the <b>Enter</b> and <b>Exit</b> methods is identical to that provided by the C# <b>lock</b> statement.</p>
+<p> If a critical section spans an entire method, the locking facility described above can be achieved by placing the  <a href="../../System.Runtime.CompilerServices/types/MethodImplAttribute.html">MethodImplAttribute</a> on the method, and specifying the  <a href="../../System.Runtime.CompilerServices/types/MethodImplOptions.html#Synchronized">MethodImplOptions.Synchronized</a> value in the constructor of <b>MethoImplAttribute</b>. Using this attribute, the <b>Enter</b> and <b>Exit</b> statements are not needed. Note that the attribute causes the current thread to hold the lock until the method returns; if the lock can be released sooner, use the <b>Monitor</b> class or the C# <b>lock</b> statement instead of the attribute.</p>
+<p> While it is possible for the <b>Enter</b> and <b>Exit</b> statements that lock and release a given object to cross member or class boundaries or both, this practice is not recommended.</p>
+<p> When selecting an object on which to synchronize, you should lock only on private or internal objects. Locking on external objects might result in deadlocks, because unrelated code could choose the same objects to lock on for different purposes.</p>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Threading/System.Threading.html">System.Threading Namespace</a> |  <a href="../../System.Threading/types/Thread.html">Thread</a></dd>
+</dl>
+<h3>System.Threading.Monitor Member List: </h3>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Enter(System.Object)">Enter</a></td>
+<td width="55%"> Acquires an exclusive lock on the specified object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Exit(System.Object)">Exit</a></td>
+<td width="55%"> Releases an exclusive lock on the specified object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Pulse(System.Object)">Pulse</a></td>
+<td width="55%"> Notifies a thread in the waiting queue of a change in the locked object's state.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#PulseAll(System.Object)">PulseAll</a></td>
+<td width="55%"> Notifies all waiting threads of a change in the object's state.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#TryEnter(System.Object)">TryEnter</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>TryEnter(object obj)<br><br></code> Attempts to acquire an exclusive lock on the specified object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#TryEnter(System.Object,System.Int32)">TryEnter</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>TryEnter(object obj, int millisecondsTimeout)<br><br></code> Attempts, for the specified number of milliseconds, to acquire an exclusive lock on the specified object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#TryEnter(System.Object,System.TimeSpan)">TryEnter</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>TryEnter(object obj, TimeSpan timeout)<br><br></code> Attempts, for the specified amount of time, to acquire an exclusive lock on the specified object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Wait(System.Object)">Wait</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Wait(object obj)<br><br></code> Releases the lock on an object and blocks the current thread until it reacquires the lock.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Wait(System.Object,System.Int32)">Wait</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Wait(object obj, int millisecondsTimeout)<br><br></code> Releases the lock on an object and blocks the current thread until it reacquires the lock or a specified amount of time elapses.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Wait(System.Object,System.TimeSpan)">Wait</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Wait(object obj, TimeSpan timeout)<br><br></code> Releases the lock on an object and blocks the current thread until it reacquires the lock or a specified amount of time elapses.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Wait(System.Object,System.Int32,System.Boolean)">Wait</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Wait(object obj, int millisecondsTimeout, bool exitContext)<br><br></code> Waits for notification from an object that called the  <a href="#Pulse(System.Object)">Monitor.Pulse</a> or  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a> method or for a specified timer to elapse. This method also specifies whether the synchronization domain for the context (if in a synchronized context) is exited before the wait and reacquired.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Wait(System.Object,System.TimeSpan,System.Boolean)">Wait</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Wait(object obj, TimeSpan timeout, bool exitContext)<br><br></code> Releases the lock on an object and blocks the current thread until it reacquires the lock, or until a specified amount of time elapses, optionally exiting the synchronization domain for the synchronized context before the wait and reacquiring the domain.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Threading.Monitor</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Threading.Monitor Member Details</h3><b>Method: <i><a name="EnterTopic1"></a><a name="Enter(System.Object)">Enter</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Acquires an exclusive lock on the specified object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static void Enter(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object on which to acquire the monitor lock.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>obj</i> parameter is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Use <b>Enter</b> to acquire the <b>Monitor</b> for the object passed as the parameter. If another thread has executed an <b>Enter</b> on the object, but has not yet executed the corresponding  <a href="#Exit(System.Object)">Monitor.Exit</a>, the current thread will block until the other thread releases the object. It is legal for the same thread to invoke <b>Enter</b> more than once without it blocking; however, an equal number of <b>Exit</b> calls must be invoked before other threads waiting on the object will unblock.<p> <a href="../../System.Threading/types/Thread.html#Interrupt">Thread.Interrupt</a> can interrupt threads waiting to enter a <b>Monitor</b> on an object. A  <a href="../../System.Threading/types/ThreadInterruptedException.html">ThreadInterruptedException</a> will be thrown.</p>
+<p> Invoking this member is identical to using the C# <b>lock</b> statement.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example demonstrates how to use the <b>Enter</b> method.<pre>
+		//Define the queue to safe thread access.
+		private Queue m_inputQueue;
+
+		public MonitorSample()
+		{
+			m_inputQueue = new Queue(); 
+		}
+
+		//Add an element to the queue and obtain the monitor lock for the queue object.
+		public void AddElement(object qValue)
+		{
+			//Lock the queue.
+			Monitor.Enter(m_inputQueue);
+			//Add element
+			m_inputQueue.Enqueue(qValue);
+			//Unlock the queue.
+			Monitor.Exit(m_inputQueue);
+		}
+
+		//Try to add an element to the queue.
+		//Add the element to the queue only if the queue object is unlocked.
+		public bool AddElementWithoutWait(object qValue)
+		{
+			//Check if the queue is locked 
+			if(!Monitor.TryEnter(m_inputQueue))
+				return false;
+			m_inputQueue.Enqueue(qValue);
+
+			Monitor.Exit(m_inputQueue);
+			return true;
+		}
+
+		//Try to add an element to the queue. 
+		//Add the element to the queue only if during the specified time the queue object will be unlocked.
+		public bool WaitToAddElement(object qValue, int waitTime)
+		{
+			//Wait while the queue is locked.
+			if(!Monitor.TryEnter(m_inputQueue,waitTime))
+				return false;
+			m_inputQueue.Enqueue(qValue);
+			Monitor.Exit(m_inputQueue);
+
+			return true;
+		}
+		
+		//Delete all elements that equal the given object and obtain the monitor lock for the queue object.
+		public void DeleteElement(object qValue)
+		{
+			//Lock the queue.
+			Monitor.Enter(m_inputQueue);
+			int counter = m_inputQueue.Count;
+			while(counter &gt; 0)
+			{	
+				//Check each element.
+				object elm = m_inputQueue.Dequeue();
+				if(!elm.Equals(qValue))
+				{
+					m_inputQueue.Enqueue(elm);
+				}
+				--counter;
+			}
+			//Unlock the queue.
+			Monitor.Exit(m_inputQueue);
+		}
+		
+		//Print all queue elements.
+		public void PrintAllElements()
+		{
+			//Lock the queue.
+			Monitor.Enter(m_inputQueue);			
+			IEnumerator elmEnum = m_inputQueue.GetEnumerator();
+			while(elmEnum.MoveNext())
+			{
+				//Print the next element.
+				Console.WriteLine(elmEnum.Current.ToString());
+			}
+			//Unlock the queue.
+			Monitor.Exit(m_inputQueue);	
+		}
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Threading/types/Thread.html">Thread</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ExitTopic1"></a><a name="Exit(System.Object)">Exit</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Releases an exclusive lock on the specified object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static void Exit(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object on which to release the lock.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>obj</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Threading/types/SynchronizationLockException.html">SynchronizationLockException</a></td>
+<td> The current thread does not own the lock for the specified object.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The caller must own the lock on the <i>obj</i> parameter. If the caller owns the lock on the specified object, and has made an equal number of <b>Exit</b> and  <a href="#Enter(System.Object)">Monitor.Enter</a> calls for the object, then the lock is released. If the caller has not invoked <b>Exit</b> as many times as <b>Enter</b>, the lock is not released.<p> If the lock is released and other threads are in the ready queue for the object, one of the threads acquires the lock. If other threads are in the waiting queue waiting to acquire the lock, they are not automatically moved to the ready queue when the owner of the lock calls <b>Exit</b>. To move one or more waiting threads into the ready queue, call  <a href="#Pulse(System.Object)">Monitor.Pulse</a> or  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a> before invoking <b>Exit</b>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example demonstrates how to use the <b>Exit</b> method.<pre>
+		//Define the queue to safe thread access.
+		private Queue m_inputQueue;
+
+		public MonitorSample()
+		{
+			m_inputQueue = new Queue(); 
+		}
+
+		//Add an element to the queue and obtain the monitor lock for the queue object.
+		public void AddElement(object qValue)
+		{
+			//Lock the queue.
+			Monitor.Enter(m_inputQueue);
+			//Add element
+			m_inputQueue.Enqueue(qValue);
+			//Unlock the queue.
+			Monitor.Exit(m_inputQueue);
+		}
+
+		//Try to add an element to the queue.
+		//Add the element to the queue only if the queue object is unlocked.
+		public bool AddElementWithoutWait(object qValue)
+		{
+			//Check if the queue is locked 
+			if(!Monitor.TryEnter(m_inputQueue))
+				return false;
+			m_inputQueue.Enqueue(qValue);
+
+			Monitor.Exit(m_inputQueue);
+			return true;
+		}
+
+		//Try to add an element to the queue. 
+		//Add the element to the queue only if during the specified time the queue object will be unlocked.
+		public bool WaitToAddElement(object qValue, int waitTime)
+		{
+			//Wait while the queue is locked.
+			if(!Monitor.TryEnter(m_inputQueue,waitTime))
+				return false;
+			m_inputQueue.Enqueue(qValue);
+			Monitor.Exit(m_inputQueue);
+
+			return true;
+		}
+		
+		//Delete all elements that equal the given object and obtain the monitor lock for the queue object.
+		public void DeleteElement(object qValue)
+		{
+			//Lock the queue.
+			Monitor.Enter(m_inputQueue);
+			int counter = m_inputQueue.Count;
+			while(counter &gt; 0)
+			{	
+				//Check each element.
+				object elm = m_inputQueue.Dequeue();
+				if(!elm.Equals(qValue))
+				{
+					m_inputQueue.Enqueue(elm);
+				}
+				--counter;
+			}
+			//Unlock the queue.
+			Monitor.Exit(m_inputQueue);
+		}
+		
+		//Print all queue elements.
+		public void PrintAllElements()
+		{
+			//Lock the queue.
+			Monitor.Enter(m_inputQueue);			
+			IEnumerator elmEnum = m_inputQueue.GetEnumerator();
+			while(elmEnum.MoveNext())
+			{
+				//Print the next element.
+				Console.WriteLine(elmEnum.Current.ToString());
+			}
+			//Unlock the queue.
+			Monitor.Exit(m_inputQueue);	
+		}
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Threading/types/Thread.html">Thread</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~Monitor();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="PulseTopic1"></a><a name="Pulse(System.Object)">Pulse</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Notifies a thread in the waiting queue of a change in the locked object's state.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static void Pulse(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object a thread is waiting for.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>obj</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Threading/types/SynchronizationLockException.html">SynchronizationLockException</a></td>
+<td> The calling thread does not own the lock for the specified object.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Only the current owner of the lock can signal a waiting object using <b>Pulse</b>.<p> The thread that currently owns the lock on the specified object invokes this method to signal the next thread in line for the lock. Upon receiving the pulse, the waiting thread is moved to the ready queue. When the thread that invoked <b>Pulse</b> releases the lock, the next thread in the ready queue (which is not necessarily the thread that was pulsed) acquires the lock.</p>
+<p> Note that a synchronized object holds several references, including a reference to the thread that currently holds the lock, a reference to the ready queue, which contains the threads that are ready to obtain the lock, and a reference to the waiting queue, which contains the threads that are waiting for notification of a change in the object's state. The <b>Pulse</b>,  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a>, and  <a href="#Wait(System.Object,System.Int32,System.Boolean)">Monitor.Wait</a> methods must be invoked from within a synchronized block of code. The remarks for <a href="../../System.Threading/types/Monitor.html#waittopic2">Wait</a> address an issue that arises when <b>Pulse</b> is invoked before <b>Wait</b>.</p>
+<p> To signal multiple threads, use the  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a> method.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example demonstrates how to use the <b>Pulse</b> method.<pre>
+using System;
+using System.Threading;
+using System.Collections;
+
+namespace MonitorCS1
+{
+	class MonitorSample
+	{
+		const int MAX_LOOP_TIME = 1000;
+		Queue	m_smplQueue;
+
+		public MonitorSample()
+		{
+			m_smplQueue = new Queue(); 
+		}
+		public void FirstThread()
+		{
+			int counter = 0;
+			lock(m_smplQueue)
+			{
+				while(counter &lt; MAX_LOOP_TIME)
+				{
+					//Wait, if the queue is busy.
+					Monitor.Wait(m_smplQueue);
+					//Push one element.
+					m_smplQueue.Enqueue(counter);
+					//Release the waiting thread.
+					Monitor.Pulse(m_smplQueue);	
+
+					counter++;
+				}
+			}
+		}
+		public void SecondThread()
+		{
+			lock(m_smplQueue)
+			{
+				//Release the waiting thread.
+				Monitor.Pulse(m_smplQueue);
+				//Wait in the loop, while the queue is busy.
+				//Exit on the timeout when the first thread stopped. 
+				while(Monitor.Wait(m_smplQueue,1000))
+				{
+					//Pop the first element.
+					int counter = (int)m_smplQueue.Dequeue();
+					//Print the first element.
+					Console.WriteLine(counter.ToString());
+					//Release waiting thread.
+					Monitor.Pulse(m_smplQueue);
+				}
+			}
+		}
+		//Return the number of the queue elements.
+		public int GetQueueCount()
+		{
+			return m_smplQueue.Count;
+		}
+
+		static void Main(string[] args)
+		{
+			//Create the MonitorSample object.
+			MonitorSample test = new MonitorSample();			
+			//Create the first thread.
+			Thread tFirst = new Thread(new ThreadStart(test.FirstThread));
+			//Create the second thread.
+			Thread tSecond = new Thread(new ThreadStart(test.SecondThread));
+			//Start threads.
+			tFirst.Start();
+			tSecond.Start();
+			//wait to the end of the two threads
+			tFirst.Join();
+			tSecond.Join();			
+			//Print the number of the queue elements.
+			Console.WriteLine("Queue Count = " + test.GetQueueCount().ToString());
+		}
+	}
+}
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Threading/types/Thread.html">Thread</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="PulseAllTopic1"></a><a name="PulseAll(System.Object)">PulseAll</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Notifies all waiting threads of a change in the object's state.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static void PulseAll(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object that sends the pulse.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>obj</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Threading/types/SynchronizationLockException.html">SynchronizationLockException</a></td>
+<td> The calling thread does not own the lock for the specified object.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The thread that currently owns the lock on the specified object invokes this method to signal all threads waiting to acquire the lock on the object. After the signal is sent, the waiting threads are moved to the ready queue. When the thread that invoked <b>PulseAll</b> releases the lock, the next thread in the ready queue acquires the lock.<p> Note that a synchronized object holds several references, including a reference to the thread that currently holds the lock, a reference to the ready queue, which contains the threads that are ready to obtain the lock, and a reference to the waiting queue, which contains the threads that are waiting for notification of a change in the object's state. The  <a href="#Pulse(System.Object)">Monitor.Pulse</a>, <b>PulseAll</b>, and  <a href="#Wait(System.Object,System.Int32,System.Boolean)">Monitor.Wait</a> methods must be invoked from within a synchronized block of code. The remarks for <a href="../../System.Threading/types/Monitor.html#waittopic2">Wait</a> address an issue that arises when  <a href="#Pulse(System.Object)">Monitor.Pulse</a> is invoked before  <a href="#Wait(System.Object,System.Int32,System.Boolean)">Monitor.Wait</a>.</p>
+<p> To signal a single thread, use the <b>Pulse</b> method.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Threading/types/Thread.html">Thread</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="TryEnterTopic1"></a><a name="TryEnter(System.Object)">TryEnter</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Attempts to acquire an exclusive lock on the specified object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Boolean.html">bool</a> TryEnter(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object on which to acquire the lock.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the current thread acquires the lock; otherwise, <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>obj</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The <i>obj</i> parameter is a value type.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If successful, this method acquires an exclusive lock on the <i>obj</i> parameter. This method returns immediately, whether or not the lock is available.<p> This method is similar to  <a href="#Enter(System.Object)">Monitor.Enter</a>, but it will never block. If the thread cannot enter without blocking, the method returns <b>false,</b> and the thread does not enter the critical section.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example demonstrates how to use the <b>TryEnter</b> method.<pre>
+		//Define the queue to safe thread access.
+		private Queue m_inputQueue;
+
+		public MonitorSample()
+		{
+			m_inputQueue = new Queue(); 
+		}
+
+		//Add an element to the queue and obtain the monitor lock for the queue object.
+		public void AddElement(object qValue)
+		{
+			//Lock the queue.
+			Monitor.Enter(m_inputQueue);
+			//Add element
+			m_inputQueue.Enqueue(qValue);
+			//Unlock the queue.
+			Monitor.Exit(m_inputQueue);
+		}
+
+		//Try to add an element to the queue.
+		//Add the element to the queue only if the queue object is unlocked.
+		public bool AddElementWithoutWait(object qValue)
+		{
+			//Check if the queue is locked 
+			if(!Monitor.TryEnter(m_inputQueue))
+				return false;
+			m_inputQueue.Enqueue(qValue);
+
+			Monitor.Exit(m_inputQueue);
+			return true;
+		}
+
+		//Try to add an element to the queue. 
+		//Add the element to the queue only if during the specified time the queue object will be unlocked.
+		public bool WaitToAddElement(object qValue, int waitTime)
+		{
+			//Wait while the queue is locked.
+			if(!Monitor.TryEnter(m_inputQueue,waitTime))
+				return false;
+			m_inputQueue.Enqueue(qValue);
+			Monitor.Exit(m_inputQueue);
+
+			return true;
+		}
+		
+		//Delete all elements that equal the given object and obtain the monitor lock for the queue object.
+		public void DeleteElement(object qValue)
+		{
+			//Lock the queue.
+			Monitor.Enter(m_inputQueue);
+			int counter = m_inputQueue.Count;
+			while(counter &gt; 0)
+			{	
+				//Check each element.
+				object elm = m_inputQueue.Dequeue();
+				if(!elm.Equals(qValue))
+				{
+					m_inputQueue.Enqueue(elm);
+				}
+				--counter;
+			}
+			//Unlock the queue.
+			Monitor.Exit(m_inputQueue);
+		}
+		
+		//Print all queue elements.
+		public void PrintAllElements()
+		{
+			//Lock the queue.
+			Monitor.Enter(m_inputQueue);			
+			IEnumerator elmEnum = m_inputQueue.GetEnumerator();
+			while(elmEnum.MoveNext())
+			{
+				//Print the next element.
+				Console.WriteLine(elmEnum.Current.ToString());
+			}
+			//Unlock the queue.
+			Monitor.Exit(m_inputQueue);	
+		}
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Threading/types/Thread.html">Thread</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="TryEnterTopic2"></a><a name="TryEnter(System.Object,System.Int32)">TryEnter</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>millisecondsTimeout</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Attempts, for the specified number of milliseconds, to acquire an exclusive lock on the specified object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Boolean.html">bool</a> TryEnter(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>millisecondsTimeout</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object on which to acquire the lock.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>millisecondsTimeout</i><br><dl>
+<dd>
+<param> The number of milliseconds to wait for the lock.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the current thread acquires the lock; otherwise, <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>obj</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The <i>obj</i> parameter is a value type.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>millisecondsTimeout</i> is negative, and not equal to  <a href="../../System.Threading/types/Timeout.html#Infinite">Timeout.Infinite</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the <i>millisecondsTimeout</i> parameter equals  <a href="../../System.Threading/types/Timeout.html#Infinite">Timeout.Infinite</a>, this method is equivalent to  <a href="#Enter(System.Object)">Monitor.Enter</a>. If <i>millisecondsTimeout</i> equals zero, this method is equivalent to <a href="../../System.Threading/types/Monitor.html#tryentertopic1">TryEnter</a>.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Threading/types/Thread.html">Thread</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="TryEnterTopic3"></a><a name="TryEnter(System.Object,System.TimeSpan)">TryEnter</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i>,</font><br>   <font color="#008080"><a href="../../System/types/TimeSpan.html">TimeSpan</a> <i>timeout</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Attempts, for the specified amount of time, to acquire an exclusive lock on the specified object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Boolean.html">bool</a> TryEnter(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i>,</font><br>   <font color="#008080"><a href="../../System/types/TimeSpan.html">TimeSpan</a> <i>timeout</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object on which to acquire the lock.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>timeout</i><br><dl>
+<dd>
+<param> A  <a href="../../System/types/TimeSpan.html">TimeSpan</a> representing the amount of time to wait for the lock.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the current thread acquires the lock without blocking; otherwise, <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>obj</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The <i>obj</i> parameter is a value type.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The value of <i>timeout</i> in milliseconds is negative and is not equal to  <a href="../../System.Threading/types/Timeout.html#Infinite">Timeout.Infinite</a>, or is greater than  <a href="../../System/types/Int32.html#MaxValue">Int32.MaxValue</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the value of the <i>timeout</i> parameter converted to milliseconds equals  <a href="../../System.Threading/types/Timeout.html#Infinite">Timeout.Infinite</a>, this method is equivalent to  <a href="#Enter(System.Object)">Monitor.Enter</a>. If the value of <i>timeout</i> equals zero, this method is equivalent to <a href="../../System.Threading/types/Monitor.html#tryentertopic1">TryEnter</a>.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Threading/types/Thread.html">Thread</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WaitTopic1"></a><a name="Wait(System.Object)">Wait</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Releases the lock on an object and blocks the current thread until it reacquires the lock.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Boolean.html">bool</a> Wait(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object on which to wait.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the call returned because the caller reacquired the lock for the specified object. This method does not return if the lock is not reacquired.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>obj</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Threading/types/SynchronizationLockException.html">SynchronizationLockException</a></td>
+<td> The calling thread does not own the lock for the specified object.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Threading/types/ThreadInterruptedException.html">ThreadInterruptedException</a></td>
+<td> The thread that invokes <b>Wait</b> is later interrupted from the waiting state. This happens when another thread calls this thread's  <a href="../../System.Threading/types/Thread.html#Interrupt">Thread.Interrupt</a> method.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The thread that currently owns the lock on the specified object invokes this method in order to release the object so that another thread can access it. The caller is blocked while waiting to reacquire the lock. This method is called when the caller is waiting for a change in the state of the object that will occur as a result of another thread's operations on the object.<p> When a thread calls <b>Wait</b>, it releases the lock on the object and enters the object's waiting queue. The next thread in the object's ready queue (if there is one) acquires the lock and has exclusive use of the object. All threads that call <b>Wait</b> remain in the waiting queue until they receive a signal from  <a href="#Pulse(System.Object)">Monitor.Pulse</a> or  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a>, sent by the owner of the lock. If <b>Pulse</b> is sent, only the thread at the head of the waiting queue is affected. If <b>PulseAll</b> is sent, all threads that are waiting for the object are affected. When the signal is received, one or more threads leave the waiting queue and enter the ready queue. A thread in the ready queue is permitted to reacquire the lock.</p>
+<p> This method returns when the calling thread reacquires the lock on the object. Note that this method blocks indefinitely if the holder of the lock does not call <b>Pulse</b> or <b>PulseAll</b>.</p>
+<p> The caller executes <b>Wait</b> once, regardless of the number of times  <a href="#Enter(System.Object)">Monitor.Enter</a> has been invoked for the specified object. Conceptually, the <b>Wait</b> method stores the number of times the caller invoked <b>Enter</b> on the object and invokes <b>Exit</b> as many times as necessary to fully release the locked object. The caller then blocks while waiting to reacquire the object. When the caller reacquires the lock, the system calls <b>Enter</b> as many times as necessary to restore the saved <b>Enter</b> count for the caller. Calling <b>Wait</b> releases the lock for the specified object only; if the caller is the owner of locks on other objects, these locks are not released.</p> Note that a synchronized object holds several references, including a reference to the thread that currently holds the lock, a reference to the ready queue, which contains the threads that are ready to obtain the lock, and a reference to the waiting queue, which contains the threads that are waiting for notification of a change in the object's state. The  <a href="#Pulse(System.Object)">Monitor.Pulse</a>,  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a>, and <b>Wait</b> methods must be invoked from within a synchronized block of code.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Threading/types/Thread.html">Thread</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WaitTopic2"></a><a name="Wait(System.Object,System.Int32)">Wait</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>millisecondsTimeout</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Releases the lock on an object and blocks the current thread until it reacquires the lock or a specified amount of time elapses.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Boolean.html">bool</a> Wait(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>millisecondsTimeout</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object on which to wait.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>millisecondsTimeout</i><br><dl>
+<dd>
+<param> The number of milliseconds to wait before this method returns.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the lock was reacquired before the specified time elapsed; otherwise, <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>obj</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Threading/types/SynchronizationLockException.html">SynchronizationLockException</a></td>
+<td> The calling thread does not own the lock for the specified object.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Threading/types/ThreadInterruptedException.html">ThreadInterruptedException</a></td>
+<td> The thread that invokes <b>Wait</b> is later interrupted from the waiting state. This happens when another thread calls this thread's  <a href="../../System.Threading/types/Thread.html#Interrupt">Thread.Interrupt</a> method.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The value of the <i>millisecondsTimeout</i> parameter is negative, and is not equal to  <a href="../../System.Threading/types/Timeout.html#Infinite">Timeout.Infinite</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If successful, this method reacquires an exclusive lock on the <i>obj</i> parameter.<p> This method behaves identically to <a href="../../System.Threading/types/Monitor.html#waittopic1">Wait</a>, except that it does not block indefinitely unless  <a href="../../System.Threading/types/Timeout.html#Infinite">Timeout.Infinite</a> is specified for the <i>millisecondsTimeout</i> parameter. Once the specified time has elapsed, this method returns a value that indicates whether or not the lock has been reacquired by the caller. If <i>millisecondsTimeout</i> equals 0, this method returns immediately.</p>
+<p> The thread that currently owns the lock on the specified object invokes this method in order to release the object so that another thread can access it. The caller is blocked while waiting to reacquire the lock. This method is called when the caller is waiting for a change in the state of the object that will occur as a result of another thread's operations on the object.</p>
+<p> When a thread calls <b>Wait</b>, it releases the lock on the object and enters the object's waiting queue. The next thread in the object's ready queue (if there is one) acquires the lock and has exclusive use of the object. The thread that invoked <b>Wait</b> remains in the waiting queue until either a thread that holds the lock invokes  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a>, or it is the next in the queue and a thread that holds the lock invokes  <a href="#Pulse(System.Object)">Monitor.Pulse</a>. However, if <i>millisecondsTimeout</i> elapses before another thread invokes this object's  <a href="#Pulse(System.Object)">Monitor.Pulse</a> or  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a> method, the original thread is moved to the ready queue in order to regain the lock. If the condition in the object's state has not been met, the thread might call <b>Wait</b> again to reenter the waiting queue until it has been met.</p>
+<p> Note that if  <a href="../../System.Threading/types/Timeout.html#Infinite">Timeout.Infinite</a> is specified for the <i>millisecondsTimeout</i> parameter, this method blocks indefinitely if the holder of the lock does not call  <a href="#Pulse(System.Object)">Monitor.Pulse</a> or  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a>.</p>
+<p> The caller executes <b>Wait</b> once, regardless of the number of times  <a href="#Enter(System.Object)">Monitor.Enter</a> has been invoked for the specified object. Conceptually, the <b>Wait</b> method stores the number of times the caller invoked  <a href="#Enter(System.Object)">Monitor.Enter</a> on the object and invokes  <a href="#Exit(System.Object)">Monitor.Exit</a> as many times as necessary to fully release the locked object. The caller then blocks while waiting to reacquire the object. When the caller reacquires the lock, the system calls  <a href="#Enter(System.Object)">Monitor.Enter</a> as many times as necessary to restore the saved  <a href="#Enter(System.Object)">Monitor.Enter</a> count for the caller.Calling <b>Wait</b> releases the lock for the specified object only; if the caller is the owner of locks on other objects, these locks are not released.</p>
+<p> Note that a synchronized object holds several references, including a reference to the thread that currently holds the lock, a reference to the ready queue, which contains the threads that are ready to obtain the lock, and a reference to the waiting queue, which contains the threads that are waiting for notification of a change in the object's state. The  <a href="#Pulse(System.Object)">Monitor.Pulse</a>,  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a>, and <b>Wait</b> methods must be invoked from within a synchronized block of code.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Threading/types/Thread.html">Thread</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WaitTopic3"></a><a name="Wait(System.Object,System.TimeSpan)">Wait</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i>,</font><br>   <font color="#008080"><a href="../../System/types/TimeSpan.html">TimeSpan</a> <i>timeout</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Releases the lock on an object and blocks the current thread until it reacquires the lock or a specified amount of time elapses.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Boolean.html">bool</a> Wait(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i>,</font><br>   <font color="#008080"><a href="../../System/types/TimeSpan.html">TimeSpan</a> <i>timeout</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object on which to wait.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>timeout</i><br><dl>
+<dd>
+<param> A  <a href="../../System/types/TimeSpan.html">TimeSpan</a> representing the amount of time to wait before this method returns.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the lock was reacquired before the specified time elapsed; otherwise, <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>obj</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Threading/types/SynchronizationLockException.html">SynchronizationLockException</a></td>
+<td> The calling thread does not own the lock for the specified object.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Threading/types/ThreadInterruptedException.html">ThreadInterruptedException</a></td>
+<td> The thread that invokes <b>Wait</b> is later interrupted from the waiting state. This happens when another thread calls this thread's  <a href="../../System.Threading/types/Thread.html#Interrupt">Thread.Interrupt</a> method.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The value of the <i>timeout</i> parameter in milliseconds is negative and is not equal to  <a href="../../System.Threading/types/Timeout.html#Infinite">Timeout.Infinite</a>, or is greater than  <a href="../../System/types/Int32.html#MaxValue">Int32.MaxValue</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If successful, this method reacquires an exclusive lock on the <i>obj</i> parameter.<p> This method behaves identically to <a href="../../System.Threading/types/Monitor.html#waittopic1">Wait</a>, except that it does not block indefinitely unless  <a href="../../System.Threading/types/Timeout.html#Infinite">Timeout.Infinite</a> milliseconds is specified for the <i>timeout</i> parameter. Once the specified time has elapsed, this method returns a value that indicates whether or not the lock has been reacquired by the caller. If <i>timeout</i> equals 0, the thread that calls <b>Wait</b> releases the lock and then immediately enters the ready queue in order to regain the lock.</p>
+<p> The thread that currently owns the lock on the specified object invokes this method in order to release the object so that another thread can access it. The caller is blocked while waiting to reacquire the lock. This method is called when the caller is waiting for a change in the state of the object that will occur as a result of another thread's operations on the object.</p>
+<p> When a thread calls <b>Wait</b>, it releases the lock on the object and enters the object's waiting queue. The next thread in the object's ready queue (if there is one) acquires the lock and has exclusive use of the object. The thread that invoked <b>Wait</b> remains in the waiting queue until either a thread that holds the lock invokes  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a>, or it is the next in the queue and a thread that holds the lock invokes  <a href="#Pulse(System.Object)">Monitor.Pulse</a>. However, if <i>timeout</i> elapses before another thread invokes this object's  <a href="#Pulse(System.Object)">Monitor.Pulse</a> or  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a> method, the original thread is moved to the ready queue in order to regain the lock. If the condition in the object's state has not been met, the thread might call <b>Wait</b> again to reenter the waiting queue until it has been met.</p>
+<p> Note that if  <a href="../../System.Threading/types/Timeout.html#Infinite">Timeout.Infinite</a> is specified for the <i>timeout</i> parameter, this method blocks indefinitely if the holder of the lock does not call  <a href="#Pulse(System.Object)">Monitor.Pulse</a> or  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a>.</p>
+<p> The caller executes <b>Wait</b> once, regardless of the number of times  <a href="#Enter(System.Object)">Monitor.Enter</a> has been invoked for the specified object. Conceptually, the <b>Wait</b> method stores the number of times the caller invoked  <a href="#Enter(System.Object)">Monitor.Enter</a> on the object and invokes  <a href="#Exit(System.Object)">Monitor.Exit</a> as many times as necessary to fully release the locked object. The caller then blocks while waiting to reacquire the object. When the caller reacquires the lock, the system calls  <a href="#Enter(System.Object)">Monitor.Enter</a> as many times as necessary to restore the saved  <a href="#Enter(System.Object)">Monitor.Enter</a> count for the caller. Calling <b>Wait</b> releases the lock for the specified object only; if the caller is the owner of locks on other objects, these locks are not released.</p>
+<p> Note that a synchronized object holds several references, including a reference to the thread that currently holds the lock, a reference to the ready queue, which contains the threads that are ready to obtain the lock, and a reference to the waiting queue, which contains the threads that are waiting for notification of a change in the object's state. The  <a href="#Pulse(System.Object)">Monitor.Pulse</a>,  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a>, and <b>Wait</b> methods must be invoked from within a synchronized block of code.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Threading/types/Thread.html">Thread</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WaitTopic4"></a><a name="Wait(System.Object,System.Int32,System.Boolean)">Wait</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>millisecondsTimeout</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>exitContext</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Waits for notification from an object that called the  <a href="#Pulse(System.Object)">Monitor.Pulse</a> or  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a> method or for a specified timer to elapse. This method also specifies whether the synchronization domain for the context (if in a synchronized context) is exited before the wait and reacquired.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Boolean.html">bool</a> Wait(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>millisecondsTimeout</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>exitContext</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object on which to wait.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>millisecondsTimeout</i><br><dl>
+<dd>
+<param> The number of milliseconds to wait before the method returns.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>exitContext</i><br><dl>
+<dd>
+<param><b>true</b> to exit and reacquire the synchronization domain for the context (if in a synchronized context) before the wait; otherwise, <b>false</b>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the wait succeeded or did not time out; otherwise, <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>obj</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Threading/types/SynchronizationLockException.html">SynchronizationLockException</a></td>
+<td><b>Wait</b> is not invoked from within a synchronized block of code.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Threading/types/ThreadInterruptedException.html">ThreadInterruptedException</a></td>
+<td> The thread that invokes <b>Wait</b> is later interrupted from the waiting state. This happens when another thread calls this thread's  <a href="../../System.Threading/types/Thread.html#Interrupt">Thread.Interrupt</a> method.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method acquires the monitor wait handle for the object. If this thread holds the monitor lock for the object, it releases it. On exit from the method, it reobtains the monitor lock.<p> The thread that currently holds the lock on this object invokes this method in order to wait until a condition in the object's state has been met. Shortly after the call to <b>Wait</b>, the thread that invoked <b>Wait</b> releases the lock and enters the waiting queue. At this point, the next thread in the ready queue (if there is one) is allowed to take control of the lock. The thread that invoked <b>Wait</b> remains in the waiting queue until either a thread that holds the lock invokes  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a>, or it is the next in the queue and a thread that holds the lock invokes  <a href="#Pulse(System.Object)">Monitor.Pulse</a>. However, if <i>millisecondsTimeout</i> elapses before another thread invokes this object's  <a href="#Pulse(System.Object)">Monitor.Pulse</a> or  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a> method, the original thread is moved to the ready queue in order to regain the lock. If the condition in the object's state has not been met, the thread might call <b>Wait</b> again to reenter the waiting queue until it has been met.</p>
+<p> If timeout equals 0, the thread that calls <b>Wait</b> releases the lock and then immediately enters the ready queue in order to regain the lock.</p>
+<p> Note that a synchronized object holds several references, including a reference to the thread that currently holds the lock, a reference to the ready queue, which contains the threads that are ready to obtain the lock, and a reference to the waiting queue, which contains the threads that are waiting for notification of a change in the object's state. The  <a href="#Pulse(System.Object)">Monitor.Pulse</a>,  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a>, and <b>Wait</b> methods must be invoked from within a synchronized block of code.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example demonstrates how to use the <b>Wait</b> method.<pre>
+using System;
+using System.Threading;
+using System.Collections;
+
+namespace MonitorCS1
+{
+	class MonitorSample
+	{
+		const int MAX_LOOP_TIME = 1000;
+		Queue	m_smplQueue;
+
+		public MonitorSample()
+		{
+			m_smplQueue = new Queue(); 
+		}
+		public void FirstThread()
+		{
+			int counter = 0;
+			lock(m_smplQueue)
+			{
+				while(counter &lt; MAX_LOOP_TIME)
+				{
+					//Wait, if the queue is busy.
+					Monitor.Wait(m_smplQueue);
+					//Push one element.
+					m_smplQueue.Enqueue(counter);
+					//Release the waiting thread.
+					Monitor.Pulse(m_smplQueue);	
+
+					counter++;
+				}
+			}
+		}
+		public void SecondThread()
+		{
+			lock(m_smplQueue)
+			{
+				//Release the waiting thread.
+				Monitor.Pulse(m_smplQueue);
+				//Wait in the loop, while the queue is busy.
+				//Exit on the timeout when the first thread stopped. 
+				while(Monitor.Wait(m_smplQueue,1000))
+				{
+					//Pop the first element.
+					int counter = (int)m_smplQueue.Dequeue();
+					//Print the first element.
+					Console.WriteLine(counter.ToString());
+					//Release waiting thread.
+					Monitor.Pulse(m_smplQueue);
+				}
+			}
+		}
+		//Return the number of the queue elements.
+		public int GetQueueCount()
+		{
+			return m_smplQueue.Count;
+		}
+
+		static void Main(string[] args)
+		{
+			//Create the MonitorSample object.
+			MonitorSample test = new MonitorSample();			
+			//Create the first thread.
+			Thread tFirst = new Thread(new ThreadStart(test.FirstThread));
+			//Create the second thread.
+			Thread tSecond = new Thread(new ThreadStart(test.SecondThread));
+			//Start threads.
+			tFirst.Start();
+			tSecond.Start();
+			//wait to the end of the two threads
+			tFirst.Join();
+			tSecond.Join();			
+			//Print the number of the queue elements.
+			Console.WriteLine("Queue Count = " + test.GetQueueCount().ToString());
+		}
+	}
+}
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Threading/types/Thread.html">Thread</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WaitTopic5"></a><a name="Wait(System.Object,System.TimeSpan,System.Boolean)">Wait</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i>,</font><br>   <font color="#008080"><a href="../../System/types/TimeSpan.html">TimeSpan</a> <i>timeout</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>exitContext</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Releases the lock on an object and blocks the current thread until it reacquires the lock, or until a specified amount of time elapses, optionally exiting the synchronization domain for the synchronized context before the wait and reacquiring the domain.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Boolean.html">bool</a> Wait(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i>,</font><br>   <font color="#008080"><a href="../../System/types/TimeSpan.html">TimeSpan</a> <i>timeout</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>exitContext</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object on which to wait.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>timeout</i><br><dl>
+<dd>
+<param> A  <a href="../../System/types/TimeSpan.html">TimeSpan</a> representing the amount of time to wait before this method returns.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>exitContext</i><br><dl>
+<dd>
+<param><b>true</b> to exit and reacquire the synchronization domain for the context (if in a synchronized context) before the wait; otherwise, <b>false</b>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the wait succeeded or did not time out; otherwise, <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>obj</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The <i>timeout</i> parameter is negative or greater than  <a href="../../System/types/Int32.html#MaxValue">Int32.MaxValue</a>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Threading/types/SynchronizationLockException.html">SynchronizationLockException</a></td>
+<td><b>Wait</b> is not invoked from within a synchronized block of code.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Threading/types/ThreadInterruptedException.html">ThreadInterruptedException</a></td>
+<td> The thread that invokes Wait is later interrupted from the waiting state. This happens when another thread calls this thread's  <a href="../../System.Threading/types/Thread.html#Interrupt">Thread.Interrupt</a> method.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The <i>timeout</i> parameter is negative or greater than  <a href="../../System/types/Int32.html#MaxValue">Int32.MaxValue</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The thread that currently holds the lock on this object invokes this method in order to wait until a condition in the object's state has been met. Shortly after the call to <b>Wait</b>, the thread that invoked <b>Wait</b> releases the lock and enters the waiting queue. At this point, the next thread in the ready queue (if there is one) is allowed to take control of the lock. The thread that invoked <b>Wait</b> remains in the waiting queue until either a thread that holds the lock invokes  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a>, or it is the next in the queue and a thread that holds the lock invokes  <a href="#Pulse(System.Object)">Monitor.Pulse</a>. However, if <i>timeout</i> milliseconds elapse before another thread invokes this object's  <a href="#Pulse(System.Object)">Monitor.Pulse</a> or  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a> method, the original thread is moved to the ready queue in order to regain the lock. If the condition in the object's state has not been met, the thread might call <b>Wait</b> again to reenter the waiting queue until it has been met.<p> If timeout equals 0, the thread that calls <b>Wait</b> releases the lock and then immediately enters the ready queue in order to regain the lock.</p>
+<p> Note that a synchronized object holds several references, including a reference to the thread that currently holds the lock, a reference to the ready queue, which contains the threads that are ready to obtain the lock, and a reference to the waiting queue, which contains the threads that are waiting for notification of a change in the object's state. The  <a href="#Pulse(System.Object)">Monitor.Pulse</a>,  <a href="#PulseAll(System.Object)">Monitor.PulseAll</a>, and <b>Wait</b> methods must be invoked from within a synchronized block of code.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Threading/types/Thread.html">Thread</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

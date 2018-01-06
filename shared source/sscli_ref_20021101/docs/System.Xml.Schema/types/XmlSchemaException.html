@@ -1,0 +1,806 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Xml.Schema.XmlSchemaException</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Xml.Schema.XmlSchemaException Class</h2><b>Assembly: </b>System.Xml.dll<br><b>Namespace: </b>System.Xml.Schema<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns detailed information about the schema exception.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public class XmlSchemaException : SystemException</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows the use of the <b>XmlSchemaException</b> class.<pre>
+using System;
+using System.Xml;
+using System.Xml.Schema;
+using System.IO;
+
+public class ValidXSD {
+    public static int Main() {
+
+        FileStream fs;
+        XmlSchema schema;
+        try {
+            fs = new FileStream("example.xsd", FileMode.Open);
+            schema = XmlSchema.Read(fs,new ValidationEventHandler(ShowCompileError));
+
+            schema.Compile(new ValidationEventHandler(ShowCompileError));
+            if (schema.IsCompiled) {
+                XmlTextReader tr = new XmlTextReader("instance.xml");
+                XmlValidatingReader rdr = new XmlValidatingReader(tr);
+            
+                rdr.ValidationType = ValidationType.Schema;
+                rdr.Schemas.Add(schema);
+               // rdr.ValidationEventHandler += new ValidationEventHandler(ShowCompileError);
+                while (rdr.Read());
+            
+            }
+            return 0;
+        } catch (XmlSchemaException e) {
+            Console.WriteLine("LineNumber = {0}", e.LineNumber);
+            Console.WriteLine("LinePosition = {0}", e.LinePosition);
+            Console.WriteLine("Message = {0}", e.Message);
+            return -1;
+        }
+        catch (Exception e) {
+            Console.WriteLine(e);
+            return -1;
+        }
+
+    }
+    
+    public static void ShowCompileError(object sender, ValidationEventArgs e) {
+        Console.WriteLine("Validation Error: {0}", e.Message);
+    }
+}
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Xml.Schema/System.Xml.Schema.html">System.Xml.Schema Namespace</a></dd>
+</dl>
+<h3>System.Xml.Schema.XmlSchemaException Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(string message, Exception innerException)<br><br></code> The formatted error message describing the error code.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#HelpLink">HelpLink</a><br>(inherited from <b>System.Exception)</b></td>
+<td width="55%"><b>Read-write</b><br><br><b><font color="#800080">See base class member description: <a href="../../System/types/Exception.html#HelpLink">System.Exception.HelpLink</a></font></b><br><br><br> Gets or sets a link to the help file associated with this exception.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#InnerException">InnerException</a><br>(inherited from <b>System.Exception)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System/types/Exception.html#InnerException">System.Exception.InnerException</a></font></b><br><br><br> Gets the  <a href="../../System/types/Exception.html">Exception</a> instance that caused the current exception.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#LineNumber">LineNumber</a></td>
+<td width="55%"><b>Read-only</b><br><br></td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#LinePosition">LinePosition</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the line position indicating where the error occurred.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Message">Message</a></td>
+<td width="55%"><b>Read-only</b><br><br><b>Overridden: </b><br> Gets the formatted error message describing the error code.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Source">Source</a><br>(inherited from <b>System.Exception)</b></td>
+<td width="55%"><b>Read-write</b><br><br><b><font color="#800080">See base class member description: <a href="../../System/types/Exception.html#Source">System.Exception.Source</a></font></b><br><br><br> Gets or sets the name of the application or the object that causes the error.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SourceSchemaObject">SourceSchemaObject</a></td>
+<td width="55%"><b>Read-only</b><br><br> The <b>XmlSchemaObject</b> that produced the <b>XmlSchemaException</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SourceUri">SourceUri</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the location of the file used to load the schema.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#StackTrace">StackTrace</a><br>(inherited from <b>System.Exception)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System/types/Exception.html#StackTrace">System.Exception.StackTrace</a></font></b><br><br><br> Gets a string representation of the frames on the call stack at the time the current exception was thrown.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#TargetSite">TargetSite</a><br>(inherited from <b>System.Exception)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System/types/Exception.html#TargetSite">System.Exception.TargetSite</a></font></b><br><br><br> Gets the method that throws the current exception.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetBaseException">GetBaseException</a><br>(inherited from <b>System.Exception)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Exception.html#GetBaseException">System.Exception.GetBaseException</a></font></b><br><br><br> When overridden in a derived class, returns the  <a href="../../System/types/Exception.html">Exception</a> that is the root cause of one or more subsequent exceptions.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">GetObjectData</a></td>
+<td width="55%"><b>Overridden: </b><br> Streams all the <b>XmlSchemaException</b> properties into the <b>SerializationInfo</b> class for the given <b>StreamingContext</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Exception)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Exception.html#ToString">System.Exception.ToString</a></font></b><br><br><br> Creates and returns a string representation of the current exception.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(SerializationInfo info, StreamingContext context)<br><br></code> Constructs a new <b>XmlSchemaException</b> object with the given <b>SerializationInfo</b> and <b>StreamingContext</b> information that contains all the properties of the <b>XmlSchemaException</b>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#HResult">HResult</a><br>(inherited from <b>System.Exception)</b></td>
+<td width="55%"><b>Read-write</b><br><br><b><font color="#800080">See base class member description: <a href="../../System/types/Exception.html#HResult">System.Exception.HResult</a></font></b><br><br><br> Gets or sets HRESULT, a coded numerical value that is assigned to a specific exception.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/Exception.html">System.Exception</a></li>
+<ul class="none">
+<li><a href="../../System/types/SystemException.html">System.SystemException</a></li>
+<ul class="none">
+<li><b>System.Xml.Schema.XmlSchemaException</b></li>
+</ul>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Xml.Schema.XmlSchemaException Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Constructs a new <b>XmlSchemaException</b> object with the given <b>SerializationInfo</b> and <b>StreamingContext</b> information that contains all the properties of the <b>XmlSchemaException</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected XmlSchemaException(<br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> <i>info</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> <i>context</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>info</i><br><dl>
+<dd>
+<param> SerializationInfo 
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>context</i><br><dl>
+<dd>
+<param> StreamingContext 
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> The formatted error message describing the error code.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlSchemaException(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i>,</font><br>   <font color="#008080"><a href="../../System/types/Exception.html">Exception</a> <i>innerException</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>message</i><br><dl>
+<dd>
+<param> The string.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>innerException</i><br><dl>
+<dd>
+<param> The exception.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="HelpLinkTopic1"></a><a name="HelpLink">HelpLink</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Exception.html#HelpLink">System.Exception.HelpLink</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets a link to the help file associated with this exception.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/String.html">string</a> HelpLink {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The return value, which represents a help file, is a URN or URL. For example, the <b>HelpLink</b> value could be: <p> "file:///C:/Applications/Bazzal/help.html#ErrorNum42" </p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="HResultTopic1"></a><a name="HResult">HResult</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Exception.html#HResult">System.Exception.HResult</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets HRESULT, a coded numerical value that is assigned to a specific exception.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Int32.html">int</a> HResult {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> HRESULT is a 32-bit value, divided into three different fields: a severity code, a facility code, and an error code. The severity code indicates whether the return value represents information, warning, or error. The facility code identifies the area of the system responsible for the error. The error code is a unique number that is assigned to represent the exception. Each exception is mapped to a distinct HRESULT. When managed code throws an exception, the runtime passes the HRESULT to the COM client. When unmanaged code returns an error, the HRESULT is converted to an exception, which is then thrown by the runtime.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="InnerExceptionTopic1"></a><a name="InnerException">InnerException</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Exception.html#InnerException">System.Exception.InnerException</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the  <a href="../../System/types/Exception.html">Exception</a> instance that caused the current exception.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Exception.html">Exception</a> InnerException {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> When an exception <i>X</i> is thrown as a direct result of a previous exception <i>Y</i>, the <b>InnerException</b> property of <i>X</i> should contain a reference to <i>Y</i>.<p> Use the <b>InnerException</b> property to obtain the set of exceptions that led to the current exception.</p>
+<p> You can create a new exception that catches an earlier exception. The code that handles the second exception can make use of the additional information from the earlier exception to handle the error more appropriately.</p>
+<p> Suppose that there is a function that reads a file and formats the data from that file. In this example, as the code tries to read the file, an  <a href="../../System.IO/types/IOException.html">IOException</a> is thrown. The function catches the  <a href="../../System.IO/types/IOException.html">IOException</a> and throws a  <a href="../../System.IO/types/FileNotFoundException.html">FileNotFoundException</a>. The  <a href="../../System.IO/types/IOException.html">IOException</a> could be saved in the  <a href="#InnerException">Exception.InnerException</a> property of the  <a href="../../System.IO/types/FileNotFoundException.html">FileNotFoundException</a>, enabling the code that catches the  <a href="../../System.IO/types/FileNotFoundException.html">FileNotFoundException</a> to examine what causes the initial error.</p>
+<p> The  <a href="#InnerException">Exception.InnerException</a> property, which holds a reference to the inner exception, is set upon initialization of the exception object.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example demonstrates throwing and catching an exception that references an inner exception.<pre>
+using System;
+public class MyAppException:ApplicationException 
+{
+   public MyAppException (String message) : base (message) 
+   {}
+   public MyAppException (String message, Exception inner) : base(message,inner) {}	
+   }
+public class ExceptExample 
+{
+   public void ThrowInner () 
+   {
+   throw new MyAppException("ExceptExample inner exception");
+   }
+   public void CatchInner() 
+   {
+      try 
+      {
+      this.ThrowInner();
+      }
+         catch (Exception e) 
+         {
+         throw new MyAppException("Error caused by trying ThrowInner.",e);
+         }
+      }
+   }
+public class Test 
+{
+   public static void Main() 
+   {
+   ExceptExample testInstance = new ExceptExample();
+      try 
+      {
+      testInstance.CatchInner();
+      }
+         catch(Exception e) 
+         {
+         Console.WriteLine ("In Main catch block. Caught: {0}", e.Message);
+         Console.WriteLine ("Inner Exception is {0}",e.InnerException);
+         }
+      }
+}
+
+    </pre>
+<p> This code has the following output: </p>
+<p><code>
+                In Main
+                catch block. Caught: Error caused by trying ThrowInner. Inner Exception is
+                MyAppException: ExceptExample inner exception at ExceptExample.ThrowInner() at
+                ExceptExample.CatchInner()
+              </code></p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="LineNumberTopic1"></a><a name="LineNumber">LineNumber</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the line number indicating where the error occurred.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> LineNumber {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="LinePositionTopic1"></a><a name="LinePosition">LinePosition</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the line position indicating where the error occurred.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> LinePosition {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Property: <i><a name="MessageTopic1"></a><a name="Message">Message</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the formatted error message describing the error code.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/String.html">string</a> Message {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="SourceTopic1"></a><a name="Source">Source</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Exception.html#Source">System.Exception.Source</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the name of the application or the object that causes the error.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/String.html">string</a> Source {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If  <a href="#Source">Exception.Source</a> is not set, the name of the assembly where the exception originated is returned.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="SourceSchemaObjectTopic1"></a><a name="SourceSchemaObject">SourceSchemaObject</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> The <b>XmlSchemaObject</b> that produced the <b>XmlSchemaException</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchemaObject.html">XmlSchemaObject</a> SourceSchemaObject {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This can be queried for the <b>LineNumber</b>, <b>LinePosition</b>, and <b>SourceUri</b> of the XML Schema definition language (XSD) schema file. A return value of <b>nil</b> indicates a syntactic parsing validation error in the SOM.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="SourceUriTopic1"></a><a name="SourceUri">SourceUri</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the location of the file used to load the schema.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> SourceUri {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="StackTraceTopic1"></a><a name="StackTrace">StackTrace</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Exception.html#StackTrace">System.Exception.StackTrace</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a string representation of the frames on the call stack at the time the current exception was thrown.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/String.html">string</a> StackTrace {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The execution stack keeps track of all the methods that are in execution at a given instant. A trace of the method calls is called a stack trace. The stack trace listing provides a means to follow the call sequence to the line number in the method where the exception occurs.<p><b>StackTrace</b> may not report as many method calls as expected, due to code transformations, such as inlining, that occur during optimization.</p><br><br><b>Notes to inheritors: </b> The <b>StackTrace</b> property is overridden in classes that require control over the stack trace content or format.<p> By default, the stack trace is captured immediately before an exception object is thrown. Use  <a href="../../System/types/Environment.html#StackTrace">Environment.StackTrace</a> to get stack trace information when no exception is being thrown.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/Environment.html#StackTrace">Environment.StackTrace</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="TargetSiteTopic1"></a><a name="TargetSite">TargetSite</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Exception.html#TargetSite">System.Exception.TargetSite</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the method that throws the current exception.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Reflection/types/MethodBase.html">MethodBase</a> TargetSite {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the method that throws this exception is not available and the stack trace is not a null reference (not set or empty),  <a href="#TargetSite">Exception.TargetSite</a> obtains the method from the stack trace. If the stack trace is a null reference ,  <a href="#TargetSite">Exception.TargetSite</a> also returns a null reference.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~XmlSchemaException();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetBaseExceptionTopic1"></a><a name="GetBaseException">GetBaseException</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Exception.html#GetBaseException">System.Exception.GetBaseException</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, returns the  <a href="../../System/types/Exception.html">Exception</a> that is the root cause of one or more subsequent exceptions.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Exception.html">Exception</a> GetBaseException();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The first exception thrown in a chain of exceptions. If the  <a href="#InnerException">Exception.InnerException</a> property of the current exception is a null reference (not set or empty), this property returns the current exception.</dd>
+</dl><b>Remarks</b><dl>
+<dd> A chain of exceptions consists of a set of exceptions such that each exception in the chain was thrown as a direct result of the exception referenced in its <b>InnerException</b> property. For a given chain, there can be exactly one exception that is the root cause of all other exceptions in the chain. This exception is called the base exception and its <b>InnerException</b> property always contains a null reference.<p> For all exceptions in a chain of exceptions, the <b>GetBaseException</b> method must return the same object (the base exception).</p>
+<p> Use the <b>GetBaseException</b> method when you want to find the root cause of an exception but do not need information about exceptions that may have occurred between the current exception and the first exception.</p><br><br><b>Notes to inheritors: </b> The <b>GetBaseException</b> method is overridden in classes that require control over the exception content or format.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="GetObjectDataTopic1"></a><a name="GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">GetObjectData</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> <i>info</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> <i>context</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Streams all the <b>XmlSchemaException</b> properties into the <b>SerializationInfo</b> class for the given <b>StreamingContext</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void GetObjectData(<br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> <i>info</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> <i>context</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>info</i><br><dl>
+<dd>
+<param> The <b>SerializationInfo</b>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>context</i><br><dl>
+<dd>
+<param> The <b>StreamingContext</b> information.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Serialization/types/ISerializable.html#GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">ISerializable.GetObjectData</a></dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Exception.html#ToString">System.Exception.ToString</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates and returns a string representation of the current exception.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/String.html">string</a> ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A string representation of the current exception.</dd>
+</dl><b>Remarks</b><dl>
+<dd><b>ToString</b> returns a representation of the current exception that is intended to be understood by humans. Where the exception contains culture-sensitive data, the string representation returned by <b>ToString</b> is required to take into account the current system culture. Although there are no exact requirements for the format of the returned string, it should attempt to reflect the value of the object as perceived by the user.<p> The default implementation of <b>Exception.ToString</b> obtains the name of the class that threw the current exception, the message, the result of calling <b>ToString</b> on the inner exception, and the result of calling  <a href="../../System/types/Environment.html#StackTrace">Environment.StackTrace</a>. If any of these members is a null reference (not set or empty), its value is not included in the returned string.</p>
+<p> If there is no error message or if it is an empty string (""), then no error message is returned. The name of the inner exception and the stack trace are returned only if they are not a null reference.</p>
+<p> This method overrides  <a href="../../System/types/Object.html#ToString">Object.ToString</a>.</p><br><br><b>Notes to inheritors: </b> It is recommended, but not required, that <b>ToString</b> be overridden to return information about members declared in the derived class. For example, the  <a href="../../System/types/ArgumentException.html">ArgumentException</a> class implements <b>ToString</b> so that it returns the value of the <b>ParamName</b> property, if that value is not a null reference.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example causes an exception and displays the result of calling <b>ToString</b> on that exception.<pre>
+using System;
+
+public class MyClass {}
+public class ArgExceptionExample 
+   {
+   public static void Main()
+      {
+      MyClass my = new MyClass();
+      string s = "sometext";
+      try 
+         {
+         int i = s.CompareTo(my);
+         }
+            catch (Exception e) 
+            {
+            Console.WriteLine("Error: {0}",e.ToString());
+            }
+      }
+}
+
+    </pre>
+<p> This code has the following output: </p>
+<p><code>
+                Error:
+                System.ArgumentException: Object must be of type String. at
+                System.String.CompareTo(Object value) at ArgExceptionExample.Main()
+              </code></p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

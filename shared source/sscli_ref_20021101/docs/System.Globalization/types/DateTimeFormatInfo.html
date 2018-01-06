@@ -1,0 +1,3167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Globalization.DateTimeFormatInfo</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Globalization.DateTimeFormatInfo Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Globalization<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Defines how  <a href="../../System/types/DateTime.html">DateTime</a> values are formatted and displayed, depending on the culture.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public sealed class DateTimeFormatInfo : ICloneable, IFormatProvider</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Thread Safety</b><br><dl>
+<dd> This type is safe for multithreaded operations.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This class contains information, such as date patterns, time patterns, and AM/PM designators.<p> To create a  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> for a specific culture, create a  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> for that culture and retrieve the  <a href="../../System.Globalization/types/CultureInfo.html#DateTimeFormat">CultureInfo.DateTimeFormat</a> property. To create a  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> for the culture of the current thread, use the  <a href="#CurrentInfo">DateTimeFormatInfo.CurrentInfo</a> property. To create a  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> for the invariant culture, use the  <a href="#InvariantInfo">DateTimeFormatInfo.InvariantInfo</a> property for a read-only version, or use the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> constructor for a writable version. It is not possible to create a  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> for a neutral culture.</p>
+<p> The user might choose to override some of the values associated with the current culture of Windows through Regional and Language Options (or Regional Options or Regional Settings) in Control Panel. For example, the user might choose to display the date in a different format or to use a currency other than the default for the culture. If the  <a href="../../System.Globalization/types/CultureInfo.html#UseUserOverride">CultureInfo.UseUserOverride</a> property is set to <b>true</b>, the properties of the  <a href="../../System.Globalization/types/CultureInfo.html#DateTimeFormat">CultureInfo.DateTimeFormat</a> instance, the  <a href="../../System.Globalization/types/CultureInfo.html#NumberFormat">CultureInfo.NumberFormat</a> instance, and the  <a href="../../System.Globalization/types/CultureInfo.html#TextInfo">CultureInfo.TextInfo</a> instance are also retrieved from the user settings. If the user settings are incompatible with the culture associated with the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> (for example, if the selected calendar is not one of the  <a href="../../System.Globalization/types/CultureInfo.html#OptionalCalendars">CultureInfo.OptionalCalendars</a>), the results of the methods and the values of the properties are undefined.</p>
+<p> <a href="../../System/types/DateTime.html">DateTime</a> values are formatted using standard or custom patterns stored in the properties of a  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a>.</p>
+<p> The standard patterns can be replaced with custom patterns by setting the associated properties of a writable  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a>. To determine if a  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is writable, use the  <a href="#IsReadOnly">DateTimeFormatInfo.IsReadOnly</a> property.</p>
+<p> The following table lists the standard format characters for each standard pattern and the associated  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> property that can be set to modify the standard pattern. The format characters are case-sensitive; for example, 'g' and 'G' represent slightly different patterns.</p><br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+              Format Character
+            </TH>
+<TH>
+              Associated Property / Description
+            </TH>
+<TH>
+              Example Format Pattern (en-US)
+            </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+              d
+            </TD>
+<TD> <a href="#ShortDatePattern">DateTimeFormatInfo.ShortDatePattern</a></TD>
+<TD>
+              MM/dd/yyyy
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              D
+            </TD>
+<TD> <a href="#LongDatePattern">DateTimeFormatInfo.LongDatePattern</a></TD>
+<TD>
+              dddd, dd MMMM yyyy
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              f
+            </TD>
+<TD>
+              Full date and time (long date and short time)
+            </TD>
+<TD>
+              dddd, dd MMMM yyyy HH:mm
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              F
+            </TD>
+<TD> <a href="#FullDateTimePattern">DateTimeFormatInfo.FullDateTimePattern</a>
+              (long date and long time)
+            </TD>
+<TD>
+              dddd, dd MMMM yyyy HH:mm:ss
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              g
+            </TD>
+<TD>
+              General (short date and short time)
+            </TD>
+<TD>
+              MM/dd/yyyy HH:mm
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              G
+            </TD>
+<TD>
+              General (short date and long time)
+            </TD>
+<TD>
+              MM/dd/yyyy HH:mm:ss
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              m, M
+            </TD>
+<TD> <a href="#MonthDayPattern">DateTimeFormatInfo.MonthDayPattern</a></TD>
+<TD>
+              MMMM dd
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              r, R
+            </TD>
+<TD> <a href="#RFC1123Pattern">DateTimeFormatInfo.RFC1123Pattern</a></TD>
+<TD>
+              ddd, dd MMM yyyy HH':'mm':'ss 'GMT'
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              s
+            </TD>
+<TD> <a href="#SortableDateTimePattern">DateTimeFormatInfo.SortableDateTimePattern</a>
+              (based on ISO 8601) using local time
+            </TD>
+<TD>
+              yyyy'-'MM'-'dd'T'HH':'mm':'ss
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              t
+            </TD>
+<TD> <a href="#ShortTimePattern">DateTimeFormatInfo.ShortTimePattern</a></TD>
+<TD>
+              HH:mm
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              T
+            </TD>
+<TD> <a href="#LongTimePattern">DateTimeFormatInfo.LongTimePattern</a></TD>
+<TD>
+              HH:mm:ss
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              u
+            </TD>
+<TD> <a href="#UniversalSortableDateTimePattern">DateTimeFormatInfo.UniversalSortableDateTimePattern</a>
+              using universal time
+            </TD>
+<TD>
+              yyyy'-'MM'-'dd HH':'mm':'ss'Z'
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              U
+            </TD>
+<TD>
+              Full date and time (long date and long time) using universal time
+            </TD>
+<TD>
+              dddd, dd MMMM yyyy HH:mm:ss
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              y, Y
+            </TD>
+<TD> <a href="#YearMonthPattern">DateTimeFormatInfo.YearMonthPattern</a></TD>
+<TD>
+              yyyy MMMM
+            </TD>
+</TR>
+</table>
+<p> The following table lists the patterns that can be combined to construct custom patterns. The patterns are case-sensitive; for example, "MM" is recognized, but "mm" is not. If the custom pattern contains white-space characters or characters enclosed in single quotation marks, the output string will also contain those characters. Characters not defined as part of a format pattern or as format characters are reproduced literally.</p><br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+              Format Pattern
+            </TH>
+<TH>
+              Description
+            </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+              d
+            </TD>
+<TD>
+              The day of the month. Single-digit days will not have a leading zero.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              dd
+            </TD>
+<TD>
+              The day of the month. Single-digit days will have a leading zero.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              ddd
+            </TD>
+<TD>
+              The abbreviated name of the day of the week, as defined in
+               <a href="#AbbreviatedDayNames">DateTimeFormatInfo.AbbreviatedDayNames</a>
+              .
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              dddd
+            </TD>
+<TD>
+              The full name of the day of the week, as defined in
+               <a href="#DayNames">DateTimeFormatInfo.DayNames</a>
+              .
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              M
+            </TD>
+<TD>
+              The numeric month. Single-digit months will not have a leading zero.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              MM
+            </TD>
+<TD>
+              The numeric month. Single-digit months will have a leading zero.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              MMM
+            </TD>
+<TD>
+              The abbreviated name of the month, as defined in
+               <a href="#AbbreviatedMonthNames">DateTimeFormatInfo.AbbreviatedMonthNames</a>
+              .
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              MMMM
+            </TD>
+<TD>
+              The full name of the month, as defined in
+               <a href="#MonthNames">DateTimeFormatInfo.MonthNames</a>
+              .
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              y
+            </TD>
+<TD>
+              The year without the century.
+              If the year without the century is less than 10, the year is displayed with no leading zero.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              yy
+            </TD>
+<TD>
+              The year without the century.
+              If the year without the century is less than 10, the year is displayed with a leading zero.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              yyyy
+            </TD>
+<TD>
+              The year in four digits, including the century.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              gg
+            </TD>
+<TD>
+              The period or era.
+              This pattern is ignored if the date to be formatted does not have an associated period or era string.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              h
+            </TD>
+<TD>
+              The hour in a 12-hour clock. Single-digit hours will not have a leading zero.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              hh
+            </TD>
+<TD>
+              The hour in a 12-hour clock. Single-digit hours will have a leading zero.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              H
+            </TD>
+<TD>
+              The hour in a 24-hour clock. Single-digit hours will not have a leading zero.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              HH
+            </TD>
+<TD>
+              The hour in a 24-hour clock. Single-digit hours will have a leading zero.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              m
+            </TD>
+<TD>
+              The minute. Single-digit minutes will not have a leading zero.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              mm
+            </TD>
+<TD>
+              The minute. Single-digit minutes will have a leading zero.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              s
+            </TD>
+<TD>
+              The second. Single-digit seconds will not have a leading zero.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              ss
+            </TD>
+<TD>
+              The second. Single-digit seconds will have a leading zero.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              f
+            </TD>
+<TD>
+              The fraction of a second in single-digit precision. The remaining digits are truncated.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              ff
+            </TD>
+<TD>
+              The fraction of a second in double-digit precision. The remaining digits are truncated.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              fff
+            </TD>
+<TD>
+              The fraction of a second in three-digit precision. The remaining digits are truncated.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              ffff
+            </TD>
+<TD>
+              The fraction of a second in four-digit precision. The remaining digits are truncated.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              fffff
+            </TD>
+<TD>
+              The fraction of a second in five-digit precision. The remaining digits are truncated.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              ffffff
+            </TD>
+<TD>
+              The fraction of a second in six-digit precision. The remaining digits are truncated.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              fffffff
+            </TD>
+<TD>
+              The fraction of a second in seven-digit precision. The remaining digits are truncated.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              t
+            </TD>
+<TD>
+              The first character in the AM/PM designator defined
+              in
+               <a href="#AMDesignator">DateTimeFormatInfo.AMDesignator</a>
+              or
+               <a href="#PMDesignator">DateTimeFormatInfo.PMDesignator</a>
+              .
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              tt
+            </TD>
+<TD>
+              The AM/PM designator defined in
+               <a href="#AMDesignator">DateTimeFormatInfo.AMDesignator</a>
+              or
+               <a href="#PMDesignator">DateTimeFormatInfo.PMDesignator</a>
+              .
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              z
+            </TD>
+<TD>
+              The time zone offset ("+" or "-" followed by the hour only).
+              Single-digit hours will not have a leading zero. For example, Pacific Standard Time is "-8".
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              zz
+            </TD>
+<TD>
+              The time zone offset ("+" or "-" followed by the hour only).
+              Single-digit hours will have a leading zero. For example, Pacific Standard Time is "-08".
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              zzz
+            </TD>
+<TD>
+              The full time zone offset ("+" or "-" followed by the hour and minutes).
+              Single-digit hours and minutes will have leading zeros. For example, Pacific Standard Time is "-08:00".
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              :
+            </TD>
+<TD>
+              The default time separator defined in
+               <a href="#TimeSeparator">DateTimeFormatInfo.TimeSeparator</a>
+              .
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              /
+            </TD>
+<TD>
+              The default date separator defined in
+               <a href="#DateSeparator">DateTimeFormatInfo.DateSeparator</a>
+              .
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              %
+              </TD>
+<TD>
+              Where
+              
+              is a format pattern if used alone.
+              The "%" character can be omitted if the format pattern is combined with literal characters or other format patterns.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              \
+              </TD>
+<TD>
+              Where
+              
+              is any character.
+              Displays the character literally. To display the backslash character, use "\\".
+            </TD>
+</TR>
+</table>
+<p> Only format patterns listed in the second table above can be used to create custom patterns; standard format characters listed in the first table cannot be used to create custom patterns. Custom patterns are at least two characters long; for example, </p>
+<UL>
+<li> DateTime.ToString( "d" ) returns the DateTime value; "d" is the standard short date pattern.</li>
+<li> DateTime.ToString( "%d" ) returns the day of the month; "%d" is a custom pattern.</li>
+<li> DateTime.ToString( "d " ) returns the day of the month followed by a white-space character; "d " is a custom pattern.</li>
+</UL>
+<p> A  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> or a  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> can be created only for the invariant culture or for specific cultures, not for neutral cultures. For more information about the invariant culture, specific cultures, and neutral cultures, see the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> class.</p>
+<p> This class implements the  <a href="../../System/types/ICloneable.html">ICloneable</a> interface to enable duplication of  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> objects. It also implements  <a href="../../System/types/IFormatProvider.html">IFormatProvider</a> to supply formatting information to applications.</p>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Globalization/System.Globalization.html">System.Globalization Namespace</a> |  <a href="../../System/types/DateTime.html">DateTime</a> |  <a href="../../System.Globalization/types/Calendar.html">Calendar</a> |  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconformattingoverview.asp">MSDN: formattingoverview</a></dd>
+</dl>
+<h3>System.Globalization.DateTimeFormatInfo Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%">Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Initializes a new writable instance of the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> class that is culture-independent (invariant).</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#AbbreviatedDayNames">AbbreviatedDayNames</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets a one-dimensional array of type  <a href="../../System/types/String.html">String</a> containing the culture-specific abbreviated names of the days of the week.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AbbreviatedMonthNames">AbbreviatedMonthNames</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets a one-dimensional array of type  <a href="../../System/types/String.html">String</a> containing the culture-specific abbreviated names of the months.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AMDesignator">AMDesignator</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the string designator for hours that are "ante meridiem" (before noon).</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Calendar">Calendar</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the calendar to use for the current culture.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CalendarWeekRule">CalendarWeekRule</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets a value that specifies which rule is used to determine the first calendar week of the year.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CurrentInfo">CurrentInfo</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a read-only  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> that formats values based on the current culture.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#DateSeparator">DateSeparator</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the string that separates the components of a date; that is, the year, month, and day.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#DayNames">DayNames</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets a one-dimensional array of type  <a href="../../System/types/String.html">String</a> containing the culture-specific full names of the days of the week.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#FirstDayOfWeek">FirstDayOfWeek</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the first day of the week.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#FullDateTimePattern">FullDateTimePattern</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the format pattern for a long date and long time value, which is associated with the 'F' format character.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#InvariantInfo">InvariantInfo</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the default read-only  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> that is culture-independent (invariant).</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsReadOnly">IsReadOnly</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a value indicating whether the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is read-only.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#LongDatePattern">LongDatePattern</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the format pattern for a long date value, which is associated with the 'D' format character.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#LongTimePattern">LongTimePattern</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the format pattern for a long time value, which is associated with the 'T' format character.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MonthDayPattern">MonthDayPattern</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the format pattern for a month and day value, which is associated with the 'm' and 'M' format characters.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MonthNames">MonthNames</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets a one-dimensional array of type  <a href="../../System/types/String.html">String</a> containing the culture-specific full names of the months.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#PMDesignator">PMDesignator</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the string designator for hours that are "post meridiem" (after noon).</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#RFC1123Pattern">RFC1123Pattern</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the format pattern for a time value, which is based on the Internet Engineering Task Force (IETF) Request for Comments (RFC) 1123 specification and is associated with the 'r' and 'R' format characters.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ShortDatePattern">ShortDatePattern</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the format pattern for a short date value, which is associated with the 'd' format character.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ShortTimePattern">ShortTimePattern</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the format pattern for a short time value, which is associated with the 't' format character.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SortableDateTimePattern">SortableDateTimePattern</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the format pattern for a sortable date and time value, which is associated with the 's' format character.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#TimeSeparator">TimeSeparator</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the string that separates the components of time; that is, the hour, minutes, and seconds.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#UniversalSortableDateTimePattern">UniversalSortableDateTimePattern</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the format pattern for a universal sortable date and time value, which is associated with the 'u' and 'U' format characters.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#YearMonthPattern">YearMonthPattern</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the format pattern for a year and month value, which is associated with the 'y' and 'Y' format characters.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Clone">Clone</a></td>
+<td width="55%"> Creates a shallow copy of the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetAbbreviatedDayName(System.DayOfWeek)">GetAbbreviatedDayName</a></td>
+<td width="55%"> Returns the culture-specific abbreviated name of the specified day of the week based on the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> of the current thread.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetAbbreviatedEraName(System.Int32)">GetAbbreviatedEraName</a></td>
+<td width="55%"> Returns the string containing the abbreviated name of the specified era, if an abbreviation exists.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetAbbreviatedMonthName(System.Int32)">GetAbbreviatedMonthName</a></td>
+<td width="55%"> Returns the culture-specific abbreviated name of the specified month based on the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> of the current thread.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetAllDateTimePatterns">GetAllDateTimePatterns</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetAllDateTimePatterns()<br><br></code> Returns all the standard patterns in which  <a href="../../System/types/DateTime.html">DateTime</a> values can be formatted.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetAllDateTimePatterns(System.Char)">GetAllDateTimePatterns</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>GetAllDateTimePatterns(char format)<br><br></code> Returns all the standard patterns in which  <a href="../../System/types/DateTime.html">DateTime</a> values can be formatted using the specified format character.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetDayName(System.DayOfWeek)">GetDayName</a></td>
+<td width="55%"> Returns the culture-specific full name of the specified day of the week based on the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> of the current thread.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetEra(System.String)">GetEra</a></td>
+<td width="55%"> Returns the integer representing the specified era.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetEraName(System.Int32)">GetEraName</a></td>
+<td width="55%"> Returns the string containing the name of the specified era.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetFormat(System.Type)">GetFormat</a></td>
+<td width="55%"> Returns an object of the specified type that provides a  <a href="../../System/types/DateTime.html">DateTime</a> formatting service.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetInstance(System.IFormatProvider)">GetInstance</a></td>
+<td width="55%"> Returns the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> associated with the specified  <a href="../../System/types/IFormatProvider.html">IFormatProvider</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetMonthName(System.Int32)">GetMonthName</a></td>
+<td width="55%"> Returns the culture-specific full name of the specified month based on the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> of the current thread.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ReadOnly(System.Globalization.DateTimeFormatInfo)">ReadOnly</a></td>
+<td width="55%"> Returns a read-only  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> wrapper.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Globalization.DateTimeFormatInfo</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Globalization.DateTimeFormatInfo Member Details</h3><b><i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new writable instance of the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> class that is culture-independent (invariant).</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public DateTimeFormatInfo();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The properties of this  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> can be modified with user-defined patterns.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="AbbreviatedDayNamesTopic1"></a><a name="AbbreviatedDayNames">AbbreviatedDayNames</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets a one-dimensional array of type  <a href="../../System/types/String.html">String</a> containing the culture-specific abbreviated names of the days of the week.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string[]</a> AbbreviatedDayNames {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The property is being set to an array that is multidimensional or whose length is not exactly 7.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If setting this property, the array must be one-dimensional and must have exactly seven elements.<p> If the custom pattern includes the format pattern "ddd",  <a href="../../System/types/DateTime.html#ToString">DateTime.ToString</a> displays the value of  <a href="#AbbreviatedDayNames">DateTimeFormatInfo.AbbreviatedDayNames</a> in place of the "ddd" in the format pattern.</p>
+<p> This property is affected if the value of the  <a href="#Calendar">DateTimeFormatInfo.Calendar</a> property changes. If the selected  <a href="#Calendar">DateTimeFormatInfo.Calendar</a> does not support abbreviated day names, the array contains the full day names.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#DayNames">DateTimeFormatInfo.DayNames</a> |  <a href="#AbbreviatedMonthNames">DateTimeFormatInfo.AbbreviatedMonthNames</a> |  <a href="#GetAbbreviatedDayName(System.DayOfWeek)">DateTimeFormatInfo.GetAbbreviatedDayName</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="AbbreviatedMonthNamesTopic1"></a><a name="AbbreviatedMonthNames">AbbreviatedMonthNames</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets a one-dimensional array of type  <a href="../../System/types/String.html">String</a> containing the culture-specific abbreviated names of the months.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string[]</a> AbbreviatedMonthNames {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The property is being set to an array that is multidimensional or whose length is not exactly 13.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If setting this property, the array must be one-dimensional and must have exactly 13 elements. <a href="../../System.Globalization/types/Calendar.html">Calendar</a> objects accommodate calendars with 13 months.<p> If the custom pattern includes the format pattern "MMM",  <a href="../../System/types/DateTime.html#ToString">DateTime.ToString</a> displays the value of  <a href="#AbbreviatedMonthNames">DateTimeFormatInfo.AbbreviatedMonthNames</a> in place of the "MMM" in the format pattern.</p>
+<p> This property is affected if the value of the  <a href="#Calendar">DateTimeFormatInfo.Calendar</a> property changes. If the selected  <a href="#Calendar">DateTimeFormatInfo.Calendar</a> does not support abbreviated month names, the array contains the full month names.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#AbbreviatedDayNames">DateTimeFormatInfo.AbbreviatedDayNames</a> |  <a href="#MonthNames">DateTimeFormatInfo.MonthNames</a> |  <a href="#GetAbbreviatedMonthName(System.Int32)">DateTimeFormatInfo.GetAbbreviatedMonthName</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="AMDesignatorTopic1"></a><a name="AMDesignator">AMDesignator</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the string designator for hours that are "ante meridiem" (before noon).</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> AMDesignator {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the custom pattern includes the format pattern "tt" and the time is before noon,  <a href="../../System/types/DateTime.html#ToString">DateTime.ToString</a> displays the value of  <a href="#AMDesignator">DateTimeFormatInfo.AMDesignator</a> in place of the "tt" in the format pattern. If the custom pattern includes the format pattern "t", only the first character of  <a href="#AMDesignator">DateTimeFormatInfo.AMDesignator</a> is displayed.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#PMDesignator">DateTimeFormatInfo.PMDesignator</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CalendarTopic1"></a><a name="Calendar">Calendar</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the calendar to use for the current culture.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Globalization/types/Calendar.html">Calendar</a> Calendar {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The property is being set to a  <a href="../../System.Globalization/types/Calendar.html">Calendar</a> that is not valid for the current culture.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#Calendar">DateTimeFormatInfo.Calendar</a> property only accepts calendars that are valid for the current culture of the current thread. The  <a href="../../System.Globalization/types/CultureInfo.html#Calendar">CultureInfo.Calendar</a> property specifies the default calendar for the culture and the  <a href="../../System.Globalization/types/CultureInfo.html#OptionalCalendars">CultureInfo.OptionalCalendars</a> property specifies other calendars supported by the culture.<p> Changing the value of this property affects the following properties as well:  <a href="#MonthNames">DateTimeFormatInfo.MonthNames</a>,  <a href="#AbbreviatedMonthNames">DateTimeFormatInfo.AbbreviatedMonthNames</a>,  <a href="#DayNames">DateTimeFormatInfo.DayNames</a>,  <a href="#AbbreviatedDayNames">DateTimeFormatInfo.AbbreviatedDayNames</a>,  <a href="#CalendarWeekRule">DateTimeFormatInfo.CalendarWeekRule</a>,  <a href="#FirstDayOfWeek">DateTimeFormatInfo.FirstDayOfWeek</a>,  <a href="#FullDateTimePattern">DateTimeFormatInfo.FullDateTimePattern</a>,  <a href="#LongDatePattern">DateTimeFormatInfo.LongDatePattern</a>,  <a href="#ShortDatePattern">DateTimeFormatInfo.ShortDatePattern</a>,  <a href="#YearMonthPattern">DateTimeFormatInfo.YearMonthPattern</a>, and  <a href="#MonthDayPattern">DateTimeFormatInfo.MonthDayPattern</a>.</p>
+<p> For example, if the culture of the current thread is Japanese, this property accepts  <a href="../../System.Globalization/types/JapaneseCalendar.html">JapaneseCalendar</a>,  <a href="../../System.Globalization/types/GregorianCalendarTypes.html#Localized">GregorianCalendarTypes.Localized</a> <a href="../../System.Globalization/types/GregorianCalendar.html">GregorianCalendar</a>, or  <a href="../../System.Globalization/types/GregorianCalendarTypes.html#USEnglish">GregorianCalendarTypes.USEnglish</a> <a href="../../System.Globalization/types/GregorianCalendar.html">GregorianCalendar</a>. When the  <a href="../../System.Globalization/types/JapaneseCalendar.html">JapaneseCalendar</a> is used, the default long date pattern is "gg y'\x5e74'M'\x6708'd'\x65e5'". When the  <a href="../../System.Globalization/types/GregorianCalendarTypes.html#Localized">GregorianCalendarTypes.Localized</a> <a href="../../System.Globalization/types/GregorianCalendar.html">GregorianCalendar</a>, is used, the default long date pattern is "yyyy'\x5e74'M'\x6708'd'\x65e5'".</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Globalization/types/Calendar.html">Calendar</a> |  <a href="../../System.Globalization/types/GregorianCalendar.html">GregorianCalendar</a> |  <a href="../../System.Globalization/types/HebrewCalendar.html">HebrewCalendar</a> |  <a href="../../System.Globalization/types/HijriCalendar.html">HijriCalendar</a> |  <a href="../../System.Globalization/types/JapaneseCalendar.html">JapaneseCalendar</a> |  <a href="../../System.Globalization/types/JulianCalendar.html">JulianCalendar</a> |  <a href="../../System.Globalization/types/KoreanCalendar.html">KoreanCalendar</a> |  <a href="../../System.Globalization/types/ThaiBuddhistCalendar.html">ThaiBuddhistCalendar</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CalendarWeekRuleTopic1"></a><a name="CalendarWeekRule">CalendarWeekRule</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets a value that specifies which rule is used to determine the first calendar week of the year.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Globalization/types/CalendarWeekRule.html">CalendarWeekRule</a> CalendarWeekRule {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The property is being set to a value that is not a valid  <a href="../../System.Globalization/types/CalendarWeekRule.html">CalendarWeekRule</a> value.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property is affected if the value of the  <a href="#Calendar">DateTimeFormatInfo.Calendar</a> property changes.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Globalization/types/CalendarWeekRule.html">CalendarWeekRule</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CurrentInfoTopic1"></a><a name="CurrentInfo">CurrentInfo</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a read-only  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> that formats values based on the current culture.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> CurrentInfo {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="DateSeparatorTopic1"></a><a name="DateSeparator">DateSeparator</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the string that separates the components of a date; that is, the year, month, and day.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> DateSeparator {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the custom pattern includes the format pattern "/",  <a href="../../System/types/DateTime.html#ToString">DateTime.ToString</a> displays the value of  <a href="#DateSeparator">DateTimeFormatInfo.DateSeparator</a> in place of the "/" in the format pattern.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#TimeSeparator">DateTimeFormatInfo.TimeSeparator</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="DayNamesTopic1"></a><a name="DayNames">DayNames</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets a one-dimensional array of type  <a href="../../System/types/String.html">String</a> containing the culture-specific full names of the days of the week.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string[]</a> DayNames {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The property is being set to an array that is multidimensional or whose length is not exactly 7.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If setting this property, the array must be one-dimensional and must have exactly seven elements.<p> If the custom pattern includes the format pattern "dddd",  <a href="../../System/types/DateTime.html#ToString">DateTime.ToString</a> displays the value of  <a href="#DayNames">DateTimeFormatInfo.DayNames</a> in place of the "dddd" in the format pattern.</p>
+<p> This property is affected if the value of the  <a href="#Calendar">DateTimeFormatInfo.Calendar</a> property changes.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#AbbreviatedDayNames">DateTimeFormatInfo.AbbreviatedDayNames</a> |  <a href="#MonthNames">DateTimeFormatInfo.MonthNames</a> |  <a href="#GetDayName(System.DayOfWeek)">DateTimeFormatInfo.GetDayName</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="FirstDayOfWeekTopic1"></a><a name="FirstDayOfWeek">FirstDayOfWeek</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the first day of the week.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/DayOfWeek.html">DayOfWeek</a> FirstDayOfWeek {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The property is being set to a value that is not a valid  <a href="../../System/types/DayOfWeek.html">DayOfWeek</a> value.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property is affected if the value of the  <a href="#Calendar">DateTimeFormatInfo.Calendar</a> property changes.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/DayOfWeek.html">DayOfWeek</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="FullDateTimePatternTopic1"></a><a name="FullDateTimePattern">FullDateTimePattern</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the format pattern for a long date and long time value, which is associated with the 'F' format character.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> FullDateTimePattern {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> See  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> for patterns that can be combined to construct custom patterns; for example, "dddd, dd MMMM yyyy HH:mm:ss".<p> This property is affected if the value of the  <a href="#Calendar">DateTimeFormatInfo.Calendar</a> property changes.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="InvariantInfoTopic1"></a><a name="InvariantInfo">InvariantInfo</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the default read-only  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> that is culture-independent (invariant).</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> InvariantInfo {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property does not change regardless of the current culture.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsReadOnlyTopic1"></a><a name="IsReadOnly">IsReadOnly</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is read-only.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> IsReadOnly {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#ReadOnly(System.Globalization.DateTimeFormatInfo)">DateTimeFormatInfo.ReadOnly</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="LongDatePatternTopic1"></a><a name="LongDatePattern">LongDatePattern</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the format pattern for a long date value, which is associated with the 'D' format character.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> LongDatePattern {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> See  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> for patterns that can be combined to construct custom patterns; for example, "dddd, dd MMMM yyyy".<p> This property is affected if the value of the  <a href="#Calendar">DateTimeFormatInfo.Calendar</a> property changes.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="LongTimePatternTopic1"></a><a name="LongTimePattern">LongTimePattern</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the format pattern for a long time value, which is associated with the 'T' format character.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> LongTimePattern {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> See  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> for patterns that can be combined to construct custom patterns; for example, "HH:mm:ss".</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="MonthDayPatternTopic1"></a><a name="MonthDayPattern">MonthDayPattern</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the format pattern for a month and day value, which is associated with the 'm' and 'M' format characters.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> MonthDayPattern {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> See  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> for patterns that can be combined to construct custom patterns; for example, "MMMM dd".<p> This property is affected if the value of the  <a href="#Calendar">DateTimeFormatInfo.Calendar</a> property changes.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="MonthNamesTopic1"></a><a name="MonthNames">MonthNames</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets a one-dimensional array of type  <a href="../../System/types/String.html">String</a> containing the culture-specific full names of the months.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string[]</a> MonthNames {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The property is being set to an array that is multidimensional or whose length is not exactly 13.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If setting this property, the array must be one-dimensional and must have exactly 13 elements. <a href="../../System.Globalization/types/Calendar.html">Calendar</a> objects accommodate calendars with 13 months.<p> If the custom pattern includes the format pattern "MMMM",  <a href="../../System/types/DateTime.html#ToString">DateTime.ToString</a> displays the value of  <a href="#MonthNames">DateTimeFormatInfo.MonthNames</a> in place of the "MMMM" in the format pattern.</p>
+<p> This property is affected if the value of the  <a href="#Calendar">DateTimeFormatInfo.Calendar</a> property changes.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#DayNames">DateTimeFormatInfo.DayNames</a> |  <a href="#AbbreviatedMonthNames">DateTimeFormatInfo.AbbreviatedMonthNames</a> |  <a href="#GetMonthName(System.Int32)">DateTimeFormatInfo.GetMonthName</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="PMDesignatorTopic1"></a><a name="PMDesignator">PMDesignator</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the string designator for hours that are "post meridiem" (after noon).</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> PMDesignator {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the custom pattern includes the format pattern "tt" and the time is after noon,  <a href="../../System/types/DateTime.html#ToString">DateTime.ToString</a> displays the value of  <a href="#PMDesignator">DateTimeFormatInfo.PMDesignator</a> in place of the "tt" in the format pattern. If the custom pattern includes the format pattern "t", only the first character of  <a href="#PMDesignator">DateTimeFormatInfo.PMDesignator</a> is displayed.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#AMDesignator">DateTimeFormatInfo.AMDesignator</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="RFC1123PatternTopic1"></a><a name="RFC1123Pattern">RFC1123Pattern</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the format pattern for a time value, which is based on the Internet Engineering Task Force (IETF) Request for Comments (RFC) 1123 specification and is associated with the 'r' and 'R' format characters.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> RFC1123Pattern {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ShortDatePatternTopic1"></a><a name="ShortDatePattern">ShortDatePattern</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the format pattern for a short date value, which is associated with the 'd' format character.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> ShortDatePattern {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> See  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> for patterns that can be combined to construct custom patterns; for example, "MM/dd/yyyy".<p> This property is affected if the value of the  <a href="#Calendar">DateTimeFormatInfo.Calendar</a> property changes.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ShortTimePatternTopic1"></a><a name="ShortTimePattern">ShortTimePattern</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the format pattern for a short time value, which is associated with the 't' format character.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> ShortTimePattern {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> See  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> for patterns that can be combined to construct custom patterns; for example, "HH:mm".</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="SortableDateTimePatternTopic1"></a><a name="SortableDateTimePattern">SortableDateTimePattern</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the format pattern for a sortable date and time value, which is associated with the 's' format character.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> SortableDateTimePattern {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#UniversalSortableDateTimePattern">DateTimeFormatInfo.UniversalSortableDateTimePattern</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="TimeSeparatorTopic1"></a><a name="TimeSeparator">TimeSeparator</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the string that separates the components of time; that is, the hour, minutes, and seconds.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> TimeSeparator {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the custom pattern includes the format pattern ":",  <a href="../../System/types/DateTime.html#ToString">DateTime.ToString</a> displays the value of  <a href="#TimeSeparator">DateTimeFormatInfo.TimeSeparator</a> in place of the ":" in the format pattern.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#DateSeparator">DateTimeFormatInfo.DateSeparator</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="UniversalSortableDateTimePatternTopic1"></a><a name="UniversalSortableDateTimePattern">UniversalSortableDateTimePattern</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the format pattern for a universal sortable date and time value, which is associated with the 'u' and 'U' format characters.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> UniversalSortableDateTimePattern {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#SortableDateTimePattern">DateTimeFormatInfo.SortableDateTimePattern</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="YearMonthPatternTopic1"></a><a name="YearMonthPattern">YearMonthPattern</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the format pattern for a year and month value, which is associated with the 'y' and 'Y' format characters.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> YearMonthPattern {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> See  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> for patterns that can be combined to construct custom patterns; for example, "yyyy MMMM".<p> This property is affected if the value of the  <a href="#Calendar">DateTimeFormatInfo.Calendar</a> property changes.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CloneTopic1"></a><a name="Clone">Clone</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates a shallow copy of the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> Clone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A new  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> copied from the original  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System/types/ICloneable.html#Clone">ICloneable.Clone</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The clone is writable even if the original  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is read-only; therefore, the properties of the clone can be modified with user-defined patterns.<p> A shallow copy of an object is a copy of the object only. If the object contains references to other objects, the shallow copy does not create copies of the referred objects. It refers to the original objects instead. In contrast, a deep copy of an object creates a copy of the object and a copy of everything directly or indirectly referenced by that object.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~DateTimeFormatInfo();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetAbbreviatedDayNameTopic1"></a><a name="GetAbbreviatedDayName(System.DayOfWeek)">GetAbbreviatedDayName</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/DayOfWeek.html">DayOfWeek</a> <i>dayofweek</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the culture-specific abbreviated name of the specified day of the week based on the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> of the current thread.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> GetAbbreviatedDayName(<br>   <font color="#008080"><a href="../../System/types/DayOfWeek.html">DayOfWeek</a> <i>dayofweek</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>dayofweek</i><br><dl>
+<dd>
+<param> A  <a href="../../System/types/DayOfWeek.html">DayOfWeek</a> value.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The culture-specific abbreviated name of the day of the week represented by <i>dayofweek</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>dayofweek</i> is not a valid  <a href="../../System/types/DayOfWeek.html">DayOfWeek</a> value.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For the default invariant  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a>, this method returns a string from the  <a href="../../System.Globalization/types/GregorianCalendar.html">GregorianCalendar</a>: <br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH></TH>
+<TH>
+                  Return Value
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+                  Sunday
+                </TD>
+<TD>
+                  "Sun"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Monday
+                </TD>
+<TD>
+                  "Mon"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Tuesday
+                </TD>
+<TD>
+                  "Tue"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Wednesday
+                </TD>
+<TD>
+                  "Wed"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Thursday
+                </TD>
+<TD>
+                  "Thu"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Friday
+                </TD>
+<TD>
+                  "Fri"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Saturday
+                </TD>
+<TD>
+                  "Sat"
+                </TD>
+</TR>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> |  <a href="../../System.Globalization/types/GregorianCalendar.html">GregorianCalendar</a> |  <a href="#AbbreviatedDayNames">DateTimeFormatInfo.AbbreviatedDayNames</a> |  <a href="../../System/types/DayOfWeek.html">DayOfWeek</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetAbbreviatedEraNameTopic1"></a><a name="GetAbbreviatedEraName(System.Int32)">GetAbbreviatedEraName</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>era</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the string containing the abbreviated name of the specified era, if an abbreviation exists.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> GetAbbreviatedEraName(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>era</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>era</i><br><dl>
+<dd>
+<param> The integer representing the era.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A string containing the abbreviated name of the specified era, if an abbreviation exists.<p> -or- </p>
+<p> A string containing the full name of the era, if an abbreviation does not exist.</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>era</i> does not represent a valid era in the calendar specified in the  <a href="#Calendar">DateTimeFormatInfo.Calendar</a> property.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The era name is the name a calendar uses to refer to a period of time reckoned from a fixed point or event. For example, "A.D." or "C.E." is the current era in the Gregorian calendar.<p> The valid values for <i>era</i> are listed in the  <a href="../../System.Globalization/types/Calendar.html#Eras">Calendar.Eras</a> property of the appropriate class derived from  <a href="../../System.Globalization/types/Calendar.html">Calendar</a>. For example:  <a href="../../System.Globalization/types/JapaneseCalendar.html#Eras">JapaneseCalendar.Eras</a> displays a list of eras that are supported by this implementation.</p>
+<p> If the  <a href="../../System.Globalization/types/GregorianCalendar.html">GregorianCalendar</a> is selected in  <a href="#Calendar">DateTimeFormatInfo.Calendar</a>,  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> ignores punctuation in abbreviated era names; that is, "A.D." is equivalent to "AD".</p>
+<p> In the  <a href="../../System.Globalization/types/JapaneseCalendar.html">JapaneseCalendar</a>, the abbreviated era name is the first character of the full era name; that is, either the single-character case-insensitive Latin alphabet abbreviation or the single-character Kanji abbreviation.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Globalization/types/JapaneseCalendar.html">JapaneseCalendar</a> |  <a href="../../System.Globalization/types/TaiwanCalendar.html">TaiwanCalendar</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetAbbreviatedMonthNameTopic1"></a><a name="GetAbbreviatedMonthName(System.Int32)">GetAbbreviatedMonthName</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>month</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the culture-specific abbreviated name of the specified month based on the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> of the current thread.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> GetAbbreviatedMonthName(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>month</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>month</i><br><dl>
+<dd>
+<param> An integer from 1 through 13 representing the name of the month to retrieve.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The culture-specific abbreviated name of the month represented by <i>month</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>month</i> is less than 1 or greater than 13.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For the default invariant  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a>, this method returns a string from the  <a href="../../System.Globalization/types/GregorianCalendar.html">GregorianCalendar</a>: <br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH></TH>
+<TH>
+                  Return Value
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+                  1
+                </TD>
+<TD>
+                  "Jan"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  2
+                </TD>
+<TD>
+                  "Feb"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  3
+                </TD>
+<TD>
+                  "Mar"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  4
+                </TD>
+<TD>
+                  "Apr"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  5
+                </TD>
+<TD>
+                  "May"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  6
+                </TD>
+<TD>
+                  "Jun"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  7
+                </TD>
+<TD>
+                  "Jul"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  8
+                </TD>
+<TD>
+                  "Aug"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  9
+                </TD>
+<TD>
+                  "Sep"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  10
+                </TD>
+<TD>
+                  "Oct"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  11
+                </TD>
+<TD>
+                  "Nov"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  12
+                </TD>
+<TD>
+                  "Dec"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  13
+                </TD>
+<TD>
+                  ""
+                </TD>
+</TR>
+</table>
+<p> <a href="../../System.Globalization/types/Calendar.html">Calendar</a> objects can accommodate calendars with 13 months. For 12-month calendars, the empty string is always returned as the name of the 13th month.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Globalization/types/Calendar.html">Calendar</a> |  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> |  <a href="../../System.Globalization/types/GregorianCalendar.html">GregorianCalendar</a> |  <a href="#AbbreviatedMonthNames">DateTimeFormatInfo.AbbreviatedMonthNames</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetAllDateTimePatternsTopic1"></a><a name="GetAllDateTimePatterns">GetAllDateTimePatterns</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns all the standard patterns in which  <a href="../../System/types/DateTime.html">DateTime</a> values can be formatted.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string[]</a> GetAllDateTimePatterns();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An array containing the standard patterns in which  <a href="../../System/types/DateTime.html">DateTime</a> values can be formatted.</dd>
+</dl><b>Remarks</b><dl>
+<dd> See the summary page of the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> class for a list of the standard format characters and their associated patterns.</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example gets and prints the  <a href="../../System/types/DateTime.html">DateTime</a> patterns for the current calendar.<pre>
+ using System;
+ using System.Globalization;
+ public class SamplesDateTimeFormatInfo  {
+ 
+    public static void Main()  {
+ 
+       // Creates a new DateTimeFormatinfo.
+       DateTimeFormatInfo myDtfi = new DateTimeFormatInfo();
+ 
+       // Gets and prints all the patterns.
+       String[] myPatternsArray = myDtfi.GetAllDateTimePatterns();
+       Console.WriteLine( "ALL the patterns:" );
+       PrintIndexAndValues( myPatternsArray );
+ 
+       // Gets and prints the pattern(s) associated with some of the format characters.
+       myPatternsArray = myDtfi.GetAllDateTimePatterns('d');
+       Console.WriteLine( "The patterns for 'd':" );
+       PrintIndexAndValues( myPatternsArray );
+ 
+       myPatternsArray = myDtfi.GetAllDateTimePatterns('D');
+       Console.WriteLine( "The patterns for 'D':" );
+       PrintIndexAndValues( myPatternsArray );
+ 
+       myPatternsArray = myDtfi.GetAllDateTimePatterns('f');
+       Console.WriteLine( "The patterns for 'f':" );
+       PrintIndexAndValues( myPatternsArray );
+ 
+       myPatternsArray = myDtfi.GetAllDateTimePatterns('F');
+       Console.WriteLine( "The patterns for 'F':" );
+       PrintIndexAndValues( myPatternsArray );
+ 
+       myPatternsArray = myDtfi.GetAllDateTimePatterns('r');
+       Console.WriteLine( "The patterns for 'r':" );
+       PrintIndexAndValues( myPatternsArray );
+ 
+       myPatternsArray = myDtfi.GetAllDateTimePatterns('R');
+       Console.WriteLine( "The patterns for 'R':" );
+       PrintIndexAndValues( myPatternsArray );
+    }
+ 
+    public static void PrintIndexAndValues( String[] myArray )  {
+       int i = 0;
+       foreach ( String s in myArray )
+          Console.WriteLine( "\t[{0}]:\t{1}", i++, s );
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+
+ ALL the patterns:
+         [0]:    MM/dd/yyyy
+         [1]:    M/d/yy
+         [2]:    MM/dd/yy
+         [3]:    M/d/yyyy
+         [4]:    yy/MM/dd
+         [5]:    yyyy-MM-dd
+         [6]:    dd-MMM-yy
+         [7]:    dddd, MMMM dd, yyyy
+         [8]:    MMMM dd, yyyy
+         [9]:    dddd, dd MMMM, yyyy
+         [10]:   dd MMMM, yyyy
+         [11]:   dddd, MMMM dd, yyyy HH:mm
+         [12]:   dddd, MMMM dd, yyyy hh:mm tt
+         [13]:   dddd, MMMM dd, yyyy H:mm
+         [14]:   dddd, MMMM dd, yyyy h:mm tt
+         [15]:   MMMM dd, yyyy HH:mm
+         [16]:   MMMM dd, yyyy hh:mm tt
+         [17]:   MMMM dd, yyyy H:mm
+         [18]:   MMMM dd, yyyy h:mm tt
+         [19]:   dddd, dd MMMM, yyyy HH:mm
+         [20]:   dddd, dd MMMM, yyyy hh:mm tt
+         [21]:   dddd, dd MMMM, yyyy H:mm
+         [22]:   dddd, dd MMMM, yyyy h:mm tt
+         [23]:   dd MMMM, yyyy HH:mm
+         [24]:   dd MMMM, yyyy hh:mm tt
+         [25]:   dd MMMM, yyyy H:mm
+         [26]:   dd MMMM, yyyy h:mm tt
+         [27]:   dddd, MMMM dd, yyyy HH:mm:ss
+         [28]:   dddd, MMMM dd, yyyy hh:mm:ss tt
+         [29]:   dddd, MMMM dd, yyyy H:mm:ss
+         [30]:   dddd, MMMM dd, yyyy h:mm:ss tt
+         [31]:   MMMM dd, yyyy HH:mm:ss
+         [32]:   MMMM dd, yyyy hh:mm:ss tt
+         [33]:   MMMM dd, yyyy H:mm:ss
+         [34]:   MMMM dd, yyyy h:mm:ss tt
+         [35]:   dddd, dd MMMM, yyyy HH:mm:ss
+         [36]:   dddd, dd MMMM, yyyy hh:mm:ss tt
+         [37]:   dddd, dd MMMM, yyyy H:mm:ss
+         [38]:   dddd, dd MMMM, yyyy h:mm:ss tt
+         [39]:   dd MMMM, yyyy HH:mm:ss
+         [40]:   dd MMMM, yyyy hh:mm:ss tt
+         [41]:   dd MMMM, yyyy H:mm:ss
+         [42]:   dd MMMM, yyyy h:mm:ss tt
+         [43]:   MM/dd/yyyy HH:mm
+         [44]:   MM/dd/yyyy hh:mm tt
+         [45]:   MM/dd/yyyy H:mm
+         [46]:   MM/dd/yyyy h:mm tt
+         [47]:   M/d/yy HH:mm
+         [48]:   M/d/yy hh:mm tt
+         [49]:   M/d/yy H:mm
+         [50]:   M/d/yy h:mm tt
+         [51]:   MM/dd/yy HH:mm
+         [52]:   MM/dd/yy hh:mm tt
+         [53]:   MM/dd/yy H:mm
+         [54]:   MM/dd/yy h:mm tt
+         [55]:   M/d/yyyy HH:mm
+         [56]:   M/d/yyyy hh:mm tt
+         [57]:   M/d/yyyy H:mm
+         [58]:   M/d/yyyy h:mm tt
+         [59]:   yy/MM/dd HH:mm
+         [60]:   yy/MM/dd hh:mm tt
+         [61]:   yy/MM/dd H:mm
+         [62]:   yy/MM/dd h:mm tt
+         [63]:   yyyy-MM-dd HH:mm
+         [64]:   yyyy-MM-dd hh:mm tt
+         [65]:   yyyy-MM-dd H:mm
+         [66]:   yyyy-MM-dd h:mm tt
+         [67]:   dd-MMM-yy HH:mm
+         [68]:   dd-MMM-yy hh:mm tt
+         [69]:   dd-MMM-yy H:mm
+         [70]:   dd-MMM-yy h:mm tt
+         [71]:   MM/dd/yyyy HH:mm:ss
+         [72]:   MM/dd/yyyy hh:mm:ss tt
+         [73]:   MM/dd/yyyy H:mm:ss
+         [74]:   MM/dd/yyyy h:mm:ss tt
+         [75]:   M/d/yy HH:mm:ss
+         [76]:   M/d/yy hh:mm:ss tt
+         [77]:   M/d/yy H:mm:ss
+         [78]:   M/d/yy h:mm:ss tt
+         [79]:   MM/dd/yy HH:mm:ss
+         [80]:   MM/dd/yy hh:mm:ss tt
+         [81]:   MM/dd/yy H:mm:ss
+         [82]:   MM/dd/yy h:mm:ss tt
+         [83]:   M/d/yyyy HH:mm:ss
+         [84]:   M/d/yyyy hh:mm:ss tt
+         [85]:   M/d/yyyy H:mm:ss
+         [86]:   M/d/yyyy h:mm:ss tt
+         [87]:   yy/MM/dd HH:mm:ss
+         [88]:   yy/MM/dd hh:mm:ss tt
+         [89]:   yy/MM/dd H:mm:ss
+         [90]:   yy/MM/dd h:mm:ss tt
+         [91]:   yyyy-MM-dd HH:mm:ss
+         [92]:   yyyy-MM-dd hh:mm:ss tt
+         [93]:   yyyy-MM-dd H:mm:ss
+         [94]:   yyyy-MM-dd h:mm:ss tt
+         [95]:   dd-MMM-yy HH:mm:ss
+         [96]:   dd-MMM-yy hh:mm:ss tt
+         [97]:   dd-MMM-yy H:mm:ss
+         [98]:   dd-MMM-yy h:mm:ss tt
+         [99]:   MMMM dd
+         [100]:  MMMM dd
+         [101]:  ddd, dd MMM yyyy HH':'mm':'ss 'GMT'
+         [102]:  ddd, dd MMM yyyy HH':'mm':'ss 'GMT'
+         [103]:  yyyy-MM-dd HH:mm:ss
+         [104]:  HH:mm
+         [105]:  hh:mm tt
+         [106]:  H:mm
+         [107]:  h:mm tt
+         [108]:  HH:mm:ss
+         [109]:  hh:mm:ss tt
+         [110]:  H:mm:ss
+         [111]:  h:mm:ss tt
+         [112]:  yyyy-MM-dd HH:mm:ss
+         [113]:  dddd, MMMM dd, yyyy HH:mm:ss
+         [114]:  dddd, MMMM dd, yyyy hh:mm:ss tt
+         [115]:  dddd, MMMM dd, yyyy H:mm:ss
+         [116]:  dddd, MMMM dd, yyyy h:mm:ss tt
+         [117]:  MMMM dd, yyyy HH:mm:ss
+         [118]:  MMMM dd, yyyy hh:mm:ss tt
+         [119]:  MMMM dd, yyyy H:mm:ss
+         [120]:  MMMM dd, yyyy h:mm:ss tt
+         [121]:  dddd, dd MMMM, yyyy HH:mm:ss
+         [122]:  dddd, dd MMMM, yyyy hh:mm:ss tt
+         [123]:  dddd, dd MMMM, yyyy H:mm:ss
+         [124]:  dddd, dd MMMM, yyyy h:mm:ss tt
+         [125]:  dd MMMM, yyyy HH:mm:ss
+         [126]:  dd MMMM, yyyy hh:mm:ss tt
+         [127]:  dd MMMM, yyyy H:mm:ss
+         [128]:  dd MMMM, yyyy h:mm:ss tt
+         [129]:  MMMM, yyyy
+         [130]:  MMMM, yyyy
+ 
+ The patterns for 'd':
+         [0]:    MM/dd/yyyy
+         [1]:    M/d/yy
+         [2]:    MM/dd/yy
+         [3]:    M/d/yyyy
+         [4]:    yy/MM/dd
+         [5]:    yyyy-MM-dd
+         [6]:    dd-MMM-yy
+ 
+ The patterns for 'D':
+         [0]:    dddd, MMMM dd, yyyy
+         [1]:    MMMM dd, yyyy
+         [2]:    dddd, dd MMMM, yyyy
+         [3]:    dd MMMM, yyyy
+ 
+ The patterns for 'f':
+         [0]:    dddd, MMMM dd, yyyy HH:mm
+         [1]:    dddd, MMMM dd, yyyy hh:mm tt
+         [2]:    dddd, MMMM dd, yyyy H:mm
+         [3]:    dddd, MMMM dd, yyyy h:mm tt
+         [4]:    MMMM dd, yyyy HH:mm
+         [5]:    MMMM dd, yyyy hh:mm tt
+         [6]:    MMMM dd, yyyy H:mm
+         [7]:    MMMM dd, yyyy h:mm tt
+         [8]:    dddd, dd MMMM, yyyy HH:mm
+         [9]:    dddd, dd MMMM, yyyy hh:mm tt
+         [10]:   dddd, dd MMMM, yyyy H:mm
+         [11]:   dddd, dd MMMM, yyyy h:mm tt
+         [12]:   dd MMMM, yyyy HH:mm
+         [13]:   dd MMMM, yyyy hh:mm tt
+         [14]:   dd MMMM, yyyy H:mm
+         [15]:   dd MMMM, yyyy h:mm tt
+ 
+ The patterns for 'F':
+         [0]:    dddd, MMMM dd, yyyy HH:mm:ss
+         [1]:    dddd, MMMM dd, yyyy hh:mm:ss tt
+         [2]:    dddd, MMMM dd, yyyy H:mm:ss
+         [3]:    dddd, MMMM dd, yyyy h:mm:ss tt
+         [4]:    MMMM dd, yyyy HH:mm:ss
+         [5]:    MMMM dd, yyyy hh:mm:ss tt
+         [6]:    MMMM dd, yyyy H:mm:ss
+         [7]:    MMMM dd, yyyy h:mm:ss tt
+         [8]:    dddd, dd MMMM, yyyy HH:mm:ss
+         [9]:    dddd, dd MMMM, yyyy hh:mm:ss tt
+         [10]:   dddd, dd MMMM, yyyy H:mm:ss
+         [11]:   dddd, dd MMMM, yyyy h:mm:ss tt
+         [12]:   dd MMMM, yyyy HH:mm:ss
+         [13]:   dd MMMM, yyyy hh:mm:ss tt
+         [14]:   dd MMMM, yyyy H:mm:ss
+         [15]:   dd MMMM, yyyy h:mm:ss tt
+ 
+ The patterns for 'r':
+         [0]:    ddd, dd MMM yyyy HH':'mm':'ss 'GMT'
+ 
+ The patterns for 'R':
+         [0]:    ddd, dd MMM yyyy HH':'mm':'ss 'GMT'
+ */
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="GetAllDateTimePatternsTopic2"></a><a name="GetAllDateTimePatterns(System.Char)">GetAllDateTimePatterns</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>format</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns all the standard patterns in which  <a href="../../System/types/DateTime.html">DateTime</a> values can be formatted using the specified format character.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string[]</a> GetAllDateTimePatterns(<br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>format</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>format</i><br><dl>
+<dd>
+<param> A standard format character.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An array containing the standard patterns in which  <a href="../../System/types/DateTime.html">DateTime</a> values can be formatted using the specified format character.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>format</i> is not a valid standard format character.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> See the summary page of the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> class for a list of the standard format characters and their associated patterns.</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example gets and prints the  <a href="../../System/types/DateTime.html">DateTime</a> patterns for the current calendar.<pre>
+ using System;
+ using System.Globalization;
+ public class SamplesDateTimeFormatInfo  {
+ 
+    public static void Main()  {
+ 
+       // Creates a new DateTimeFormatinfo.
+       DateTimeFormatInfo myDtfi = new DateTimeFormatInfo();
+ 
+       // Gets and prints all the patterns.
+       String[] myPatternsArray = myDtfi.GetAllDateTimePatterns();
+       Console.WriteLine( "ALL the patterns:" );
+       PrintIndexAndValues( myPatternsArray );
+ 
+       // Gets and prints the pattern(s) associated with some of the format characters.
+       myPatternsArray = myDtfi.GetAllDateTimePatterns('d');
+       Console.WriteLine( "The patterns for 'd':" );
+       PrintIndexAndValues( myPatternsArray );
+ 
+       myPatternsArray = myDtfi.GetAllDateTimePatterns('D');
+       Console.WriteLine( "The patterns for 'D':" );
+       PrintIndexAndValues( myPatternsArray );
+ 
+       myPatternsArray = myDtfi.GetAllDateTimePatterns('f');
+       Console.WriteLine( "The patterns for 'f':" );
+       PrintIndexAndValues( myPatternsArray );
+ 
+       myPatternsArray = myDtfi.GetAllDateTimePatterns('F');
+       Console.WriteLine( "The patterns for 'F':" );
+       PrintIndexAndValues( myPatternsArray );
+ 
+       myPatternsArray = myDtfi.GetAllDateTimePatterns('r');
+       Console.WriteLine( "The patterns for 'r':" );
+       PrintIndexAndValues( myPatternsArray );
+ 
+       myPatternsArray = myDtfi.GetAllDateTimePatterns('R');
+       Console.WriteLine( "The patterns for 'R':" );
+       PrintIndexAndValues( myPatternsArray );
+    }
+ 
+    public static void PrintIndexAndValues( String[] myArray )  {
+       int i = 0;
+       foreach ( String s in myArray )
+          Console.WriteLine( "\t[{0}]:\t{1}", i++, s );
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+
+ ALL the patterns:
+         [0]:    MM/dd/yyyy
+         [1]:    M/d/yy
+         [2]:    MM/dd/yy
+         [3]:    M/d/yyyy
+         [4]:    yy/MM/dd
+         [5]:    yyyy-MM-dd
+         [6]:    dd-MMM-yy
+         [7]:    dddd, MMMM dd, yyyy
+         [8]:    MMMM dd, yyyy
+         [9]:    dddd, dd MMMM, yyyy
+         [10]:   dd MMMM, yyyy
+         [11]:   dddd, MMMM dd, yyyy HH:mm
+         [12]:   dddd, MMMM dd, yyyy hh:mm tt
+         [13]:   dddd, MMMM dd, yyyy H:mm
+         [14]:   dddd, MMMM dd, yyyy h:mm tt
+         [15]:   MMMM dd, yyyy HH:mm
+         [16]:   MMMM dd, yyyy hh:mm tt
+         [17]:   MMMM dd, yyyy H:mm
+         [18]:   MMMM dd, yyyy h:mm tt
+         [19]:   dddd, dd MMMM, yyyy HH:mm
+         [20]:   dddd, dd MMMM, yyyy hh:mm tt
+         [21]:   dddd, dd MMMM, yyyy H:mm
+         [22]:   dddd, dd MMMM, yyyy h:mm tt
+         [23]:   dd MMMM, yyyy HH:mm
+         [24]:   dd MMMM, yyyy hh:mm tt
+         [25]:   dd MMMM, yyyy H:mm
+         [26]:   dd MMMM, yyyy h:mm tt
+         [27]:   dddd, MMMM dd, yyyy HH:mm:ss
+         [28]:   dddd, MMMM dd, yyyy hh:mm:ss tt
+         [29]:   dddd, MMMM dd, yyyy H:mm:ss
+         [30]:   dddd, MMMM dd, yyyy h:mm:ss tt
+         [31]:   MMMM dd, yyyy HH:mm:ss
+         [32]:   MMMM dd, yyyy hh:mm:ss tt
+         [33]:   MMMM dd, yyyy H:mm:ss
+         [34]:   MMMM dd, yyyy h:mm:ss tt
+         [35]:   dddd, dd MMMM, yyyy HH:mm:ss
+         [36]:   dddd, dd MMMM, yyyy hh:mm:ss tt
+         [37]:   dddd, dd MMMM, yyyy H:mm:ss
+         [38]:   dddd, dd MMMM, yyyy h:mm:ss tt
+         [39]:   dd MMMM, yyyy HH:mm:ss
+         [40]:   dd MMMM, yyyy hh:mm:ss tt
+         [41]:   dd MMMM, yyyy H:mm:ss
+         [42]:   dd MMMM, yyyy h:mm:ss tt
+         [43]:   MM/dd/yyyy HH:mm
+         [44]:   MM/dd/yyyy hh:mm tt
+         [45]:   MM/dd/yyyy H:mm
+         [46]:   MM/dd/yyyy h:mm tt
+         [47]:   M/d/yy HH:mm
+         [48]:   M/d/yy hh:mm tt
+         [49]:   M/d/yy H:mm
+         [50]:   M/d/yy h:mm tt
+         [51]:   MM/dd/yy HH:mm
+         [52]:   MM/dd/yy hh:mm tt
+         [53]:   MM/dd/yy H:mm
+         [54]:   MM/dd/yy h:mm tt
+         [55]:   M/d/yyyy HH:mm
+         [56]:   M/d/yyyy hh:mm tt
+         [57]:   M/d/yyyy H:mm
+         [58]:   M/d/yyyy h:mm tt
+         [59]:   yy/MM/dd HH:mm
+         [60]:   yy/MM/dd hh:mm tt
+         [61]:   yy/MM/dd H:mm
+         [62]:   yy/MM/dd h:mm tt
+         [63]:   yyyy-MM-dd HH:mm
+         [64]:   yyyy-MM-dd hh:mm tt
+         [65]:   yyyy-MM-dd H:mm
+         [66]:   yyyy-MM-dd h:mm tt
+         [67]:   dd-MMM-yy HH:mm
+         [68]:   dd-MMM-yy hh:mm tt
+         [69]:   dd-MMM-yy H:mm
+         [70]:   dd-MMM-yy h:mm tt
+         [71]:   MM/dd/yyyy HH:mm:ss
+         [72]:   MM/dd/yyyy hh:mm:ss tt
+         [73]:   MM/dd/yyyy H:mm:ss
+         [74]:   MM/dd/yyyy h:mm:ss tt
+         [75]:   M/d/yy HH:mm:ss
+         [76]:   M/d/yy hh:mm:ss tt
+         [77]:   M/d/yy H:mm:ss
+         [78]:   M/d/yy h:mm:ss tt
+         [79]:   MM/dd/yy HH:mm:ss
+         [80]:   MM/dd/yy hh:mm:ss tt
+         [81]:   MM/dd/yy H:mm:ss
+         [82]:   MM/dd/yy h:mm:ss tt
+         [83]:   M/d/yyyy HH:mm:ss
+         [84]:   M/d/yyyy hh:mm:ss tt
+         [85]:   M/d/yyyy H:mm:ss
+         [86]:   M/d/yyyy h:mm:ss tt
+         [87]:   yy/MM/dd HH:mm:ss
+         [88]:   yy/MM/dd hh:mm:ss tt
+         [89]:   yy/MM/dd H:mm:ss
+         [90]:   yy/MM/dd h:mm:ss tt
+         [91]:   yyyy-MM-dd HH:mm:ss
+         [92]:   yyyy-MM-dd hh:mm:ss tt
+         [93]:   yyyy-MM-dd H:mm:ss
+         [94]:   yyyy-MM-dd h:mm:ss tt
+         [95]:   dd-MMM-yy HH:mm:ss
+         [96]:   dd-MMM-yy hh:mm:ss tt
+         [97]:   dd-MMM-yy H:mm:ss
+         [98]:   dd-MMM-yy h:mm:ss tt
+         [99]:   MMMM dd
+         [100]:  MMMM dd
+         [101]:  ddd, dd MMM yyyy HH':'mm':'ss 'GMT'
+         [102]:  ddd, dd MMM yyyy HH':'mm':'ss 'GMT'
+         [103]:  yyyy-MM-dd HH:mm:ss
+         [104]:  HH:mm
+         [105]:  hh:mm tt
+         [106]:  H:mm
+         [107]:  h:mm tt
+         [108]:  HH:mm:ss
+         [109]:  hh:mm:ss tt
+         [110]:  H:mm:ss
+         [111]:  h:mm:ss tt
+         [112]:  yyyy-MM-dd HH:mm:ss
+         [113]:  dddd, MMMM dd, yyyy HH:mm:ss
+         [114]:  dddd, MMMM dd, yyyy hh:mm:ss tt
+         [115]:  dddd, MMMM dd, yyyy H:mm:ss
+         [116]:  dddd, MMMM dd, yyyy h:mm:ss tt
+         [117]:  MMMM dd, yyyy HH:mm:ss
+         [118]:  MMMM dd, yyyy hh:mm:ss tt
+         [119]:  MMMM dd, yyyy H:mm:ss
+         [120]:  MMMM dd, yyyy h:mm:ss tt
+         [121]:  dddd, dd MMMM, yyyy HH:mm:ss
+         [122]:  dddd, dd MMMM, yyyy hh:mm:ss tt
+         [123]:  dddd, dd MMMM, yyyy H:mm:ss
+         [124]:  dddd, dd MMMM, yyyy h:mm:ss tt
+         [125]:  dd MMMM, yyyy HH:mm:ss
+         [126]:  dd MMMM, yyyy hh:mm:ss tt
+         [127]:  dd MMMM, yyyy H:mm:ss
+         [128]:  dd MMMM, yyyy h:mm:ss tt
+         [129]:  MMMM, yyyy
+         [130]:  MMMM, yyyy
+ 
+ The patterns for 'd':
+         [0]:    MM/dd/yyyy
+         [1]:    M/d/yy
+         [2]:    MM/dd/yy
+         [3]:    M/d/yyyy
+         [4]:    yy/MM/dd
+         [5]:    yyyy-MM-dd
+         [6]:    dd-MMM-yy
+ 
+ The patterns for 'D':
+         [0]:    dddd, MMMM dd, yyyy
+         [1]:    MMMM dd, yyyy
+         [2]:    dddd, dd MMMM, yyyy
+         [3]:    dd MMMM, yyyy
+ 
+ The patterns for 'f':
+         [0]:    dddd, MMMM dd, yyyy HH:mm
+         [1]:    dddd, MMMM dd, yyyy hh:mm tt
+         [2]:    dddd, MMMM dd, yyyy H:mm
+         [3]:    dddd, MMMM dd, yyyy h:mm tt
+         [4]:    MMMM dd, yyyy HH:mm
+         [5]:    MMMM dd, yyyy hh:mm tt
+         [6]:    MMMM dd, yyyy H:mm
+         [7]:    MMMM dd, yyyy h:mm tt
+         [8]:    dddd, dd MMMM, yyyy HH:mm
+         [9]:    dddd, dd MMMM, yyyy hh:mm tt
+         [10]:   dddd, dd MMMM, yyyy H:mm
+         [11]:   dddd, dd MMMM, yyyy h:mm tt
+         [12]:   dd MMMM, yyyy HH:mm
+         [13]:   dd MMMM, yyyy hh:mm tt
+         [14]:   dd MMMM, yyyy H:mm
+         [15]:   dd MMMM, yyyy h:mm tt
+ 
+ The patterns for 'F':
+         [0]:    dddd, MMMM dd, yyyy HH:mm:ss
+         [1]:    dddd, MMMM dd, yyyy hh:mm:ss tt
+         [2]:    dddd, MMMM dd, yyyy H:mm:ss
+         [3]:    dddd, MMMM dd, yyyy h:mm:ss tt
+         [4]:    MMMM dd, yyyy HH:mm:ss
+         [5]:    MMMM dd, yyyy hh:mm:ss tt
+         [6]:    MMMM dd, yyyy H:mm:ss
+         [7]:    MMMM dd, yyyy h:mm:ss tt
+         [8]:    dddd, dd MMMM, yyyy HH:mm:ss
+         [9]:    dddd, dd MMMM, yyyy hh:mm:ss tt
+         [10]:   dddd, dd MMMM, yyyy H:mm:ss
+         [11]:   dddd, dd MMMM, yyyy h:mm:ss tt
+         [12]:   dd MMMM, yyyy HH:mm:ss
+         [13]:   dd MMMM, yyyy hh:mm:ss tt
+         [14]:   dd MMMM, yyyy H:mm:ss
+         [15]:   dd MMMM, yyyy h:mm:ss tt
+ 
+ The patterns for 'r':
+         [0]:    ddd, dd MMM yyyy HH':'mm':'ss 'GMT'
+ 
+ The patterns for 'R':
+         [0]:    ddd, dd MMM yyyy HH':'mm':'ss 'GMT'
+ */
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetDayNameTopic1"></a><a name="GetDayName(System.DayOfWeek)">GetDayName</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/DayOfWeek.html">DayOfWeek</a> <i>dayofweek</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the culture-specific full name of the specified day of the week based on the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> of the current thread.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> GetDayName(<br>   <font color="#008080"><a href="../../System/types/DayOfWeek.html">DayOfWeek</a> <i>dayofweek</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>dayofweek</i><br><dl>
+<dd>
+<param> A  <a href="../../System/types/DayOfWeek.html">DayOfWeek</a> value.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The culture-specific full name of the day of the week represented by <i>dayofweek</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>dayofweek</i> is not a valid  <a href="../../System/types/DayOfWeek.html">DayOfWeek</a> value.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For the default invariant  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a>, this method returns a string from the  <a href="../../System.Globalization/types/GregorianCalendar.html">GregorianCalendar</a>: <br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH></TH>
+<TH>
+                  Return Value
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+                  Sunday
+                </TD>
+<TD>
+                  "Sunday"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Monday
+                </TD>
+<TD>
+                  "Monday"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Tuesday
+                </TD>
+<TD>
+                  "Tuesday"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Wednesday
+                </TD>
+<TD>
+                  "Wednesday"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Thursday
+                </TD>
+<TD>
+                  "Thursday"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Friday
+                </TD>
+<TD>
+                  "Friday"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Saturday
+                </TD>
+<TD>
+                  "Saturday"
+                </TD>
+</TR>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> |  <a href="../../System.Globalization/types/GregorianCalendar.html">GregorianCalendar</a> |  <a href="#DayNames">DateTimeFormatInfo.DayNames</a> |  <a href="../../System/types/DayOfWeek.html">DayOfWeek</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetEraTopic1"></a><a name="GetEra(System.String)">GetEra</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>eraName</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the integer representing the specified era.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> GetEra(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>eraName</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>eraName</i><br><dl>
+<dd>
+<param> The string containing the name of the era.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The integer representing the era, if <i>eraName</i> is valid; otherwise, -1.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>eraName</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The era name is the name a calendar uses to refer to a period of time reckoned from a fixed point or event. For example, "A.D." or "C.E." is the current era in the Gregorian calendar.<p> The comparison with <i>eraName</i> is case-insensitive; for example, "A.D." is equivalent to "a.d.".</p>
+<p> If the  <a href="../../System.Globalization/types/GregorianCalendar.html">GregorianCalendar</a> is selected in  <a href="#Calendar">DateTimeFormatInfo.Calendar</a>,  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> ignores punctuation in abbreviated era names; that is, "A.D." is equivalent to "AD".</p>
+<p> <a href="#GetEra(System.String)">DateTimeFormatInfo.GetEra</a> compares <i>eraName</i> with the full era name returned by  <a href="#GetEraName(System.Int32)">DateTimeFormatInfo.GetEraName</a> and with the abbreviated era name returned by  <a href="#GetAbbreviatedEraName(System.Int32)">DateTimeFormatInfo.GetAbbreviatedEraName</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#GetEraName(System.Int32)">DateTimeFormatInfo.GetEraName</a> |  <a href="../../System.Globalization/types/Calendar.html">Calendar</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetEraNameTopic1"></a><a name="GetEraName(System.Int32)">GetEraName</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>era</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the string containing the name of the specified era.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> GetEraName(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>era</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>era</i><br><dl>
+<dd>
+<param> The integer representing the era.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A string containing the name of the era.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>era</i> does not represent a valid era in the calendar specified in the  <a href="#Calendar">DateTimeFormatInfo.Calendar</a> property.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The era name is the name a calendar uses to refer to a period of time reckoned from a fixed point or event. For example, "A.D." or "C.E." is the current era in the Gregorian calendar.<p> The valid values for <i>era</i> are listed in the  <a href="../../System.Globalization/types/Calendar.html#Eras">Calendar.Eras</a> property of the appropriate class derived from  <a href="../../System.Globalization/types/Calendar.html">Calendar</a>. For example:  <a href="../../System.Globalization/types/JapaneseCalendar.html#Eras">JapaneseCalendar.Eras</a> displays a list of eras that are supported by this implementation.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#GetEra(System.String)">DateTimeFormatInfo.GetEra</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetFormatTopic1"></a><a name="GetFormat(System.Type)">GetFormat</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>formatType</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns an object of the specified type that provides a  <a href="../../System/types/DateTime.html">DateTime</a> formatting service.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> GetFormat(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>formatType</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>formatType</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Type.html">Type</a> of the required formatting service.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The current  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a>, if <i>formatType</i> is the same as the type of the current  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a>; otherwise, <b>null</b>.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System/types/IFormatProvider.html#GetFormat(System.Type)">IFormatProvider.GetFormat</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The Format(String, IFormatProvider) method supported by the base data types invoke this method when the current  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> is passed as the  <a href="../../System/types/IFormatProvider.html">IFormatProvider</a> parameter. This method implements  <a href="../../System/types/IFormatProvider.html#GetFormat(System.Type)">IFormatProvider.GetFormat</a>.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/IFormatProvider.html">IFormatProvider</a> |  <a href="../../System.Globalization/types/NumberFormatInfo.html#GetFormat(System.Type)">NumberFormatInfo.GetFormat</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetInstanceTopic1"></a><a name="GetInstance(System.IFormatProvider)">GetInstance</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/IFormatProvider.html">IFormatProvider</a> <i>provider</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> associated with the specified  <a href="../../System/types/IFormatProvider.html">IFormatProvider</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> GetInstance(<br>   <font color="#008080"><a href="../../System/types/IFormatProvider.html">IFormatProvider</a> <i>provider</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>provider</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/IFormatProvider.html">IFormatProvider</a> that gets the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a>.<p> -or- </p>
+<p><b>null</b> to get  <a href="#CurrentInfo">DateTimeFormatInfo.CurrentInfo</a>.</p> The  <a href="../../System/types/IFormatProvider.html">IFormatProvider</a> that gets the  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a>.<p> -or- </p>
+<p><b>null</b> to get  <a href="#CurrentInfo">DateTimeFormatInfo.CurrentInfo</a>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> associated with the specified  <a href="../../System/types/IFormatProvider.html">IFormatProvider</a>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method uses the  <a href="../../System/types/IFormatProvider.html#GetFormat(System.Type)">IFormatProvider.GetFormat</a> method of <i>formatProvider</i> using  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> as the Type parameter. If <i>formatProvider</i> is <b>null</b> or if  <a href="../../System/types/IFormatProvider.html#GetFormat(System.Type)">IFormatProvider.GetFormat</a> returns <b>null</b>, this method returns  <a href="#CurrentInfo">DateTimeFormatInfo.CurrentInfo</a>.<p> You can get a  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> for a specific culture using one of the following methods: </p>
+<UL>
+<li> Through the  <a href="../../System.Globalization/types/CultureInfo.html#DateTimeFormat">CultureInfo.DateTimeFormat</a> property.</li>
+<li> Through the  <a href="#GetInstance(System.IFormatProvider)">DateTimeFormatInfo.GetInstance</a> method where <i>provider</i> is a  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a>.</li>
+</UL>
+<p> A  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> can be created only for the invariant culture or for specific cultures, not for neutral cultures. For more information about the invariant culture, specific cultures, and neutral cultures, see the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> class.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/IFormatProvider.html">IFormatProvider</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetMonthNameTopic1"></a><a name="GetMonthName(System.Int32)">GetMonthName</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>month</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the culture-specific full name of the specified month based on the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> of the current thread.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> GetMonthName(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>month</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>month</i><br><dl>
+<dd>
+<param> An integer from 1 through 13 representing the name of the month to retrieve.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The culture-specific full name of the month represented by <i>month</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>month</i> is less than 1 or greater than 13.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For the default invariant  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a>, this method returns a string from the  <a href="../../System.Globalization/types/GregorianCalendar.html">GregorianCalendar</a>: <br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH></TH>
+<TH>
+                  Return Value
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+                  1
+                </TD>
+<TD>
+                  "January"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  2
+                </TD>
+<TD>
+                  "February"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  3
+                </TD>
+<TD>
+                  "March"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  4
+                </TD>
+<TD>
+                  "April"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  5
+                </TD>
+<TD>
+                  "May"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  6
+                </TD>
+<TD>
+                  "June"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  7
+                </TD>
+<TD>
+                  "July"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  8
+                </TD>
+<TD>
+                  "August"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  9
+                </TD>
+<TD>
+                  "September"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  10
+                </TD>
+<TD>
+                  "October"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  11
+                </TD>
+<TD>
+                  "November"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  12
+                </TD>
+<TD>
+                  "December"
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  13
+                </TD>
+<TD>
+                  ""
+                </TD>
+</TR>
+</table>
+<p> <a href="../../System.Globalization/types/Calendar.html">Calendar</a> objects can accommodate calendars with 13 months. For 12-month calendars, the empty string is always returned as the name of the 13th month.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Globalization/types/Calendar.html">Calendar</a> |  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> |  <a href="../../System.Globalization/types/GregorianCalendar.html">GregorianCalendar</a> |  <a href="#MonthNames">DateTimeFormatInfo.MonthNames</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ReadOnlyTopic1"></a><a name="ReadOnly(System.Globalization.DateTimeFormatInfo)">ReadOnly</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> <i>dtfi</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns a read-only  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> wrapper.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> ReadOnly(<br>   <font color="#008080"><a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> <i>dtfi</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>dtfi</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> to wrap.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A read-only  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> wrapper around <i>dtfi</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>dtfi</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This wrapper prevents any modifications to <i>dtfi</i>.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#IsReadOnly">DateTimeFormatInfo.IsReadOnly</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

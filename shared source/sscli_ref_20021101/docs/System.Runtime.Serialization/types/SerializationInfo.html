@@ -1,0 +1,2527 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Runtime.Serialization.SerializationInfo</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Runtime.Serialization.SerializationInfo Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Runtime.Serialization<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Holds all the data needed to serialize or deserialize an object. This class cannot be inherited.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public sealed class SerializationInfo
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This class is used by objects with custom serialization behavior. The  <a href="../../System.Runtime.Serialization/types/ISerializable.html#GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">ISerializable.GetObjectData</a> method on either  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> or  <a href="../../System.Runtime.Serialization/types/ISerializationSurrogate.html">ISerializationSurrogate</a> populates the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> with the name, type, and value of each piece of information it wants to serialize. During deserialization, the appropriate function can extract this information.<p> Objects are added to the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> at serialization time using the  <a href="#AddValue(System.String,System.Object,System.Type)">SerializationInfo.AddValue</a> methods and extracted from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> at deserialization using the  <a href="#GetValue(System.String,System.Type)">SerializationInfo.GetValue</a> methods.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example demonstrates the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> for custom serialization and deserialization of various values.<pre>
+ using System;
+ using System.IO;
+ using System.Runtime.Serialization;
+ using System.Runtime.Serialization.Formatters.Binary;
+ 
+ namespace Testing 
+ {
+    public class Test {
+       public static void Main(String[] args) {
+       // Creates a new MyClass1 object.
+          MyClass1 f = new MyClass1();
+    
+          // Opens a file and serializes the object into it in binary format.
+          Stream stream = File.Open("MyClass1MyClass2.bin", FileMode.Create);
+          BinaryFormatter bformatter = new BinaryFormatter();
+ 
+          bformatter.Serialize(stream, f);
+          stream.Close();
+    
+          //Empties f.
+          f = null;
+    
+          //Opens file "MyClass1MyClass2.bin" and deserializes the MyClass1 object from it.
+          stream = File.Open("MyClass1MyClass2.bin", FileMode.Open);
+          bformatter = new BinaryFormatter();
+          f = (MyClass1)bformatter.Deserialize(stream);
+          stream.Close();
+       }
+    }
+ 
+
+    [Serializable()] 
+    public class MyClass1: ISerializable {
+
+       public MyClass2 someObject;
+       public int size;
+       public String shape;
+
+       //Default constructor
+       public MyClass1() {
+          someObject = new MyClass2();
+       }
+ 
+       //Deserialization constructor.
+       public MyClass1 (SerializationInfo info, StreamingContext context) {
+          size = (int)info.GetValue("size", typeof(int));
+          shape = (String)info.GetValue("shape", typeof(string));
+
+          //Allows MyClass2 to deserialize itself
+          someObject = new MyClass2(info, context);
+       }
+ 
+       //Serialization function.
+       public void GetObjectData(SerializationInfo info, StreamingContext context){
+          info.AddValue("size", size);
+          info.AddValue("shape", shape);
+
+          //Allows MyClass2 to serialize itself
+          someObject.GetObjectData(info, context);
+       }
+    }
+ 
+    public class MyClass2 {
+ 
+       public double value = 3.14159265;
+
+       public MyClass2() {
+       }
+
+       public MyClass2(SerializationInfo info, StreamingContext context) {
+           value = (double)info.GetValue("MyClass2_value", typeof(double));
+       }
+
+ 
+       public void GetObjectData(SerializationInfo info, StreamingContext context) {
+          info.AddValue("MyClass2_value", value);
+       }
+
+    }
+ }
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Runtime.Serialization/System.Runtime.Serialization.html">System.Runtime.Serialization Namespace</a><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconserialization.asp">MSDN: serialization</a> |  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a></dd>
+</dl>
+<h3>System.Runtime.Serialization.SerializationInfo Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"> Creates a new instance of the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> class.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#AssemblyName">AssemblyName</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the assembly name of the type to serialize.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#FullTypeName">FullTypeName</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the full name of the  <a href="../../System/types/Type.html">Type</a> to serialize.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberCount">MemberCount</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the number of members that have been added to the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#AddValue(System.String,System.Boolean)">AddValue</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>AddValue(string name, bool value)<br><br></code> Adds a Boolean value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AddValue(System.String,System.Byte)">AddValue</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>AddValue(string name, byte value)<br><br></code> Adds an 8-bit unsigned integer value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AddValue(System.String,System.Char)">AddValue</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>AddValue(string name, char value)<br><br></code> Adds a Unicode character value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AddValue(System.String,System.DateTime)">AddValue</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>AddValue(string name, DateTime value)<br><br></code> Adds a  <a href="../../System/types/DateTime.html">DateTime</a> value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AddValue(System.String,System.Decimal)">AddValue</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>AddValue(string name, decimal value)<br><br></code> Adds a Decimal value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AddValue(System.String,System.Double)">AddValue</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>AddValue(string name, double value)<br><br></code> Adds a double-precision floating-point value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AddValue(System.String,System.Int16)">AddValue</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>AddValue(string name, short value)<br><br></code> Adds a 16-bit signed integer value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AddValue(System.String,System.Int32)">AddValue</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>AddValue(string name, int value)<br><br></code> Adds a 32-bit signed integer value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AddValue(System.String,System.Int64)">AddValue</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>AddValue(string name, long value)<br><br></code> Adds a 64-bit signed integer value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AddValue(System.String,System.Object)">AddValue</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>AddValue(string name, object value)<br><br></code> Adds the specified object into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>, where it is associated with a specified name.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AddValue(System.String,System.SByte)">AddValue</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>AddValue(string name, sbyte value)<br><br></code> Adds an 8-bit signed integer value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AddValue(System.String,System.Single)">AddValue</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>AddValue(string name, float value)<br><br></code> Adds a single-precision floating-point value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AddValue(System.String,System.UInt16)">AddValue</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>AddValue(string name, ushort value)<br><br></code> Adds a 16-bit unsigned integer value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AddValue(System.String,System.UInt32)">AddValue</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>AddValue(string name, uint value)<br><br></code> Adds a 32-bit unsigned integer value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AddValue(System.String,System.UInt64)">AddValue</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>AddValue(string name, ulong value)<br><br></code> Adds a 64-bit unsigned integer value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AddValue(System.String,System.Object,System.Type)">AddValue</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>AddValue(string name, object value, Type type)<br><br></code> Adds a value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>, where <i>value</i> is associated with <i>name</i> and is serialized as being of  <a href="../../System/types/Type.html">Type</a><i>type</i>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetBoolean(System.String)">GetBoolean</a></td>
+<td width="55%"> Retrieves a Boolean value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetByte(System.String)">GetByte</a></td>
+<td width="55%"> Retrieves an 8-bit unsigned integer value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetChar(System.String)">GetChar</a></td>
+<td width="55%"> Retrieves a Unicode character value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetDateTime(System.String)">GetDateTime</a></td>
+<td width="55%"> Retrieves a  <a href="../../System/types/DateTime.html">DateTime</a> value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetDecimal(System.String)">GetDecimal</a></td>
+<td width="55%"> Retrieves a Decimal value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetDouble(System.String)">GetDouble</a></td>
+<td width="55%"> Retrieves a double-precision floating-point value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetEnumerator">GetEnumerator</a></td>
+<td width="55%"> Returns a  <a href="../../System.Runtime.Serialization/types/SerializationInfoEnumerator.html">SerializationInfoEnumerator</a> used to iterate through the name-value pairs in the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetInt16(System.String)">GetInt16</a></td>
+<td width="55%"> Retrieves a 16-bit signed integer value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetInt32(System.String)">GetInt32</a></td>
+<td width="55%"> Retrieves a 32-bit signed integer value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetInt64(System.String)">GetInt64</a></td>
+<td width="55%"> Retrieves a 64-bit signed integer value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetSByte(System.String)">GetSByte</a></td>
+<td width="55%"> Retrieves an 8-bit signed integer value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetSingle(System.String)">GetSingle</a></td>
+<td width="55%"> Retrieves a single-precision floating-point value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetString(System.String)">GetString</a></td>
+<td width="55%"> Retrieves a  <a href="../../System/types/String.html">String</a> value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetUInt16(System.String)">GetUInt16</a></td>
+<td width="55%"> Retrieves a 16-bit unsigned integer value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetUInt32(System.String)">GetUInt32</a></td>
+<td width="55%"> Retrieves a 32-bit unsigned integer value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetUInt64(System.String)">GetUInt64</a></td>
+<td width="55%"> Retrieves a 64-bit unsigned integer value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetValue(System.String,System.Type)">GetValue</a></td>
+<td width="55%"> Retrieves a value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SetType(System.Type)">SetType</a></td>
+<td width="55%"> Sets the  <a href="../../System/types/Type.html">Type</a> of the object to serialize.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Runtime.Serialization.SerializationInfo</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Runtime.Serialization.SerializationInfo Member Details</h3><b><i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates a new instance of the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> class.</dd>
+</dl>
+<dl>
+<dd><b><font color="#FF3399">This member is not CLS Compliant<br><br></font></b></dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[CLSCompliant(false)]<br><b>public SerializationInfo(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/IFormatterConverter.html">IFormatterConverter</a> <i>converter</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Type.html">Type</a> of the object to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>converter</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Runtime.Serialization/types/IFormatterConverter.html">IFormatterConverter</a> used during deserialization.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>type</i> or <i>converter</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Runtime.Serialization/types/IFormatterConverter.html">IFormatterConverter</a> passed as the <i>converter</i> parameter converts data from its internal representation to the form the user requested. The internal representation of the data within the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> depends on the formatter that created it.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="AssemblyNameTopic1"></a><a name="AssemblyName">AssemblyName</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the assembly name of the type to serialize.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> AssemblyName {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The value the property is set to is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#AssemblyName">SerializationInfo.AssemblyName</a> is the same as the value returned by  <a href="../../System.Reflection/types/Assembly.html#FullName">Assembly.FullName</a> property of the assembly of the containing type. This is the assembly name that the formatter uses when serializing type information for this object.<p> The assembly name contains the name of the assembly, version, culture, and some security information about the object. During deserialization, users who implemented  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> can compare the version of the assembly with the expected type to ensure that they are deserializing an expected version of the object.</p>
+<p> Users who are changing the type being serialized (for example, to send a proxy for a particular type) will set the value of this property.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="FullTypeNameTopic1"></a><a name="FullTypeName">FullTypeName</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the full name of the  <a href="../../System/types/Type.html">Type</a> to serialize.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> FullTypeName {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The value this property is set to is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#FullTypeName">SerializationInfo.FullTypeName</a> is the same as what would be returned by calling the  <a href="../../System/types/Type.html#FullName">Type.FullName</a> on  <a href="../../System/types/Type.html">Type</a>. This is the type name the formatter uses when serializing type information for this object.<p> Users who are changing the type to serialize (for example, to send a proxy for a particular type) will want to set the value of this property.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="MemberCountTopic1"></a><a name="MemberCount">MemberCount</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the number of members that have been added to the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> MemberCount {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddValueTopic1"></a><a name="AddValue(System.String,System.Boolean)">AddValue</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds a Boolean value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void AddValue(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name to associate with the value, so it can be deserialized later.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The Boolean value to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>name</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> A value has already been associated with <i>name</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Trying to add the same name twice into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> is an error. The names are compared using an ordinal comparison, so it is possible, but not advisable, to have two names that differ only by case.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddValueTopic2"></a><a name="AddValue(System.String,System.Byte)">AddValue</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Byte.html">byte</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds an 8-bit unsigned integer value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void AddValue(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Byte.html">byte</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name to associate with the value, so it can be deserialized later.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The byte value to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>name</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> A value has already been associated with <i>name</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Trying to add the same name twice into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> is an error. The names are compared using an ordinal comparison, so it is possible, but not advisable, to have two names that differ only by case.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddValueTopic3"></a><a name="AddValue(System.String,System.Char)">AddValue</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds a Unicode character value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void AddValue(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name to associate with the value, so it can be deserialized later.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The character value to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>name</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> A value has already been associated with <i>name</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Trying to add the same name twice into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> is an error. The names are compared using an ordinal comparison, so it is possible, but not advisable, to have two names that differ only by case.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddValueTopic4"></a><a name="AddValue(System.String,System.DateTime)">AddValue</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/DateTime.html">DateTime</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds a  <a href="../../System/types/DateTime.html">DateTime</a> value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void AddValue(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/DateTime.html">DateTime</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name to associate with the value, so it can be deserialized later.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/DateTime.html">DateTime</a> value to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>name</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> A value has already been associated with <i>name</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Trying to add the same name twice into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> is an error. The names are compared using an ordinal comparison, so it is possible, but not advisable, to have two names that differ only by case.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddValueTopic5"></a><a name="AddValue(System.String,System.Decimal)">AddValue</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Decimal.html">decimal</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds a Decimal value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void AddValue(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Decimal.html">decimal</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name to associate with the value, so it can be deserialized later.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The Decimal value to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> If The <i>name</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> If a value has already been associated with <i>name</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Trying to add the same name twice into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> is an error. The names are compared using an ordinal comparison, so it is possible, but not advisable, to have two names that differ only by case.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddValueTopic6"></a><a name="AddValue(System.String,System.Double)">AddValue</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Double.html">double</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds a double-precision floating-point value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void AddValue(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Double.html">double</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name to associate with the value, so it can be deserialized later.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The Double value to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>name</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> A value has already been associated with <i>name</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Trying to add the same name twice into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> is an error. The names are compared using an ordinal comparison, so it is possible, but not advisable, to have two names that differ only by case.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddValueTopic7"></a><a name="AddValue(System.String,System.Int16)">AddValue</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int16.html">short</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds a 16-bit signed integer value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void AddValue(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int16.html">short</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name to associate with the value, so it can be deserialized later.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The Int16 value to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>name</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> A value has already been associated with <i>name</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Trying to add the same name twice into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> is an error. The names are compared using an ordinal comparison, so it is possible, but not advisable, to have two names that differ only by case.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddValueTopic8"></a><a name="AddValue(System.String,System.Int32)">AddValue</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds a 32-bit signed integer value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void AddValue(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name to associate with the value, so it can be deserialized later.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The Int32 value to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>name</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> A value has already been associated with <i>name</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Trying to add the same name twice into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> is an error. The names are compared using an ordinal comparison, so it is possible, but not advisable, to have two names that differ only by case.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddValueTopic9"></a><a name="AddValue(System.String,System.Int64)">AddValue</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds a 64-bit signed integer value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void AddValue(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name to associate with the value, so it can be deserialized later.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The Int64 value to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>name</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> A value has already been associated with <i>name</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Trying to add the same name twice into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> is an error. The names are compared using an ordinal comparison, so it is possible, but not advisable, to have two names that differ only by case.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddValueTopic10"></a><a name="AddValue(System.String,System.Object)">AddValue</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds the specified object into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>, where it is associated with a specified name.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void AddValue(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name to associate with the value, so it can be deserialized later.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The value to be serialized. Any children of this object will automatically be serialized.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>name</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> A value has already been associated with <i>name</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The object contained in the <i>value</i> parameter is serialized as the type returned by <i>value</i>.<b>GetType()</b> or  <a href="../../System/types/Object.html">Object</a> if <i>value</i> is <b>null</b>.<p> Trying to add the same name twice into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> is an error. The names are compared using an ordinal comparison, so it is possible, but not advisable, to have two names that differ only by case.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddValueTopic11"></a><a name="AddValue(System.String,System.SByte)">AddValue</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/SByte.html">sbyte</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds an 8-bit signed integer value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dd><b><font color="#FF3399">This member is not CLS Compliant<br><br></font></b></dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[CLSCompliant(false)]<br><b>public void AddValue(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/SByte.html">sbyte</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name to associate with the value, so it can be deserialized later.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The Sbyte value to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>name</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> A value has already been associated with <i>name</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Trying to add the same name twice into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> is an error. The names are compared using an ordinal comparison, so it is possible, but not advisable, to have two names that differ only by case.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddValueTopic12"></a><a name="AddValue(System.String,System.Single)">AddValue</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Single.html">float</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds a single-precision floating-point value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void AddValue(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Single.html">float</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name to associate with the value, so it can be deserialized later.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The Single value to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>name</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> A value has already been associated with <i>name</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Trying to add the same name twice into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> is an error. The names are compared using an ordinal comparison, so it is possible, but not advisable, to have two names that differ only by case.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddValueTopic13"></a><a name="AddValue(System.String,System.UInt16)">AddValue</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/UInt16.html">ushort</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds a 16-bit unsigned integer value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dd><b><font color="#FF3399">This member is not CLS Compliant<br><br></font></b></dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[CLSCompliant(false)]<br><b>public void AddValue(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/UInt16.html">ushort</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name to associate with the value, so it can be deserialized later.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The UInt16 value to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>name</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> A value has already been associated with <i>name</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Trying to add the same name twice into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> is an error. The names are compared using an ordinal comparison, so it is possible, but not advisable, to have two names that differ only by case.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddValueTopic14"></a><a name="AddValue(System.String,System.UInt32)">AddValue</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/UInt32.html">uint</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds a 32-bit unsigned integer value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dd><b><font color="#FF3399">This member is not CLS Compliant<br><br></font></b></dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[CLSCompliant(false)]<br><b>public void AddValue(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/UInt32.html">uint</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name to associate with the value, so it can be deserialized later.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The UInt32 value to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>name</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> A value has already been associated with <i>name</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Trying to add the same name twice into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> is an error. The names are compared using an ordinal comparison, so it is possible, but not advisable, to have two names that differ only by case.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddValueTopic15"></a><a name="AddValue(System.String,System.UInt64)">AddValue</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/UInt64.html">ulong</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds a 64-bit unsigned integer value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dd><b><font color="#FF3399">This member is not CLS Compliant<br><br></font></b></dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[CLSCompliant(false)]<br><b>public void AddValue(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/UInt64.html">ulong</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name to associate with the value, so it can be deserialized later.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The UInt64 value to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>name</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> A value has already been associated with <i>name</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Trying to add the same name twice into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> is an error. The names are compared using an ordinal comparison, so it is possible, but not advisable, to have two names that differ only by case.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddValueTopic16"></a><a name="AddValue(System.String,System.Object,System.Type)">AddValue</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds a value into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>, where <i>value</i> is associated with <i>name</i> and is serialized as being of  <a href="../../System/types/Type.html">Type</a><i>type</i>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void AddValue(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name to associate with the value, so it can be deserialized later.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The value to be serialized. Any children of this object will automatically be serialized.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Type.html">Type</a> to associate with the current object. This parameter must always be the type of the object itself or of one of its base classes.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> If <i>name</i> or <i>type</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> A value has already been associated with <i>name</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The assigned type is always the type of the object, or one of its parents.<p> Trying to add the same name twice into the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> is an error. The names are compared using an ordinal comparison, so it is possible, but not advisable, to have two names that differ only by case.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~SerializationInfo();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetBooleanTopic1"></a><a name="GetBoolean(System.String)">GetBoolean</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves a Boolean value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> GetBoolean(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the value to retrieve.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The Boolean value associated with <i>name</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>name</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td> The value associated with <i>name</i> cannot be converted to a Boolean value.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> An element with the specified name is not found in the current instance.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the value is a Boolean, or can be converted to one, that value is returned; otherwise, an  <a href="../../System/types/InvalidCastException.html">InvalidCastException</a> is thrown. All conversions are done by the  <a href="../../System.Runtime.Serialization/types/IFormatterConverter.html">IFormatterConverter</a> associated with this  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetByteTopic1"></a><a name="GetByte(System.String)">GetByte</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves an 8-bit unsigned integer value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Byte.html">byte</a> GetByte(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the value to retrieve.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The 8-bit unsigned integer associated with <i>name</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>name</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td> The value associated with <i>name</i> cannot be converted to an 8-bit unsigned integer.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> An element with the specified name is not found in the current instance.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the value is an 8-bit unsigned integer, or can be converted to one, that value is returned; otherwise, an  <a href="../../System/types/InvalidCastException.html">InvalidCastException</a> is thrown. All conversions are done by the  <a href="../../System.Runtime.Serialization/types/IFormatterConverter.html">IFormatterConverter</a> associated with this  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetCharTopic1"></a><a name="GetChar(System.String)">GetChar</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves a Unicode character value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Char.html">char</a> GetChar(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the value to retrieve.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The Unicode character associated with <i>name</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>name</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td> The value associated with <i>name</i> cannot be converted to a Unicode character.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> An element with the specified name is not found in the current instance.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the value is a Unicode character, or can be converted to one, that value is returned; otherwise, an  <a href="../../System/types/InvalidCastException.html">InvalidCastException</a> is thrown. All conversions are done by the  <a href="../../System.Runtime.Serialization/types/IFormatterConverter.html">IFormatterConverter</a> associated with this  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetDateTimeTopic1"></a><a name="GetDateTime(System.String)">GetDateTime</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves a  <a href="../../System/types/DateTime.html">DateTime</a> value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/DateTime.html">DateTime</a> GetDateTime(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the value to retrieve.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The  <a href="../../System/types/DateTime.html">DateTime</a> value associated with <i>name</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>name</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td> The value associated with <i>name</i> cannot be converted to a  <a href="../../System/types/DateTime.html">DateTime</a> value.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> An element with the specified name is not found in the current instance.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the value is a  <a href="../../System/types/DateTime.html">DateTime</a>, or can be converted to a  <a href="../../System/types/DateTime.html">DateTime</a>, that value is returned; otherwise, an  <a href="../../System/types/InvalidCastException.html">InvalidCastException</a> is thrown. All conversions are done by the  <a href="../../System.Runtime.Serialization/types/IFormatterConverter.html">IFormatterConverter</a> associated with this  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetDecimalTopic1"></a><a name="GetDecimal(System.String)">GetDecimal</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves a Decimal value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Decimal.html">decimal</a> GetDecimal(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the value to retrieve.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A Decimal value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>name</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td> The value associated with <i>name</i> cannot be converted to a Decimal.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> An element with the specified name is not found in the current instance.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the value is a Decimal, or can be converted to a Decimal, that value is returned; otherwise an  <a href="../../System/types/InvalidCastException.html">InvalidCastException</a> is thrown. All conversions are done by the  <a href="../../System.Runtime.Serialization/types/IFormatterConverter.html">IFormatterConverter</a> associated with this  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetDoubleTopic1"></a><a name="GetDouble(System.String)">GetDouble</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves a double-precision floating-point value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Double.html">double</a> GetDouble(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the value to retrieve.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The double-precision floating-point value associated with <i>name</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>name</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td> The value associated with <i>name</i> cannot be converted to a double-precision floating-point value.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> An element with the specified name is not found in the current instance.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the value is a Double, or can be converted to a Double, that value is returned; otherwise, an  <a href="../../System/types/InvalidCastException.html">InvalidCastException</a> is thrown. All conversions are done by the  <a href="../../System.Runtime.Serialization/types/IFormatterConverter.html">IFormatterConverter</a> associated with this  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetEnumeratorTopic1"></a><a name="GetEnumerator">GetEnumerator</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns a  <a href="../../System.Runtime.Serialization/types/SerializationInfoEnumerator.html">SerializationInfoEnumerator</a> used to iterate through the name-value pairs in the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Runtime.Serialization/types/SerializationInfoEnumerator.html">SerializationInfoEnumerator</a> GetEnumerator();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System.Runtime.Serialization/types/SerializationInfoEnumerator.html">SerializationInfoEnumerator</a> for parsing the name-value pairs in this  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This function will most often be used by formatters that need to enumerate through the values before writing them out to the stream.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetInt16Topic1"></a><a name="GetInt16(System.String)">GetInt16</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves a 16-bit signed integer value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int16.html">short</a> GetInt16(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the value to retrieve.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The 16-bit signed integer associated with <i>name</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>name</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td> The value associated with <i>name</i> cannot be converted to an 16-bit signed integer.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> An element with the specified name is not found in the current instance.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the value is a 16-bit signed integer, or can be converted to one, that value is returned; otherwise, an  <a href="../../System/types/InvalidCastException.html">InvalidCastException</a> is thrown. All conversions are done by the  <a href="../../System.Runtime.Serialization/types/IFormatterConverter.html">IFormatterConverter</a> associated with this  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetInt32Topic1"></a><a name="GetInt32(System.String)">GetInt32</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves a 32-bit signed integer value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> GetInt32(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the value to retrieve.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The 32-bit signed integer associated with <i>name</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>name</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td> The value associated with <i>name</i> cannot be converted to an 32-bit signed integer.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> An element with the specified name is not found in the current instance.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the value is a 32-bit signed integer, or can be converted to one, that value is returned; otherwise, an  <a href="../../System/types/InvalidCastException.html">InvalidCastException</a> is thrown. All conversions are done by the  <a href="../../System.Runtime.Serialization/types/IFormatterConverter.html">IFormatterConverter</a> associated with this  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetInt64Topic1"></a><a name="GetInt64(System.String)">GetInt64</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves a 64-bit signed integer value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int64.html">long</a> GetInt64(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the value to retrieve.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The 64-bit signed integer associated with <i>name</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>name</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td> The value associated with <i>name</i> cannot be converted to an 64-bit signed integer.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> An element with the specified name is not found in the current instance.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the value is a 64-bit signed integer, or can be converted to one, that value is returned; otherwise, an  <a href="../../System/types/InvalidCastException.html">InvalidCastException</a> is thrown. All conversions are done by the  <a href="../../System.Runtime.Serialization/types/IFormatterConverter.html">IFormatterConverter</a> associated with this  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetSByteTopic1"></a><a name="GetSByte(System.String)">GetSByte</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves an 8-bit signed integer value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dd><b><font color="#FF3399">This member is not CLS Compliant<br><br></font></b></dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[CLSCompliant(false)]<br><b>public <a href="../../System/types/SByte.html">sbyte</a> GetSByte(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the value to retrieve.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The 8-bit signed integer associated with <i>name</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>name</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td> The value associated with <i>name</i> cannot be converted to an 8-bit signed integer.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> An element with the specified name is not found in the current instance.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the value is an Int8, or can be converted to an Int8, that value is returned; otherwise an  <a href="../../System/types/InvalidCastException.html">InvalidCastException</a> is thrown. All conversions are done by the  <a href="../../System.Runtime.Serialization/types/IFormatterConverter.html">IFormatterConverter</a> associated with this  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetSingleTopic1"></a><a name="GetSingle(System.String)">GetSingle</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves a single-precision floating-point value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Single.html">float</a> GetSingle(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the value to retrieve.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The single-precision floating-point value associated with <i>name</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>name</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td> The value associated with <i>name</i> cannot be converted to a single-precision floating-point value.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> An element with the specified name is not found in the current instance.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the value is a single-precision floating-point number, or can be converted to one, that value is returned; otherwise, an  <a href="../../System/types/InvalidCastException.html">InvalidCastException</a> is thrown. All conversions are done by the  <a href="../../System.Runtime.Serialization/types/IFormatterConverter.html">IFormatterConverter</a> associated with this  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetStringTopic1"></a><a name="GetString(System.String)">GetString</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves a  <a href="../../System/types/String.html">String</a> value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> GetString(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the value to retrieve.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The  <a href="../../System/types/String.html">String</a> associated with <i>name</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>name</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td> The value associated with <i>name</i> cannot be converted to a  <a href="../../System/types/String.html">String</a>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> An element with the specified name is not found in the current instance.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the value is a  <a href="../../System/types/String.html">String</a>, or can be converted to a  <a href="../../System/types/String.html">String</a>, that value is returned; otherwise, an  <a href="../../System/types/InvalidCastException.html">InvalidCastException</a> is thrown. All conversions are done by the  <a href="../../System.Runtime.Serialization/types/IFormatterConverter.html">IFormatterConverter</a> associated with this  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetUInt16Topic1"></a><a name="GetUInt16(System.String)">GetUInt16</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves a 16-bit unsigned integer value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dd><b><font color="#FF3399">This member is not CLS Compliant<br><br></font></b></dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[CLSCompliant(false)]<br><b>public <a href="../../System/types/UInt16.html">ushort</a> GetUInt16(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the value to retrieve.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The 16-bit unsigned integer associated with <i>name</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>name</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td> The value associated with <i>name</i> cannot be converted to an 16-bit unsigned integer.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> An element with the specified name is not found in the current instance.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the value is a 16-bit unsigned integer, or can be converted to one, that value is returned; otherwise, an  <a href="../../System/types/InvalidCastException.html">InvalidCastException</a> is thrown. All conversions are done by the  <a href="../../System.Runtime.Serialization/types/IFormatterConverter.html">IFormatterConverter</a> associated with this  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetUInt32Topic1"></a><a name="GetUInt32(System.String)">GetUInt32</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves a 32-bit unsigned integer value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dd><b><font color="#FF3399">This member is not CLS Compliant<br><br></font></b></dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[CLSCompliant(false)]<br><b>public <a href="../../System/types/UInt32.html">uint</a> GetUInt32(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the value to retrieve.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The 32-bit unsigned integer associated with <i>name</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>name</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td> The value associated with <i>name</i> cannot be converted to an 32-bit unsigned integer.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> An element with the specified name is not found in the current instance.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the value is a 32-bit signed integer, or can be converted to one, that value is returned; otherwise, an  <a href="../../System/types/InvalidCastException.html">InvalidCastException</a> is thrown. All conversions are done by the  <a href="../../System.Runtime.Serialization/types/IFormatterConverter.html">IFormatterConverter</a> associated with this  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetUInt64Topic1"></a><a name="GetUInt64(System.String)">GetUInt64</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves a 64-bit unsigned integer value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dd><b><font color="#FF3399">This member is not CLS Compliant<br><br></font></b></dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[CLSCompliant(false)]<br><b>public <a href="../../System/types/UInt64.html">ulong</a> GetUInt64(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the value to retrieve.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The 64-bit unsigned integer associated with <i>name</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>name</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td> The value associated with <i>name</i> cannot be converted to an 64-bit unsigned integer.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> An element with the specified name is not found in the current instance.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the value is a 64-bit unsigned integer, or can be converted to one, that value is returned; otherwise, an  <a href="../../System/types/InvalidCastException.html">InvalidCastException</a> is thrown. All conversions are done by the  <a href="../../System.Runtime.Serialization/types/IFormatterConverter.html">IFormatterConverter</a> associated with this  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetValueTopic1"></a><a name="GetValue(System.String,System.Type)">GetValue</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves a value from the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> GetValue(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the value to retrieve.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param> The type of the value to retrieve. If the stored value cannot be converted to this type, the system will throw an  <a href="../../System/types/InvalidCastException.html">InvalidCastException</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The object of the specified  <a href="../../System/types/Type.html">Type</a> associated with <i>name</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>name</i> or <i>type</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td> The value associated with <i>name</i> cannot be converted to <i>type</i>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> An element with the specified name is not found in the current instance.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the data stored in the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> is of the type requested (or one of its derived classes), that value is returned directly. Otherwise,  <a href="../../System.Runtime.Serialization/types/IFormatterConverter.html#Convert(System.Object,System.Type)">IFormatterConverter.Convert</a> is called to convert it to the appropriate type.<br><br><b>Note </b> The value returned by the  <a href="#GetValue(System.String,System.Type)">SerializationInfo.GetValue</a> method can always be safely cast to the type specified in the <i>type</i> parameter.</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example demonstrates the use of the  <a href="#GetValue(System.String,System.Type)">SerializationInfo.GetValue</a> method: <pre>
+// A serializable LinkedList example.  For the full LinkedList implementation
+// see the Serialization sample in the .NET Framework SDK.
+[Serializable()]
+class LinkedList: ISerializable {
+
+   public static void Main() {}
+
+   Node m_head = null;
+   Node m_tail = null;
+   
+   // Serializes the object.
+   public void GetObjectData(SerializationInfo info, StreamingContext context){
+      // Stores the m_head and m_tail references in the SerializationInfo info.
+      info.AddValue("head", m_head, m_head.GetType());
+      info.AddValue("tail", m_tail, m_tail.GetType());
+   }
+   
+   // Constructor that is called automatically during deserialization.
+   // Reconstructs the object from the information in SerializationInfo info
+   private LinkedList(SerializationInfo info, StreamingContext context){      
+      Node temp = new Node(0);
+      // Retrieves the values of Type temp.GetType() from SerializationInfo info
+      m_head = (Node)info.GetValue("head", temp.GetType());
+      m_tail = (Node)info.GetValue("tail", temp.GetType());
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="SetTypeTopic1"></a><a name="SetType(System.Type)">SetType</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Sets the  <a href="../../System/types/Type.html">Type</a> of the object to serialize.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void SetType(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Type.html">Type</a> of the object to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>type</i> parameter is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Runtime.Serialization/types/Formatter.html">Formatter</a> is responsible for setting the  <a href="../../System/types/Type.html">Type</a> of the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> before passing it to  <a href="../../System.Runtime.Serialization/types/ISerializable.html#GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">ISerializable.GetObjectData</a>. However, users who want to send proxies for their objects will need to change the type represented by this  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a>. Using the  <a href="#SetType(System.Type)">SerializationInfo.SetType</a> method is equivalent to setting both the  <a href="#FullTypeName">SerializationInfo.FullTypeName</a> and the  <a href="#AssemblyName">SerializationInfo.AssemblyName</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

@@ -1,0 +1,777 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Runtime.Serialization.Formatters.Binary.BinaryFormatter</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Runtime.Serialization.Formatters.Binary.BinaryFormatter Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Runtime.Serialization.Formatters.Binary<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Serializes and deserializes an object, or an entire graph of connected objects, in binary format.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public sealed class BinaryFormatter : IRemotingFormatter, IFormatter
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Runtime.Serialization.Formatters.Soap/types/SoapFormatter.html">SoapFormatter</a> and  <a href="../../System.Runtime.Serialization.Formatters.Binary/types/BinaryFormatter.html">BinaryFormatter</a> classes implement the  <a href="../../System.Runtime.Remoting.Messaging/types/IRemotingFormatter.html">IRemotingFormatter</a> interface to support remote procedure calls (RPCs), and the  <a href="../../System.Runtime.Serialization/types/IFormatter.html">IFormatter</a> interface (inherited by the  <a href="../../System.Runtime.Remoting.Messaging/types/IRemotingFormatter.html">IRemotingFormatter</a>) to support serialization of a graph of objects. The  <a href="../../System.Runtime.Serialization.Formatters.Soap/types/SoapFormatter.html">SoapFormatter</a> class also supports RPCs with  <a href="../../System.Runtime.Serialization.Formatters/types/ISoapMessage.html">ISoapMessage</a> objects, without using the  <a href="../../System.Runtime.Remoting.Messaging/types/IRemotingFormatter.html">IRemotingFormatter</a> functionality.<p> During RPCs, the  <a href="../../System.Runtime.Remoting.Messaging/types/IRemotingFormatter.html">IRemotingFormatter</a> interface allows the specification of two separate object graphs: the graph of objects to serialize, and an additional graph containing an array of header objects that convey information about the remote function call (for example, transaction ID or a method signature).</p>
+<p> RPCs that use the  <a href="../../System.Runtime.Serialization.Formatters.Binary/types/BinaryFormatter.html">BinaryFormatter</a> separate into two distinct parts: method calls, which are sent to the server with the remote object containing the method called, and method responses, which are sent from the server to the client with the status and response information from the called method.</p>
+<p> During serialization of a method call the first object of the object graph must support the  <a href="../../System.Runtime.Remoting.Messaging/types/IMethodCallMessage.html">IMethodCallMessage</a> interface. To deserialize a method call, use the  <a href="#Deserialize(System.IO.Stream)">BinaryFormatter.Deserialize</a> method with the  <a href="../../System.Runtime.Remoting.Messaging/types/HeaderHandler.html">HeaderHandler</a> parameter. The remoting infrastructure uses the  <a href="../../System.Runtime.Remoting.Messaging/types/HeaderHandler.html">HeaderHandler</a> delegate to produce an object that supports the  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> interface. When the  <a href="../../System.Runtime.Serialization.Formatters.Binary/types/BinaryFormatter.html">BinaryFormatter</a> invokes the  <a href="../../System.Runtime.Remoting.Messaging/types/HeaderHandler.html">HeaderHandler</a> delegate, it returns the URI of the remote object with the method that is being called. The first object in the graph returned supports the  <a href="../../System.Runtime.Remoting.Messaging/types/IMethodCallMessage.html">IMethodCallMessage</a> interface.</p>
+<p> The serialization procedure for a method response is identical to that of a method call, except the first object of the object graph must support the  <a href="../../System.Runtime.Remoting.Messaging/types/IMethodReturnMessage.html">IMethodReturnMessage</a> interface. To deserialize a method response, use the  <a href="#DeserializeMethodResponse(System.IO.Stream,System.Runtime.Remoting.Messaging.HeaderHandler,System.Runtime.Remoting.Messaging.IMethodCallMessage)">BinaryFormatter.DeserializeMethodResponse</a> method. To save time, details about the caller object are not sent to the remote object during the method call. These details are instead obtained from the original method call, which is passed to the  <a href="#DeserializeMethodResponse(System.IO.Stream,System.Runtime.Remoting.Messaging.HeaderHandler,System.Runtime.Remoting.Messaging.IMethodCallMessage)">BinaryFormatter.DeserializeMethodResponse</a> method in the  <a href="../../System.Runtime.Remoting.Messaging/types/IMethodCallMessage.html">IMethodCallMessage</a> parameter. The first object in the graph returned by the  <a href="#DeserializeMethodResponse(System.IO.Stream,System.Runtime.Remoting.Messaging.HeaderHandler,System.Runtime.Remoting.Messaging.IMethodCallMessage)">BinaryFormatter.DeserializeMethodResponse</a> method supports the  <a href="../../System.Runtime.Remoting.Messaging/types/IMethodReturnMessage.html">IMethodReturnMessage</a> interface.</p>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Runtime.Serialization.Formatters.Binary/System.Runtime.Serialization.Formatters.Binary.html">System.Runtime.Serialization.Formatters.Binary Namespace</a></dd>
+</dl>
+<h3>System.Runtime.Serialization.Formatters.Binary.BinaryFormatter Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor()<br><br></code>Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Initializes a new instance of the  <a href="../../System.Runtime.Serialization.Formatters.Binary/types/BinaryFormatter.html">BinaryFormatter</a> class with default values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(ISurrogateSelector selector, StreamingContext context)<br><br></code> Initializes a new instance of the  <a href="../../System.Runtime.Serialization.Formatters.Binary/types/BinaryFormatter.html">BinaryFormatter</a> class with a given surrogate selector and streaming context.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#AssemblyFormat">AssemblyFormat</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the format in which assembly names are serialized.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Binder">Binder</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets an object of type  <a href="../../System.Runtime.Serialization/types/SerializationBinder.html">SerializationBinder</a> that controls the binding of a serialized object to a type.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Context">Context</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> for this formatter.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SurrogateSelector">SurrogateSelector</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets an  <a href="../../System.Runtime.Serialization/types/ISurrogateSelector.html">ISurrogateSelector</a> that controls type substitution during serialization and deserialization.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#TypeFormat">TypeFormat</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the format in which type descriptions are laid out in the serialized stream.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Deserialize(System.IO.Stream)">Deserialize</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Deserialize(Stream serializationStream)<br><br></code> Deserializes the specified stream into an object graph.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Deserialize(System.IO.Stream,System.Runtime.Remoting.Messaging.HeaderHandler)">Deserialize</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Deserialize(Stream serializationStream, HeaderHandler handler)<br><br></code> Deserializes the specified stream into an object graph. The provided  <a href="../../System.Runtime.Remoting.Messaging/types/HeaderHandler.html">HeaderHandler</a> handles any headers in that stream.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#DeserializeMethodResponse(System.IO.Stream,System.Runtime.Remoting.Messaging.HeaderHandler,System.Runtime.Remoting.Messaging.IMethodCallMessage)">DeserializeMethodResponse</a></td>
+<td width="55%"> Deserializes a response to a remote method call from the provided  <a href="../../System.IO/types/Stream.html">Stream</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Serialize(System.IO.Stream,System.Object)">Serialize</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Serialize(Stream serializationStream, object graph)<br><br></code> Serializes the object, or graph of objects with the specified top (root), to the given stream.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Serialize(System.IO.Stream,System.Object,System.Runtime.Remoting.Messaging.Header[])">Serialize</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Serialize(Stream serializationStream, object graph, Header[] headers)<br><br></code> Serializes the object, or graph of objects with the specified top (root), to the given stream attaching the provided headers.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Runtime.Serialization.Formatters.Binary.BinaryFormatter</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Runtime.Serialization.Formatters.Binary.BinaryFormatter Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Runtime.Serialization.Formatters.Binary/types/BinaryFormatter.html">BinaryFormatter</a> class with default values.</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public BinaryFormatter();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This constructor sets the properties of the  <a href="../../System.Runtime.Serialization.Formatters.Binary/types/BinaryFormatter.html">BinaryFormatter</a> object as follows: <br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  Property Type
+                </TH>
+<TH>
+                  Condition
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD> <a href="#SurrogateSelector">BinaryFormatter.SurrogateSelector</a></TD>
+<TD><b>null</b>
+                  .
+                </TD>
+</TR>
+<TR valign="top">
+<TD> <a href="#Context">BinaryFormatter.Context</a></TD>
+<TD>
+                  A
+                   <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a>
+                  with a value indicating that serialized data can be transmitted to or received from any of the other contexts. (
+                   <a href="../../System.Runtime.Serialization/types/StreamingContextStates.html#All">StreamingContextStates.All</a>
+                  ).
+                </TD>
+</TR>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Runtime.Serialization.Formatters.Binary/types/BinaryFormatter.html">BinaryFormatter</a> class with a given surrogate selector and streaming context.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public BinaryFormatter(<br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/ISurrogateSelector.html">ISurrogateSelector</a> <i>selector</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> <i>context</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>selector</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Runtime.Serialization/types/ISurrogateSelector.html">ISurrogateSelector</a> to use. Can be <b>null</b>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>context</i><br><dl>
+<dd>
+<param> The source and destination for the serialized data.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Initializes a new <b>BinaryFormatter</b> for serialization or deserialization of objects from the specified  <a href="../../System.IO/types/Stream.html">Stream</a>.<p> The serialization or deserialization process uses the specified  <a href="../../System.Runtime.Serialization/types/ISurrogateSelector.html">ISurrogateSelector</a> to search for surrogates that are registered for the object types you want to deserialize. Surrogates are helpers that serialize and deserialize objects of specific classes. The default  <a href="../../System.Runtime.Serialization/types/ISurrogateSelector.html">ISurrogateSelector</a> cannot handle the serialization of objects that derive from the  <a href="../../System/types/MarshalByRefObject.html">MarshalByRefObject</a> for remoting purposes. In a remoting situation the specified  <a href="../../System.Runtime.Serialization/types/ISurrogateSelector.html">ISurrogateSelector</a> replaces the object derived from  <a href="../../System/types/MarshalByRefObject.html">MarshalByRefObject</a> with an  <a href="../../System.Runtime.Remoting/types/ObjRef.html">ObjRef</a> object that is serialized by the specified surrogate selector. Therefore, if you want to use remote objects, set the <i>selector</i> parameter to an instance of  <a href="../../System.Runtime.Remoting.Messaging/types/RemotingSurrogateSelector.html">RemotingSurrogateSelector</a>. If you do not need surrogates, set the <i>selector</i> argument to be <b>null</b>.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="AssemblyFormatTopic1"></a><a name="AssemblyFormat">AssemblyFormat</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the format in which assembly names are serialized.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Runtime.Serialization.Formatters/types/FormatterAssemblyStyle.html">FormatterAssemblyStyle</a> AssemblyFormat {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Runtime.Serialization.Formatters/types/FormatterAssemblyStyle.html">FormatterAssemblyStyle</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="BinderTopic1"></a><a name="Binder">Binder</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets an object of type  <a href="../../System.Runtime.Serialization/types/SerializationBinder.html">SerializationBinder</a> that controls the binding of a serialized object to a type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Runtime.Serialization/types/SerializationBinder.html">SerializationBinder</a> Binder {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Serialization/types/IFormatter.html#Binder">IFormatter.Binder</a></dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Runtime.Serialization/types/SerializationBinder.html">SerializationBinder</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ContextTopic1"></a><a name="Context">Context</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> for this formatter.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> Context {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Serialization/types/IFormatter.html#Context">IFormatter.Context</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> provides an enumeration that describes the source and the destination for a given serialized stream, as well as a way for serialization to retain that context and an additional caller-defined context.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="SurrogateSelectorTopic1"></a><a name="SurrogateSelector">SurrogateSelector</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets an  <a href="../../System.Runtime.Serialization/types/ISurrogateSelector.html">ISurrogateSelector</a> that controls type substitution during serialization and deserialization.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Runtime.Serialization/types/ISurrogateSelector.html">ISurrogateSelector</a> SurrogateSelector {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Serialization/types/IFormatter.html#SurrogateSelector">IFormatter.SurrogateSelector</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The surrogate selector is used by  <a href="../../System.Runtime.Remoting/System.Runtime.Remoting.html">System.Runtime.Remoting</a> to generate  <a href="../../System.Runtime.Remoting/types/ObjRef.html">ObjRef</a> instances for objects that derive from  <a href="../../System/types/MarshalByRefObject.html">MarshalByRefObject</a>.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Runtime.Serialization/types/SurrogateSelector.html">SurrogateSelector</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="TypeFormatTopic1"></a><a name="TypeFormat">TypeFormat</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the format in which type descriptions are laid out in the serialized stream.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Runtime.Serialization.Formatters/types/FormatterTypeStyle.html">FormatterTypeStyle</a> TypeFormat {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Runtime.Serialization.Formatters/types/FormatterTypeStyle.html">FormatterTypeStyle</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="DeserializeTopic1"></a><a name="Deserialize(System.IO.Stream)">Deserialize</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.IO/types/Stream.html">Stream</a> <i>serializationStream</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Deserializes the specified stream into an object graph.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> Deserialize(<br>   <font color="#008080"><a href="../../System.IO/types/Stream.html">Stream</a> <i>serializationStream</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>serializationStream</i><br><dl>
+<dd>
+<param> The stream from which to deserialize the object graph.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The top (root) of the object graph.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>serializationStream</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td><i>serializationStream</i> supports seeking, but its length is 0.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Serialization/types/IFormatter.html#Deserialize(System.IO.Stream)">IFormatter.Deserialize</a></dd>
+</dl><b>Remarks</b><dl>
+<dd><br><br><b>Note </b> For successful deserialization, the current position in the stream must be at the beginning of the object graph.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="DeserializeTopic2"></a><a name="Deserialize(System.IO.Stream,System.Runtime.Remoting.Messaging.HeaderHandler)">Deserialize</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.IO/types/Stream.html">Stream</a> <i>serializationStream</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Messaging/types/HeaderHandler.html">HeaderHandler</a> <i>handler</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Deserializes the specified stream into an object graph. The provided  <a href="../../System.Runtime.Remoting.Messaging/types/HeaderHandler.html">HeaderHandler</a> handles any headers in that stream.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> Deserialize(<br>   <font color="#008080"><a href="../../System.IO/types/Stream.html">Stream</a> <i>serializationStream</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Messaging/types/HeaderHandler.html">HeaderHandler</a> <i>handler</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>serializationStream</i><br><dl>
+<dd>
+<param> The stream from which to deserialize the object graph.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>handler</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Runtime.Remoting.Messaging/types/HeaderHandler.html">HeaderHandler</a> that handles any headers in the <i>serializationStream</i>. Can be <b>null</b>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The deserialized object or the top object (root) of the object graph.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>serializationStream</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td><i>serializationStream</i> supports seeking, but its length is 0.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Remoting.Messaging/types/IRemotingFormatter.html#Deserialize(System.IO.Stream,System.Runtime.Remoting.Messaging.HeaderHandler)">IRemotingFormatter.Deserialize</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> Headers are used only for specific remoting applications.<br><br><b>Note </b> In order for deserialization to succeed the current position in the stream must be at the beginning of the object graph.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="DeserializeMethodResponseTopic1"></a><a name="DeserializeMethodResponse(System.IO.Stream,System.Runtime.Remoting.Messaging.HeaderHandler,System.Runtime.Remoting.Messaging.IMethodCallMessage)">DeserializeMethodResponse</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.IO/types/Stream.html">Stream</a> <i>serializationStream</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Messaging/types/HeaderHandler.html">HeaderHandler</a> <i>handler</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Messaging/types/IMethodCallMessage.html">IMethodCallMessage</a> <i>methodCallMessage</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Deserializes a response to a remote method call from the provided  <a href="../../System.IO/types/Stream.html">Stream</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> DeserializeMethodResponse(<br>   <font color="#008080"><a href="../../System.IO/types/Stream.html">Stream</a> <i>serializationStream</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Messaging/types/HeaderHandler.html">HeaderHandler</a> <i>handler</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Messaging/types/IMethodCallMessage.html">IMethodCallMessage</a> <i>methodCallMessage</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>serializationStream</i><br><dl>
+<dd>
+<param> The stream from which to deserialize the object graph.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>handler</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Runtime.Remoting.Messaging/types/HeaderHandler.html">HeaderHandler</a> that handles any headers in the <i>serializationStream</i>. Can be <b>null</b>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>methodCallMessage</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Runtime.Remoting.Messaging/types/IMethodCallMessage.html">IMethodCallMessage</a> containing details about where the call came from.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The deserialized response to the remote method call.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>serializationStream</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td><i>serializationStream</i> supports seeking, but its length is 0.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> To save time, details about the caller object are not sent to the remote object during the method call. Instead, these details are obtained from the original method call that is passed to the current method in the <i>methodCallMessage</i> parameter.<br><br><b>Note </b> In order for deserialization to succeed the current position in the stream must be at the beginning of the object graph.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~BinaryFormatter();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="SerializeTopic1"></a><a name="Serialize(System.IO.Stream,System.Object)">Serialize</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.IO/types/Stream.html">Stream</a> <i>serializationStream</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>graph</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Serializes the object, or graph of objects with the specified top (root), to the given stream.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void Serialize(<br>   <font color="#008080"><a href="../../System.IO/types/Stream.html">Stream</a> <i>serializationStream</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>graph</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>serializationStream</i><br><dl>
+<dd>
+<param> The stream to which the graph is to be serialized.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>graph</i><br><dl>
+<dd>
+<param> The object at the root of the graph to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>serializationStream</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> An error has occurred during serialization, such as if an object in the <i>graph</i> parameter is not marked as serializable.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Serialization/types/IFormatter.html#Serialize(System.IO.Stream,System.Object)">IFormatter.Serialize</a></dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="SerializeTopic2"></a><a name="Serialize(System.IO.Stream,System.Object,System.Runtime.Remoting.Messaging.Header[])">Serialize</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.IO/types/Stream.html">Stream</a> <i>serializationStream</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>graph</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Messaging/types/Header.html">Header[]</a> <i>headers</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Serializes the object, or graph of objects with the specified top (root), to the given stream attaching the provided headers.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void Serialize(<br>   <font color="#008080"><a href="../../System.IO/types/Stream.html">Stream</a> <i>serializationStream</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>graph</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Messaging/types/Header.html">Header[]</a> <i>headers</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>serializationStream</i><br><dl>
+<dd>
+<param> The stream to which the object is to be serialized.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>graph</i><br><dl>
+<dd>
+<param> The object at the root of the graph to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>headers</i><br><dl>
+<dd>
+<param> Remoting headers to include in the serialization. Can be <b>null</b>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>serializationStream</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Serialization/types/SerializationException.html">SerializationException</a></td>
+<td> An error has occurred during serialization, such as if an object in the <i>graph</i> parameter is not marked as serializable.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Remoting.Messaging/types/IRemotingFormatter.html#Serialize(System.IO.Stream,System.Object,System.Runtime.Remoting.Messaging.Header[])">IRemotingFormatter.Serialize</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The serialization process includes the information supplied in the <i>headers</i> parameter at the front of the serialized stream.<br><br><b>Note </b> Headers are used only for specific remoting applications.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

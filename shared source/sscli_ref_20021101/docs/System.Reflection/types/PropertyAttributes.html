@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Reflection.PropertyAttributes</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Reflection.PropertyAttributes Enumeration</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Reflection<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Defines the attributes that may be associated with a property. These attribute values are defined in corhdr.h.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Flags]<br>[Serializable]<br><b>public enum PropertyAttributes</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> To get the <b>PropertyAttributes</b>, first get the class <b>Type</b>. From the <b>Type</b>, get the <b>PropertyInfo</b>. From the <b>PropertyInfo</b>, get the <b>Attributes</b>.<p> The enumerated value is a number representing the bitwise OR of the attributes implemented on the method.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> In the example shown below, three properties are built and the <b>PropertyAttributes</b> enumerated value is displayed. Note that the for the read only property has no setter and thus cannot be changed by .Caption = statement.<pre>
+ using System;
+ using System.Reflection;
+ 
+ //Make three properties, one read-write, one default
+ // and one read only. 
+ public class Aproperty  
+ // A read-write property
+ {
+    private string caption = "A Default caption";
+    public string Caption{
+       get{return caption;}
+       set{
+          if (caption != value){caption = value;}
+       }
+    }
+ }
+ public class Bproperty  
+ // A default property
+ {
+    private string caption  = "B Default caption";
+    public string this [int index]{
+       get {return "1";}
+    }
+    public string Caption{
+  
+       get{return caption;}
+       set{
+          if (caption != value){caption = value;}
+       }
+    }
+ }
+ public class Cproperty  
+ // A read only property
+ {
+    private string caption = "C Default caption";
+    public string Caption{
+       get{return caption;}
+       //No set- this is read only
+    }
+ }
+  
+ class propertyattributesenum
+ {
+    public static int Main(string[] args)
+    {
+       Console.WriteLine("\nReflection.PropertyAttributes");
+  
+       //Prove that a property exist and change its value
+       Aproperty Mypropertya = new Aproperty();
+       Bproperty Mypropertyb = new Bproperty();
+       Cproperty Mypropertyc = new Cproperty();
+  
+      
+       Console.Write("\n1. Mypropertya.Caption = " + Mypropertya.Caption );
+      
+       Console.Write("\n1. Mypropertyb.Caption = " + Mypropertyb.Caption );
+      
+       Console.Write("\n1. Mypropertyc.Caption = " + Mypropertyc.Caption );
+  
+       //Can change only Mypropertya as Mypropertyb is read only
+       Mypropertya.Caption = "A- This is changed.";
+       Mypropertyb.Caption = "B- This is changed.";
+       //Note that Mypropertyc is not changed- it is read only
+  
+       Console.Write("\n\n2. Mypropertya.Caption = " + Mypropertya.Caption );
+  
+       Console.Write("\n2.Mypropertyb.Caption = " + Mypropertyb.Caption );
+ 
+       Console.Write("\n2. Mypropertyc.Caption = " + Mypropertyc.Caption );
+  
+       //Get the PropertyAttributes Enumeration of the property.
+       //Get the type
+       Type MyTypea = Type.GetType("Aproperty");
+       Type MyTypeb = Type.GetType("Bproperty");
+       Type MyTypec = Type.GetType("Cproperty");
+  
+       //Get the property attributes
+       PropertyInfo Mypropertyinfoa = MyTypea.GetProperty("Caption");
+       PropertyAttributes Myattributesa = Mypropertyinfoa.Attributes;
+       PropertyInfo Mypropertyinfob = MyTypeb.GetProperty("Item");
+       PropertyAttributes Myattributesb = Mypropertyinfob.Attributes;
+       PropertyInfo Mypropertyinfoc = MyTypec.GetProperty("Caption");
+       PropertyAttributes Myattributesc = Mypropertyinfoc.Attributes;
+  
+       //Display the property attributes value
+      
+       Console.Write("\n\na- " + Myattributesa.ToString());
+  
+       Console.Write("\nb-" + Myattributesb.ToString());
+      
+       Console.Write("\nc- " + Myattributesc.ToString());
+       return 0;
+    }
+ }
+ /*
+ Produces the following output
+ 
+ Reflection.PropertyAttributes
+  
+ 1. Mypropertya.Caption = A Default caption
+ 1. Mypropertyb.Caption = B Default caption
+ 1. Mypropertyc.Caption = C Default caption
+  
+ 2. Mypropertya.Caption = A- This is changed.
+ 2. Mypropertyb.Caption = B- This is changed.
+ 2. Mypropertyc.Caption = C Default caption
+  
+ a- None
+ b- DefaultProperty
+ c- None
+ */
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Reflection/System.Reflection.html">System.Reflection Namespace</a></dd>
+</dl>
+<h3>System.Reflection.PropertyAttributes Member List: </h3>
+<dl>
+<dt><b>Public Fields</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><b>HasDefault</b></td>
+<td width="55%"> Specifies that the property has a default value.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>None</b></td>
+<td width="55%"> Specifies that no attributes are associated with a property.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>Reserved2</b></td>
+<td width="55%"> Reserved.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>Reserved3</b></td>
+<td width="55%"> Reserved.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>Reserved4</b></td>
+<td width="55%"> Reserved.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>ReservedMask</b></td>
+<td width="55%"> Specifies a flag reserved for runtime use only.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>RTSpecialName</b></td>
+<td width="55%"> Specifies that the metadata internal APIs check the name encoding.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>SpecialName</b></td>
+<td width="55%"> Specifies that the property is special, with the name describing how the property is special.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/ValueType.html">System.ValueType</a></li>
+<ul class="none">
+<li><a href="../../System/types/Enum.html">System.Enum</a></li>
+<ul class="none">
+<li><b>System.Reflection.PropertyAttributes</b></li>
+</ul>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

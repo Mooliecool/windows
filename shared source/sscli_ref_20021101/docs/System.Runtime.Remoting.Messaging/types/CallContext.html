@@ -1,0 +1,521 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Runtime.Remoting.Messaging.CallContext</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Runtime.Remoting.Messaging.CallContext Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Runtime.Remoting.Messaging<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides a set of properties that are carried with the execution code path. This class cannot be inherited.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public sealed class CallContext</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="../../System.Runtime.Remoting.Messaging/types/CallContext.html">CallContext</a> is a specialized collection object similar to a Thread Local Storage for method calls, and provides data slots that are unique to each logical thread of execution. The slots are not shared across call contexts on other logical threads. Objects can be added to the  <a href="../../System.Runtime.Remoting.Messaging/types/CallContext.html">CallContext</a> as it travels down and back up the execution code path, and examined by various objects along the path.<p> When a remote method call is made to an object in another  <a href="../../System/types/AppDomain.html">AppDomain</a>, the  <a href="../../System.Runtime.Remoting.Messaging/types/CallContext.html">CallContext</a> class generates a  <a href="../../System.Runtime.Remoting.Messaging/types/LogicalCallContext.html">LogicalCallContext</a> instance that travels along with the remote call. Only objects that expose the  <a href="../../System.Runtime.Remoting.Messaging/types/ILogicalThreadAffinative.html">ILogicalThreadAffinative</a> interface and are stored in the  <a href="../../System.Runtime.Remoting.Messaging/types/CallContext.html">CallContext</a> are propagated outside the  <a href="../../System/types/AppDomain.html">AppDomain</a> in a  <a href="../../System.Runtime.Remoting.Messaging/types/LogicalCallContext.html">LogicalCallContext</a>. Objects that do not support this interface are not transmitted in  <a href="../../System.Runtime.Remoting.Messaging/types/LogicalCallContext.html">LogicalCallContext</a> instances with remote method calls.</p><br><br><b>Note </b> All methods in  <a href="../../System.Runtime.Remoting.Messaging/types/CallContext.html">CallContext</a> are static and operate on the call context in the current  <a href="../../System.Threading/types/Thread.html">Thread</a>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example demonstrates the use of the  <a href="../../System.Runtime.Remoting.Messaging/types/CallContext.html">CallContext</a> class to transmit  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconprincipalidentityobjects.asp">MSDN: principalidentityobjects</a> to a remote location for identification. To view the code for the <b>LogicalCallContextData</b> class used in this sample, see the example for the  <a href="../../System.Runtime.Remoting.Messaging/types/ILogicalThreadAffinative.html">ILogicalThreadAffinative</a> interface. To view the code for the <b>HelloServiceClass</b> class used in this sample, see the example for the  <a href="#GetData(System.String)">CallContext.GetData</a> method. To view the code for the server class used in this sample, see example for the  <a href="../../System.Runtime.Remoting/types/RemotingConfiguration.html#RegisterActivatedServiceType(System.Type)">RemotingConfiguration.RegisterActivatedServiceType</a> class.<pre>
+using System;
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Channels.Tcp;
+using System.Runtime.Remoting.Messaging;
+using System.Security.Principal;
+
+public class ClientClass {
+
+   public static void Main() {
+      
+      GenericIdentity ident = new GenericIdentity("Bob");
+      GenericPrincipal prpal = new GenericPrincipal(ident, 
+                                                    new string[] {"Level1"});
+      LogicalCallContextData data = new LogicalCallContextData(prpal);      
+      
+      //Enter data into the CallContext
+      CallContext.SetData("test data", data);
+
+      
+      Console.WriteLine(data.numOfAccesses);
+
+      ChannelServices.RegisterChannel(new TcpChannel());
+
+      RemotingConfiguration.RegisterActivatedClientType(typeof(HelloServiceClass),
+                                                        "tcp://localhost:8082");
+
+      HelloServiceClass service = new HelloServiceClass();
+
+      if(service == null) {
+          Console.WriteLine("Could not locate server.");
+          return;
+      }
+
+
+      // call remote method
+      Console.WriteLine();
+      Console.WriteLine("Calling remote object");
+      Console.WriteLine(service.HelloMethod("Caveman"));
+      Console.WriteLine(service.HelloMethod("Spaceman"));
+      Console.WriteLine(service.HelloMethod("Bob"));
+      Console.WriteLine("Finished remote object call");
+      Console.WriteLine();
+
+      //Extract the returned data from the call context
+      LogicalCallContextData returnedData = 
+         (LogicalCallContextData)CallContext.GetData("test data");
+
+      Console.WriteLine(data.numOfAccesses);
+      Console.WriteLine(returnedData.numOfAccesses);
+   }
+}
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Runtime.Remoting.Messaging/System.Runtime.Remoting.Messaging.html">System.Runtime.Remoting.Messaging Namespace</a></dd>
+</dl>
+<h3>System.Runtime.Remoting.Messaging.CallContext Member List: </h3>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#FreeNamedDataSlot(System.String)">FreeNamedDataSlot</a></td>
+<td width="55%"> Empties a data slot with the specified name.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetData(System.String)">GetData</a></td>
+<td width="55%"> Retrieves an object with the specified name from the  <a href="../../System.Runtime.Remoting.Messaging/types/CallContext.html">CallContext</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHeaders">GetHeaders</a></td>
+<td width="55%"> Returns the headers that are sent along with the method call.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SetData(System.String,System.Object)">SetData</a></td>
+<td width="55%"> Stores a given object and associates it with the specified name.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SetHeaders(System.Runtime.Remoting.Messaging.Header[])">SetHeaders</a></td>
+<td width="55%"> Sets the headers that are sent along with the method call.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Runtime.Remoting.Messaging.CallContext</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Runtime.Remoting.Messaging.CallContext Member Details</h3><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~CallContext();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FreeNamedDataSlotTopic1"></a><a name="FreeNamedDataSlot(System.String)">FreeNamedDataSlot</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Empties a data slot with the specified name.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static void FreeNamedDataSlot(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the data slot to empty.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetDataTopic1"></a><a name="GetData(System.String)">GetData</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves an object with the specified name from the  <a href="../../System.Runtime.Remoting.Messaging/types/CallContext.html">CallContext</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Object.html">object</a> GetData(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the item in the call context.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The object in the call context associated with the specified name.</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example demonstrates the use of the  <a href="#GetData(System.String)">CallContext.GetData</a> method to transmit  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconprincipalidentityobjects.asp">MSDN: principalidentityobjects</a> to a remote location for identification. To view the code for the <b>LogicalCallContextData</b> class used in this sample, see the example for the  <a href="../../System.Runtime.Remoting.Messaging/types/ILogicalThreadAffinative.html">ILogicalThreadAffinative</a> interface. To view the code for the client class used in the sample, see the example for the  <a href="../../System.Runtime.Remoting.Messaging/types/CallContext.html">CallContext</a> class. To view the code for the server class used in this sample, see example for the  <a href="../../System.Runtime.Remoting/types/RemotingConfiguration.html#RegisterActivatedServiceType(System.Type)">RemotingConfiguration.RegisterActivatedServiceType</a> class.<pre>
+using System;
+using System.Text;
+using System.Runtime.Remoting.Messaging;
+using System.Security.Principal;
+
+public class HelloServiceClass : MarshalByRefObject {
+
+   static int n_instances;
+   int instanceNum;
+
+   public HelloServiceClass() {
+      n_instances++;
+      instanceNum = n_instances;
+      Console.WriteLine(this.GetType().Name + " has been created.  Instance # = {0}", instanceNum);
+   }
+
+
+   ~HelloServiceClass() {
+      Console.WriteLine("Destroyed instance {0} of HelloServiceClass.", instanceNum);      
+   }
+
+
+   public String HelloMethod(String name) {
+
+      //Extract the call context data
+      LogicalCallContextData data = (LogicalCallContextData)CallContext.GetData("test data");      
+      IPrincipal myPrincipal = data.Principal;
+      
+      //Check the user identity
+      if(myPrincipal.Identity.Name == "Bob") {
+         Console.WriteLine("\nHello {0}, you are identified!", myPrincipal.Identity.Name);
+         Console.WriteLine(data.numOfAccesses);
+      }
+      else {
+         Console.WriteLine("Go away! You are not identified!");
+         return String.Empty;
+      }
+
+        // calculate and return result to client	
+      return "Hi there " + name + ".";
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHeadersTopic1"></a><a name="GetHeaders">GetHeaders</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the headers that are sent along with the method call.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Runtime.Remoting.Messaging/types/Header.html">Header[]</a> GetHeaders();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The headers that are sent along with the method call.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="SetDataTopic1"></a><a name="SetData(System.String,System.Object)">SetData</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>data</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Stores a given object and associates it with the specified name.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static void SetData(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>data</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name with which to associate the new item in the call context.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>data</i><br><dl>
+<dd>
+<param> The object to store in the call context.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example demonstrates the use of the  <a href="#SetData(System.String,System.Object)">CallContext.SetData</a> method to transmit  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconprincipalidentityobjects.asp">MSDN: principalidentityobjects</a> to a remote location for identification. To view the code for the <b>LogicalCallContextData</b> class used in this sample, see the example for the  <a href="../../System.Runtime.Remoting.Messaging/types/ILogicalThreadAffinative.html">ILogicalThreadAffinative</a> interface. To view the code for the <b>HelloServiceClass</b> class used in this sample, see the example for the  <a href="#GetData(System.String)">CallContext.GetData</a> method. To view the code for the server class used in this sample, see example for the  <a href="../../System.Runtime.Remoting/types/RemotingConfiguration.html#RegisterActivatedServiceType(System.Type)">RemotingConfiguration.RegisterActivatedServiceType</a> class.<pre>
+using System;
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Channels.Tcp;
+using System.Runtime.Remoting.Messaging;
+using System.Security.Principal;
+
+public class ClientClass {
+
+   public static void Main() {
+      
+      GenericIdentity ident = new GenericIdentity("Bob");
+      GenericPrincipal prpal = new GenericPrincipal(ident, 
+                                                    new string[] {"Level1"});
+      LogicalCallContextData data = new LogicalCallContextData(prpal);      
+      
+      //Enter data into the CallContext
+      CallContext.SetData("test data", data);
+
+      
+      Console.WriteLine(data.numOfAccesses);
+
+      ChannelServices.RegisterChannel(new TcpChannel());
+
+      RemotingConfiguration.RegisterActivatedClientType(typeof(HelloServiceClass),
+                                                        "tcp://localhost:8082");
+
+      HelloServiceClass service = new HelloServiceClass();
+
+      if(service == null) {
+          Console.WriteLine("Could not locate server.");
+          return;
+      }
+
+
+      // call remote method
+      Console.WriteLine();
+      Console.WriteLine("Calling remote object");
+      Console.WriteLine(service.HelloMethod("Caveman"));
+      Console.WriteLine(service.HelloMethod("Spaceman"));
+      Console.WriteLine(service.HelloMethod("Bob"));
+      Console.WriteLine("Finished remote object call");
+      Console.WriteLine();
+
+      //Extract the returned data from the call context
+      LogicalCallContextData returnedData = 
+         (LogicalCallContextData)CallContext.GetData("test data");
+
+      Console.WriteLine(data.numOfAccesses);
+      Console.WriteLine(returnedData.numOfAccesses);
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="SetHeadersTopic1"></a><a name="SetHeaders(System.Runtime.Remoting.Messaging.Header[])">SetHeaders</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Messaging/types/Header.html">Header[]</a> <i>headers</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Sets the headers that are sent along with the method call.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static void SetHeaders(<br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Messaging/types/Header.html">Header[]</a> <i>headers</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>headers</i><br><dl>
+<dd>
+<param> An  <a href="../../System.Runtime.Remoting.Messaging/types/Header.html">Header</a> array of the headers that are to be sent along with the method call.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

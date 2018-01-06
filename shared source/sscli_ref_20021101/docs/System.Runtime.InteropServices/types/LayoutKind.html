@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Runtime.InteropServices.LayoutKind</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Runtime.InteropServices.LayoutKind Enumeration</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Runtime.InteropServices<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Controls the layout of an object when exported to unmanaged code.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public enum LayoutKind</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This enumeration is used with  <a href="../../System.Runtime.InteropServices/types/StructLayoutAttribute.html">StructLayoutAttribute</a>.</dd>
+</dl><b>Example</b><dl>
+<dd> Illustrates a managed declaration of the PtInRect function which checks whether a point lies within a rectangle, and defines a Point structure with  <a href="#Sequential">LayoutKind.Sequential</a> layout and a Rect structure with  <a href="#Explicit">LayoutKind.Explicit</a> layout.<pre>
+   enum Bool
+   {
+      False = 0,
+      True
+   };
+   [StructLayout(LayoutKind.Sequential)]
+   public struct Point 
+   {
+      public int x;
+      public int y;
+   }   
+
+   [StructLayout(LayoutKind.Explicit)]
+   public struct Rect 
+   {
+      [FieldOffset(0)] public int left;
+      [FieldOffset(4)] public int top;
+      [FieldOffset(8)] public int right;
+      [FieldOffset(12)] public int bottom;
+   }   
+
+   class LibWrapper
+   {
+      [DllImport("user32.dll", CallingConvention=CallingConvention.StdCall)]
+      public static extern Bool PtInRect(ref Rect r, Point p);
+   };
+
+   class TestApplication
+   {
+      public static void Main()
+      {
+         try
+         {
+            Bool bPointInRect = 0;
+            Rect myRect = new Rect();
+            myRect.left = 10;
+            myRect.right = 100;
+            myRect.top = 10;
+            myRect.bottom = 100;
+            Point myPoint = new Point();
+            myPoint.x = 50;
+            myPoint.y = 50;
+            bPointInRect = LibWrapper.PtInRect(ref myRect, myPoint);
+            if(bPointInRect == Bool.True)
+               Console.WriteLine("Point lies within the Rect");
+            else
+               Console.WriteLine("Point did not lies within the Rect");
+         }
+         catch(Exception e)
+         {
+            Console.WriteLine("Exception : " + e.Message);
+         }
+      }
+   }
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Runtime.InteropServices/System.Runtime.InteropServices.html">System.Runtime.InteropServices Namespace</a></dd>
+</dl>
+<h3>System.Runtime.InteropServices.LayoutKind Member List: </h3>
+<dl>
+<dt><b>Public Fields</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><b>Auto</b></td>
+<td width="55%"> The runtime automatically chooses an appropriate layout for the members of an object in unmanaged memory.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>Explicit</b></td>
+<td width="55%"> The precise position of each member of an object in unmanaged memory is explicitly controlled. Each member must use the  <a href="../../System.Runtime.InteropServices/types/FieldOffsetAttribute.html">FieldOffsetAttribute</a> to indicate the position of that field within the type.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>Sequential</b></td>
+<td width="55%"> The members of the object are laid out sequentially, in the order in which they appear when exported to unmanaged memory. The members are laid out according to the packing specified in  <a href="../../System.Runtime.InteropServices/types/StructLayoutAttribute.html#Pack">StructLayoutAttribute.Pack</a>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/ValueType.html">System.ValueType</a></li>
+<ul class="none">
+<li><a href="../../System/types/Enum.html">System.Enum</a></li>
+<ul class="none">
+<li><b>System.Runtime.InteropServices.LayoutKind</b></li>
+</ul>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

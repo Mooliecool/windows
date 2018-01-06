@@ -1,0 +1,1338 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.IO.Path</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.IO.Path Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.IO<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Performs operations on  <a href="../../System/types/String.html">String</a> instances that contain file or directory path information. These operations are performed in a cross-platform manner.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public sealed class Path
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> A path is a string that provides the location of a file or directory. A path does not necessarily point to a location on disk; for example, a path might map to a location in memory or on a device. The exact format of a path is determined by the current platform. For example, on some systems, a path can start with a drive or volume letter, while this element is not present in other systems. On some systems, file paths can contain extensions, which indicate the type of information stored in the file. The format of a file name extension is platform-dependent; for example, some systems limit extensions to three characters, and others do not. The current platform also determines the set of characters used to separate the elements of a path, and the set of characters that cannot be used when specifying paths. Because of these differences, the fields of the <b>Path</b> class as well as the exact behavior of some members of the <b>Path</b> class are platform-dependent.<p> A path can contain absolute or relative location information. Absolute paths fully specify a location: the file or directory can be uniquely identified regardless of the current location. Relative paths specify a partial location: the current location is used as the starting point when locating a file specified with a relative path. To determine the current directory, call  <a href="../../System.IO/types/Directory.html#GetCurrentDirectory">Directory.GetCurrentDirectory</a>.</p>
+<p> Most members of the <b>Path</b> class do not interact with the file system and do not verify the existence of the file specified by a path string.<b>Path</b> class members that modify a path string, such as  <a href="#ChangeExtension(System.String,System.String)">Path.ChangeExtension</a>, have no effect on names of files in the file system.<b>Path</b> members do, however, validate the contents of a specified path string, and throw an  <a href="../../System/types/ArgumentException.html">ArgumentException</a> if the string contains characters that are not valid in path strings, as defined in  <a href="#InvalidPathChars">Path.InvalidPathChars</a>. For example, on Windows-based desktop platforms, invalid path characters might include quote ("), less than (&lt;), greater than (&gt;), pipe (|), backspace (\b), null (\0), and Unicode characters 16 through 18 and 20 through 25.</p>
+<p> The members of the <b>Path</b> class enable you to quickly and easily perform common operations such as determining whether a file name extension is part of a path, and combining two strings into one path name.</p>
+<p> All members of the <b>Path</b> class are static and can therefore be called without having an instance of a path.</p><br><br><b>Note </b> In members that accept a path as an input string, that path must be well-formed or an exception is raised. For example, if a path is fully qualified but begins with a space, the path is not trimmed in methods of the class. Therefore, the path is malformed and an exception is raised. Similarly, a path or a combination of paths cannot be fully qualified twice. For example, "c:\temp c:\windows" also raises an exception in most cases. Ensure that your paths are well-formed when using methods that accept a path string.<p> In members that accept a path, the path can refer to a file or just a directory. The specified path can also refer to a relative path or a Universal Naming Convention (UNC) path for a server and share name. For example, all of the following are acceptable paths: </p>
+<UL>
+<li> "c:\\MyDir\\MyFile.txt" in C#, or "c:\MyDir\MyFile.txt" in Visual Basic.<font color="#FF0000"><i> (Visual Basic not implemented in the shared source CLI)</i></font>
+</li>
+<li> "c:\\MyDir" in C#, or "c:\MyDir" in Visual Basic.<font color="#FF0000"><i> (Visual Basic not implemented in the shared source CLI)</i></font>
+</li>
+<li> "MyDir\\MySubdir" in C#, or "MyDir\MySubDir" in Visual Basic.<font color="#FF0000"><i> (Visual Basic not implemented in the shared source CLI)</i></font>
+</li>
+<li> "\\\\MyServer\\MyShare" in C#, or "\\MyServer\MyShare" in Visual Basic.<font color="#FF0000"><i> (Visual Basic not implemented in the shared source CLI)</i></font>
+</li>
+</UL>
+<p> Because all these operations are performed on strings, it is impossible to verify that the results are valid in all scenarios. For example, the  <a href="#GetExtension(System.String)">Path.GetExtension</a> method parses a string that you pass to it and returns the extension from that string. However, this does not mean that a file with that extension exists on the disk.</p>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.IO/System.IO.html">System.IO Namespace</a></dd>
+</dl>
+<h3>System.IO.Path Member List: </h3>
+<dl>
+<dt><b>Public Fields</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#AltDirectorySeparatorChar">AltDirectorySeparatorChar</a></td>
+<td width="55%"> Provides a platform-specific alternate character used to separate directory levels in a path string that reflects a hierarchical file system organization.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#DirectorySeparatorChar">DirectorySeparatorChar</a></td>
+<td width="55%"> Provides a platform-specific character used to separate directory levels in a path string that reflects a hierarchical file system organization.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#InvalidPathChars">InvalidPathChars</a></td>
+<td width="55%"> Provides a platform-specific array of characters that cannot be specified in path string arguments passed to members of the  <a href="../../System.IO/types/Path.html">Path</a> class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#PathSeparator">PathSeparator</a></td>
+<td width="55%"> A platform-specific separator character used to separate path strings in environment variables.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#VolumeSeparatorChar">VolumeSeparatorChar</a></td>
+<td width="55%"> Provides a platform-specific volume separator character.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ChangeExtension(System.String,System.String)">ChangeExtension</a></td>
+<td width="55%"> Changes the extension of a path string.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Combine(System.String,System.String)">Combine</a></td>
+<td width="55%"> Combines two path strings.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetDirectoryName(System.String)">GetDirectoryName</a></td>
+<td width="55%"> Returns the directory information for the specified path string.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetExtension(System.String)">GetExtension</a></td>
+<td width="55%"> Returns the extension of the specified path string.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetFileName(System.String)">GetFileName</a></td>
+<td width="55%"> Returns the file name and extension of the specified path string.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetFileNameWithoutExtension(System.String)">GetFileNameWithoutExtension</a></td>
+<td width="55%"> Returns the file name of the specified path string without the extension.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetFullPath(System.String)">GetFullPath</a></td>
+<td width="55%"> Returns the absolute path for the specified path string.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetPathRoot(System.String)">GetPathRoot</a></td>
+<td width="55%"> Gets the root directory information of the specified path.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetTempFileName">GetTempFileName</a></td>
+<td width="55%"> Returns a unique temporary file name and creates a zero-byte file by that name on disk.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetTempPath">GetTempPath</a></td>
+<td width="55%"> Returns the path of the current system's temporary folder.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#HasExtension(System.String)">HasExtension</a></td>
+<td width="55%"> Determines whether a path includes a file name extension.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsPathRooted(System.String)">IsPathRooted</a></td>
+<td width="55%"> Gets a value indicating whether the specified path string contains absolute or relative path information.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.IO.Path</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.IO.Path Member Details</h3><b>Field: <i><a name="AltDirectorySeparatorCharTopic1"></a><a name="AltDirectorySeparatorChar">AltDirectorySeparatorChar</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides a platform-specific alternate character used to separate directory levels in a path string that reflects a hierarchical file system organization.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static readonly <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">char</a> AltDirectorySeparatorChar;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The character stored in this field cannot be in  <a href="#InvalidPathChars">Path.InvalidPathChars</a>. This field can be set to the same value as  <a href="#DirectorySeparatorChar">Path.DirectorySeparatorChar</a>.<b>AltDirectorySeparatorChar</b> and <b>DirectorySeparatorChar</b> are both valid for separating directory levels in a path string.<p> The value of this field is a backslash ('\') on Unix, and a slash ('/') on Windows and Macintosh operating systems.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example code demonstrates the use of the <b>AltDirectorySeparatorChar</b> field.<pre>
+        Console.WriteLine("Path.AltDirectorySeparatorChar={0}", 
+                          Path.AltDirectorySeparatorChar);
+        Console.WriteLine("Path.DirectorySeparatorChar={0}", 
+                          Path.DirectorySeparatorChar);
+        Console.WriteLine("Path.PathSeparator={0}", 
+                          Path.PathSeparator);
+        Console.WriteLine("Path.VolumeSeparatorChar={0}", 
+                          Path.VolumeSeparatorChar);
+        
+        Console.Write("Path.InvalidPathChars=");
+        foreach (char c in Path.InvalidPathChars)
+            Console.Write(c);
+        Console.WriteLine();
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="DirectorySeparatorCharTopic1"></a><a name="DirectorySeparatorChar">DirectorySeparatorChar</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides a platform-specific character used to separate directory levels in a path string that reflects a hierarchical file system organization.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static readonly <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">char</a> DirectorySeparatorChar;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The character stored in this field cannot be in  <a href="#InvalidPathChars">Path.InvalidPathChars</a>. <a href="#AltDirectorySeparatorChar">Path.AltDirectorySeparatorChar</a> and <b>DirectorySeparatorChar</b> are both valid for separating directory levels in a path string.<p> The value of this field is a backslash ('\') on Unix, and a slash ('/') on Windows and Macintosh operating systems.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example code demonstrates the use of the <b>DirectorySeparatorChar</b> field.<pre>
+        Console.WriteLine("Path.AltDirectorySeparatorChar={0}", 
+                          Path.AltDirectorySeparatorChar);
+        Console.WriteLine("Path.DirectorySeparatorChar={0}", 
+                          Path.DirectorySeparatorChar);
+        Console.WriteLine("Path.PathSeparator={0}", 
+                          Path.PathSeparator);
+        Console.WriteLine("Path.VolumeSeparatorChar={0}", 
+                          Path.VolumeSeparatorChar);
+        
+        Console.Write("Path.InvalidPathChars=");
+        foreach (char c in Path.InvalidPathChars)
+            Console.Write(c);
+        Console.WriteLine();
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="InvalidPathCharsTopic1"></a><a name="InvalidPathChars">InvalidPathChars</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides a platform-specific array of characters that cannot be specified in path string arguments passed to members of the  <a href="../../System.IO/types/Path.html">Path</a> class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static readonly <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">char[]</a> InvalidPathChars;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This array is not guaranteed to contain the complete set of characters that are invalid in file and directory names. The full set of invalid characters can vary by file system. For example, on Windows-based desktop platforms, invalid path characters might include quote ("), less than (&lt;), greater than (&gt;), pipe (|), backspace (\b), null (\0), and Unicode characters 16 through 18 and 20 through 25.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example code demonstrates the use of the <b>InvalidPathChars</b> property.<pre>
+        Console.WriteLine("Path.AltDirectorySeparatorChar={0}", 
+                          Path.AltDirectorySeparatorChar);
+        Console.WriteLine("Path.DirectorySeparatorChar={0}", 
+                          Path.DirectorySeparatorChar);
+        Console.WriteLine("Path.PathSeparator={0}", 
+                          Path.PathSeparator);
+        Console.WriteLine("Path.VolumeSeparatorChar={0}", 
+                          Path.VolumeSeparatorChar);
+        
+        Console.Write("Path.InvalidPathChars=");
+        foreach (char c in Path.InvalidPathChars)
+            Console.Write(c);
+        Console.WriteLine();
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="PathSeparatorTopic1"></a><a name="PathSeparator">PathSeparator</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> A platform-specific separator character used to separate path strings in environment variables.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static readonly <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">char</a> PathSeparator;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> On Windows-based desktop platforms, the value of this field is the semicolon (;) by default, but might vary on other platforms.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example code demonstrates the use of the <b>PathSeparator</b> field.<pre>
+        Console.WriteLine("Path.AltDirectorySeparatorChar={0}", 
+                          Path.AltDirectorySeparatorChar);
+        Console.WriteLine("Path.DirectorySeparatorChar={0}", 
+                          Path.DirectorySeparatorChar);
+        Console.WriteLine("Path.PathSeparator={0}", 
+                          Path.PathSeparator);
+        Console.WriteLine("Path.VolumeSeparatorChar={0}", 
+                          Path.VolumeSeparatorChar);
+        
+        Console.Write("Path.InvalidPathChars=");
+        foreach (char c in Path.InvalidPathChars)
+            Console.Write(c);
+        Console.WriteLine();
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="VolumeSeparatorCharTopic1"></a><a name="VolumeSeparatorChar">VolumeSeparatorChar</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides a platform-specific volume separator character.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static readonly <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">char</a> VolumeSeparatorChar;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The value of this field is a colon (':') on Windows and Macintosh, and a slash ('/') on Unix operating systems. This is most useful for parsing paths such as "c:\windows" or "MacVolume:System Folder".</dd>
+</dl><b>Example</b><dl>
+<dd> The following example code demonstrates the use of the <b>VolumeSeparatorChar</b> field.<pre>
+        Console.WriteLine("Path.AltDirectorySeparatorChar={0}", 
+                          Path.AltDirectorySeparatorChar);
+        Console.WriteLine("Path.DirectorySeparatorChar={0}", 
+                          Path.DirectorySeparatorChar);
+        Console.WriteLine("Path.PathSeparator={0}", 
+                          Path.PathSeparator);
+        Console.WriteLine("Path.VolumeSeparatorChar={0}", 
+                          Path.VolumeSeparatorChar);
+        
+        Console.Write("Path.InvalidPathChars=");
+        foreach (char c in Path.InvalidPathChars)
+            Console.Write(c);
+        Console.WriteLine();
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ChangeExtensionTopic1"></a><a name="ChangeExtension(System.String,System.String)">ChangeExtension</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>extension</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Changes the extension of a path string.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/String.html">string</a> ChangeExtension(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>extension</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>path</i><br><dl>
+<dd>
+<param> The path information to modify. The path cannot contain any of the characters defined in  <a href="#InvalidPathChars">Path.InvalidPathChars</a>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>extension</i><br><dl>
+<dd>
+<param> The new extension (with a leading period). Specify <b>null</b> to remove an existing extension from <i>path</i>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A string containing the modified path information.<p> On Windows-based desktop platforms, if <i>path</i> is <b>null</b> or an empty string (""), the path information is returned unmodified. If <i>extension</i> is <b>null</b>, the returned string contains the specified path with its extension removed. If <i>path</i> has no extension, and <i>extension</i> is not <b>null</b>, the returned path string contains <i>extension</i> appended to the end of <i>path</i>.</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The path contains one or more of the invalid characters defined in  <a href="#InvalidPathChars">Path.InvalidPathChars</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If neither <i>path</i> nor <i>extension</i> contains a period (.), <b>ChangeExtension</b> adds the period.<p> The <i>extension</i> parameter can contain multiple periods and any valid path characters, and can be any length. If <i>extension</i> is <b>null</b>, the returned string contains the contents of <i>path</i> with the last period and all characters following it removed.</p>
+<p> If <i>extension</i> is an empty string, the returned path string contains the contents of <i>path</i> with any characters following the last period removed.</p>
+<p> If <i>path</i> does not have an extension and <i>extension</i> is not <b>null</b>, the returned string contains <i>path</i> followed by <i>extension</i>.</p>
+<p> If <i>extension</i> is not <b>null</b> and does not contain a leading period, the period is added.</p>
+<p> If <i>path</i> contains a multiple extension separated by multiple periods, the returned string contains the contents of <i>path</i> with the last period and all characters following it replaced by <i>extension</i>. For example, if <i>path</i> is "\Dir1\examples\pathtests.csx.txt" and <i>extension</i> is "cs", the modified path is "\Dir1\examples\pathtests.csx.cs".</p>
+<p> It is not possible to verify that the returned results are valid in all scenarios. For example, if <i>path</i> is empty, <i>extension</i> is appended.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example code demonstrates the use of the <b>ChangeExtension</b> method.<pre>
+        string goodFileName = @"C:\mydir\myfile.com.extension";
+        string badFileName = @"C:\mydir\";
+        string result;
+
+        result = Path.ChangeExtension(goodFileName, ".old");
+        Console.WriteLine("ChangeExtension({0}, '.old') returns '{1}'",
+                          goodFileName, result); 
+
+        result = Path.ChangeExtension(goodFileName, "");
+        Console.WriteLine("ChangeExtension({0}, '') returns '{1}'", 
+                          goodFileName, result); 
+
+        result = Path.ChangeExtension(badFileName, ".old");
+        Console.WriteLine("ChangeExtension({0}, '.old') returns '{1}'", 
+                          badFileName, result); 
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CombineTopic1"></a><a name="Combine(System.String,System.String)">Combine</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path1</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path2</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Combines two path strings.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/String.html">string</a> Combine(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path1</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path2</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>path1</i><br><dl>
+<dd>
+<param> The first path.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>path2</i><br><dl>
+<dd>
+<param> The second path, which cannot be a volume letter or a Universal Naming Convention (UNC) name.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A string containing the combined paths. If one of the specified paths is a zero-length string, this method returns the other path. If <i>path2</i> contains an absolute path, this method returns <i>path2</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><b>IsPathRooted</b> is <b>true</b>.<p> -or- </p>
+<p><i>path1</i> is not empty, and <i>path2</i> is a volume letter, a UNC share name, or begins with a path separator character.</p>
+<p> -or- </p>
+<p><i>path1</i> or <i>path2</i> contain one or more of the invalid characters defined in  <a href="#InvalidPathChars">Path.InvalidPathChars</a>.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>path1</i> or <i>path2</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If <i>path1</i> does not end with a valid separator character as defined in  <a href="#DirectorySeparatorChar">Path.DirectorySeparatorChar</a> or  <a href="#AltDirectorySeparatorChar">Path.AltDirectorySeparatorChar</a>, <b>DirectorySeparatorChar</b> is appended to <i>path1</i> before concatenation.<p> If <i>path2</i> does not include a root (for example, if <i>path2</i> does not start with a separator character or a drive specification), the result is a concatenation of the two paths, with an intervening separator character. If <i>path2</i> includes a root, the root is returned.</p>
+<p> If <i>path2</i> has no leading white space and begins with a Universal Naming Convention (UNC) name or volume letter, this will not throw an exception. Because the parameters are not parsed if they have white space, if <i>path2</i> is " c:\\ ", this will be appended successfully and will not be verified. Strings such as "c :\\" and " \\ hello.txt" will also be accepted.</p>
+<p> Not all invalid characters for directory and file names are interpreted as unacceptable by the <b>Combine</b> method, because you can use these characters for search wildcard characters. For example, while <code>
+                Path.Combine("c:\\", "*.txt")
+              </code> might be invalid if you were to create a file from it, it is valid as a search string. It is therefore successfully interpreted by the <b>Combine</b> method.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example demonstrates using the <b>Combine</b> method on a Windows-based desktop platform.<pre>
+using System;
+using System.IO;
+
+public class ChangeExtensionTest {
+
+    public static void Main() {
+
+        string path1 = "c:\\temp";
+        string path2 = "subdir\\file.txt";
+        string path3 = "c:\\temp.txt";
+        string path4 = "c:^*&amp;)(_=@#'\\^&amp;#2.*(.txt";
+        string path5 = "";
+        string path6 = null;
+
+        CombinePaths(path1, path2);
+        CombinePaths(path1, path3);
+        CombinePaths(path3, path2);
+        CombinePaths(path4, path2);
+        CombinePaths(path5, path2);
+        CombinePaths(path6, path2);
+    }
+
+    private static void CombinePaths(string p1, string p2) {
+
+        try {
+            string combination = Path.Combine(p1, p2);
+
+            Console.WriteLine("When you combine '{0}' and '{1}', the result is: {2}'{3}'",
+                        p1, p2, Environment.NewLine, combination);
+        } catch (Exception e) {
+            Console.WriteLine("You cannot combine '{0}' and '{1}' because: {2}{3}",
+                        p1, p2, Environment.NewLine, e.Message);
+        }
+
+        Console.WriteLine();
+    }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~Path();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetDirectoryNameTopic1"></a><a name="GetDirectoryName(System.String)">GetDirectoryName</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the directory information for the specified path string.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/String.html">string</a> GetDirectoryName(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>path</i><br><dl>
+<dd>
+<param> The path of a file or directory.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System/types/String.html">String</a> containing directory information for <i>path</i>, or <b>null</b> if <i>path</i> denotes a root directory, is the empty string (""), or is <b>null</b>. Returns  <a href="../../System/types/String.html#Empty">String.Empty</a> if <i>path</i> does not contain directory information.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>path</i> contains invalid characters, is empty, or contains only white spaces.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The string returned by this method consists of all characters between the first and last  <a href="#DirectorySeparatorChar">Path.DirectorySeparatorChar</a> or  <a href="#AltDirectorySeparatorChar">Path.AltDirectorySeparatorChar</a> character in path. The first separator character is included, but the last separator character is not included in the returned string.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example demonstrates using the <b>GetDirectoryName</b> method on a Windows-based desktop platform.<pre>
+        string fileName = @"C:\mydir\myfile.ext";
+        string path = @"C:\mydir\";
+        string rootPath = @"C:\";
+        string directoryName;
+    
+        directoryName = Path.GetDirectoryName(fileName);
+        Console.WriteLine("GetDirectoryName('{0}') returns '{1}'", 
+                          fileName, directoryName);
+
+        directoryName = Path.GetDirectoryName(path);
+        Console.WriteLine("GetDirectoryName('{0}') returns '{1}'", 
+                          path, directoryName);
+
+        directoryName = Path.GetDirectoryName(rootPath);
+        Console.WriteLine("GetDirectoryName('{0}') returns '{1}'", 
+                          rootPath, directoryName);
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetExtensionTopic1"></a><a name="GetExtension(System.String)">GetExtension</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the extension of the specified path string.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/String.html">string</a> GetExtension(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>path</i><br><dl>
+<dd>
+<param> The path string from which to get the extension.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System/types/String.html">String</a> containing the extension of the specified path (including the "."), <b>null</b>, or  <a href="../../System/types/String.html#Empty">String.Empty</a>. If <i>path</i> is <b>null</b>, <b>GetExtension</b> returns <b>null</b>. If <i>path</i> does not have extension information, <b>GetExtension</b> returns <b>Empty</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>path</i> contains one or more of the invalid characters defined in  <a href="#InvalidPathChars">Path.InvalidPathChars</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The extension of <i>path</i> is obtained by searching <i>path</i> for a period (.), starting with the last character in path and continuing toward the start of path. If a period is found before a  <a href="#DirectorySeparatorChar">Path.DirectorySeparatorChar</a> or  <a href="#AltDirectorySeparatorChar">Path.AltDirectorySeparatorChar</a> character, the returned string contains the period and the characters after it; otherwise,  <a href="../../System/types/String.html#Empty">String.Empty</a> is returned.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example demonstrates using the <b>GetExtension</b> method on a Windows-based desktop platform.<pre>
+        string fileName = @"C:\mydir.old\myfile.ext";
+        string path = @"C:\mydir.old\";
+        string extension;
+
+        extension = Path.GetExtension(fileName);
+        Console.WriteLine("GetExtension('{0}') returns '{1}'", 
+                          fileName, extension);
+
+        extension = Path.GetExtension(path);
+        Console.WriteLine("GetExtension('{0}') returns '{1}'", 
+                          path, extension);
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetFileNameTopic1"></a><a name="GetFileName(System.String)">GetFileName</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the file name and extension of the specified path string.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/String.html">string</a> GetFileName(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>path</i><br><dl>
+<dd>
+<param> The path string from which to obtain the file name and extension.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System/types/String.html">String</a> consisting of the characters after the last directory character in <i>path</i>. If the last character of <i>path</i> is a directory separator character, this method returns  <a href="../../System/types/String.html#Empty">String.Empty</a>. If <i>path</i> is <b>null</b>, this method returns <b>null</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>path</i> contains one or more of the invalid characters defined in  <a href="#InvalidPathChars">Path.InvalidPathChars</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method effectively removes the last element of the given file path, returning a string consisting of all characters up to but not including the last separator character in the file path. If you pass a string ending in a path separator character, it will be passed one level lower. The returned value is <b>null</b> if the file path is <b>null</b> or if the file path denotes a root (such as "\", "C:", or "\\server\share").<p> The separator characters used to determine the start of the file name are  <a href="#DirectorySeparatorChar">Path.DirectorySeparatorChar</a> and  <a href="#AltDirectorySeparatorChar">Path.AltDirectorySeparatorChar</a>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example demonstrates the behavior of the <b>GetFileName</b> method on a Windows-based desktop platform.<pre>
+        string fileName = @"C:\mydir\myfile.ext";
+        string path = @"C:\mydir\";
+        string result;
+
+        result = Path.GetFileName(fileName);
+        Console.WriteLine("GetFileName('{0}') returns '{1}'", 
+                          fileName, result);
+
+        result = Path.GetFileName(path);
+        Console.WriteLine("GetFileName('{0}') returns '{1}'", 
+                          path, result);
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetFileNameWithoutExtensionTopic1"></a><a name="GetFileNameWithoutExtension(System.String)">GetFileNameWithoutExtension</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the file name of the specified path string without the extension.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/String.html">string</a> GetFileNameWithoutExtension(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>path</i><br><dl>
+<dd>
+<param> The path of the file.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System/types/String.html">String</a> containing the string returned by  <a href="#GetFileName(System.String)">Path.GetFileName</a>, minus the last period (.) and all characters following it.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>path</i> contains one or more of the invalid characters defined in  <a href="#InvalidPathChars">Path.InvalidPathChars</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method does not verify that the path or file name exists.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example code demonstrates the use of the <b>GetFileNameWithoutExtension</b> method.<pre>
+        string fileName = @"C:\mydir\myfile.ext";
+        string path = @"C:\mydir\";
+        string result;
+
+        result = Path.GetFileNameWithoutExtension(fileName);
+        Console.WriteLine("GetFileNameWithoutExtension('{0}') returns '{1}'", 
+                          fileName, result);
+
+        result = Path.GetFileName(path);
+        Console.WriteLine("GetFileNameWithoutExtension('{0}') returns '{1}'", 
+                          path, result);
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetFullPathTopic1"></a><a name="GetFullPath(System.String)">GetFullPath</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the absolute path for the specified path string.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/String.html">string</a> GetFullPath(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>path</i><br><dl>
+<dd>
+<param> The file or directory for which to obtain absolute path information 
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A string containing the fully qualified location of <i>path</i>, such as "C:\MyFile.txt". If <i>path</i> is <b>null</b>, <b>GetFullPath</b> returns <b>null</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>path</i> is a zero-length string, contains only white space, or contains one or more invalid characters as defined by  <a href="#InvalidPathChars">Path.InvalidPathChars</a>.<p> -or- </p>
+<p> The system could not retrieve the absolute path.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td> The caller does not have the required permissions.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>path</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/PathTooLongException.html">PathTooLongException</a></td>
+<td> The length of <i>path</i> or the absolute path information for <i>path</i> exceeds the system-defined maximum length.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The absolute path includes all information required to locate a file or directory on a system.<p> The file or directory specified by <i>path</i> is not required to exist. For example, if c:\temp\newdir is the current directory, calling <b>GetFullPath</b> on a file name such as test.txt returns c:\temp\newdir\test.txt. The file need not exist.</p>
+<p> However, if <i>path</i> does exist, the caller must have permission to obtain path information for <i>path</i>. Note that unlike most members of the  <a href="../../System.IO/types/Path.html">Path</a> class, this method accesses the file system.</p>
+<p> This method uses current directory and current volume information to fully qualify <i>path</i>. If you only specify a file name in <i>path</i>, <b>GetFullPath</b> returns the fully qualified path of the current directory.</p>
+<p> If you pass in a short file name, it is not expanded to a long file name.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example demonstrates the <b>GetFullPath</b> method on a Windows-based desktop platform.<pre>
+        string fileName = "myfile.ext";
+        string path = @"\mydir\";
+        string fullPath;
+
+        fullPath = Path.GetFullPath(path);
+        Console.WriteLine("GetFullPath('{0}') returns '{1}'", 
+                          path, fullPath);
+        
+        fullPath = Path.GetFullPath(fileName);
+        Console.WriteLine("GetFullPath('{0}') returns '{1}'", 
+                          fileName, fullPath);
+
+    </pre>
+</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/FileIOPermission.html">FileIOPermission</a> for access to the path. Associated enumeration:  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#PathDiscovery">FileIOPermissionAccess.PathDiscovery</a></dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetPathRootTopic1"></a><a name="GetPathRoot(System.String)">GetPathRoot</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the root directory information of the specified path.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/String.html">string</a> GetPathRoot(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>path</i><br><dl>
+<dd>
+<param> The path from which to obtain root directory information.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A string containing the root directory of <i>path</i>, such as "C:\", or <b>null</b> if <i>path</i> is <b>null</b> or does not contain root directory information.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>path</i> contains one or more of the invalid characters defined in  <a href="#InvalidPathChars">Path.InvalidPathChars</a>, <p> -or- </p>
+<p> <a href="../../System/types/String.html#Empty">String.Empty</a> was passed to <i>path</i>.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method does not verify that the path or file name exists.<p> Possible patterns for the string returned by this method are as follows: </p>
+<UL>
+<li> An empty string (<i>path</i> specified a relative path on the current drive or volume, or <i>path</i> is <b>null</b>).</li>
+<li> "/" (<i>path</i> specified an absolute path on the current drive).</li>
+<li> "X:" (<i>path</i> specified a relative path on a drive, where X represents a drive or volume letter).</li>
+<li> "X:/" (<i>path</i> specified an absolute path on a given drive).</li>
+</UL>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example code demonstrates the use of the <b>GetPathRoot</b> method.<pre>
+        string path = @"\mydir\";
+        string fileName = "myfile.ext";
+        string fullPath = @"C:\mydir\myfile.ext";
+        string pathRoot;
+
+        pathRoot = Path.GetPathRoot(path);
+        Console.WriteLine("GetPathRoot('{0}') returns '{1}'", 
+                          path, pathRoot);
+        
+        pathRoot = Path.GetPathRoot(fileName);
+        Console.WriteLine("GetPathRoot('{0}') returns '{1}'", 
+                          fileName, pathRoot);
+
+        pathRoot = Path.GetPathRoot(fullPath);
+        Console.WriteLine("GetPathRoot('{0}') returns '{1}'", 
+                          fullPath, pathRoot);
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTempFileNameTopic1"></a><a name="GetTempFileName">GetTempFileName</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns a unique temporary file name and creates a zero-byte file by that name on disk.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/String.html">string</a> GetTempFileName();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System/types/String.html">String</a> containing the name of the temporary file.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The following example code demonstrates the use of the <b>GetTempFileName</b> method.<pre>
+        string fileName = Path.GetTempFileName();
+
+        FileInfo  fileInfo = new FileInfo(fileName);
+        Console.WriteLine("File '{0}' created of size {1} bytes", 
+                          fileName, fileInfo.Length);
+        
+        // Write some text to the file.
+        FileStream f = new FileStream(fileName, FileMode.Open);
+        StreamWriter s = new StreamWriter(f);
+        s.WriteLine("Output to the file");
+        s.Close();
+        f.Close();
+
+        fileInfo.Refresh();                                            
+        Console.WriteLine("File '{0}' now has size {1} bytes", 
+                          fileName, fileInfo.Length);
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTempPathTopic1"></a><a name="GetTempPath">GetTempPath</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the path of the current system's temporary folder.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/String.html">string</a> GetTempPath();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System/types/String.html">String</a> containing the path information of a temporary directory.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td> The caller does not have the required permissions.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The following example code demonstrates the use of the <b>GetTempPath</b> method.<pre>
+        string tempPath = Path.GetTempPath();
+        Console.WriteLine("Temporary path is '{0}'", tempPath);
+
+        DirectoryInfo tempDir = new DirectoryInfo(tempPath);
+        Console.WriteLine("{0} contains {1} files", tempPath, 
+                          tempDir.GetFiles().Length);
+
+    </pre>
+</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/EnvironmentPermission.html">EnvironmentPermission</a> for unrestricted access to environment variables. Associated enumeration:  <a href="../../System.Security.Permissions/types/PermissionState.html#Unrestricted">PermissionState.Unrestricted</a></dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="HasExtensionTopic1"></a><a name="HasExtension(System.String)">HasExtension</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines whether a path includes a file name extension.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Boolean.html">bool</a> HasExtension(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>path</i><br><dl>
+<dd>
+<param> The path to search for an extension.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the characters that follow the last directory separator (\\ or /) or volume separator (:) in the path include a period (.) followed by one or more characters; otherwise, <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>path</i> contains one or more of the invalid characters defined in  <a href="#InvalidPathChars">Path.InvalidPathChars</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Starting from the end of <i>path</i>, this method searches for a period (.) followed by at least one character. If this pattern is found before a  <a href="#DirectorySeparatorChar">Path.DirectorySeparatorChar</a>,  <a href="#AltDirectorySeparatorChar">Path.AltDirectorySeparatorChar</a>, or  <a href="#VolumeSeparatorChar">Path.VolumeSeparatorChar</a> character is encountered, this method returns <b>true</b>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example code demonstrates the use of the <b>HasExtension</b> method.<pre>
+        string fileName1 = "myfile.ext";
+        string fileName2 = @"mydir\myfile";
+        string path = @"C:\mydir.ext\";
+        bool result;
+
+        result = Path.HasExtension(fileName1);
+        Console.WriteLine("HasExtension('{0}') returns {1}", 
+                          fileName1, result);
+
+        result = Path.HasExtension(fileName2);
+        Console.WriteLine("HasExtension('{0}') returns {1}", 
+                          fileName2, result);
+        
+        result = Path.HasExtension(path);
+        Console.WriteLine("HasExtension('{0}') returns {1}", 
+                          path, result);
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IsPathRootedTopic1"></a><a name="IsPathRooted(System.String)">IsPathRooted</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether the specified path string contains absolute or relative path information.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Boolean.html">bool</a> IsPathRooted(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>path</i><br><dl>
+<dd>
+<param> The path to test.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if <i>path</i> contains an absolute path; otherwise, <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>path</i> contains one or more of the invalid characters defined in  <a href="#InvalidPathChars">Path.InvalidPathChars</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method does not verify that the path or file name exists.<p><b>IsPathRooted</b> returns <b>true</b> for <i>path</i> strings such as "\\MyDir\\MyFile.txt" and "C:\\MyDir". It returns <b>false</b> for <i>path</i> strings such as "MyDir".</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+        string fileName = @"C:\mydir\myfile.ext";
+        string UncPath = @"\\myPc\mydir\myfile";
+        string relativePath = @"mydir\sudir\";
+        bool result;
+
+        result = Path.IsPathRooted(fileName);
+        Console.WriteLine("IsPathRooted('{0}') returns {1}", 
+                          fileName, result);
+
+        result = Path.IsPathRooted(UncPath);
+        Console.WriteLine("IsPathRooted('{0}') returns {1}", 
+                          UncPath, result);
+        
+        result = Path.IsPathRooted(relativePath);
+        Console.WriteLine("IsPathRooted('{0}') returns {1}", 
+                          relativePath, result);
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

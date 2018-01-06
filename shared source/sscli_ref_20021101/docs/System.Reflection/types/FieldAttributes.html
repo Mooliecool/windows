@@ -1,0 +1,239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Reflection.FieldAttributes</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Reflection.FieldAttributes Enumeration</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Reflection<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Specifies flags that describe the attributes of a field.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public enum FieldAttributes</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd><b>FieldAttributes</b> uses the value from <b>FieldAccessMask</b> to mask off only the parts of the attribute value that is the accessibility. For example, the following code determines if <b>Attributes</b> has the public bit set: <p> (Attributes &amp; FieldAttributes.FieldAccessMask) == FieldAttributes.Public </p>
+<p> To get the <b>FieldAttributes</b>, first get the class <b>Type</b>. From the <b>Type</b>, get the <b>FieldInfo</b>. From the <b>FieldInfo</b>, get the <b>Attributes</b>.</p>
+<p> The enumerated value is a number representing the bitwise OR of the attributes implemented on the field.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> In this example, three fields are built and the <b>FieldAttributes</b> value is displayed when it is exactly defined. A <b>FieldAttributes</b> may contain more than one attribute, such as both <b>Public</b> and <b>Literal</b>, as shown in the third field below.<pre>
+ using System;
+ using System.Reflection;
+
+ //Make three fields
+ //The first field is private
+ public class Myfielda
+ {
+     private string field = "A private field";
+     public string Field{
+         get{return field;}
+         set{if(field!=value) {field=value + "---";}}
+     }
+ }
+ //The second field is public
+ public class Myfieldb
+ {
+     public string field = "B public field";
+     public string Field{
+         get{return field;}
+         set{if(field!=value) {field=value;}}
+     }
+ }
+ //The third field is public and literal, which is not exactly defined.
+ public class Myfieldc
+ {
+     public const string field = "C constant field";
+     public string Field{
+         get{return field;}
+     }
+ }
+ public class Myfieldattributes
+ {
+     public static int Main()
+     {
+         Console.WriteLine ("\nReflection.FieldAttributes");
+         Myfielda Myfielda = new Myfielda();
+         Myfieldb Myfieldb = new Myfieldb();
+         Myfieldc Myfieldc = new Myfieldc();
+ 
+         //Get the Type and FieldInfo for each of the three fields
+         Type MyTypea = Type.GetType("Myfielda");
+         FieldInfo Myfieldinfoa = MyTypea.GetField("field",
+             BindingFlags.NonPublic);
+         Type MyTypeb = Type.GetType("Myfieldb");
+         FieldInfo Myfieldinfob = MyTypeb.GetField("field",
+             BindingFlags.NonPublic);
+         Type MyTypec = Type.GetType("Myfieldc");
+         FieldInfo Myfieldinfoc = MyTypec.GetField("field",
+             BindingFlags.NonPublic);
+ 
+         //For the first field;
+         //Get and Display the Name, field, and attributes
+         Console.Write ("\n{0} - ", MyTypea.FullName);
+         Console.Write ("{0}; ", Myfieldinfoa.GetValue(Myfielda));
+         FieldAttributes Myattributesa = Myfieldinfoa.Attributes;
+ 
+         //If the FieldAttributes is exactly defined,
+         // print it out, otherwise say it is not defined
+         if (Enum.IsDefined(typeof(FieldAttributes),
+             Myattributesa))
+             Console.Write ("It has a {0} field attribute.",
+                 Myattributesa.ToString());
+         else
+             Console.Write ("It is not exactly defined.");
+ 
+         //For the second field;
+         //Get and Display the Name, field, and attributes
+         Console.Write ("\n{0} - ", MyTypeb.FullName);
+         Console.Write ("{0}; ", Myfieldinfob.GetValue(Myfieldb));
+         FieldAttributes Myattributesb = Myfieldinfob.Attributes;
+ 
+         //If the FieldAttributes is exactly defined,
+         // print it out, otherwise say it is not defined
+         if (Enum.IsDefined(typeof(FieldAttributes),
+             Myattributesb))
+             Console.Write ("It has a {0} field attribute.",
+                 Myattributesb.ToString());
+         else
+             Console.Write ("It is not exactly defined.");
+ 
+         //For the third field;
+         //Get and Display the Name, field, and attributes
+         Console.Write ("\n{0} - ", MyTypec.FullName);
+         Console.Write ("{0}; ", Myfieldinfoc.GetValue(Myfieldc));
+         FieldAttributes Myattributesc = Myfieldinfoc.Attributes;
+ 
+         //If the FieldAttributes is exactly defined,
+         // print it out, otherwise say it is not defined
+         if (Enum.IsDefined(typeof(FieldAttributes),
+             Myattributesc))
+             Console.Write ("It has a {0} field attribute.",
+                 Myattributesc.ToString());
+         else
+             Console.Write ("It is not exactly defined.");
+ 
+         return 0;
+     }
+ }
+
+    </pre>
+<p> This code produces the following output: </p>
+<p> Reflection.FieldAttributes </p>
+<p> Myfielda - A private field; it has a Private field attribute.</p>
+<p> Myfieldb - B public field; it has a Public field attribute.</p>
+<p> Myfieldc - C constant field; it is not exactly defined.</p>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Reflection/System.Reflection.html">System.Reflection Namespace</a></dd>
+</dl>
+<h3>System.Reflection.FieldAttributes Member List: </h3>
+<dl>
+<dt><b>Public Fields</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><b>Assembly</b></td>
+<td width="55%"> Specifies that the field is accessible throughout the assembly.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>FamANDAssem</b></td>
+<td width="55%"> Specifies that the field is accessible only by subtypes in this assembly.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>Family</b></td>
+<td width="55%"> Specifies that the field is accessible only by type and subtypes.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>FamORAssem</b></td>
+<td width="55%"> Specifies that the field is accessible by subtypes anywhere, as well as throughout this assembly.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>FieldAccessMask</b></td>
+<td width="55%"> Specifies the access level of a given field.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>HasDefault</b></td>
+<td width="55%"> Specifies that the field has a default value.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>HasFieldMarshal</b></td>
+<td width="55%"> Specifies that the field has marshalling information.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>HasFieldRVA</b></td>
+<td width="55%"> Specifies that the field has a Relative Virtual Address (RVA). The RVA is the location of the method body in the current image, as an address relative to the start of the image file in which it is located.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>InitOnly</b></td>
+<td width="55%"> Specifies that the field is initialized only, and cannot be written after initialization.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>Literal</b></td>
+<td width="55%"> Specifies that the field's value is a compile-time (static or early bound) constant. No set accessor.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>NotSerialized</b></td>
+<td width="55%"> Specifies that the field does not have to be serialized when the type is remoted.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>PinvokeImpl</b></td>
+<td width="55%"> Reserved for future use.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>Private</b></td>
+<td width="55%"> Specifies that the field is accessible only by the parent type.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>PrivateScope</b></td>
+<td width="55%"> Specifies that the field cannot be referenced.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>Public</b></td>
+<td width="55%"> Specifies that the field is accessible by any member for whom this scope is visible.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>ReservedMask</b></td>
+<td width="55%"> Reserved.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>RTSpecialName</b></td>
+<td width="55%"> Specifies that the common language runtime (metadata internal APIs) should check the name encoding.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>SpecialName</b></td>
+<td width="55%"> Specifies a special method, with the name describing how the method is special.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>Static</b></td>
+<td width="55%"> Specifies that the field represents the defined type, or else it is per-instance.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/ValueType.html">System.ValueType</a></li>
+<ul class="none">
+<li><a href="../../System/types/Enum.html">System.Enum</a></li>
+<ul class="none">
+<li><b>System.Reflection.FieldAttributes</b></li>
+</ul>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

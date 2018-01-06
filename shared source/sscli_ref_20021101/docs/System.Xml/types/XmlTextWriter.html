@@ -1,0 +1,5028 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Xml.XmlTextWriter</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Xml.XmlTextWriter Class</h2><b>Assembly: </b>System.Xml.dll<br><b>Namespace: </b>System.Xml<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Represents a writer that provides a fast, non-cached, forward-only way of generating streams or files containing XML data that conforms to the W3C Extensible Markup Language (XML) 1.0 and the Namespaces in XML recommendations.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public class XmlTextWriter : XmlWriter
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This class implements the  <a href="../../System.Xml/types/XmlWriter.html">XmlWriter</a> class.<p><b>XmlTextWriter</b> maintains a namespace stack corresponding to all the namespaces defined in the current element stack. Using <b>XmlTextWriter</b> you can declare namespaces manually.</p>
+<pre>
+          w.WriteStartElement("root");
+          w.WriteAttributeString("xmlns", "x", null, "urn:1");
+           w.WriteStartElement("item","urn:1");
+           w.WriteEndElement();
+           w.WriteStartElement("item","urn:1");
+           w.WriteEndElement();
+          w.WriteEndElement();
+        </pre>
+<p> The above C# code produces the following output.<b>XmlTextWriter</b> promotes the namespace declaration to the root element to avoid having it duplicated on the two child elements. The child elements pick up the prefix from the namespace declaration.</p>
+<pre>
+          &lt;root xmlns:x="urn:1"&gt;
+           &lt;x:item/&gt;
+           &lt;x:item/&gt;
+          &lt;/x:root&gt;
+        </pre>
+<p><b>XmlTextWriter</b> also allows you to override the current namespace declaration. In the following example the namespace URI "123" is overridden by "bar" to produce the XML element <code>
+            &lt;x:node xmlns:x="bar"/&gt;
+          </code>.</p>
+<pre>
+          w.WriteStartElement("x","node","123");
+          w.WriteAttributeString("xmlns","x",null,"bar");
+        </pre> By using the write methods that take a prefix as an argument you can also specify which prefix to use. In the following example, two different prefixes are mapped to the same namespace URI to produce the XML text <code>
+          &lt;x:root
+          xmlns:x="urn:1"&gt;&lt;y:item xmlns:y="urn:1"/&gt;&lt;/x:root&gt;
+        </code>.<pre>
+          XmlTextWriter w = new XmlTextWriter(Console.Out);
+          w.WriteStartElement("x","root","urn:1");
+           w.WriteStartElement("y","item","urn:1");
+           w.WriteEndElement();
+          w.WriteEndElement();
+          w.Close();
+        </pre>
+<p> If there are multiple namespace declarations mapping different prefixes to the same namespace URI, <b>XmlTextWriter</b> walks the stack of namespace declarations backwards and picks the closest one.</p>
+<pre>
+          XmlTextWriter w = new XmlTextWriter(Console.Out);
+          w.Formatting = Formatting.Indented;
+          w.WriteStartElement("x","root","urn:1");
+          w.WriteStartElement("y","item","urn:1");
+          w.WriteAttributeString("attr","urn:1","123");
+          w.WriteEndElement();
+          w.WriteEndElement();
+          w.Close();
+        </pre>
+<p> In the above C# example, because the <b>WriteAttributeString</b> call does not specify a prefix, the writer uses the last prefix pushed onto the namespace stack, and produces the following XML: </p>
+<pre>
+          &lt;x:root xmlns:x="urn:1"&gt;
+           &lt;y:item y:attr="123" xmlns:y="urn:1" /&gt;
+          &lt;/x:root&gt;
+        </pre>
+<p> If namespace conflicts occur, <b>XmlTextWriter</b> resolves them by generating alternate prefixes. For example, if an attribute and element have the same prefix but different namespaces, <b>XmlWriter</b> generates an alternate prefix for the attribute. The generated prefixes are named <b>n{i}</b> where <b>i</b> is a number beginning at 1. The number is reset to 1 for each element.</p>
+<p> Attributes which are associated with a namespace URI must have a prefix (default namespaces do not apply to attributes). This conforms to section 5.2 of the W3C Namespaces in XML recommendation. If an attribute references a namespace URI, but does not specify a prefix, the writer generates a prefix for the attribute.</p>
+<p> When writing an empty element, an additional space is added between tag name and the closing tag, for example <b>&lt;item /&gt;</b>. This provides compatibility with older browsers.</p>
+<p> When a <b>String</b> is used as method parameter, <b>null</b> and <b>String.Empty</b> are equivalent.<b>String.Empty</b> follows the W3C rules.</p>
+<p> To write strongly typed data, use the  <a href="../../System.Xml/types/XmlConvert.html">XmlConvert</a> class to convert data types to string. For example, the following C# code converts the data from <b>Double</b> to <b>String</b> and writes the element <code>
+            &lt;price&gt;19.95&lt;/price&gt;
+          </code>.</p>
+<pre>
+          Double price = 19.95;
+          writer.WriteElementString("price", XmlConvert.ToString(price));
+        </pre> For more information on writing XML, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconWritingXMLWithXmlWriter.asp">MSDN: writingxmlwithxmlwriter</a>.</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Xml/System.Xml.html">System.Xml Namespace</a></dd>
+</dl>
+<h3>System.Xml.XmlTextWriter Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(TextWriter w)<br><br></code> Creates an instance of the <b>XmlTextWriter</b> class using the specified  <a href="../../System.IO/types/TextWriter.html">TextWriter</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(Stream w, Encoding encoding)<br><br></code> Creates an instance of the <b>XmlTextWriter</b> class using the specified stream.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor3">ctor #3</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(string filename, Encoding encoding)<br><br></code> Creates an instance of the  <a href="../../System.Xml/types/XmlTextWriter.html">XmlTextWriter</a> class using the specified file.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#BaseStream">BaseStream</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the underlying stream object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Formatting">Formatting</a></td>
+<td width="55%"><b>Read-write</b><br><br> Indicates how the output is formatted.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Indentation">Indentation</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets how many IndentChars to write for each level in the hierarchy when  <a href="#Formatting">XmlTextWriter.Formatting</a> is set to <b>Formatting.Indented</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IndentChar">IndentChar</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets which character to use for indenting when  <a href="#Formatting">XmlTextWriter.Formatting</a> is set to Formatting.Indented.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Namespaces">Namespaces</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets a value indicating whether to do namespace support.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#QuoteChar">QuoteChar</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets which character to use to quote attribute values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteState">WriteState</a></td>
+<td width="55%"><b>Read-only</b><br><br><b>Overridden: </b><br> Gets the state of the writer.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#XmlLang">XmlLang</a></td>
+<td width="55%"><b>Read-only</b><br><br><b>Overridden: </b><br> Gets the current xml:lang scope.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#XmlSpace">XmlSpace</a></td>
+<td width="55%"><b>Read-only</b><br><br><b>Overridden: </b><br> Gets an  <a href="../../System.Xml/types/XmlSpace.html">XmlSpace</a> representing the current xml:space scope.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Close">Close</a></td>
+<td width="55%"><b>Overridden: </b><br> Closes this stream and the underlying stream.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Flush">Flush</a></td>
+<td width="55%"><b>Overridden: </b><br> Flushes whatever is in the buffer to the underlying streams and also flushes the underlying stream.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#LookupPrefix(System.String)">LookupPrefix</a></td>
+<td width="55%"><b>Overridden: </b><br> Returns the closest prefix defined in the current namespace scope for the namespace URI.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteAttributes(System.Xml.XmlReader,System.Boolean)">WriteAttributes</a><br>(inherited from <b>System.Xml.XmlWriter)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System.Xml/types/XmlWriter.html#WriteAttributes(System.Xml.XmlReader,System.Boolean)">System.Xml.XmlWriter.WriteAttributes</a></font></b><br><br><br> When overridden in a derived class, writes out all the attributes found at the current position in the  <a href="../../System.Xml/types/XmlReader.html">XmlReader</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteAttributeString(System.String,System.String)">WriteAttributeString</a><br>(inherited from <b>System.Xml.XmlWriter)</b></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteAttributeString(string localName, string value)<br><br></code><b><font color="#800080">See base class member description: <a href="../../System.Xml/types/XmlWriter.html#WriteAttributeString(System.String,System.String)">System.Xml.XmlWriter.WriteAttributeString</a></font></b><br><br><br> When overridden in a derived class, writes out the attribute with the specified local name and value.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteAttributeString(System.String,System.String,System.String)">WriteAttributeString</a><br>(inherited from <b>System.Xml.XmlWriter)</b></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteAttributeString(string localName, string ns, string value)<br><br></code><b><font color="#800080">See base class member description: <a href="../../System.Xml/types/XmlWriter.html#WriteAttributeString(System.String,System.String,System.String)">System.Xml.XmlWriter.WriteAttributeString</a></font></b><br><br><br> When overridden in a derived class, writes an attribute with the specified parameters.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteAttributeString(System.String,System.String,System.String,System.String)">WriteAttributeString</a><br>(inherited from <b>System.Xml.XmlWriter)</b></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteAttributeString(string prefix, string localName, string ns, string value)<br><br></code><b><font color="#800080">See base class member description: <a href="../../System.Xml/types/XmlWriter.html#WriteAttributeString(System.String,System.String,System.String,System.String)">System.Xml.XmlWriter.WriteAttributeString</a></font></b><br><br><br> When overridden in a derived class, writes out the attribute with the specified prefix, local name, namespace URI and value.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteBase64(System.Byte[],System.Int32,System.Int32)">WriteBase64</a></td>
+<td width="55%"><b>Overridden: </b><br> Encodes the specified binary bytes as base64 and writes out the resulting text.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteBinHex(System.Byte[],System.Int32,System.Int32)">WriteBinHex</a></td>
+<td width="55%"><b>Overridden: </b><br> Encodes the specified binary bytes as binhex and writes out the resulting text.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteCData(System.String)">WriteCData</a></td>
+<td width="55%"><b>Overridden: </b><br> Writes out a &lt;![CDATA[...]]&gt; block containing the specified text.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteCharEntity(System.Char)">WriteCharEntity</a></td>
+<td width="55%"><b>Overridden: </b><br> Forces the generation of a character entity for the specified Unicode character value.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteChars(System.Char[],System.Int32,System.Int32)">WriteChars</a></td>
+<td width="55%"><b>Overridden: </b><br> Writes text a buffer at a time.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteComment(System.String)">WriteComment</a></td>
+<td width="55%"><b>Overridden: </b><br> Writes out a comment &lt;!--...--&gt; containing the specified text.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteDocType(System.String,System.String,System.String,System.String)">WriteDocType</a></td>
+<td width="55%"><b>Overridden: </b><br> Writes the DOCTYPE declaration with the specified name and optional attributes.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteElementString(System.String,System.String)">WriteElementString</a><br>(inherited from <b>System.Xml.XmlWriter)</b></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteElementString(string localName, string value)<br><br></code><b><font color="#800080">See base class member description: <a href="../../System.Xml/types/XmlWriter.html#WriteElementString(System.String,System.String)">System.Xml.XmlWriter.WriteElementString</a></font></b><br><br><br> When overridden in a derived class, writes an element with the specified local name and value.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteElementString(System.String,System.String,System.String)">WriteElementString</a><br>(inherited from <b>System.Xml.XmlWriter)</b></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteElementString(string localName, string ns, string value)<br><br></code><b><font color="#800080">See base class member description: <a href="../../System.Xml/types/XmlWriter.html#WriteElementString(System.String,System.String,System.String)">System.Xml.XmlWriter.WriteElementString</a></font></b><br><br><br> When overridden in a derived class, writes an element with the specified parameters.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteEndAttribute">WriteEndAttribute</a></td>
+<td width="55%"><b>Overridden: </b><br> Closes the previous  <a href="#WriteStartAttribute(System.String,System.String,System.String)">XmlTextWriter.WriteStartAttribute</a> call.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteEndDocument">WriteEndDocument</a></td>
+<td width="55%"><b>Overridden: </b><br> Closes any open elements or attributes and puts the writer back in the Start state.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteEndElement">WriteEndElement</a></td>
+<td width="55%"><b>Overridden: </b><br> Closes one element and pops the corresponding namespace scope.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteEntityRef(System.String)">WriteEntityRef</a></td>
+<td width="55%"><b>Overridden: </b><br> Writes out an entity reference as follows: &amp; <i>name</i>;.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteFullEndElement">WriteFullEndElement</a></td>
+<td width="55%"><b>Overridden: </b><br> Closes one element and pops the corresponding namespace scope.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteName(System.String)">WriteName</a></td>
+<td width="55%"><b>Overridden: </b><br> Writes out the specified name, ensuring it is a valid name according to the W3C XML 1.0 recommendation(http://www.w3.org/TR/1998/REC-xml-19980210#NT-Name ).</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteNmToken(System.String)">WriteNmToken</a></td>
+<td width="55%"><b>Overridden: </b><br> Writes out the specified name, ensuring it is a valid NmToken according to the W3C XML 1.0 recommendation(http://www.w3.org/TR/1998/REC-xml-19980210#NT-Name).</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteNode(System.Xml.XmlReader,System.Boolean)">WriteNode</a><br>(inherited from <b>System.Xml.XmlWriter)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System.Xml/types/XmlWriter.html#WriteNode(System.Xml.XmlReader,System.Boolean)">System.Xml.XmlWriter.WriteNode</a></font></b><br><br><br> When overridden in a derived class, copies everything from the reader to the writer and moves the reader to the start of the next sibling.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteProcessingInstruction(System.String,System.String)">WriteProcessingInstruction</a></td>
+<td width="55%"><b>Overridden: </b><br> Writes out a processing instruction with a space between the name and text as follows: &lt;?name text?&gt;.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteQualifiedName(System.String,System.String)">WriteQualifiedName</a></td>
+<td width="55%"><b>Overridden: </b><br> Writes out the namespace-qualified name. This method looks up the prefix that is in scope for the given namespace.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteRaw(System.String)">WriteRaw</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteRaw(string data)<br><br></code><b>Overridden: </b><br> Writes raw markup manually from a string.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteRaw(System.Char[],System.Int32,System.Int32)">WriteRaw</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteRaw(char[] buffer, int index, int count)<br><br></code><b>Overridden: </b><br> Writes raw markup manually from a character buffer.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteStartAttribute(System.String,System.String)">WriteStartAttribute</a><br>(inherited from <b>System.Xml.XmlWriter)</b></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteStartAttribute(string localName, string ns)<br><br></code><b><font color="#800080">See base class member description: <a href="../../System.Xml/types/XmlWriter.html#WriteStartAttribute(System.String,System.String)">System.Xml.XmlWriter.WriteStartAttribute</a></font></b><br><br><br> When overridden in a derived class, writes the start of an attribute.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteStartAttribute(System.String,System.String,System.String)">WriteStartAttribute</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteStartAttribute(string prefix, string localName, string ns)<br><br></code><b>Overridden: </b><br> Writes the start of an attribute.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteStartDocument">WriteStartDocument</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteStartDocument()<br><br></code><b>Overridden: </b><br> Writes the XML declaration with the version "1.0".</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteStartDocument(System.Boolean)">WriteStartDocument</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteStartDocument(bool standalone)<br><br></code><b>Overridden: </b><br> Writes the XML declaration with the version "1.0" and the standalone attribute.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteStartElement(System.String)">WriteStartElement</a><br>(inherited from <b>System.Xml.XmlWriter)</b></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteStartElement(string localName)<br><br></code><b><font color="#800080">See base class member description: <a href="../../System.Xml/types/XmlWriter.html#WriteStartElement(System.String)">System.Xml.XmlWriter.WriteStartElement</a></font></b><br><br><br> When overridden in a derived class, writes out a start tag with the specified local name.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteStartElement(System.String,System.String)">WriteStartElement</a><br>(inherited from <b>System.Xml.XmlWriter)</b></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteStartElement(string localName, string ns)<br><br></code><b><font color="#800080">See base class member description: <a href="../../System.Xml/types/XmlWriter.html#WriteStartElement(System.String,System.String)">System.Xml.XmlWriter.WriteStartElement</a></font></b><br><br><br> When overridden in a derived class, writes the specified start tag and associates it with the given namespace.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteStartElement(System.String,System.String,System.String)">WriteStartElement</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteStartElement(string prefix, string localName, string ns)<br><br></code><b>Overridden: </b><br> Writes the specified start tag and associates it with the given namespace and prefix.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteString(System.String)">WriteString</a></td>
+<td width="55%"><b>Overridden: </b><br> Writes the given text content.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteSurrogateCharEntity(System.Char,System.Char)">WriteSurrogateCharEntity</a></td>
+<td width="55%"><b>Overridden: </b><br> Generates and writes the surrogate character entity for the surrogate character pair.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteWhitespace(System.String)">WriteWhitespace</a></td>
+<td width="55%"><b>Overridden: </b><br> Writes out the given white space.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System.Xml/types/XmlWriter.html">System.Xml.XmlWriter</a></li>
+<ul class="none">
+<li><b>System.Xml.XmlTextWriter</b></li>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Xml.XmlTextWriter Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates an instance of the <b>XmlTextWriter</b> class using the specified  <a href="../../System.IO/types/TextWriter.html">TextWriter</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlTextWriter(<br>   <font color="#008080"><a href="../../System.IO/types/TextWriter.html">TextWriter</a> <i>w</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>w</i><br><dl>
+<dd>
+<param> The <b>TextWriter</b> to write to. It is assumed that the <b>TextWriter</b> is already set to the correct encoding.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates an instance of the <b>XmlTextWriter</b> class using the specified stream.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlTextWriter(<br>   <font color="#008080"><a href="../../System.IO/types/Stream.html">Stream</a> <i>w</i>,</font><br>   <font color="#008080"><a href="../../System.Text/types/Encoding.html">Encoding</a> <i>encoding</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>w</i><br><dl>
+<dd>
+<param> The stream to which you want to write.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>encoding</i><br><dl>
+<dd>
+<param> The encoding to generate. If encoding is <b>null</b> it writes out the stream as UTF-8 and omits the encoding attribute from the ProcessingInstruction.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The encoding is not supported or the stream cannot be written to.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic3"></a><a name="ctor3">ctor #3</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates an instance of the  <a href="../../System.Xml/types/XmlTextWriter.html">XmlTextWriter</a> class using the specified file.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlTextWriter(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>filename</i>,</font><br>   <font color="#008080"><a href="../../System.Text/types/Encoding.html">Encoding</a> <i>encoding</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>filename</i><br><dl>
+<dd>
+<param> The filename to write to. If the file exists, it will truncate it and overwrite it with the new content.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>encoding</i><br><dl>
+<dd>
+<param> The encoding to generate. If encoding is <b>null</b> it writes the file out as UTF-8, and omits the encoding attribute from the ProcessingInstruction.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The encoding is not supported; the filename is empty, contains only white space, or contains one or more invalid characters.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/UnauthorizedAccessException.html">UnauthorizedAccessException</a></td>
+<td> Access is denied.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The filename is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/DirectoryNotFoundException.html">DirectoryNotFoundException</a></td>
+<td> The directory to write to is not found.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> The filename includes an incorrect or invalid syntax for file name, directory name, or volume label syntax.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td> The caller does not have the required permission.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="BaseStreamTopic1"></a><a name="BaseStream">BaseStream</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the underlying stream object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.IO/types/Stream.html">Stream</a> BaseStream {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the writer was constructed using a <b>TextWriter</b> that is a subclass of the <b>StreamWriter</b> class, this property is equivalent to the  <a href="../../System.IO/types/StreamWriter.html#BaseStream">StreamWriter.BaseStream</a> property. If the writer was constructed using a  <a href="../../System.IO/types/Stream.html">Stream</a>, this property returns the <b>Stream</b> passed to the constructor. If the writer was constructed using a file name, this property returns the <b>Stream</b> representing the file.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="FormattingTopic1"></a><a name="Formatting">Formatting</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Indicates how the output is formatted.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml/types/Formatting.html">Formatting</a> Formatting {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the Indented option is set, child elements are indented using the  <a href="#Indentation">XmlTextWriter.Indentation</a> and  <a href="#IndentChar">XmlTextWriter.IndentChar</a> properties. Only element content will be indented. The following C# code writes out HTML elements including mixed content: <pre>
+              XmlTextWriter w = new XmlTextWriter(Console.Out); 
+               w.Formatting = Formatting.Indented; 
+               w.WriteStartElement("ol"); 
+               w.WriteStartElement("li"); 
+               w.WriteString("The big "); // This means "li" now has a mixed content model. 
+               w.WriteElementString("b", "E"); 
+               w.WriteElementString("i", "lephant"); 
+               w.WriteString(" walks slowly."); 
+               w.WriteEndElement(); 
+               w.WriteEndElement();
+                 
+            </pre>
+<p> The above code produces the following output: </p>
+<pre>
+              &lt;ol&gt; 
+                &lt;li&gt;The big &lt;b&gt;E&lt;/b&gt;&lt;i&gt;lephant&lt;/i&gt; walks slowly.&lt;/li&gt; 
+              &lt;/ol&gt;
+                 
+            </pre>
+<p> When this is viewed in HTML no white space appears between the bold and italic elements. In fact, in this example, if indenting was added between these elements the word "Elephant" would be incorrectly broken.</p><br><br><b>Note </b> Writing any text content, including String.Empty puts that element into mixed content mode. Child elements do not inherit this "mixed" mode status. A child element of a "mixed" element will do indenting, unless it is also contains "mixed" content. Element content (http://www.w3.org/TR/1998/REC-xml-19980210#sec-element-content) and mixed content (http://www.w3.org/TR/1998/REC-xml-19980210#sec-mixed-content) are defined according to the XML 1.0 definitions of these terms.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes an XML fragment.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  
+  public static void Main()
+  {
+     //Create a writer to write XML to the console.
+     XmlTextWriter writer = null;
+     writer = new XmlTextWriter (Console.Out);
+
+     //Use indentation for readability.
+     writer.Formatting = Formatting.Indented;
+     writer.Indentation = 4;
+        
+     //Write an element (this one is the root).
+     writer.WriteStartElement("book");
+
+     //Write the title element.
+     writer.WriteStartElement("title");
+     writer.WriteString("Pride And Prejudice");
+     writer.WriteEndElement();
+
+     //Write the close tag for the root element.
+     writer.WriteEndElement();
+             
+     //Write the XML to file and close the writer.
+     writer.Close();  
+
+  }
+
+}
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml/types/Formatting.html">Formatting</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IndentationTopic1"></a><a name="Indentation">Indentation</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets how many IndentChars to write for each level in the hierarchy when  <a href="#Formatting">XmlTextWriter.Formatting</a> is set to <b>Formatting.Indented</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> Indentation {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> Setting this property to a negative value.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Indentation is performed on following node types: DocumentType, Element, Comment, ProcessingInstruction, and CDATASection. All other node types are not affected. The <b>XmlTextWriter</b> does not indent the internal DTD subset. However, you could do the following to apply formatting to the internal DTD subset.<pre>
+              String name = "Employees";
+              String pubid = null;
+              String sysid = null;
+              String subset =
+              @"
+                  &lt;!ELEMENT Employees (Employee)+&gt;
+                  &lt;!ELEMENT Employee EMPTY&gt;
+                  &lt;!ATTLIST Employee firstname CDATA #REQUIRED&gt;
+                  &lt;!ENTITY Company 'Microsoft'&gt;]&gt;
+              ";
+              XmlTextWriter tw = new XmlTextWriter(Console.Out);
+              tw.WriteDocType(name, pubid, sysid, subset);
+                 
+            </pre>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes an XML fragment.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  
+  public static void Main()
+  {
+     //Create a writer to write XML to the console.
+     XmlTextWriter writer = null;
+     writer = new XmlTextWriter (Console.Out);
+
+     //Use indentation for readability.
+     writer.Formatting = Formatting.Indented;
+     writer.Indentation = 4;
+        
+     //Write an element (this one is the root).
+     writer.WriteStartElement("book");
+
+     //Write the title element.
+     writer.WriteStartElement("title");
+     writer.WriteString("Pride And Prejudice");
+     writer.WriteEndElement();
+
+     //Write the close tag for the root element.
+     writer.WriteEndElement();
+             
+     //Write the XML to file and close the writer.
+     writer.Close();  
+
+  }
+
+}
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#IndentChar">XmlTextWriter.IndentChar</a> |  <a href="../../System.Xml/types/Formatting.html">Formatting</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IndentCharTopic1"></a><a name="IndentChar">IndentChar</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets which character to use for indenting when  <a href="#Formatting">XmlTextWriter.Formatting</a> is set to Formatting.Indented.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Char.html">char</a> IndentChar {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Indentation">XmlTextWriter.Indentation</a> |  <a href="../../System.Xml/types/Formatting.html">Formatting</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NamespacesTopic1"></a><a name="Namespaces">Namespaces</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets a value indicating whether to do namespace support.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> Namespaces {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> You can only change this property when in the WriteState.Start state.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property determines whether the writer supports the W3C Namespaces in XML recommendation located at www.w3.org/TR/REC-xml-names .</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="QuoteCharTopic1"></a><a name="QuoteChar">QuoteChar</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets which character to use to quote attribute values.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Char.html">char</a> QuoteChar {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> Setting this property to something other than either a single or double quote.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Property: <i><a name="WriteStateTopic1"></a><a name="WriteState">WriteState</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the state of the writer.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System.Xml/types/WriteState.html">WriteState</a> WriteState {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Property: <i><a name="XmlLangTopic1"></a><a name="XmlLang">XmlLang</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the current xml:lang scope.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/String.html">string</a> XmlLang {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property allows one component to find out what state another component has left the writer in. For example, perhaps one component wants to tell another which language help text to generate. The language information is communicated by writing an xml:lang attribute.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Property: <i><a name="XmlSpaceTopic1"></a><a name="XmlSpace">XmlSpace</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an  <a href="../../System.Xml/types/XmlSpace.html">XmlSpace</a> representing the current xml:space scope.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System.Xml/types/XmlSpace.html">XmlSpace</a> XmlSpace {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This allows one component to find out in what state another component has left the writer.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example uses the <b>WriteWhitespace</b> method to control how the file is formatted.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{  
+  public static void Main()
+  {
+    // Create the writer.
+    XmlTextWriter writer = null;
+    writer = new XmlTextWriter ("ws.html", null);
+
+    // Write an element (this one is the root).
+    writer.WriteStartElement("p");
+
+    // Write the xml:space attribute.
+    writer.WriteAttributeString("xml", "space", null, "preserve");
+
+    // Verify that xml:space is set properly.
+    if (writer.XmlSpace == XmlSpace.Preserve)
+      Console.WriteLine("xmlspace is correct!");
+
+    // Write out the HTML elements.  Insert white space
+    // between 'something' and 'Big'
+    writer.WriteString("something");
+    writer.WriteWhitespace("  ");
+    writer.WriteElementString("b", "B");
+    writer.WriteString("ig");
+
+    // Write the root end element.
+    writer.WriteEndElement();
+             
+    // Write the XML to file and close the writer.
+    writer.Close();  
+  }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="CloseTopic1"></a><a name="Close">Close</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Closes this stream and the underlying stream.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void Close();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> A call is made to write more output after <b>Close</b> has been called or the result of this call is an invalid XML document.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Any elements or attributes left open will be automatically closed.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes an XML fragment.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  
+  public static void Main()
+  {
+     //Create a writer to write XML to the console.
+     XmlTextWriter writer = null;
+     writer = new XmlTextWriter (Console.Out);
+
+     //Use indentation for readability.
+     writer.Formatting = Formatting.Indented;
+     writer.Indentation = 4;
+        
+     //Write an element (this one is the root).
+     writer.WriteStartElement("book");
+
+     //Write the title element.
+     writer.WriteStartElement("title");
+     writer.WriteString("Pride And Prejudice");
+     writer.WriteEndElement();
+
+     //Write the close tag for the root element.
+     writer.WriteEndElement();
+             
+     //Write the XML to file and close the writer.
+     writer.Close();  
+
+  }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~XmlTextWriter();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="FlushTopic1"></a><a name="Flush">Flush</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Flushes whatever is in the buffer to the underlying streams and also flushes the underlying stream.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void Flush();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This is called instead of  <a href="#Close">XmlTextWriter.Close</a> when you want to write more to the underlying stream without losing what is still in the buffer.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes out two XML fragments.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+
+  public static void Main()
+  {
+     XmlTextWriter writer = new XmlTextWriter (Console.Out);
+     //Use indenting for readability
+     writer.Formatting = Formatting.Indented;
+	
+     //Write an XML fragment.
+     writer.WriteStartElement("book");
+     writer.WriteElementString("title", "Pride And Prejudice");
+     writer.WriteEndElement();
+     writer.Flush();
+
+     //Write another XML fragment.
+     writer.WriteStartElement("cd");
+     writer.WriteElementString("title", "Americana");
+     writer.WriteEndElement();
+     writer.Flush();  
+
+     //Close the writer.
+     writer.Close();
+  }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="LookupPrefixTopic1"></a><a name="LookupPrefix(System.String)">LookupPrefix</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the closest prefix defined in the current namespace scope for the namespace URI.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/String.html">string</a> LookupPrefix(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>ns</i><br><dl>
+<dd>
+<param> Namespace URI whose prefix you want to find.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The matching prefix. Or <b>null</b> if no matching namespace URI is found in the current scope.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>ns</i> is either <b>null</b> or String.Empty.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes out a book.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  private const string filename = "sampledata.xml";
+
+  public static void Main()
+  {
+
+     XmlTextWriter writer = new XmlTextWriter (filename, null);
+     //Use indenting for readability
+     writer.Formatting = Formatting.Indented;
+        
+     writer.WriteComment("sample XML fragment");
+    
+     //Write an element (this one is the root)
+     writer.WriteStartElement("bookstore");
+
+     //Write the namespace declaration
+     writer.WriteAttributeString("xmlns", "bk", null, "urn:samples");
+
+     writer.WriteStartElement("book");
+
+     //Lookup the prefix and then write the ISBN attribute
+     string prefix = writer.LookupPrefix("urn:samples");
+     writer.WriteStartAttribute(prefix, "ISBN", "urn:samples");
+     writer.WriteString("1-861003-78");
+     writer.WriteEndAttribute();     
+
+     //Write the title
+     writer.WriteStartElement("title");
+     writer.WriteString("The Handmaid's Tale");
+     writer.WriteEndElement();
+              
+     //Write the price
+     writer.WriteElementString("price", "19.95");
+     
+     //Write the style element
+     writer.WriteStartElement(prefix, "style", "urn:samples");
+     writer.WriteString("hardcover");
+     writer.WriteEndElement();
+
+     //Write the end tag for the book element
+     writer.WriteEndElement();
+
+     //Write the close tag for the root element
+     writer.WriteEndElement();
+             
+     //Write the XML to file and close the writer
+     writer.Flush();
+     writer.Close();
+
+     //Read the file back in and parse to ensure well formed XML
+     XmlDocument doc = new XmlDocument();
+     //Preserve white space for readability
+     doc.PreserveWhitespace = true;
+     //Load the file
+     doc.Load(filename);
+    
+     //Write the XML content to the console
+     Console.Write(doc.InnerXml);  
+
+  }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="WriteAttributesTopic1"></a><a name="WriteAttributes(System.Xml.XmlReader,System.Boolean)">WriteAttributes</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Xml/types/XmlReader.html">XmlReader</a> <i>reader</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>defattr</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml/types/XmlWriter.html#WriteAttributes(System.Xml.XmlReader,System.Boolean)">System.Xml.XmlWriter.WriteAttributes</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, writes out all the attributes found at the current position in the  <a href="../../System.Xml/types/XmlReader.html">XmlReader</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void WriteAttributes(<br>   <font color="#008080"><a href="../../System.Xml/types/XmlReader.html">XmlReader</a> <i>reader</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>defattr</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>reader</i><br><dl>
+<dd>
+<param> The <b>XmlReader</b> from which to copy the attributes.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>defattr</i><br><dl>
+<dd>
+<param><b>true</b> to copy the default attributes from the <b>XmlReader</b>; otherwise, <b>false</b>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>reader</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Xml/types/XmlException.html">XmlException</a></td>
+<td> The reader is not positioned on either an element, attribute or XmlDeclaration node.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the reader is positioned on an element node <b>WriteAttributes</b> copies all the contained attributes. If the reader is positioned on an attribute node, this method writes the current attribute, then the rest of the attributes until the element closing tag. If the reader is positioned on an XmlDeclaration node, this method writes all the attributes in the declaration. If the reader is positioned on any other node type this method has no operation.<p> If this method is called using  <a href="../../System.Xml/types/XmlValidatingReader.html">XmlValidatingReader</a>, to ensure well-formed XML any content (which has been expanded from the entities) that could result in an invalid document is replaced when written. For example, if an attribute includes an &amp;gt; entity that has been expanded, to ensure a well-formed document the expanded "&gt;" is replaced when written out with &amp;gt;.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example copies all the elements to the output, changes the tag names to upper case, and copies all the attributes unchanged.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+
+  public static void Main()
+  {
+    XmlTextReader reader = new XmlTextReader("test1.xml");
+    XmlTextWriter writer = new XmlTextWriter(Console.Out);
+    writer.Formatting = Formatting.Indented;
+
+    while (reader.Read())
+    {
+      if (reader.NodeType == XmlNodeType.Element)
+      {
+        writer.WriteStartElement(reader.Name.ToUpper());
+        writer.WriteAttributes(reader, false);
+        if (reader.IsEmptyElement) writer.WriteEndElement();
+      }
+      else if (reader.NodeType == XmlNodeType.EndElement)
+      {
+        writer.WriteEndElement();
+      }
+    }
+    writer.Close();
+    reader.Close();
+  }
+}
+
+    </pre> The example uses the file, <b>test1.xml</b>, as input.<pre>
+
+&lt;test a="1" b="2"&gt;
+  &lt;item c="3" d="4" e="5" f="6"/&gt;
+&lt;/test&gt;
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml/types/EntityHandling.html">EntityHandling</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteAttributeStringTopic1"></a><a name="WriteAttributeString(System.String,System.String)">WriteAttributeString</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>value</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml/types/XmlWriter.html#WriteAttributeString(System.String,System.String)">System.Xml.XmlWriter.WriteAttributeString</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, writes out the attribute with the specified local name and value.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void WriteAttributeString(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>localName</i><br><dl>
+<dd>
+<param> The local name of the attribute.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The value of the attribute.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The state of writer is not WriteState.Element or writer is closed.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The <b>xml:space</b> or <b>xml:lang</b> attribute value is invalid.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd><b>WriteAttributeString</b> does the following <UL>
+<li> If the attribute value includes double or single quotes, they are replaced with <b>&amp;quot;</b> and <b>&amp;apos;</b> respectively.</li>
+<li> If writing an <b>xml:space</b> attribute, the writer verifies the attribute value is valid. (Valid values are <b>preserve</b> or <b>default</b>.) </li>
+<li> If writing an <b>xml:lang</b> attribute, the writer does not verify that the attribute value is valid according to the W3C XML 1.0 recommendation.</li>
+</UL>
+</dd>
+</dl><b>Example</b><dl>
+<dd> See  <a href="../../System.Xml/types/XmlTextWriter.html#WriteEndAttribute">XmlTextWriter.WriteEndAttribute</a> (in the XmlTextWriter class) for an example using this method.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteAttributeStringTopic2"></a><a name="WriteAttributeString(System.String,System.String,System.String)">WriteAttributeString</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>value</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml/types/XmlWriter.html#WriteAttributeString(System.String,System.String,System.String)">System.Xml.XmlWriter.WriteAttributeString</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, writes an attribute with the specified parameters.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void WriteAttributeString(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>localName</i><br><dl>
+<dd>
+<param> The local name of the attribute.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>ns</i><br><dl>
+<dd>
+<param> The namespace URI to associate with the attribute.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The value of the attribute.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The state of writer is not WriteState.Element or writer is closed.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The <b>xml:space</b> or <b>xml:lang</b> attribute value is invalid.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method writes out the attribute with a user defined namespace prefix and associates it with the given namespace. If <i>localName</i> is "xmlns" then this method also treats this as a namespace declaration. In this case, the <i>ns</i> argument can be <b>null</b>.<p><b>WriteAttributeString</b> does the following </p>
+<UL>
+<li> If the attribute value includes double or single quotes, they are replaced with <b>&amp;quot;</b> and <b>&amp;apos;</b> respectively.</li>
+<li> If writing an <b>xml:space</b> attribute, the writer verifies the attribute value is valid. (Valid values are <b>preserve</b> or <b>default</b>.) </li>
+<li> If writing an <b>xml:lang</b> attribute, the writer does not verify that the attribute value is valid according to the W3C XML 1.0 recommendation.</li>
+</UL>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes out a portion of a XSD schema.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  private const string filename = "sampledata.xml";
+
+  public static void Main()
+  {
+     XmlTextWriter writer = null;
+
+     writer = new XmlTextWriter (filename, null);
+     //Use indenting for readability
+     writer.Formatting = Formatting.Indented;
+        
+     //Write an element (this one is the root)
+     writer.WriteStartElement("schema");
+
+     //Write the namespace declarations.
+     writer.WriteAttributeString("xmlns", null,"http://www.w3.org/2001/XMLSchema");
+     writer.WriteAttributeString("xmlns","po",null,"http://contoso.com/po");
+
+     writer.WriteStartElement("element");
+
+     writer.WriteAttributeString("name", "purchaseOrder");
+
+     //Write the type attribute
+     writer.WriteStartAttribute(null,"type", null);
+     writer.WriteQualifiedName("PurchaseOrder", "http://contoso.com/po");
+     writer.WriteEndAttribute();
+
+     writer.WriteEndElement();
+
+
+     //Write the close tag for the root element
+     writer.WriteEndElement();
+             
+     //Write the XML to file and close the writer
+     writer.Flush();
+     writer.Close();  
+
+     // Read the file back in and parse to ensure well formed XML
+     XmlDocument doc = new XmlDocument();
+     //Preserve white space for readability
+     doc.PreserveWhitespace = true;
+     //Load the file
+     doc.Load(filename);
+    
+     //Write the XML content to the console
+     Console.Write(doc.InnerXml);
+
+  }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteAttributeStringTopic3"></a><a name="WriteAttributeString(System.String,System.String,System.String,System.String)">WriteAttributeString</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>prefix</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>value</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml/types/XmlWriter.html#WriteAttributeString(System.String,System.String,System.String,System.String)">System.Xml.XmlWriter.WriteAttributeString</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, writes out the attribute with the specified prefix, local name, namespace URI and value.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void WriteAttributeString(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>prefix</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>prefix</i><br><dl>
+<dd>
+<param> The namespace prefix of the attribute.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>localName</i><br><dl>
+<dd>
+<param> The local name of the attribute.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>ns</i><br><dl>
+<dd>
+<param> The namespace URI of the attribute.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The value of the attribute.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The state of writer is not WriteState.Element or writer is closed.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The <b>xml:space</b> or <b>xml:lang</b> attribute value is invalid.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method writes out the attribute with a user defined namespace prefix and associates it with the given namespace. If the prefix is "xmlns" then this method also treats this as a namespace declaration and associates the declared prefix with the namespace URI provided in the given attribute value. In this case the <i>ns</i> argument can be <b>null</b>.<p><b>WriteAttributeString</b> does the following </p>
+<UL>
+<li> If the attribute value includes double or single quotes, they are replaced with <b>&amp;quot;</b> and <b>&amp;apos;</b> respectively.</li>
+<li> If writing an <b>xml:space</b> attribute, the writer verifies the attribute value is valid. (Valid values are <b>preserve</b> or <b>default</b>.) </li>
+<li> If writing an <b>xml:lang</b> attribute, the writer does not verify that the attribute value is valid according to the W3C XML 1.0 recommendation.</li>
+</UL>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes out a portion of a XSD schema.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  private const string filename = "sampledata.xml";
+
+  public static void Main()
+  {
+     XmlTextWriter writer = null;
+
+     writer = new XmlTextWriter (filename, null);
+     //Use indenting for readability
+     writer.Formatting = Formatting.Indented;
+        
+     //Write an element (this one is the root)
+     writer.WriteStartElement("schema");
+
+     //Write the namespace declarations.
+     writer.WriteAttributeString("xmlns", null,"http://www.w3.org/2001/XMLSchema");
+     writer.WriteAttributeString("xmlns","po",null,"http://contoso.com/po");
+
+     writer.WriteStartElement("element");
+
+     writer.WriteAttributeString("name", "purchaseOrder");
+
+     //Write the type attribute
+     writer.WriteStartAttribute(null,"type", null);
+     writer.WriteQualifiedName("PurchaseOrder", "http://contoso.com/po");
+     writer.WriteEndAttribute();
+
+     writer.WriteEndElement();
+
+
+     //Write the close tag for the root element
+     writer.WriteEndElement();
+             
+     //Write the XML to file and close the writer
+     writer.Flush();
+     writer.Close();  
+
+     // Read the file back in and parse to ensure well formed XML
+     XmlDocument doc = new XmlDocument();
+     //Preserve white space for readability
+     doc.PreserveWhitespace = true;
+     //Load the file
+     doc.Load(filename);
+    
+     //Write the XML content to the console
+     Console.Write(doc.InnerXml);
+
+  }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteBase64Topic1"></a><a name="WriteBase64(System.Byte[],System.Int32,System.Int32)">WriteBase64</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>buffer</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Encodes the specified binary bytes as base64 and writes out the resulting text.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteBase64(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>buffer</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>buffer</i><br><dl>
+<dd>
+<param> Byte array to encode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The position within the buffer indicating the start of the bytes to write.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>count</i><br><dl>
+<dd>
+<param> The number of bytes to write.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>buffer</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The buffer length minus <i>index</i> is less than <i>count</i>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>index</i> or <i>count</i> is less than zero.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For example, the byte buffer may contain the binary contents of a GIF image. This clearly would not be valid XML. The Base64 encoding is designed to represent arbitrary byte sequences in a text form comprised of the 65 US-ASCII characters ([A-Za-z0-9+/=]) where each character encodes 6 bits of the binary data. See RFC 1521. (You can obtain RFCs from the Request for Comments Web site at http://www.rfc-editor.org/.) </dd>
+</dl><b>Example</b><dl>
+<dd> The following example encodes an input file using <b>WriteBase64</b> and generates a temporary XML file. The temporary XML file is decoded using the  <a href="../../System.Xml/types/XmlTextReader.html#ReadBase64(System.Byte[],System.Int32,System.Int32)">XmlTextReader.ReadBase64</a> method and compared to the original file.<pre>
+using System;
+using System.IO;
+using System.Xml;
+using System.Text;
+
+class TestBase64 {
+
+    private const int bufferSize=4096;
+
+    public static void Main(String[] args) {
+
+        TestBase64 testBase64=new TestBase64();
+
+        //Check that the usage string is correct.
+        if (args.Length &lt; 2 ) {
+            testBase64.Usage();
+            return;
+        }
+
+        FileStream fileOld = new FileStream(args[0], FileMode.OpenOrCreate, FileAccess.Read, FileShare.Read);
+        testBase64.EncodeXmlFile("temp.xml", fileOld);
+
+        FileStream fileNew = new FileStream(args[1], FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+
+        testBase64.DecodeOrignalObject("temp.xml", fileNew);
+
+        //Compare the two files.
+        if (testBase64.CompareResult( fileOld, fileNew)) {
+            Console.WriteLine("The recreated binary file {0} is the same as {1}", args[1], args[0] );
+        } else {
+            Console.WriteLine("The recreated binary file {0} is not the same as {1}", args[1], args[0] );
+        }
+
+        fileOld.Flush();
+        fileNew.Flush();
+        fileOld.Close();
+        fileNew.Close();
+
+    }
+
+    //Use the WriteBase64 method to create an XML document.  The object  
+    //passed by the user is encoded and included in the document.
+    public void EncodeXmlFile(String xmlFileName, FileStream fileOld) {
+
+        byte[] buffer = new byte[bufferSize];
+        int readByte=0;
+
+        XmlTextWriter xw = new XmlTextWriter(xmlFileName, Encoding.UTF8);
+        xw.WriteStartDocument();
+        xw.WriteStartElement("root");
+        // Create a Char writer.
+        BinaryReader br = new BinaryReader(fileOld);
+        // Set the file pointer to the end.
+
+        try {
+              do {
+                  readByte=br.Read(buffer, 0, bufferSize);
+                  xw.WriteBase64(buffer, 0, readByte);
+              } while (bufferSize &lt;= readByte );
+
+        } catch (Exception ex) {
+            EndOfStreamException ex1= new EndOfStreamException();
+
+            if (ex1.Equals(ex)) {
+                Console.WriteLine("We are at end of file");
+            } else {
+                Console.WriteLine(ex);
+            }
+        }
+        xw.WriteEndElement();
+        xw.WriteEndDocument();
+
+        xw.Flush();
+        xw.Close();
+    }
+
+    //Use the ReadBase64 method to decode the new XML document 
+    //and generate the original object.
+    public void DecodeOrignalObject(String xmlFileName, FileStream fileNew) {
+
+        byte[] buffer = new byte[bufferSize];
+        int readByte=0;
+
+        //Create a file to write the bmp back.
+        BinaryWriter bw = new BinaryWriter(fileNew);
+
+        XmlTextReader tr = new XmlTextReader(xmlFileName);
+        tr.MoveToContent();
+        Console.WriteLine(tr.Name);
+
+        do {
+          readByte=tr.ReadBase64(buffer, 0, bufferSize);
+          bw.Write(buffer, 0, readByte);
+        } while(readByte&gt;=bufferSize);
+
+        bw.Flush();
+
+    }
+
+    //Compare the two files.
+    public bool CompareResult(FileStream fileOld, FileStream fileNew) {
+
+        int readByteOld=0;
+        int readByteNew=0;
+        int count, readByte=0;
+
+        byte[] bufferOld = new byte[bufferSize];
+        byte[] bufferNew = new byte[bufferSize];
+
+
+        BinaryReader binaryReaderOld = new BinaryReader(fileOld);
+        BinaryReader binaryReaderNew = new BinaryReader(fileNew);
+
+        binaryReaderOld.BaseStream.Seek(0, SeekOrigin.Begin);
+        binaryReaderNew.BaseStream.Seek(0, SeekOrigin.Begin);
+
+
+        do {
+          readByteOld=binaryReaderOld.Read(bufferOld, 0, bufferSize);
+          readByteNew=binaryReaderNew.Read(bufferNew, 0, bufferSize);
+
+          if (readByteOld!=readByteNew) {
+              return false;
+          }
+
+          for (count=0; count &lt;bufferSize; ++count) {
+              if (bufferOld[count]!=bufferNew[count]) {
+                  return false;
+              }
+          }
+
+        } while (count&lt;readByte );
+
+        return true;
+
+    }
+
+    //Display the usage statement.
+    public void Usage() {
+        Console.WriteLine("TestBase64 sourceFile, targetFile \n");
+        Console.WriteLine("For example: TestBase64 winlogon.bmp, target.bmp\n");
+    }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteBinHexTopic1"></a><a name="WriteBinHex(System.Byte[],System.Int32,System.Int32)">WriteBinHex</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>buffer</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Encodes the specified binary bytes as binhex and writes out the resulting text.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteBinHex(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>buffer</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>buffer</i><br><dl>
+<dd>
+<param> Byte array to encode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The position within the buffer indicating the start of the bytes to write.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>count</i><br><dl>
+<dd>
+<param> The number of bytes to write.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>buffer</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The buffer length minus <i>index</i> is less than <i>count</i>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>index</i> or <i>count</i> is less than zero.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteCDataTopic1"></a><a name="WriteCData(System.String)">WriteCData</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>text</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes out a &lt;![CDATA[...]]&gt; block containing the specified text.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteCData(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>text</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>text</i><br><dl>
+<dd>
+<param> Text to place inside the CDATA block.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The text would result in a non-well formed XML document.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If <i>text</i> is either <b>null</b> or String.Empty, this method writes an empty CData block, for example &lt;![CDATA[]]&gt;.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes an XML file representing a book.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  private const string filename = "sampledata.xml";
+
+  public static void Main()
+  {
+     XmlTextWriter writer = null;
+
+     writer = new XmlTextWriter (filename, null);
+     //Use indenting for readability
+     writer.Formatting = Formatting.Indented;
+
+     //Write the XML delcaration 
+     writer.WriteStartDocument();
+
+     //Write the ProcessingInstruction node
+     String PItext="type='text/xsl' href='book.xsl'";
+     writer.WriteProcessingInstruction("xml-stylesheet", PItext);
+
+     //Write the DocumentType node
+     writer.WriteDocType("book", null , null, "&lt;!ENTITY h 'hardcover'&gt;");
+        
+     //Write a Comment node
+     writer.WriteComment("sample XML");
+    
+     //Write an element (this one is the root)
+     writer.WriteStartElement("book");
+
+     //Write the genre attribute
+     writer.WriteAttributeString("genre", "novel");
+    
+     //Write the ISBN attribute
+     writer.WriteAttributeString("ISBN", "1-8630-014");
+
+     //Write the title
+     writer.WriteElementString("title", "The Handmaid's Tale");
+              
+     //Write the style element
+     writer.WriteStartElement("style");
+     writer.WriteEntityRef("h");
+     writer.WriteEndElement(); 
+
+     //Write the price
+     writer.WriteElementString("price", "19.95");
+
+     //Write CDATA
+     writer.WriteCData("Prices 15% off!!");
+
+     //Write the close tag for the root element
+     writer.WriteEndElement();
+             
+     writer.WriteEndDocument();
+
+     //Write the XML to file and close the writer
+     writer.Flush();
+     writer.Close();  
+
+     //Load the file into an XmlDocument to ensure well formed XML
+     XmlDocument doc = new XmlDocument();
+     //Preserve white space for readability
+     doc.PreserveWhitespace = true;
+     //Load the file
+     doc.Load(filename);  
+    
+     //Display the XML content to the console
+     Console.Write(doc.InnerXml);  
+
+  }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteCharEntityTopic1"></a><a name="WriteCharEntity(System.Char)">WriteCharEntity</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>ch</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Forces the generation of a character entity for the specified Unicode character value.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteCharEntity(<br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>ch</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>ch</i><br><dl>
+<dd>
+<param> Unicode character for which to generate a character entity.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The character is in the surrogate pair character range, <b>0xd800</b> - <b>0xdfff</b>; or the text would result in a non-well formed XML document.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method writes the Unicode character in hexidecimal character entity reference format.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes out elements with various data types.<pre>
+using System;
+using System.IO;
+using System.Xml;
+public class SampleWriteXml 
+{
+   private const string m_Document = "sampledata.xml";
+ 
+   public static void Main()
+   {
+      XmlTextWriter writer = null;
+      XmlTextReader reader = null;
+ 
+      try
+      {
+        writer = new XmlTextWriter (m_Document, null);
+        //Use indenting for readability
+        writer.Formatting = Formatting.Indented;
+        writer.Indentation=4;
+ 
+        //Start the document with the XML declaration tag
+        writer.WriteStartDocument();
+ 
+        //Write a comment
+        writer.WriteComment("Sample XML file");
+ 
+        //Write an element (this is the root)
+        writer.WriteStartElement("TestElements","");
+     
+        //write a char entity
+        writer.WriteStartElement("Item");
+        writer.WriteString("Write out char entity:  ");
+        writer.WriteCharEntity('&amp;');
+        writer.WriteEndElement();
+ 
+        //Write out raw markup.  Note:  Depending on the string, this could
+        //result in XML that is not well-formed
+        writer.WriteStartElement("Item");
+        writer.WriteString("Write out raw:  ");
+        writer.WriteRaw("&lt;test/&gt;");
+        writer.WriteEndElement();
+ 
+        //Write out Boolean value.
+        writer.WriteStartElement("Item");
+        writer.WriteString("Write out Boolean:  ");
+        writer.WriteString(XmlConvert.ToString(false));
+        writer.WriteEndElement();
+ 
+        //Write out Date.
+        writer.WriteStartElement("Item");
+        writer.WriteString("Write out Date:  ");
+        DateTime vDate = new DateTime(2000, 01, 01 );
+        writer.WriteString(XmlConvert.ToString(vDate));
+        writer.WriteEndElement();
+ 
+        //Write out DateTime.
+        writer.WriteStartElement("Item");
+        writer.WriteString("Write out DateTime:  ");
+        DateTime vDateTime = new DateTime(2000, 01, 01 ,12, 0, 30, 500);
+        writer.WriteString(XmlConvert.ToString(vDateTime));
+        writer.WriteEndElement();
+ 
+        //Write out Time.
+        writer.WriteStartElement("Item");
+        writer.WriteString("Write out Time:  ");
+        DateTime vTime = new DateTime(1, 1, 1 ,12, 0, 30, 500);
+        writer.WriteString(XmlConvert.ToString(vTime));
+        writer.WriteEndElement();
+ 
+        //Write out TimeSpan.
+        writer.WriteStartElement("Item");
+        writer.WriteString("Write out TimeSpan:  ");
+        TimeSpan vTimeSpan = new TimeSpan(1, 15 ,32);
+        writer.WriteString(XmlConvert.ToString(vTimeSpan));
+        writer.WriteEndElement();
+ 
+        //Write out Single value.
+        writer.WriteStartElement("Item");
+        writer.WriteString("Write out Single:  ");
+        Single vSingle = ((Single)22)/((Single)7);
+        writer.WriteString(XmlConvert.ToString(vSingle));
+        writer.WriteEndElement();
+ 
+        //Write the close tag for the root element.
+        writer.WriteEndElement();
+              
+        writer.WriteEndDocument();
+     
+        //Write the XML to file and close the writer.
+        writer.Flush();
+        writer.Close();  
+ 
+        //Read the file back in and parse to ensure well formed XML.
+        reader = new XmlTextReader (m_Document);
+        XmlDocument doc = new XmlDocument();
+        //Preserve whitespace for readability
+        doc.PreserveWhitespace = true;
+        //Load the file
+        doc.Load(reader);
+     
+        //Write the XML content to the console.
+        Console.WriteLine(doc.InnerXml);
+      }
+      catch (Exception e)
+      {
+        Console.WriteLine ("Exception: {0}", e.ToString());
+      }        
+ 
+      finally 
+      {
+        Console.WriteLine();
+        Console.WriteLine("Processing of the file {0} complete.", m_Document);
+        if (reader != null)
+           reader.Close();
+        //Close the writer
+        if (writer != null)
+           writer.Close();
+     } 
+   }
+ 
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteCharsTopic1"></a><a name="WriteChars(System.Char[],System.Int32,System.Int32)">WriteChars</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Char.html">char[]</a> <i>buffer</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes text a buffer at a time.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteChars(<br>   <font color="#008080"><a href="../../System/types/Char.html">char[]</a> <i>buffer</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>buffer</i><br><dl>
+<dd>
+<param> Character array containing the text to write.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The position within the buffer indicating the start of the text to write.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>count</i><br><dl>
+<dd>
+<param> The number of characters to write.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>buffer</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The buffer length minus <i>index</i> is less than <i>count</i>; the call results in surrogate pair characters being split or an invalid surrogate pair being written.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>index</i> or <i>count</i> is less than zero.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method can be used to write large amounts of text a buffer at a time.<p> Special handling must be done to ensure the <b>WriteChars</b> method does not split surrogate pair characters across multiple buffer writes. The XML specification defines the valid ranges for surrogate pairs.</p>
+<p> An exception is thrown if surrorgate pair characters are written that would result in the surrogate pair characters being split in the buffer. This exception must be caught in order to continue writing the next surrogate pair character to the output buffer.</p>
+<p> In the following example a randomly generated surrogate pair character is split when writing to the output buffer. Catching the exception and continuing to write to the buffer ensures that the surrogate pair character is written correctly to the output stream.</p>
+<pre>
+              //Handling surrogate pair across buffer streams.
+              char [] charArray = new char[4];
+              char lowChar, highChar;
+              Random random = new Random();
+              lowChar = Convert.ToChar(random.Next(0xDC01, 0xDFFF));
+              highChar = Convert.ToChar(random.Next(0xD801, 0xDBFF));
+              XmlTextWriter tw = new XmlTextWriter("test.xml", null);
+              tw.WriteStartElement("Root");
+              charArray[0] = 'a';
+              charArray[1] = 'b';
+              charArray[2] = 'c';
+              charArray[3] = highChar;
+              try
+              {
+               tw. WriteChars(charArray, 0, charArray.Length);
+              }
+              catch (Exception ex) {
+              }
+              Array[0] = highChar;
+              Array[1] = lowChar;
+              charArray[2] = 'd';
+              tw.WriteChars(charArray, 0, 3); 
+              tw.WriteEndElement();
+            </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteCommentTopic1"></a><a name="WriteComment(System.String)">WriteComment</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>text</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes out a comment &lt;!--...--&gt; containing the specified text.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteComment(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>text</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>text</i><br><dl>
+<dd>
+<param> Text to place inside the comment.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The text would result in a non-well formed XML document </td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If <i>text</i> is either <b>null</b> or String.Empty, this method writes a Comment with no data content, for example &lt;!----&gt;.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes an XML file representing a book.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  private const string filename = "sampledata.xml";
+
+  public static void Main()
+  {
+     XmlTextWriter writer = null;
+
+     writer = new XmlTextWriter (filename, null);
+     //Use indenting for readability
+     writer.Formatting = Formatting.Indented;
+
+     //Write the XML delcaration 
+     writer.WriteStartDocument();
+
+     //Write the ProcessingInstruction node
+     String PItext="type='text/xsl' href='book.xsl'";
+     writer.WriteProcessingInstruction("xml-stylesheet", PItext);
+
+     //Write the DocumentType node
+     writer.WriteDocType("book", null , null, "&lt;!ENTITY h 'hardcover'&gt;");
+        
+     //Write a Comment node
+     writer.WriteComment("sample XML");
+    
+     //Write an element (this one is the root)
+     writer.WriteStartElement("book");
+
+     //Write the genre attribute
+     writer.WriteAttributeString("genre", "novel");
+    
+     //Write the ISBN attribute
+     writer.WriteAttributeString("ISBN", "1-8630-014");
+
+     //Write the title
+     writer.WriteElementString("title", "The Handmaid's Tale");
+              
+     //Write the style element
+     writer.WriteStartElement("style");
+     writer.WriteEntityRef("h");
+     writer.WriteEndElement(); 
+
+     //Write the price
+     writer.WriteElementString("price", "19.95");
+
+     //Write CDATA
+     writer.WriteCData("Prices 15% off!!");
+
+     //Write the close tag for the root element
+     writer.WriteEndElement();
+             
+     writer.WriteEndDocument();
+
+     //Write the XML to file and close the writer
+     writer.Flush();
+     writer.Close();  
+
+     //Load the file into an XmlDocument to ensure well formed XML
+     XmlDocument doc = new XmlDocument();
+     //Preserve white space for readability
+     doc.PreserveWhitespace = true;
+     //Load the file
+     doc.Load(filename);  
+    
+     //Display the XML content to the console
+     Console.Write(doc.InnerXml);  
+
+  }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteDocTypeTopic1"></a><a name="WriteDocType(System.String,System.String,System.String,System.String)">WriteDocType</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>pubid</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>sysid</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>subset</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes the DOCTYPE declaration with the specified name and optional attributes.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteDocType(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>pubid</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>sysid</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>subset</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The name of the DOCTYPE. This must be non-empty.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>pubid</i><br><dl>
+<dd>
+<param> If non-null it also writes PUBLIC "pubid" "sysid" where pubid and sysid are replaced with the value of the given arguments.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>sysid</i><br><dl>
+<dd>
+<param> If pubid is null and sysid is non-null it writes SYSTEM "sysid" where sysid is replaced with the value of this argument.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>subset</i><br><dl>
+<dd>
+<param> If non-null it writes [subset] where subset is replaced with the value of this argument.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> This method was called outside the prolog (after the root element).</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The value for <i>name</i> would result in invalid XML.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method does not check for invalid characters in <i>pubid, sysid</i> or <i>subset</i>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes an XML file representing a book.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  private const string filename = "sampledata.xml";
+
+  public static void Main()
+  {
+     XmlTextWriter writer = null;
+
+     writer = new XmlTextWriter (filename, null);
+     //Use indenting for readability
+     writer.Formatting = Formatting.Indented;
+
+     //Write the XML delcaration 
+     writer.WriteStartDocument();
+
+     //Write the ProcessingInstruction node
+     String PItext="type='text/xsl' href='book.xsl'";
+     writer.WriteProcessingInstruction("xml-stylesheet", PItext);
+
+     //Write the DocumentType node
+     writer.WriteDocType("book", null , null, "&lt;!ENTITY h 'hardcover'&gt;");
+        
+     //Write a Comment node
+     writer.WriteComment("sample XML");
+    
+     //Write an element (this one is the root)
+     writer.WriteStartElement("book");
+
+     //Write the genre attribute
+     writer.WriteAttributeString("genre", "novel");
+    
+     //Write the ISBN attribute
+     writer.WriteAttributeString("ISBN", "1-8630-014");
+
+     //Write the title
+     writer.WriteElementString("title", "The Handmaid's Tale");
+              
+     //Write the style element
+     writer.WriteStartElement("style");
+     writer.WriteEntityRef("h");
+     writer.WriteEndElement(); 
+
+     //Write the price
+     writer.WriteElementString("price", "19.95");
+
+     //Write CDATA
+     writer.WriteCData("Prices 15% off!!");
+
+     //Write the close tag for the root element
+     writer.WriteEndElement();
+             
+     writer.WriteEndDocument();
+
+     //Write the XML to file and close the writer
+     writer.Flush();
+     writer.Close();  
+
+     //Load the file into an XmlDocument to ensure well formed XML
+     XmlDocument doc = new XmlDocument();
+     //Preserve white space for readability
+     doc.PreserveWhitespace = true;
+     //Load the file
+     doc.Load(filename);  
+    
+     //Display the XML content to the console
+     Console.Write(doc.InnerXml);  
+
+  }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteElementStringTopic1"></a><a name="WriteElementString(System.String,System.String)">WriteElementString</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>value</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml/types/XmlWriter.html#WriteElementString(System.String,System.String)">System.Xml.XmlWriter.WriteElementString</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, writes an element with the specified local name and value.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void WriteElementString(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>localName</i><br><dl>
+<dd>
+<param> The local name of the element 
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The value of the element 
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> This results in an invalid XML document.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>localName</i> is either <b>null</b> or String.Empty.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example uses several write methods to create an XML fragment.<pre>
+using System;
+using System.IO;
+using System.Xml;
+ 
+ public class Sample
+ {
+   private const string m_Document = "sampledata.xml";
+ 
+   public static void Main()
+   {
+      XmlTextWriter writer = null;
+      XmlTextReader reader = null;
+ 
+      try
+      {
+        writer = new XmlTextWriter (m_Document, null);
+        // Use indenting for readability.
+        writer.Formatting = Formatting.Indented;
+        writer.Indentation=4;
+         
+        writer.WriteComment("sample XML fragment");
+     
+        // Write an element (this one is the root).
+        writer.WriteStartElement("book");
+ 
+        // Write the namespace declaration.
+        writer.WriteAttributeString("xmlns", "bk", null, "urn:samples");
+    
+        // Write the genre attribute.
+        writer.WriteAttributeString("genre", "novel");
+         
+        // Write the title.
+        writer.WriteStartElement("title");
+        writer.WriteString("The Handmaid's Tale");
+        writer.WriteEndElement();
+               
+        // Write the price.
+        writer.WriteElementString("price", "19.95");
+      
+        // Lookup the prefix and write the ISBN element.
+        string prefix = writer.LookupPrefix("urn:samples");
+        writer.WriteStartElement(prefix, "ISBN", "urn:samples");
+        writer.WriteString("1-861003-78");
+        writer.WriteEndElement();
+
+        // Write the style element (shows a different way to handle prefixes).
+        writer.WriteElementString("style", "urn:samples", "hardcover");
+ 
+        // Write the close tag for the root element.
+        writer.WriteEndElement();
+              
+ 
+        // Write the XML to file and close the writer.
+        writer.Flush();
+        writer.Close();
+ 
+ 
+        // Read the file back in and parse to ensure well formed XML.
+        reader = new XmlTextReader (m_Document);
+        XmlDocument doc = new XmlDocument();
+        // Preserve white space for readability.
+        doc.PreserveWhitespace = true;
+        //Load the file
+        doc.Load(reader);
+     
+        // Write the XML content to the console.
+        Console.Write(doc.InnerXml);
+      }
+
+      finally 
+      {
+        Console.WriteLine();
+        Console.WriteLine("Processing of the file {0} complete.", m_Document);
+        if (reader != null)
+           reader.Close();
+        if (writer != null)
+           writer.Close();
+     } 
+   }
+ 
+ }
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteElementStringTopic2"></a><a name="WriteElementString(System.String,System.String,System.String)">WriteElementString</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>value</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml/types/XmlWriter.html#WriteElementString(System.String,System.String,System.String)">System.Xml.XmlWriter.WriteElementString</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, writes an element with the specified parameters.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void WriteElementString(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>localName</i><br><dl>
+<dd>
+<param> The local name of the element 
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>ns</i><br><dl>
+<dd>
+<param> The namespace URI to associate with the element 
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The value of the element 
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> This results in an invalid XML document.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>localName</i> is either <b>null</b> or String.Empty.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example uses several write methods to create an XML fragment.<pre>
+using System;
+using System.IO;
+using System.Xml;
+ 
+ public class Sample
+ {
+   private const string m_Document = "sampledata.xml";
+ 
+   public static void Main()
+   {
+      XmlTextWriter writer = null;
+      XmlTextReader reader = null;
+ 
+      try
+      {
+        writer = new XmlTextWriter (m_Document, null);
+        // Use indenting for readability.
+        writer.Formatting = Formatting.Indented;
+        writer.Indentation=4;
+         
+        writer.WriteComment("sample XML fragment");
+     
+        // Write an element (this one is the root).
+        writer.WriteStartElement("book");
+ 
+        // Write the namespace declaration.
+        writer.WriteAttributeString("xmlns", "bk", null, "urn:samples");
+    
+        // Write the genre attribute.
+        writer.WriteAttributeString("genre", "novel");
+         
+        // Write the title.
+        writer.WriteStartElement("title");
+        writer.WriteString("The Handmaid's Tale");
+        writer.WriteEndElement();
+               
+        // Write the price.
+        writer.WriteElementString("price", "19.95");
+      
+        // Lookup the prefix and write the ISBN element.
+        string prefix = writer.LookupPrefix("urn:samples");
+        writer.WriteStartElement(prefix, "ISBN", "urn:samples");
+        writer.WriteString("1-861003-78");
+        writer.WriteEndElement();
+
+        // Write the style element (shows a different way to handle prefixes).
+        writer.WriteElementString("style", "urn:samples", "hardcover");
+ 
+        // Write the close tag for the root element.
+        writer.WriteEndElement();
+              
+ 
+        // Write the XML to file and close the writer.
+        writer.Flush();
+        writer.Close();
+ 
+ 
+        // Read the file back in and parse to ensure well formed XML.
+        reader = new XmlTextReader (m_Document);
+        XmlDocument doc = new XmlDocument();
+        // Preserve white space for readability.
+        doc.PreserveWhitespace = true;
+        //Load the file
+        doc.Load(reader);
+     
+        // Write the XML content to the console.
+        Console.Write(doc.InnerXml);
+      }
+
+      finally 
+      {
+        Console.WriteLine();
+        Console.WriteLine("Processing of the file {0} complete.", m_Document);
+        if (reader != null)
+           reader.Close();
+        if (writer != null)
+           writer.Close();
+     } 
+   }
+ 
+ }
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteEndAttributeTopic1"></a><a name="WriteEndAttribute">WriteEndAttribute</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Closes the previous  <a href="#WriteStartAttribute(System.String,System.String,System.String)">XmlTextWriter.WriteStartAttribute</a> call.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteEndAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If you call <b>WriteStartAttribute</b>, you can close the attribute with this method.<p> You can also close the attribute by calling <b>WriteStartAttribute</b> again, calling  <a href="../../System.Xml/types/XmlWriter.html#WriteAttributeString(System.String,System.String,System.String)">XmlWriter.WriteAttributeString</a>, or calling  <a href="#WriteEndElement">XmlTextWriter.WriteEndElement</a>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes out a book.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  private const string filename = "sampledata.xml";
+
+  public static void Main()
+  {
+
+     XmlTextWriter writer = new XmlTextWriter (filename, null);
+     //Use indenting for readability
+     writer.Formatting = Formatting.Indented;
+        
+     writer.WriteComment("sample XML fragment");
+    
+     //Write an element (this one is the root)
+     writer.WriteStartElement("bookstore");
+
+     //Write the namespace declaration
+     writer.WriteAttributeString("xmlns", "bk", null, "urn:samples");
+
+     writer.WriteStartElement("book");
+
+     //Lookup the prefix and then write the ISBN attribute
+     string prefix = writer.LookupPrefix("urn:samples");
+     writer.WriteStartAttribute(prefix, "ISBN", "urn:samples");
+     writer.WriteString("1-861003-78");
+     writer.WriteEndAttribute();     
+
+     //Write the title
+     writer.WriteStartElement("title");
+     writer.WriteString("The Handmaid's Tale");
+     writer.WriteEndElement();
+              
+     //Write the price
+     writer.WriteElementString("price", "19.95");
+     
+     //Write the style element
+     writer.WriteStartElement(prefix, "style", "urn:samples");
+     writer.WriteString("hardcover");
+     writer.WriteEndElement();
+
+     //Write the end tag for the book element
+     writer.WriteEndElement();
+
+     //Write the close tag for the root element
+     writer.WriteEndElement();
+             
+     //Write the XML to file and close the writer
+     writer.Flush();
+     writer.Close();
+
+     //Read the file back in and parse to ensure well formed XML
+     XmlDocument doc = new XmlDocument();
+     //Preserve white space for readability
+     doc.PreserveWhitespace = true;
+     //Load the file
+     doc.Load(filename);
+    
+     //Write the XML content to the console
+     Console.Write(doc.InnerXml);  
+
+  }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteEndDocumentTopic1"></a><a name="WriteEndDocument">WriteEndDocument</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Closes any open elements or attributes and puts the writer back in the Start state.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteEndDocument();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Xml/types/XmlException.html">XmlException</a></td>
+<td> The XML document is invalid.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes an XML file representing a book.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  private const string filename = "sampledata.xml";
+
+  public static void Main()
+  {
+     XmlTextWriter writer = null;
+
+     writer = new XmlTextWriter (filename, null);
+     //Use indenting for readability
+     writer.Formatting = Formatting.Indented;
+
+     //Write the XML delcaration 
+     writer.WriteStartDocument();
+
+     //Write the ProcessingInstruction node
+     String PItext="type='text/xsl' href='book.xsl'";
+     writer.WriteProcessingInstruction("xml-stylesheet", PItext);
+
+     //Write the DocumentType node
+     writer.WriteDocType("book", null , null, "&lt;!ENTITY h 'hardcover'&gt;");
+        
+     //Write a Comment node
+     writer.WriteComment("sample XML");
+    
+     //Write an element (this one is the root)
+     writer.WriteStartElement("book");
+
+     //Write the genre attribute
+     writer.WriteAttributeString("genre", "novel");
+    
+     //Write the ISBN attribute
+     writer.WriteAttributeString("ISBN", "1-8630-014");
+
+     //Write the title
+     writer.WriteElementString("title", "The Handmaid's Tale");
+              
+     //Write the style element
+     writer.WriteStartElement("style");
+     writer.WriteEntityRef("h");
+     writer.WriteEndElement(); 
+
+     //Write the price
+     writer.WriteElementString("price", "19.95");
+
+     //Write CDATA
+     writer.WriteCData("Prices 15% off!!");
+
+     //Write the close tag for the root element
+     writer.WriteEndElement();
+             
+     writer.WriteEndDocument();
+
+     //Write the XML to file and close the writer
+     writer.Flush();
+     writer.Close();  
+
+     //Load the file into an XmlDocument to ensure well formed XML
+     XmlDocument doc = new XmlDocument();
+     //Preserve white space for readability
+     doc.PreserveWhitespace = true;
+     //Load the file
+     doc.Load(filename);  
+    
+     //Display the XML content to the console
+     Console.Write(doc.InnerXml);  
+
+  }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteEndElementTopic1"></a><a name="WriteEndElement">WriteEndElement</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Closes one element and pops the corresponding namespace scope.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteEndElement();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the element contains no content a short end tag "/&gt;" is written; otherwise a full end tag is written.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes an XML file representing a book.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  private const string filename = "sampledata.xml";
+
+  public static void Main()
+  {
+     XmlTextWriter writer = null;
+
+     writer = new XmlTextWriter (filename, null);
+     //Use indenting for readability
+     writer.Formatting = Formatting.Indented;
+
+     //Write the XML delcaration 
+     writer.WriteStartDocument();
+
+     //Write the ProcessingInstruction node
+     String PItext="type=\"text/xsl\" href=\"book.xsl\"";
+     writer.WriteProcessingInstruction("xml-stylesheet", PItext);
+
+     //Write the DocumentType node
+     writer.WriteDocType("book", null , null, "&lt;!ENTITY h \"hardcover\"&gt;");
+        
+     //Write a Comment node
+     writer.WriteComment("sample XML");
+    
+     //Write an element (this one is the root)
+     writer.WriteStartElement("book");
+
+     //Write the genre attribute
+     writer.WriteAttributeString("genre", "novel");
+    
+     //Write the ISBN attribute
+     writer.WriteAttributeString("ISBN", "1-8630-014");
+
+     //Write the title
+     writer.WriteElementString("title", "The Handmaid's Tale");
+              
+     //Write the style element
+     writer.WriteStartElement("style");
+     writer.WriteEntityRef("h");
+     writer.WriteEndElement(); 
+
+     //Write the price
+     writer.WriteElementString("price", "19.95");
+
+     //Write CDATA
+     writer.WriteCData("Prices 15% off!!");
+
+     //Write the close tag for the root element
+     writer.WriteEndElement();
+             
+     writer.WriteEndDocument();
+
+     //Write the XML to file and close the writer
+     writer.Flush();
+     writer.Close();  
+
+     //Load the file into an XmlDocument to ensure well formed XML
+     XmlDocument doc = new XmlDocument();
+     //Preserve white space for readability
+     doc.PreserveWhitespace = true;
+     //Load the file
+     doc.Load(filename);  
+    
+     //Display the XML content to the console
+     Console.Write(doc.InnerXml);  
+
+  }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteEntityRefTopic1"></a><a name="WriteEntityRef(System.String)">WriteEntityRef</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes out an entity reference as follows: &amp; <i>name</i>;.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteEntityRef(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> Name of the entity reference.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The text would result in a non-well formed XML document or <i>name</i> is either <b>null</b> or String.Empty.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes an XML file representing a book.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  private const string filename = "sampledata.xml";
+
+  public static void Main()
+  {
+     XmlTextWriter writer = null;
+
+     writer = new XmlTextWriter (filename, null);
+     //Use indenting for readability
+     writer.Formatting = Formatting.Indented;
+
+     //Write the XML delcaration 
+     writer.WriteStartDocument();
+
+     //Write the ProcessingInstruction node
+     String PItext="type='text/xsl' href='book.xsl'";
+     writer.WriteProcessingInstruction("xml-stylesheet", PItext);
+
+     //Write the DocumentType node
+     writer.WriteDocType("book", null , null, "&lt;!ENTITY h 'hardcover'&gt;");
+        
+     //Write a Comment node
+     writer.WriteComment("sample XML");
+    
+     //Write an element (this one is the root)
+     writer.WriteStartElement("book");
+
+     //Write the genre attribute
+     writer.WriteAttributeString("genre", "novel");
+    
+     //Write the ISBN attribute
+     writer.WriteAttributeString("ISBN", "1-8630-014");
+
+     //Write the title
+     writer.WriteElementString("title", "The Handmaid's Tale");
+              
+     //Write the style element
+     writer.WriteStartElement("style");
+     writer.WriteEntityRef("h");
+     writer.WriteEndElement(); 
+
+     //Write the price
+     writer.WriteElementString("price", "19.95");
+
+     //Write CDATA
+     writer.WriteCData("Prices 15% off!!");
+
+     //Write the close tag for the root element
+     writer.WriteEndElement();
+             
+     writer.WriteEndDocument();
+
+     //Write the XML to file and close the writer
+     writer.Flush();
+     writer.Close();  
+
+     //Load the file into an XmlDocument to ensure well formed XML
+     XmlDocument doc = new XmlDocument();
+     //Preserve white space for readability
+     doc.PreserveWhitespace = true;
+     //Load the file
+     doc.Load(filename);  
+    
+     //Display the XML content to the console
+     Console.Write(doc.InnerXml);  
+
+  }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteFullEndElementTopic1"></a><a name="WriteFullEndElement">WriteFullEndElement</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Closes one element and pops the corresponding namespace scope.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteFullEndElement();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method always writes the full end tag. This is useful when dealing with elements that must include a full end tag. For example, browsers expect HTML script blocks to be closed with "&lt;/script&gt;".</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes out an element with no content. It uses WriteFullEndElement to write the full end element tag.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{ 
+  public static void Main()
+  {
+     //Create a writer to write XML to the console.
+     XmlTextWriter writer = null;
+     writer = new XmlTextWriter (Console.Out);
+
+     //Use indentation for readability.
+     writer.Formatting = Formatting.Indented;
+        
+     //Write an element (this one is the root).
+     writer.WriteStartElement("order");
+
+     //Write some attributes.
+     writer.WriteAttributeString("date", "2/19/01");
+     writer.WriteAttributeString("orderID", "136A5");
+
+     //Write a full end element. Because this element has no
+     //content, calling WriteEndElement would have written a
+     //short end tag '/&gt;'.
+     writer.WriteFullEndElement();
+             
+     //Write the XML to file and close the writer
+     writer.Close();  
+  }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteNameTopic1"></a><a name="WriteName(System.String)">WriteName</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes out the specified name, ensuring it is a valid name according to the W3C XML 1.0 recommendation(http://www.w3.org/TR/1998/REC-xml-19980210#NT-Name ).</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteName(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> Name to write.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>name</i> is not a valid XML name; or <i>name</i> is either <b>null</b> or String.Empty.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If  <a href="#Namespaces">XmlTextWriter.Namespaces</a> is set to <b>true</b>, <b>WriteName</b> also checks that the name is also valid according to the W3C Namespaces in XML recommendation.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteNmTokenTopic1"></a><a name="WriteNmToken(System.String)">WriteNmToken</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes out the specified name, ensuring it is a valid NmToken according to the W3C XML 1.0 recommendation(http://www.w3.org/TR/1998/REC-xml-19980210#NT-Name).</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteNmToken(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> Name to write.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>name</i> is not a valid NmToken; or <i>name</i> is either <b>null</b> or String.Empty.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="WriteNodeTopic1"></a><a name="WriteNode(System.Xml.XmlReader,System.Boolean)">WriteNode</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Xml/types/XmlReader.html">XmlReader</a> <i>reader</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>defattr</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml/types/XmlWriter.html#WriteNode(System.Xml.XmlReader,System.Boolean)">System.Xml.XmlWriter.WriteNode</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, copies everything from the reader to the writer and moves the reader to the start of the next sibling.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void WriteNode(<br>   <font color="#008080"><a href="../../System.Xml/types/XmlReader.html">XmlReader</a> <i>reader</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>defattr</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>reader</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Xml/types/XmlReader.html">XmlReader</a> to read from.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>defattr</i><br><dl>
+<dd>
+<param><b>true</b> to copy the default attributes from the <b>XmlReader</b>; otherwise, <b>false</b>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>reader</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The following table shows the supported node types for this method.<br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  NodeType
+                </TH>
+<TH>
+                  WriteNode Behavior
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+                  Element
+                </TD>
+<TD>
+                  Writes out the element node and any
+                  attribute nodes.
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Attribute
+                </TD>
+<TD>
+                  No operation. Use
+                   <a href="#WriteStartAttribute(System.String,System.String)">XmlWriter.WriteStartAttribute</a>
+                  or
+                   <a href="#WriteAttributeString(System.String,System.String,System.String)">XmlWriter.WriteAttributeString</a>
+                  instead.
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Text
+                </TD>
+<TD>
+                  Writes out the text node.
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  CDATA
+                </TD>
+<TD>
+                  Writes out the CData section node.
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  EntityReference
+                </TD>
+<TD>
+                  Writes out the entity reference node.
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  ProcessingInstruction
+                </TD>
+<TD>
+                  Writes out the processing instruction node.
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Comment
+                </TD>
+<TD>
+                  Writes out the comment node.
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  DocumentType
+                </TD>
+<TD>
+                  Writes out the document type node.
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  SignificantWhitespace
+                </TD>
+<TD>
+                  Writes out the significant whitespace node.
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Whitespace
+                </TD>
+<TD>
+                  Writes out the whitespace node.
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  EndElement
+                </TD>
+<TD>
+                  No operation.
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  EndEntity
+                </TD>
+<TD>
+                  No operation.
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  XmlDeclaration
+                </TD>
+<TD>
+                  Writes out the XML declaration node.
+                </TD>
+</TR>
+</table>
+<p> If the reader is in the initial state, this method moves the reader to EOF. If the reader is already at EOF or in a closed state, this method is non-operational.</p>
+<p> The following C# code copies an entire XML input document to the console: </p>
+<pre>
+              XmlTextReader reader = new XmlTextReader(myfile);
+              XmlTextWriter writer = new XmlTextWriter(Console.Out);
+              writer.WriteNode(reader, false);
+            </pre>
+<p> Note that if you have moved off the root node and are positioned elsewhere in the document the following C# example correctly writes out the nodes.</p>
+<pre>
+              XmlTextReader reader = new XmlTextReader(myfile);
+              reader.Read(); // Read PI
+              reader.Read(); // Read Comment
+              reader.Read(); // Read DOCType
+              XmlTextWriter writer = new XmlTextWriter(Console.Out);
+              while (!reader.EOF){
+               writer.WriteNode(reader, false);
+              }
+            </pre>
+<p> If the reader is configured to return whitespace and the writer has  <a href="../../System.Xml/types/XmlTextWriter.html#Formatting">XmlTextWriter.Formatting</a> set to "Indented", <b>WriteNode</b> may produce strange output. You will essentially be getting double formatting.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes the first and last book nodes out to the console.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample{
+
+  public static void Main(){
+
+    XmlTextReader reader = new XmlTextReader("books.xml");
+    reader.WhitespaceHandling = WhitespaceHandling.None;
+
+    //Move the reader to the first book element.
+    reader.MoveToContent();
+    reader.Read();
+
+    //Create a writer that outputs to the console.
+    XmlTextWriter writer = new XmlTextWriter (Console.Out);
+    writer.Formatting = Formatting.Indented;
+	
+    //Write the start tag.
+    writer.WriteStartElement("myBooks");
+
+    //Write the first book.
+    writer.WriteNode(reader, false);
+
+    //Skip the second book.
+    reader.Skip();
+
+    //Write the last book.
+    writer.WriteNode(reader, false);
+    writer.WriteEndElement();
+
+    //Close the writer and the reader.
+    writer.Close();
+    reader.Close();
+
+  }
+}
+
+    </pre> The example uses the file, <b>books.xml</b>, as input.<pre>
+&lt;bookstore&gt;
+  &lt;book genre="autobiography" publicationdate="1981" ISBN="1-861003-11-0"&gt;
+    &lt;title&gt;The Autobiography of Benjamin Franklin&lt;/title&gt;
+    &lt;author&gt;
+      &lt;first-name&gt;Benjamin&lt;/first-name&gt;
+      &lt;last-name&gt;Franklin&lt;/last-name&gt;
+    &lt;/author&gt;
+    &lt;price&gt;8.99&lt;/price&gt;
+  &lt;/book&gt;
+  &lt;book genre="novel" publicationdate="1967" ISBN="0-201-63361-2"&gt;
+    &lt;title&gt;The Confidence Man&lt;/title&gt;
+    &lt;author&gt;
+      &lt;first-name&gt;Herman&lt;/first-name&gt;
+      &lt;last-name&gt;Melville&lt;/last-name&gt;
+    &lt;/author&gt;
+    &lt;price&gt;11.99&lt;/price&gt;
+  &lt;/book&gt;
+  &lt;book genre="philosophy" publicationdate="1991" ISBN="1-861001-57-6"&gt;
+    &lt;title&gt;The Gorgias&lt;/title&gt;
+    &lt;author&gt;
+      &lt;name&gt;Plato&lt;/name&gt;
+    &lt;/author&gt;
+    &lt;price&gt;9.99&lt;/price&gt;
+  &lt;/book&gt;
+&lt;/bookstore&gt;
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteProcessingInstructionTopic1"></a><a name="WriteProcessingInstruction(System.String,System.String)">WriteProcessingInstruction</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>text</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes out a processing instruction with a space between the name and text as follows: &lt;?name text?&gt;.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteProcessingInstruction(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>text</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> Name of the processing instruction.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>text</i><br><dl>
+<dd>
+<param> Text to include in the processing instruction.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The text would result in a non-well formed XML document.<p><i>name</i> is either <b>null</b> or String.Empty.</p>
+<p> This method is being used to create an XML declaration after  <a href="#WriteStartDocument">XmlTextWriter.WriteStartDocument</a> has already been called.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If <i>text</i> is either <b>null</b> or String.Empty, this method writes a ProcessingInstruction with no data content, for example &lt;?name?&gt;.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes an XML file representing a book.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  private const string filename = "sampledata.xml";
+
+  public static void Main()
+  {
+     XmlTextWriter writer = null;
+
+     writer = new XmlTextWriter (filename, null);
+     //Use indenting for readability
+     writer.Formatting = Formatting.Indented;
+
+     //Write the XML delcaration 
+     writer.WriteStartDocument();
+
+     //Write the ProcessingInstruction node
+     String PItext="type='text/xsl' href='book.xsl'";
+     writer.WriteProcessingInstruction("xml-stylesheet", PItext);
+
+     //Write the DocumentType node
+     writer.WriteDocType("book", null , null, "&lt;!ENTITY h 'hardcover'&gt;");
+        
+     //Write a Comment node
+     writer.WriteComment("sample XML");
+    
+     //Write an element (this one is the root)
+     writer.WriteStartElement("book");
+
+     //Write the genre attribute
+     writer.WriteAttributeString("genre", "novel");
+    
+     //Write the ISBN attribute
+     writer.WriteAttributeString("ISBN", "1-8630-014");
+
+     //Write the title
+     writer.WriteElementString("title", "The Handmaid's Tale");
+              
+     //Write the style element
+     writer.WriteStartElement("style");
+     writer.WriteEntityRef("h");
+     writer.WriteEndElement(); 
+
+     //Write the price
+     writer.WriteElementString("price", "19.95");
+
+     //Write CDATA
+     writer.WriteCData("Prices 15% off!!");
+
+     //Write the close tag for the root element
+     writer.WriteEndElement();
+             
+     writer.WriteEndDocument();
+
+     //Write the XML to file and close the writer
+     writer.Flush();
+     writer.Close();  
+
+     //Load the file into an XmlDocument to ensure well formed XML
+     XmlDocument doc = new XmlDocument();
+     //Preserve white space for readability
+     doc.PreserveWhitespace = true;
+     //Load the file
+     doc.Load(filename);  
+    
+     //Display the XML content to the console
+     Console.Write(doc.InnerXml);  
+
+  }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteQualifiedNameTopic1"></a><a name="WriteQualifiedName(System.String,System.String)">WriteQualifiedName</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes out the namespace-qualified name. This method looks up the prefix that is in scope for the given namespace.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteQualifiedName(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>localName</i><br><dl>
+<dd>
+<param> The local name to write.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>ns</i><br><dl>
+<dd>
+<param> The namespace URI to associate with the name.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>localName</i> is either <b>null</b> or String.Empty.<p><i>localName</i> is not a valid name according to the W3C Namespaces spec.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For example, the following C# code: <pre>
+              writer.Formatting = Formatting.Indented;
+              writer.WriteStartElement("root");
+               writer.WriteAttributeString("xmlns","x",null,"urn:abc");
+               writer.WriteStartElement("item");
+               writer.WriteStartAttribute("href",null);
+               writer.WriteString("#");
+               writer.WriteQualifiedName("test","urn:abc");
+               writer.WriteEndAttribute();
+               writer.WriteEndElement();
+               writer.WriteEndElement();
+               writer.Close();
+               
+            </pre>
+<p> Generates the following output: </p>
+<pre>
+              &lt;root xmlns:x="urn:abc"&gt;
+               &lt;item href="#x:test"/&gt;
+               &lt;/root&gt;
+               
+            </pre>
+<p> If <i>ns</i> maps to the current default namespace, no prefix is generated.</p>
+<p> When writing attribute values, this method generates a prefix if <i>ns</i> is not found. When writing element content, it throws an exception if <i>ns</i> is not found.</p>
+<p> If this writer supports namespaces ( <a href="#Namespaces">XmlTextWriter.Namespaces</a> is set to <b>true</b>), this method also checks that the name is valid according to the W3C Namespaces in XML recommendation (http://www.w3.org/TR/REC-xml-names ).</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes out a portion of a XSD schema.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  private const string filename = "sampledata.xml";
+
+  public static void Main()
+  {
+     XmlTextWriter writer = null;
+
+     writer = new XmlTextWriter (filename, null);
+     //Use indenting for readability
+     writer.Formatting = Formatting.Indented;
+        
+     //Write an element (this one is the root)
+     writer.WriteStartElement("schema");
+
+     //Write the namespace declarations.
+     writer.WriteAttributeString("xmlns", null,"http://www.w3.org/2001/XMLSchema");
+     writer.WriteAttributeString("xmlns","po",null,"http://contoso.com/po");
+
+     writer.WriteStartElement("element");
+
+     writer.WriteAttributeString("name", "purchaseOrder");
+
+     //Write the type attribute
+     writer.WriteStartAttribute(null,"type", null);
+     writer.WriteQualifiedName("PurchaseOrder", "http://contoso.com/po");
+     writer.WriteEndAttribute();
+
+     writer.WriteEndElement();
+
+
+     //Write the close tag for the root element
+     writer.WriteEndElement();
+             
+     //Write the XML to file and close the writer
+     writer.Flush();
+     writer.Close();  
+
+     // Read the file back in and parse to ensure well formed XML
+     XmlDocument doc = new XmlDocument();
+     //Preserve white space for readability
+     doc.PreserveWhitespace = true;
+     //Load the file
+     doc.Load(filename);
+    
+     //Write the XML content to the console
+     Console.Write(doc.InnerXml);
+
+  }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteRawTopic1"></a><a name="WriteRaw(System.String)">WriteRaw</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>data</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes raw markup manually from a string.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteRaw(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>data</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>data</i><br><dl>
+<dd>
+<param> String containing the text to write.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method bypasses the entitization of special characters.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes a string using the <b>WriteRaw</b> method.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  public static void Main()
+  {
+     //Create a writer that outputs to the console.
+     XmlTextWriter writer = new XmlTextWriter (Console.Out);
+     writer.Formatting = Formatting.Indented;
+    
+     //Write an element (this one is the root)
+     writer.WriteStartElement("Items");
+
+     //Write a string using WriteRaw. Note that the special
+     //characters are not entitized.
+     writer.WriteStartElement("Item");
+     writer.WriteString("Write unentitized text:  ");
+     writer.WriteRaw("this &amp; that");
+     writer.WriteEndElement();
+
+     //Write the same string using WriteString. Note that the 
+     //special characters are entitized.
+     writer.WriteStartElement("Item");
+     writer.WriteString("Write the same string entitized:  ");
+     writer.WriteString("this &amp; that");
+     writer.WriteEndElement();
+
+     //Write the close tag for the root element.
+     writer.WriteEndElement();
+           
+     //Write the XML to file and close the writer.
+     writer.Close();  
+  }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteRawTopic2"></a><a name="WriteRaw(System.Char[],System.Int32,System.Int32)">WriteRaw</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Char.html">char[]</a> <i>buffer</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes raw markup manually from a character buffer.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteRaw(<br>   <font color="#008080"><a href="../../System/types/Char.html">char[]</a> <i>buffer</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>buffer</i><br><dl>
+<dd>
+<param> Character array containing the text to write.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The position within the buffer indicating the start of the text to write.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>count</i><br><dl>
+<dd>
+<param> The number of characters to write.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>buffer</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The buffer length minus <i>index</i> is less than <i>count</i>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>index</i> or <i>count</i> is less than zero.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method bypasses the entitization of special characters.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteStartAttributeTopic1"></a><a name="WriteStartAttribute(System.String,System.String)">WriteStartAttribute</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml/types/XmlWriter.html#WriteStartAttribute(System.String,System.String)">System.Xml.XmlWriter.WriteStartAttribute</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, writes the start of an attribute.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void WriteStartAttribute(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>localName</i><br><dl>
+<dd>
+<param> The local name of the attribute.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>ns</i><br><dl>
+<dd>
+<param> The namespace URI of the attribute 
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>localName</i> is either <b>null</b> or String.Empty.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This is a more advanced version of  <a href="#WriteAttributeString(System.String,System.String,System.String)">XmlWriter.WriteAttributeString</a> that allows you to write an attribute value using multiple write methods, such as  <a href="#WriteString(System.String)">XmlWriter.WriteString</a>,  <a href="#WriteQualifiedName(System.String,System.String)">XmlWriter.WriteQualifiedName</a>, and so on.</dd>
+</dl><b>Example</b><dl>
+<dd> See  <a href="../../System.Xml/types/XmlTextWriter.html#WriteStartAttribute(System.String,System.String,System.String)">XmlTextWriter.WriteStartAttribute</a> (in the XmlTextWriter class) for an example using this method.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#WriteEndAttribute">XmlWriter.WriteEndAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteStartAttributeTopic2"></a><a name="WriteStartAttribute(System.String,System.String,System.String)">WriteStartAttribute</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>prefix</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes the start of an attribute.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteStartAttribute(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>prefix</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>prefix</i><br><dl>
+<dd>
+<param> Namespace prefix of the attribute.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>localName</i><br><dl>
+<dd>
+<param> LocalName of the attribute.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>ns</i><br><dl>
+<dd>
+<param> NamespaceURI of the attribute 
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>localName</i> is either <b>null</b> or String.Empty.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This is a more advanced version of  <a href="../../System.Xml/types/XmlWriter.html#WriteAttributeString(System.String,System.String,System.String)">XmlWriter.WriteAttributeString</a> that allows you to write an attribute value using multiple write methods, such as  <a href="#WriteString(System.String)">XmlTextWriter.WriteString</a>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes out a book.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  private const string filename = "sampledata.xml";
+
+  public static void Main()
+  {
+
+     XmlTextWriter writer = new XmlTextWriter (filename, null);
+     //Use indenting for readability
+     writer.Formatting = Formatting.Indented;
+        
+     writer.WriteComment("sample XML fragment");
+    
+     //Write an element (this one is the root)
+     writer.WriteStartElement("bookstore");
+
+     //Write the namespace declaration
+     writer.WriteAttributeString("xmlns", "bk", null, "urn:samples");
+
+     writer.WriteStartElement("book");
+
+     //Lookup the prefix and then write the ISBN attribute
+     string prefix = writer.LookupPrefix("urn:samples");
+     writer.WriteStartAttribute(prefix, "ISBN", "urn:samples");
+     writer.WriteString("1-861003-78");
+     writer.WriteEndAttribute();     
+
+     //Write the title
+     writer.WriteStartElement("title");
+     writer.WriteString("The Handmaid's Tale");
+     writer.WriteEndElement();
+              
+     //Write the price
+     writer.WriteElementString("price", "19.95");
+     
+     //Write the style element
+     writer.WriteStartElement(prefix, "style", "urn:samples");
+     writer.WriteString("hardcover");
+     writer.WriteEndElement();
+
+     //Write the end tag for the book element
+     writer.WriteEndElement();
+
+     //Write the close tag for the root element
+     writer.WriteEndElement();
+             
+     //Write the XML to file and close the writer
+     writer.Flush();
+     writer.Close();
+
+     //Read the file back in and parse to ensure well formed XML
+     XmlDocument doc = new XmlDocument();
+     //Preserve white space for readability
+     doc.PreserveWhitespace = true;
+     //Load the file
+     doc.Load(filename);
+    
+     //Write the XML content to the console
+     Console.Write(doc.InnerXml);  
+
+  }
+
+}
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#WriteEndAttribute">XmlTextWriter.WriteEndAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteStartDocumentTopic1"></a><a name="WriteStartDocument">WriteStartDocument</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes the XML declaration with the version "1.0".</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteStartDocument();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> This is not the first write method called after the constructor.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The encoding level of the document is determined by how the writer is implemented. For example, if an  <a href="../../System.Text/types/Encoding.html">Encoding</a> object is specified in the <b>XmlTextWriter</b> constructor, this determines the value of the encoding attribute. This method does not create a standalone attribute.<p> When <b>WriteStartDocument</b> is called the writer validates that what you are writing is a well-formed XML document. For example, it checks that the XML declaration is the first node, that one and only one root-level element exists and so on. If this method is not called, the writer assumes an XML fragment is being written and applies no root level rules.</p>
+<p> If <b>WriteStartDocument</b> has been called and then the  <a href="#WriteProcessingInstruction(System.String,System.String)">XmlTextWriter.WriteProcessingInstruction</a> method is used to create another XML declaration, an exception will be thrown.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes an XML file representing a book.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  private const string filename = "sampledata.xml";
+
+  public static void Main()
+  {
+     XmlTextWriter writer = null;
+
+     writer = new XmlTextWriter (filename, null);
+     //Use indenting for readability
+     writer.Formatting = Formatting.Indented;
+
+     //Write the XML delcaration 
+     writer.WriteStartDocument();
+
+     //Write the ProcessingInstruction node
+     String PItext="type='text/xsl' href='book.xsl'";
+     writer.WriteProcessingInstruction("xml-stylesheet", PItext);
+
+     //Write the DocumentType node
+     writer.WriteDocType("book", null , null, "&lt;!ENTITY h 'hardcover'&gt;");
+        
+     //Write a Comment node
+     writer.WriteComment("sample XML");
+    
+     //Write an element (this one is the root)
+     writer.WriteStartElement("book");
+
+     //Write the genre attribute
+     writer.WriteAttributeString("genre", "novel");
+    
+     //Write the ISBN attribute
+     writer.WriteAttributeString("ISBN", "1-8630-014");
+
+     //Write the title
+     writer.WriteElementString("title", "The Handmaid's Tale");
+              
+     //Write the style element
+     writer.WriteStartElement("style");
+     writer.WriteEntityRef("h");
+     writer.WriteEndElement(); 
+
+     //Write the price
+     writer.WriteElementString("price", "19.95");
+
+     //Write CDATA
+     writer.WriteCData("Prices 15% off!!");
+
+     //Write the close tag for the root element
+     writer.WriteEndElement();
+             
+     writer.WriteEndDocument();
+
+     //Write the XML to file and close the writer
+     writer.Flush();
+     writer.Close();  
+
+     //Load the file into an XmlDocument to ensure well formed XML
+     XmlDocument doc = new XmlDocument();
+     //Preserve white space for readability
+     doc.PreserveWhitespace = true;
+     //Load the file
+     doc.Load(filename);  
+    
+     //Display the XML content to the console
+     Console.Write(doc.InnerXml);  
+
+  }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteStartDocumentTopic2"></a><a name="WriteStartDocument(System.Boolean)">WriteStartDocument</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>standalone</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes the XML declaration with the version "1.0" and the standalone attribute.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteStartDocument(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>standalone</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>standalone</i><br><dl>
+<dd>
+<param> If <b>true</b>, it writes "standalone=yes"; if <b>false</b>, it writes "standalone=no" 
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> This is not the first write method called after the constructor.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The encoding level of the document is determined by how the writer is implemented. For example, if an  <a href="../../System.Text/types/Encoding.html">Encoding</a> object is specified in the <b>XmlTextWriter</b> constructor, this determines the value of the encoding attribute.<p> When <b>WriteStartDocument</b> is called the writer validates that what you are writing is a well-formed XML document. For example, it checks that the XML declaration is the first node, that one and only one root-level element exists and so on. If this method is not called, the writer assumes an XML fragment is being written and applies no root level rules.</p>
+<p> If <b>WriteStartDocument</b> has been called and then the  <a href="#WriteProcessingInstruction(System.String,System.String)">XmlTextWriter.WriteProcessingInstruction</a> method is used to create another XML declaration, an exception will be thrown.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteStartElementTopic1"></a><a name="WriteStartElement(System.String)">WriteStartElement</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml/types/XmlWriter.html#WriteStartElement(System.String)">System.Xml.XmlWriter.WriteStartElement</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, writes out a start tag with the specified local name.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void WriteStartElement(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>localName</i><br><dl>
+<dd>
+<param> The local name of the element.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The writer is closed.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes an XML fragment.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  
+  public static void Main()
+  {
+     //Create a writer to write XML to the console.
+     XmlTextWriter writer = null;
+     writer = new XmlTextWriter (Console.Out);
+
+     //Use indentation for readability.
+     writer.Formatting = Formatting.Indented;
+     writer.Indentation = 4;
+        
+     //Write an element (this one is the root).
+     writer.WriteStartElement("book");
+
+     //Write the title element.
+     writer.WriteStartElement("title");
+     writer.WriteString("Pride And Prejudice");
+     writer.WriteEndElement();
+
+     //Write the close tag for the root element.
+     writer.WriteEndElement();
+             
+     //Write the XML to file and close the writer.
+     writer.Close();  
+
+  }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteStartElementTopic2"></a><a name="WriteStartElement(System.String,System.String)">WriteStartElement</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml/types/XmlWriter.html#WriteStartElement(System.String,System.String)">System.Xml.XmlWriter.WriteStartElement</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, writes the specified start tag and associates it with the given namespace.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void WriteStartElement(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>localName</i><br><dl>
+<dd>
+<param> The local name of the element. The local name of the element.</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>ns</i><br><dl>
+<dd>
+<param> The namespace URI to associate with the element. If this namespace is already in scope and has an associated prefix, the writer automatically writes that prefix also. The namespace URI to associate with the element. If this namespace is already in scope and has an associated prefix, the writer automatically writes that prefix also.</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The writer is closed.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> After calling this method you can either write attributes, or create content using  <a href="#WriteComment(System.String)">XmlWriter.WriteComment</a>,  <a href="#WriteString(System.String)">XmlWriter.WriteString</a>, or <b>WriteStartElement</b> for child elements. You can close the element with either  <a href="#WriteEndElement">XmlWriter.WriteEndElement</a> or  <a href="#WriteFullEndElement">XmlWriter.WriteFullEndElement</a>. For example, the following C# code <pre>
+              writer.WriteStartElement("item",null);
+              writer.WriteString("some text");
+              writer.WriteEndElement();
+                 
+            </pre>
+<p> generates the following output: </p>
+<pre>
+              &lt;item&gt;some text&lt;/item&gt;
+                 
+            </pre>
+</dd>
+</dl><b>Example</b><dl>
+<dd> See  <a href="../../System.Xml/types/XmlTextWriter.html#WriteStartElement(System.String,System.String,System.String)">XmlTextWriter.WriteStartElement</a> (in the XmlTextWriter class) for an example using this method.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteStartElementTopic3"></a><a name="WriteStartElement(System.String,System.String,System.String)">WriteStartElement</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>prefix</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes the specified start tag and associates it with the given namespace and prefix.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteStartElement(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>prefix</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>localName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>prefix</i><br><dl>
+<dd>
+<param> The namespace prefix of the element.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>localName</i><br><dl>
+<dd>
+<param> The local name of the element. The local name of the element.</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>ns</i><br><dl>
+<dd>
+<param> The namespace URI to associate with the element. If this namespace is already in scope and has an associated prefix then the writer will automatically write that prefix also. The namespace URI to associate with the element. If this namespace is already in scope and has an associated prefix then the writer will automatically write that prefix also.</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The writer is closed.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> After calling this method you can either write attributes or create content using  <a href="#WriteComment(System.String)">XmlTextWriter.WriteComment</a>,  <a href="#WriteString(System.String)">XmlTextWriter.WriteString</a>, or  <a href="#WriteStartElement(System.String,System.String,System.String)">XmlTextWriter.WriteStartElement</a> for child elements. You can close the element with  <a href="#WriteEndElement">XmlTextWriter.WriteEndElement</a> at which time an end tag is written out.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes out a book.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  private const string filename = "sampledata.xml";
+
+  public static void Main()
+  {
+
+     XmlTextWriter writer = new XmlTextWriter (filename, null);
+     //Use indenting for readability
+     writer.Formatting = Formatting.Indented;
+        
+     writer.WriteComment("sample XML fragment");
+    
+     //Write an element (this one is the root)
+     writer.WriteStartElement("bookstore");
+
+     //Write the namespace declaration
+     writer.WriteAttributeString("xmlns", "bk", null, "urn:samples");
+
+     writer.WriteStartElement("book");
+
+     //Lookup the prefix and then write the ISBN attribute
+     string prefix = writer.LookupPrefix("urn:samples");
+     writer.WriteStartAttribute(prefix, "ISBN", "urn:samples");
+     writer.WriteString("1-861003-78");
+     writer.WriteEndAttribute();     
+
+     //Write the title
+     writer.WriteStartElement("title");
+     writer.WriteString("The Handmaid's Tale");
+     writer.WriteEndElement();
+              
+     //Write the price
+     writer.WriteElementString("price", "19.95");
+     
+     //Write the style element
+     writer.WriteStartElement(prefix, "style", "urn:samples");
+     writer.WriteString("hardcover");
+     writer.WriteEndElement();
+
+     //Write the end tag for the book element
+     writer.WriteEndElement();
+
+     //Write the close tag for the root element
+     writer.WriteEndElement();
+             
+     //Write the XML to file and close the writer
+     writer.Flush();
+     writer.Close();
+
+     //Read the file back in and parse to ensure well formed XML
+     XmlDocument doc = new XmlDocument();
+     //Preserve white space for readability
+     doc.PreserveWhitespace = true;
+     //Load the file
+     doc.Load(filename);
+    
+     //Write the XML content to the console
+     Console.Write(doc.InnerXml);  
+
+  }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteStringTopic1"></a><a name="WriteString(System.String)">WriteString</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>text</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes the given text content.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteString(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>text</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>text</i><br><dl>
+<dd>
+<param> Text to write.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The text string contains an invalid surrogate pair.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd><b>WriteString</b> does the following <UL>
+<li> The characters <b>&amp;</b>, <b>&lt;</b>, and <b>&gt;</b> are replaced with <b>&amp;amp;</b>, <b>&amp;lt;</b>, and <b>&amp;gt;</b>, respectively.</li>
+<li> Character values in the range 0x-0x1F (excluding white space characters 0x9, 0x10, and 0x13) are replaced with numeric character entities (&amp;#0; through &amp;#0x1F).</li>
+<li> If <b>WriteString</b> is called in the context of an attribute value, double and single quotes are replaced with <b>&amp;quot;</b> and <b>&amp;apos;</b> respectively.</li>
+</UL>
+<p> For example, this input string <code>
+                test&lt;item&gt;test
+              </code> is written as </p>
+<pre>
+              test&amp;lt;item&amp;gt;test
+            </pre>
+<p> If <i>text</i> is either <b>null</b> or String.Empty, this method writes a text node with no data content.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes an XML fragment.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  
+  public static void Main()
+  {
+     //Create a writer to write XML to the console.
+     XmlTextWriter writer = null;
+     writer = new XmlTextWriter (Console.Out);
+
+     //Use indentation for readability.
+     writer.Formatting = Formatting.Indented;
+     writer.Indentation = 4;
+        
+     //Write an element (this one is the root).
+     writer.WriteStartElement("book");
+
+     //Write the title element.
+     writer.WriteStartElement("title");
+     writer.WriteString("Pride And Prejudice");
+     writer.WriteEndElement();
+
+     //Write the close tag for the root element.
+     writer.WriteEndElement();
+             
+     //Write the XML to file and close the writer.
+     writer.Close();  
+
+  }
+
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteSurrogateCharEntityTopic1"></a><a name="WriteSurrogateCharEntity(System.Char,System.Char)">WriteSurrogateCharEntity</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>lowChar</i>,</font><br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>highChar</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Generates and writes the surrogate character entity for the surrogate character pair.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteSurrogateCharEntity(<br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>lowChar</i>,</font><br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>highChar</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>lowChar</i><br><dl>
+<dd>
+<param> The low surrogate. This must be a value between 0xDC00 and 0xDFFF.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>highChar</i><br><dl>
+<dd>
+<param> The high surrogate. This must be a value between 0xD800 and 0xDBFF.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/Exception.html">Exception</a></td>
+<td> An invalid surrogate character pair was passed.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method is only applicable on systems that use UTF-16 encoding.<p> The surrogate character entity is written in hexadecimal format. The range for surrogate characters is #x10000 to #x10FFFF. The following formula is used to generate the surrogate character entity: (<i>highChar</i> -0xD800) * 0x400 + (<i>lowChar</i> -0xDC00) + 0x10000 </p>
+<p> For both HTML and XML, the document character set (and therefore the notation of numeric character references) is based on UCS [ISO-10646]. A single numeric character reference in a source document may therefore in some cases correspond to two 16-bit units in a string (a high surrogate and a low surrogate). These 16-bit units are referred to as a surrogate pair.</p>
+<p> For more information regarding surrogates or characters, refer to section 3.7 of the Unicode 3.0/Unicode 2.0 standard located at http://www.unicode.org, or section 2.2 of the W3C XML 1.0 Recommendation located at http://www.w3.org/TR/REC-xml#charsets .</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteWhitespaceTopic1"></a><a name="WriteWhitespace(System.String)">WriteWhitespace</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ws</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes out the given white space.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteWhitespace(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ws</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>ws</i><br><dl>
+<dd>
+<param> The string of white space characters.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The string contains non-white space characters.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method is used to manually format your document. Use the  <a href="#Formatting">XmlTextWriter.Formatting</a> property to have the writer format the output automatically.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example uses the <b>WriteWhitespace</b> method to control how the file is formatted.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{  
+  public static void Main()
+  {
+    // Create the writer.
+    XmlTextWriter writer = null;
+    writer = new XmlTextWriter ("ws.html", null);
+
+    // Write an element (this one is the root).
+    writer.WriteStartElement("p");
+
+    // Write the xml:space attribute.
+    writer.WriteAttributeString("xml", "space", null, "preserve");
+
+    // Verify that xml:space is set properly.
+    if (writer.XmlSpace == XmlSpace.Preserve)
+      Console.WriteLine("xmlspace is correct!");
+
+    // Write out the HTML elements.  Insert white space
+    // between 'something' and 'Big'
+    writer.WriteString("something");
+    writer.WriteWhitespace("  ");
+    writer.WriteElementString("b", "B");
+    writer.WriteString("ig");
+
+    // Write the root end element.
+    writer.WriteEndElement();
+             
+    // Write the XML to file and close the writer.
+    writer.Close();  
+  }
+}
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Formatting">XmlTextWriter.Formatting</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

@@ -1,0 +1,3292 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Reflection.Binder</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Reflection.Binder Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Reflection<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Selects a member from a list of candidates, and performs type conversion from actual argument type to formal argument type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public abstract class Binder</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd><br><br><b>Notes to inheritors: </b> When you inherit from  <a href="../../System.Reflection/types/Binder.html">Binder</a>, you must override the following members:  <a href="#BindToMethod(System.Reflection.BindingFlags,System.Reflection.MethodBase[],System.Object[]@,System.Reflection.ParameterModifier[],System.Globalization.CultureInfo,System.String[],System.Object@)">Binder.BindToMethod</a>,  <a href="#BindToField(System.Reflection.BindingFlags,System.Reflection.FieldInfo[],System.Object,System.Globalization.CultureInfo)">Binder.BindToField</a>,  <a href="#SelectMethod(System.Reflection.BindingFlags,System.Reflection.MethodBase[],System.Type[],System.Reflection.ParameterModifier[])">Binder.SelectMethod</a>,  <a href="#SelectProperty(System.Reflection.BindingFlags,System.Reflection.PropertyInfo[],System.Type,System.Type[],System.Reflection.ParameterModifier[])">Binder.SelectProperty</a>, and  <a href="#ChangeType(System.Object,System.Type,System.Globalization.CultureInfo)">Binder.ChangeType</a>.</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+using System;
+using System.Reflection;
+using System.Globalization;
+
+
+
+public class MyBinder : Binder 
+{
+
+   public MyBinder() : base()
+   {
+
+   }
+
+   private class BinderState
+   {
+      public object[] args;
+   }
+
+
+
+   public override FieldInfo BindToField(
+      BindingFlags bindingAttr,
+      FieldInfo[] match,
+      object value,
+      CultureInfo culture
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+      
+      // Get a field for which 'value' can be converted to that field type.
+      for(int i = 0; i &lt; match.Length; i++)
+         if(ChangeType(value, match[i].FieldType, culture) != null)
+            return match[i];
+
+      return null;
+   }
+
+
+
+
+   public override MethodBase BindToMethod(
+      BindingFlags bindingAttr,
+      MethodBase[] match,
+      ref object[] args,
+      ParameterModifier[] modifiers,
+      CultureInfo culture,
+      string[] names,
+      out object state
+      )
+   {
+      // Store the arguments to the method in a state object.
+      BinderState myBinderState = new BinderState();
+      object[] arguments = new Object[args.Length];
+      args.CopyTo(arguments, 0);
+      myBinderState.args = arguments;
+      state = myBinderState;
+
+      if(match == null)
+         throw new ArgumentNullException();
+
+      // Find a method that has the same parameters as those of 'args'.
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of parameters that match.
+         int count = 0;
+         ParameterInfo[] parameters = match[i].GetParameters();
+
+         // Go on to the next method if the number of parameters don't match.
+         if(args.Length != parameters.Length)
+            continue;
+
+         // Match each of the parameters that the user expects the method to have.
+         for(int j = 0; j &lt; args.Length; j++)
+         {
+            // If 'names' is not null then reorder 'args'.
+            if(names != null)
+            {
+               if(names.Length != args.Length)
+                  throw new ArgumentException("names and args must have the same number of elements");
+
+               for(int k = 0; k &lt; names.Length; k++)
+                  if(String.Compare(parameters[j].Name, names[k].ToString()) == 0)
+                     args[j] = myBinderState.args[k];
+            }
+
+            // Check if the types specified by the user can be converted to parameter type.
+            if(ChangeType(args[j], parameters[j].ParameterType, culture) != null)
+               count += 1;
+            else
+               break;
+         }
+
+         // Check if the method has been found.
+         if(count == args.Length)
+            return match[i];
+      }
+      return null;
+   }
+
+
+   public override object ChangeType(
+      object value,
+      Type myChangeType,
+      CultureInfo culture
+      )
+   {
+      // Check if the 'value' can be converted to a value of type 'myType'.
+      if(CanConvertFrom(value.GetType(), myChangeType))
+         // Return the converted object.
+         return Convert.ChangeType(value, myChangeType);
+      else
+         // Return null.
+         return null;
+   }
+
+
+   public override void ReorderArgumentArray(
+      ref object[] args,
+      object state
+      )
+   {
+      // Return the args that had been reordered by 'BindToMethod'.
+      ((BinderState)state).args.CopyTo(args, 0);
+   }
+
+
+   public override MethodBase SelectMethod(
+      BindingFlags bindingAttr,
+      MethodBase[] match,
+      Type[] types,
+      ParameterModifier[] modifiers
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of parameters that match.
+         int count = 0; 
+         ParameterInfo[] parameters = match[i].GetParameters();
+
+         // Go on to the next method if the number of parameters don't match.
+         if(types.Length != parameters.Length)
+            continue;
+
+         // Match each of the parameters that the user expects the method to have.
+         for(int j = 0; j &lt; types.Length; j++)
+            // Check if the types specified by the user can be converted to parameter type.
+            if(CanConvertFrom(types[j], parameters[j].ParameterType))
+               count += 1;
+            else
+               break;
+
+         // Check if the method has been found.
+         if(count == types.Length)
+            return match[i];
+      }
+      return null;
+   }
+
+
+   public override PropertyInfo SelectProperty(
+      BindingFlags bindingAttr,
+      PropertyInfo[] match,
+      Type returnType,
+      Type[] indexes,
+      ParameterModifier[] modifiers
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of indexes that match.
+         int count = 0;
+         ParameterInfo[] parameters = match[i].GetIndexParameters();
+
+         // Go on to the next property if the number of indexes don't match.
+         if(indexes.Length != parameters.Length)
+            continue;
+
+         // Match each of the indexes that the user expects the property to have.
+         for(int j = 0; j &lt; indexes.Length; j++)
+            // Check if the types specified by the user can be converted to index type.
+            if(CanConvertFrom(indexes[j], parameters[j].ParameterType))
+               count += 1;
+            else
+               break;
+
+         // Check if the property has been found.
+         if(count == indexes.Length)
+            // Check if the return type can be converted to the properties type.
+            if(CanConvertFrom(returnType, match[i].GetType()))
+               return match[i];
+            else
+               continue;
+      }
+      return null;
+   }
+
+
+   // Checks if 'type1' can be converted to 'type2'. (Checks only for primitive types).
+   private bool CanConvertFrom(Type type1, Type type2)
+   {
+      if(type1.IsPrimitive &amp;&amp; type2.IsPrimitive)
+      {
+         TypeCode typeCode1 = Type.GetTypeCode(type1);
+         TypeCode typeCode2 = Type.GetTypeCode(type2);
+         // If both 'type1' and 'type2' have same type return true.
+         if(typeCode1 == typeCode2)
+            return true;
+         // Possible conversions from 'Char' follow.
+         if(typeCode1 == TypeCode.Char)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt16 : return true;
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Byte' follow.
+         if(typeCode1 == TypeCode.Byte)
+            switch(typeCode2)
+            {
+               case TypeCode.Char   : return true;
+               case TypeCode.UInt16 : return true;
+               case TypeCode.Int16  : return true;
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'SByte' follow.
+         if(typeCode1 == TypeCode.SByte)
+            switch(typeCode2)
+            {
+               case TypeCode.Int16  : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt16' follow.
+         if(typeCode1 == TypeCode.UInt16)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int16' follow.
+         if(typeCode1 == TypeCode.Int16)
+            switch(typeCode2)
+            {
+               case TypeCode.Int32  : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt32' follow.
+         if(typeCode1 == TypeCode.UInt32)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int32' follow.
+         if(typeCode1 == TypeCode.Int32)
+            switch(typeCode2)
+            {
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt64' follow.
+         if(typeCode1 == TypeCode.UInt64)
+            switch(typeCode2)
+            {
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int64' follow.
+         if(typeCode1 == TypeCode.Int64)
+            switch(typeCode2)
+            {
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Single' follow.
+         if(typeCode1 == TypeCode.Single)
+            switch(typeCode2)
+            {
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+      }
+      return false;
+   }
+}
+
+
+
+public class MyClass1
+{
+   public short myFieldB;
+   public int myFieldA; 
+   public void MyMethod(long i, char k)
+   {
+      Console.WriteLine("\nThis is MyMethod(long i, char k)");
+   }
+   public void MyMethod(long i, long j)
+   {
+      Console.WriteLine("\nThis is MyMethod(long i, long j)");
+   }
+}
+
+public class Binder_Example
+{
+   public static void Main()
+   {
+      // Get the type of 'MyClass1'.
+      Type myType = typeof(MyClass1);
+      // Get the instance of 'MyClass1'.
+      MyClass1 myInstance = new MyClass1();
+      Console.WriteLine("\nDisplaying results of using 'MyBinder' binder\n");
+      // Get the method information for the method 'MyMethod'.
+      MethodInfo myMethod = myType.GetMethod("MyMethod", BindingFlags.Public | BindingFlags.Instance,
+         new MyBinder(), new Type[] {typeof(short), typeof(short)}, null);
+      Console.WriteLine(myMethod);
+      // Invoke the method named 'MyMethod'.
+      myType.InvokeMember("MyMethod", BindingFlags.InvokeMethod, new MyBinder(),
+         myInstance, new Object[] {(int)32, (int)32});
+   }
+}
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Reflection/System.Reflection.html">System.Reflection Namespace</a></dd>
+</dl>
+<h3>System.Reflection.Binder Member List: </h3>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#BindToField(System.Reflection.BindingFlags,System.Reflection.FieldInfo[],System.Object,System.Globalization.CultureInfo)">BindToField</a></td>
+<td width="55%"> Selects a field from the given set of fields, based on the specified criteria.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#BindToMethod(System.Reflection.BindingFlags,System.Reflection.MethodBase[],System.Object[],System.Reflection.ParameterModifier[],System.Globalization.CultureInfo,System.String[],System.Object)">BindToMethod</a></td>
+<td width="55%"> Selects a method to invoke from the given set of methods, based on the actual arguments.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CanChangeType(System.Object,System.Type,System.Globalization.CultureInfo)">CanChangeType</a></td>
+<td width="55%"></td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ChangeType(System.Object,System.Type,System.Globalization.CultureInfo)">ChangeType</a></td>
+<td width="55%"> Changes the type of the given <b>Object</b> to the given <b>Type</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ReorderArgumentArray(System.Object[],System.Object)">ReorderArgumentArray</a></td>
+<td width="55%"> Upon returning from  <a href="#BindToMethod(System.Reflection.BindingFlags,System.Reflection.MethodBase[],System.Object[]@,System.Reflection.ParameterModifier[],System.Globalization.CultureInfo,System.String[],System.Object@)">Binder.BindToMethod</a>, restores the <i>args</i> argument to what it was when it came from <b>BindToMethod</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SelectMethod(System.Reflection.BindingFlags,System.Reflection.MethodBase[],System.Type[],System.Reflection.ParameterModifier[])">SelectMethod</a></td>
+<td width="55%"> Selects a method from the given set of methods, based on the argument type.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SelectProperty(System.Reflection.BindingFlags,System.Reflection.PropertyInfo[],System.Type,System.Type[],System.Reflection.ParameterModifier[])">SelectProperty</a></td>
+<td width="55%"> Selects a property from the given set of properties, based on the specified criteria.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%">Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Reflection.Binder</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Reflection.Binder Member Details</h3><b><i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><br><dl>
+<dt><b>Summary:
+										</b></dt>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected Binder();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="BindToFieldTopic1"></a><a name="BindToField(System.Reflection.BindingFlags,System.Reflection.FieldInfo[],System.Object,System.Globalization.CultureInfo)">BindToField</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Reflection/types/BindingFlags.html">BindingFlags</a> <i>bindingAttr</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/FieldInfo.html">FieldInfo[]</a> <i>match</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i>,</font><br>   <font color="#008080"><a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> <i>culture</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Selects a field from the given set of fields, based on the specified criteria.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public abstract <a href="../../System.Reflection/types/FieldInfo.html">FieldInfo</a> BindToField(<br>   <font color="#008080"><a href="../../System.Reflection/types/BindingFlags.html">BindingFlags</a> <i>bindingAttr</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/FieldInfo.html">FieldInfo[]</a> <i>match</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i>,</font><br>   <font color="#008080"><a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> <i>culture</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>bindingAttr</i><br><dl>
+<dd>
+<param> One of the  <a href="../../System.Reflection/types/BindingFlags.html">BindingFlags</a> enumerators.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>match</i><br><dl>
+<dd>
+<param> The set of fields Reflection has determined to be a possible match, typically because they have the correct member name.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The field value used to locate a matching field.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>culture</i><br><dl>
+<dd>
+<param> An instance of  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> used to control the coercion of data types. If <i>culture</i> is <b>null</b>, the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> for the current thread is used.<br><br><b>Note </b> For example, this parameter is necessary to convert a <b>String</b> that represents 1000 to a <b>Double</b> value, since 1000 is represented differently by different cultures. An instance of  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> used to control the coercion of data types. If <i>culture</i> is <b>null</b>, the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> for the current thread is used.</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System.Reflection/types/FieldInfo.html">FieldInfo</a> object containing the matching field.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method controls the binding provided by Type.InvokeMember().</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+using System;
+using System.Reflection;
+using System.Globalization;
+
+
+
+public class MyBinder : Binder 
+{
+
+   public MyBinder() : base()
+   {
+
+   }
+
+   private class BinderState
+   {
+      public object[] args;
+   }
+
+
+
+   public override FieldInfo BindToField(
+      BindingFlags bindingAttr,
+      FieldInfo[] match,
+      object value,
+      CultureInfo culture
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+      
+      // Get a field for which 'value' can be converted to that field type.
+      for(int i = 0; i &lt; match.Length; i++)
+         if(ChangeType(value, match[i].FieldType, culture) != null)
+            return match[i];
+
+      return null;
+   }
+
+
+
+
+   public override MethodBase BindToMethod(
+      BindingFlags bindingAttr,
+      MethodBase[] match,
+      ref object[] args,
+      ParameterModifier[] modifiers,
+      CultureInfo culture,
+      string[] names,
+      out object state
+      )
+   {
+      // Store the arguments to the method in a state object.
+      BinderState myBinderState = new BinderState();
+      object[] arguments = new Object[args.Length];
+      args.CopyTo(arguments, 0);
+      myBinderState.args = arguments;
+      state = myBinderState;
+
+      if(match == null)
+         throw new ArgumentNullException();
+
+      // Find a method that has the same parameters as those of 'args'.
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of parameters that match.
+         int count = 0;
+         ParameterInfo[] parameters = match[i].GetParameters();
+
+         // Go on to the next method if the number of parameters don't match.
+         if(args.Length != parameters.Length)
+            continue;
+
+         // Match each of the parameters that the user expects the method to have.
+         for(int j = 0; j &lt; args.Length; j++)
+         {
+            // If 'names' is not null then reorder 'args'.
+            if(names != null)
+            {
+               if(names.Length != args.Length)
+                  throw new ArgumentException("names and args must have the same number of elements");
+
+               for(int k = 0; k &lt; names.Length; k++)
+                  if(String.Compare(parameters[j].Name, names[k].ToString()) == 0)
+                     args[j] = myBinderState.args[k];
+            }
+
+            // Check if the types specified by the user can be converted to parameter type.
+            if(ChangeType(args[j], parameters[j].ParameterType, culture) != null)
+               count += 1;
+            else
+               break;
+         }
+
+         // Check if the method has been found.
+         if(count == args.Length)
+            return match[i];
+      }
+      return null;
+   }
+
+
+   public override object ChangeType(
+      object value,
+      Type myChangeType,
+      CultureInfo culture
+      )
+   {
+      // Check if the 'value' can be converted to a value of type 'myType'.
+      if(CanConvertFrom(value.GetType(), myChangeType))
+         // Return the converted object.
+         return Convert.ChangeType(value, myChangeType);
+      else
+         // Return null.
+         return null;
+   }
+
+
+   public override void ReorderArgumentArray(
+      ref object[] args,
+      object state
+      )
+   {
+      // Return the args that had been reordered by 'BindToMethod'.
+      ((BinderState)state).args.CopyTo(args, 0);
+   }
+
+
+   public override MethodBase SelectMethod(
+      BindingFlags bindingAttr,
+      MethodBase[] match,
+      Type[] types,
+      ParameterModifier[] modifiers
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of parameters that match.
+         int count = 0; 
+         ParameterInfo[] parameters = match[i].GetParameters();
+
+         // Go on to the next method if the number of parameters don't match.
+         if(types.Length != parameters.Length)
+            continue;
+
+         // Match each of the parameters that the user expects the method to have.
+         for(int j = 0; j &lt; types.Length; j++)
+            // Check if the types specified by the user can be converted to parameter type.
+            if(CanConvertFrom(types[j], parameters[j].ParameterType))
+               count += 1;
+            else
+               break;
+
+         // Check if the method has been found.
+         if(count == types.Length)
+            return match[i];
+      }
+      return null;
+   }
+
+
+   public override PropertyInfo SelectProperty(
+      BindingFlags bindingAttr,
+      PropertyInfo[] match,
+      Type returnType,
+      Type[] indexes,
+      ParameterModifier[] modifiers
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of indexes that match.
+         int count = 0;
+         ParameterInfo[] parameters = match[i].GetIndexParameters();
+
+         // Go on to the next property if the number of indexes don't match.
+         if(indexes.Length != parameters.Length)
+            continue;
+
+         // Match each of the indexes that the user expects the property to have.
+         for(int j = 0; j &lt; indexes.Length; j++)
+            // Check if the types specified by the user can be converted to index type.
+            if(CanConvertFrom(indexes[j], parameters[j].ParameterType))
+               count += 1;
+            else
+               break;
+
+         // Check if the property has been found.
+         if(count == indexes.Length)
+            // Check if the return type can be converted to the properties type.
+            if(CanConvertFrom(returnType, match[i].GetType()))
+               return match[i];
+            else
+               continue;
+      }
+      return null;
+   }
+
+
+   // Checks if 'type1' can be converted to 'type2'. (Checks only for primitive types).
+   private bool CanConvertFrom(Type type1, Type type2)
+   {
+      if(type1.IsPrimitive &amp;&amp; type2.IsPrimitive)
+      {
+         TypeCode typeCode1 = Type.GetTypeCode(type1);
+         TypeCode typeCode2 = Type.GetTypeCode(type2);
+         // If both 'type1' and 'type2' have same type return true.
+         if(typeCode1 == typeCode2)
+            return true;
+         // Possible conversions from 'Char' follow.
+         if(typeCode1 == TypeCode.Char)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt16 : return true;
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Byte' follow.
+         if(typeCode1 == TypeCode.Byte)
+            switch(typeCode2)
+            {
+               case TypeCode.Char   : return true;
+               case TypeCode.UInt16 : return true;
+               case TypeCode.Int16  : return true;
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'SByte' follow.
+         if(typeCode1 == TypeCode.SByte)
+            switch(typeCode2)
+            {
+               case TypeCode.Int16  : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt16' follow.
+         if(typeCode1 == TypeCode.UInt16)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int16' follow.
+         if(typeCode1 == TypeCode.Int16)
+            switch(typeCode2)
+            {
+               case TypeCode.Int32  : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt32' follow.
+         if(typeCode1 == TypeCode.UInt32)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int32' follow.
+         if(typeCode1 == TypeCode.Int32)
+            switch(typeCode2)
+            {
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt64' follow.
+         if(typeCode1 == TypeCode.UInt64)
+            switch(typeCode2)
+            {
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int64' follow.
+         if(typeCode1 == TypeCode.Int64)
+            switch(typeCode2)
+            {
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Single' follow.
+         if(typeCode1 == TypeCode.Single)
+            switch(typeCode2)
+            {
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+      }
+      return false;
+   }
+}
+
+
+
+public class MyClass1
+{
+   public short myFieldB;
+   public int myFieldA; 
+   public void MyMethod(long i, char k)
+   {
+      Console.WriteLine("\nThis is MyMethod(long i, char k)");
+   }
+   public void MyMethod(long i, long j)
+   {
+      Console.WriteLine("\nThis is MyMethod(long i, long j)");
+   }
+}
+
+public class Binder_Example
+{
+   public static void Main()
+   {
+      // Get the type of 'MyClass1'.
+      Type myType = typeof(MyClass1);
+      // Get the instance of 'MyClass1'.
+      MyClass1 myInstance = new MyClass1();
+      Console.WriteLine("\nDisplaying results of using 'MyBinder' binder\n");
+      // Get the method information for the method 'MyMethod'.
+      MethodInfo myMethod = myType.GetMethod("MyMethod", BindingFlags.Public | BindingFlags.Instance,
+         new MyBinder(), new Type[] {typeof(short), typeof(short)}, null);
+      Console.WriteLine(myMethod);
+      // Invoke the method named 'MyMethod'.
+      myType.InvokeMember("MyMethod", BindingFlags.InvokeMethod, new MyBinder(),
+         myInstance, new Object[] {(int)32, (int)32});
+   }
+}
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Reflection/types/FieldInfo.html">FieldInfo</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="BindToMethodTopic1"></a><a name="BindToMethod(System.Reflection.BindingFlags,System.Reflection.MethodBase[],System.Object[],System.Reflection.ParameterModifier[],System.Globalization.CultureInfo,System.String[],System.Object)">BindToMethod</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Reflection/types/BindingFlags.html">BindingFlags</a> <i>bindingAttr</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/MethodBase.html">MethodBase[]</a> <i>match</i>,</font><br>   <font color="#008080"><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">ref</a> <i>object[] args</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/ParameterModifier.html">ParameterModifier[]</a> <i>modifiers</i>,</font><br>   <font color="#008080"><a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> <i>culture</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string[]</a> <i>names</i>,</font><br>   <font color="#008080"><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">out</a> <i>object state</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Selects a method to invoke from the given set of methods, based on the actual arguments.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public abstract <a href="../../System.Reflection/types/MethodBase.html">MethodBase</a> BindToMethod(<br>   <font color="#008080"><a href="../../System.Reflection/types/BindingFlags.html">BindingFlags</a> <i>bindingAttr</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/MethodBase.html">MethodBase[]</a> <i>match</i>,</font><br>   <font color="#008080"><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">ref</a> <i>object[] args</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/ParameterModifier.html">ParameterModifier[]</a> <i>modifiers</i>,</font><br>   <font color="#008080"><a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> <i>culture</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string[]</a> <i>names</i>,</font><br>   <font color="#008080"><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">out</a> <i>object state</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>bindingAttr</i><br><dl>
+<dd>
+<param> One of the  <a href="../../System.Reflection/types/BindingFlags.html">BindingFlags</a> enumerators.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>match</i><br><dl>
+<dd>
+<param> The set of methods Reflection has determined to be a possible match, typically because they have the correct member name.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>args</i><br><dl>
+<dd>
+<param> The actual arguments passed in. Both the types and values of the arguments can be changed.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>modifiers</i><br><dl>
+<dd>
+<param> An array of parameter modifiers that enable binding to work with parameter signatures in which the types have been modified.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>culture</i><br><dl>
+<dd>
+<param> An instance of  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> used to control the coercion of data types. If <i>culture</i> is <b>null</b>, the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> for the current thread is used.<br><br><b>Note </b> For example, this parameter is necessary to convert a <b>String</b> that represents 1000 to a <b>Double</b> value, since 1000 is represented differently by different cultures.<p> Not Yet Implemented.</p> An instance of  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> used to control the coercion of data types. If <i>culture</i> is <b>null</b>, the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> for the current thread is used.<p> Not Yet Implemented.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>names</i><br><dl>
+<dd>
+<param> The method name or names.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>state</i><br><dl>
+<dd>
+<param> A binder-provided object that keeps track of argument reordering. The <i>state</i> parameter is a cookie that was passed to <b>BindToMethod</b> and represents an opaque object. The binder creates this object, and the binder is the sole consumer of this object. If <i>state</i> is not <b>null</b> when <b>BindToMethod</b> returns, the runtime calls  <a href="#ReorderArgumentArray(System.Object[]@,System.Object)">Binder.ReorderArgumentArray</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System.Reflection/types/MethodBase.html">MethodBase</a> object containing the matching method.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The binder allows a client to map the array of arguments back to its original form if the argument array has been manipulated by <b>BindToMethod</b>. Use this remap capability to get back by-reference arguments when such arguments are present. However, to get back by-reference arguments, you must be able to ensure that the argument order you used has not changed. When you pass arguments by name, the binder reorders the argument array, and that is what the calling methods see. The state parameter keeps track of argument reordering, thus enabling the binder to reorder the argument array to its original form.</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+using System;
+using System.Reflection;
+using System.Globalization;
+
+
+
+public class MyBinder : Binder 
+{
+
+   public MyBinder() : base()
+   {
+
+   }
+
+   private class BinderState
+   {
+      public object[] args;
+   }
+
+
+
+   public override FieldInfo BindToField(
+      BindingFlags bindingAttr,
+      FieldInfo[] match,
+      object value,
+      CultureInfo culture
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+      
+      // Get a field for which 'value' can be converted to that field type.
+      for(int i = 0; i &lt; match.Length; i++)
+         if(ChangeType(value, match[i].FieldType, culture) != null)
+            return match[i];
+
+      return null;
+   }
+
+
+
+
+   public override MethodBase BindToMethod(
+      BindingFlags bindingAttr,
+      MethodBase[] match,
+      ref object[] args,
+      ParameterModifier[] modifiers,
+      CultureInfo culture,
+      string[] names,
+      out object state
+      )
+   {
+      // Store the arguments to the method in a state object.
+      BinderState myBinderState = new BinderState();
+      object[] arguments = new Object[args.Length];
+      args.CopyTo(arguments, 0);
+      myBinderState.args = arguments;
+      state = myBinderState;
+
+      if(match == null)
+         throw new ArgumentNullException();
+
+      // Find a method that has the same parameters as those of 'args'.
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of parameters that match.
+         int count = 0;
+         ParameterInfo[] parameters = match[i].GetParameters();
+
+         // Go on to the next method if the number of parameters don't match.
+         if(args.Length != parameters.Length)
+            continue;
+
+         // Match each of the parameters that the user expects the method to have.
+         for(int j = 0; j &lt; args.Length; j++)
+         {
+            // If 'names' is not null then reorder 'args'.
+            if(names != null)
+            {
+               if(names.Length != args.Length)
+                  throw new ArgumentException("names and args must have the same number of elements");
+
+               for(int k = 0; k &lt; names.Length; k++)
+                  if(String.Compare(parameters[j].Name, names[k].ToString()) == 0)
+                     args[j] = myBinderState.args[k];
+            }
+
+            // Check if the types specified by the user can be converted to parameter type.
+            if(ChangeType(args[j], parameters[j].ParameterType, culture) != null)
+               count += 1;
+            else
+               break;
+         }
+
+         // Check if the method has been found.
+         if(count == args.Length)
+            return match[i];
+      }
+      return null;
+   }
+
+
+   public override object ChangeType(
+      object value,
+      Type myChangeType,
+      CultureInfo culture
+      )
+   {
+      // Check if the 'value' can be converted to a value of type 'myType'.
+      if(CanConvertFrom(value.GetType(), myChangeType))
+         // Return the converted object.
+         return Convert.ChangeType(value, myChangeType);
+      else
+         // Return null.
+         return null;
+   }
+
+
+   public override void ReorderArgumentArray(
+      ref object[] args,
+      object state
+      )
+   {
+      // Return the args that had been reordered by 'BindToMethod'.
+      ((BinderState)state).args.CopyTo(args, 0);
+   }
+
+
+   public override MethodBase SelectMethod(
+      BindingFlags bindingAttr,
+      MethodBase[] match,
+      Type[] types,
+      ParameterModifier[] modifiers
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of parameters that match.
+         int count = 0; 
+         ParameterInfo[] parameters = match[i].GetParameters();
+
+         // Go on to the next method if the number of parameters don't match.
+         if(types.Length != parameters.Length)
+            continue;
+
+         // Match each of the parameters that the user expects the method to have.
+         for(int j = 0; j &lt; types.Length; j++)
+            // Check if the types specified by the user can be converted to parameter type.
+            if(CanConvertFrom(types[j], parameters[j].ParameterType))
+               count += 1;
+            else
+               break;
+
+         // Check if the method has been found.
+         if(count == types.Length)
+            return match[i];
+      }
+      return null;
+   }
+
+
+   public override PropertyInfo SelectProperty(
+      BindingFlags bindingAttr,
+      PropertyInfo[] match,
+      Type returnType,
+      Type[] indexes,
+      ParameterModifier[] modifiers
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of indexes that match.
+         int count = 0;
+         ParameterInfo[] parameters = match[i].GetIndexParameters();
+
+         // Go on to the next property if the number of indexes don't match.
+         if(indexes.Length != parameters.Length)
+            continue;
+
+         // Match each of the indexes that the user expects the property to have.
+         for(int j = 0; j &lt; indexes.Length; j++)
+            // Check if the types specified by the user can be converted to index type.
+            if(CanConvertFrom(indexes[j], parameters[j].ParameterType))
+               count += 1;
+            else
+               break;
+
+         // Check if the property has been found.
+         if(count == indexes.Length)
+            // Check if the return type can be converted to the properties type.
+            if(CanConvertFrom(returnType, match[i].GetType()))
+               return match[i];
+            else
+               continue;
+      }
+      return null;
+   }
+
+
+   // Checks if 'type1' can be converted to 'type2'. (Checks only for primitive types).
+   private bool CanConvertFrom(Type type1, Type type2)
+   {
+      if(type1.IsPrimitive &amp;&amp; type2.IsPrimitive)
+      {
+         TypeCode typeCode1 = Type.GetTypeCode(type1);
+         TypeCode typeCode2 = Type.GetTypeCode(type2);
+         // If both 'type1' and 'type2' have same type return true.
+         if(typeCode1 == typeCode2)
+            return true;
+         // Possible conversions from 'Char' follow.
+         if(typeCode1 == TypeCode.Char)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt16 : return true;
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Byte' follow.
+         if(typeCode1 == TypeCode.Byte)
+            switch(typeCode2)
+            {
+               case TypeCode.Char   : return true;
+               case TypeCode.UInt16 : return true;
+               case TypeCode.Int16  : return true;
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'SByte' follow.
+         if(typeCode1 == TypeCode.SByte)
+            switch(typeCode2)
+            {
+               case TypeCode.Int16  : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt16' follow.
+         if(typeCode1 == TypeCode.UInt16)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int16' follow.
+         if(typeCode1 == TypeCode.Int16)
+            switch(typeCode2)
+            {
+               case TypeCode.Int32  : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt32' follow.
+         if(typeCode1 == TypeCode.UInt32)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int32' follow.
+         if(typeCode1 == TypeCode.Int32)
+            switch(typeCode2)
+            {
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt64' follow.
+         if(typeCode1 == TypeCode.UInt64)
+            switch(typeCode2)
+            {
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int64' follow.
+         if(typeCode1 == TypeCode.Int64)
+            switch(typeCode2)
+            {
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Single' follow.
+         if(typeCode1 == TypeCode.Single)
+            switch(typeCode2)
+            {
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+      }
+      return false;
+   }
+}
+
+
+
+public class MyClass1
+{
+   public short myFieldB;
+   public int myFieldA; 
+   public void MyMethod(long i, char k)
+   {
+      Console.WriteLine("\nThis is MyMethod(long i, char k)");
+   }
+   public void MyMethod(long i, long j)
+   {
+      Console.WriteLine("\nThis is MyMethod(long i, long j)");
+   }
+}
+
+public class Binder_Example
+{
+   public static void Main()
+   {
+      // Get the type of 'MyClass1'.
+      Type myType = typeof(MyClass1);
+      // Get the instance of 'MyClass1'.
+      MyClass1 myInstance = new MyClass1();
+      Console.WriteLine("\nDisplaying results of using 'MyBinder' binder\n");
+      // Get the method information for the method 'MyMethod'.
+      MethodInfo myMethod = myType.GetMethod("MyMethod", BindingFlags.Public | BindingFlags.Instance,
+         new MyBinder(), new Type[] {typeof(short), typeof(short)}, null);
+      Console.WriteLine(myMethod);
+      // Invoke the method named 'MyMethod'.
+      myType.InvokeMember("MyMethod", BindingFlags.InvokeMethod, new MyBinder(),
+         myInstance, new Object[] {(int)32, (int)32});
+   }
+}
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Reflection/types/MethodBase.html">MethodBase</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CanChangeTypeTopic1"></a><a name="CanChangeType(System.Object,System.Type,System.Globalization.CultureInfo)">CanChangeType</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> <i>culture</i></font><br>)</i></b><dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual bool CanChangeType(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> <i>culture</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param>
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param>
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>culture</i><br><dl>
+<dd>
+<param>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ChangeTypeTopic1"></a><a name="ChangeType(System.Object,System.Type,System.Globalization.CultureInfo)">ChangeType</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> <i>culture</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Changes the type of the given <b>Object</b> to the given <b>Type</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public abstract <a href="../../System/types/Object.html">object</a> ChangeType(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> <i>culture</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The value to change into a new <b>Type</b>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param> The new <b>Type</b> that <i>value</i> will become.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>culture</i><br><dl>
+<dd>
+<param> An instance of  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> used to control the coercion of data types. If <i>culture</i> is <b>null</b>, the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> for the current thread is used.<br><br><b>Note </b> For example, this parameter is necessary to convert a <b>String</b> that represents 1000 to a <b>Double</b> value, since 1000 is represented differently by different cultures. An instance of  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> used to control the coercion of data types. If <i>culture</i> is <b>null</b>, the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> for the current thread is used.</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An <b>Object</b> containing the given value as the new type.</dd>
+</dl><b>Remarks</b><dl>
+<dd> Reflection models the accessibility rules of the common type system. For example, if the caller is in the same assembly, the caller does not need special permissions for internal members. Otherwise, the caller needs  <a href="../../System.Security.Permissions/types/ReflectionPermission.html">ReflectionPermission</a>. This is consistent with lookup of members that are protected, private, and so on.<p> The general principle is that <b>ChangeType</b> should perform only widening coercions, which never lose data. An example of a widening coercion is coercing a value that is a 32-bit signed integer to a value that is a 64-bit signed integer. This is distinguished from a narrowing coercion, which may lose data. An example of a narrowing coercion is coercing a 64-bit signed integer to a 32-bit signed integer.</p>
+<p> The following table lists the coercions performed by the default <b>ChangeType</b>.</p><br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  Source Type
+                </TH>
+<TH>
+                  Target Type
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+                  Any type
+                </TD>
+<TD>
+                  Its base type.
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Any type
+                </TD>
+<TD>
+                  The interface it implements.
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Char
+                </TD>
+<TD>
+                  UInt16, UInt32, Int32, UInt64, Int64, Single,
+                  Double
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Byte
+                </TD>
+<TD>
+                  Char, UInt16, Int16, UInt32, Int32, UInt64,
+                  Int64, Single, Double
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  SByte
+                </TD>
+<TD>
+                  Int16, Int32, Int64, Single,
+                  Double
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  UInt16
+                </TD>
+<TD>
+                  UInt32, Int32, UInt64, Int64, Single,
+                  Double
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Int16
+                </TD>
+<TD>
+                  Int32, Int64, Single, Double
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  UInt32
+                </TD>
+<TD>
+                  UInt64, Int64, Single, Double
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Int32
+                </TD>
+<TD>
+                  Int64, Single, Double
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  UInt64
+                </TD>
+<TD>
+                  Single, Double
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Int64
+                </TD>
+<TD>
+                  Single, Double
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Single
+                </TD>
+<TD>
+                  Double
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Non-reference
+                </TD>
+<TD>
+                  By-reference.
+                </TD>
+</TR>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+using System;
+using System.Reflection;
+using System.Globalization;
+
+
+
+public class MyBinder : Binder 
+{
+
+   public MyBinder() : base()
+   {
+
+   }
+
+   private class BinderState
+   {
+      public object[] args;
+   }
+
+
+
+   public override FieldInfo BindToField(
+      BindingFlags bindingAttr,
+      FieldInfo[] match,
+      object value,
+      CultureInfo culture
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+      
+      // Get a field for which 'value' can be converted to that field type.
+      for(int i = 0; i &lt; match.Length; i++)
+         if(ChangeType(value, match[i].FieldType, culture) != null)
+            return match[i];
+
+      return null;
+   }
+
+
+
+
+   public override MethodBase BindToMethod(
+      BindingFlags bindingAttr,
+      MethodBase[] match,
+      ref object[] args,
+      ParameterModifier[] modifiers,
+      CultureInfo culture,
+      string[] names,
+      out object state
+      )
+   {
+      // Store the arguments to the method in a state object.
+      BinderState myBinderState = new BinderState();
+      object[] arguments = new Object[args.Length];
+      args.CopyTo(arguments, 0);
+      myBinderState.args = arguments;
+      state = myBinderState;
+
+      if(match == null)
+         throw new ArgumentNullException();
+
+      // Find a method that has the same parameters as those of 'args'.
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of parameters that match.
+         int count = 0;
+         ParameterInfo[] parameters = match[i].GetParameters();
+
+         // Go on to the next method if the number of parameters don't match.
+         if(args.Length != parameters.Length)
+            continue;
+
+         // Match each of the parameters that the user expects the method to have.
+         for(int j = 0; j &lt; args.Length; j++)
+         {
+            // If 'names' is not null then reorder 'args'.
+            if(names != null)
+            {
+               if(names.Length != args.Length)
+                  throw new ArgumentException("names and args must have the same number of elements");
+
+               for(int k = 0; k &lt; names.Length; k++)
+                  if(String.Compare(parameters[j].Name, names[k].ToString()) == 0)
+                     args[j] = myBinderState.args[k];
+            }
+
+            // Check if the types specified by the user can be converted to parameter type.
+            if(ChangeType(args[j], parameters[j].ParameterType, culture) != null)
+               count += 1;
+            else
+               break;
+         }
+
+         // Check if the method has been found.
+         if(count == args.Length)
+            return match[i];
+      }
+      return null;
+   }
+
+
+   public override object ChangeType(
+      object value,
+      Type myChangeType,
+      CultureInfo culture
+      )
+   {
+      // Check if the 'value' can be converted to a value of type 'myType'.
+      if(CanConvertFrom(value.GetType(), myChangeType))
+         // Return the converted object.
+         return Convert.ChangeType(value, myChangeType);
+      else
+         // Return null.
+         return null;
+   }
+
+
+   public override void ReorderArgumentArray(
+      ref object[] args,
+      object state
+      )
+   {
+      // Return the args that had been reordered by 'BindToMethod'.
+      ((BinderState)state).args.CopyTo(args, 0);
+   }
+
+
+   public override MethodBase SelectMethod(
+      BindingFlags bindingAttr,
+      MethodBase[] match,
+      Type[] types,
+      ParameterModifier[] modifiers
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of parameters that match.
+         int count = 0; 
+         ParameterInfo[] parameters = match[i].GetParameters();
+
+         // Go on to the next method if the number of parameters don't match.
+         if(types.Length != parameters.Length)
+            continue;
+
+         // Match each of the parameters that the user expects the method to have.
+         for(int j = 0; j &lt; types.Length; j++)
+            // Check if the types specified by the user can be converted to parameter type.
+            if(CanConvertFrom(types[j], parameters[j].ParameterType))
+               count += 1;
+            else
+               break;
+
+         // Check if the method has been found.
+         if(count == types.Length)
+            return match[i];
+      }
+      return null;
+   }
+
+
+   public override PropertyInfo SelectProperty(
+      BindingFlags bindingAttr,
+      PropertyInfo[] match,
+      Type returnType,
+      Type[] indexes,
+      ParameterModifier[] modifiers
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of indexes that match.
+         int count = 0;
+         ParameterInfo[] parameters = match[i].GetIndexParameters();
+
+         // Go on to the next property if the number of indexes don't match.
+         if(indexes.Length != parameters.Length)
+            continue;
+
+         // Match each of the indexes that the user expects the property to have.
+         for(int j = 0; j &lt; indexes.Length; j++)
+            // Check if the types specified by the user can be converted to index type.
+            if(CanConvertFrom(indexes[j], parameters[j].ParameterType))
+               count += 1;
+            else
+               break;
+
+         // Check if the property has been found.
+         if(count == indexes.Length)
+            // Check if the return type can be converted to the properties type.
+            if(CanConvertFrom(returnType, match[i].GetType()))
+               return match[i];
+            else
+               continue;
+      }
+      return null;
+   }
+
+
+   // Checks if 'type1' can be converted to 'type2'. (Checks only for primitive types).
+   private bool CanConvertFrom(Type type1, Type type2)
+   {
+      if(type1.IsPrimitive &amp;&amp; type2.IsPrimitive)
+      {
+         TypeCode typeCode1 = Type.GetTypeCode(type1);
+         TypeCode typeCode2 = Type.GetTypeCode(type2);
+         // If both 'type1' and 'type2' have same type return true.
+         if(typeCode1 == typeCode2)
+            return true;
+         // Possible conversions from 'Char' follow.
+         if(typeCode1 == TypeCode.Char)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt16 : return true;
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Byte' follow.
+         if(typeCode1 == TypeCode.Byte)
+            switch(typeCode2)
+            {
+               case TypeCode.Char   : return true;
+               case TypeCode.UInt16 : return true;
+               case TypeCode.Int16  : return true;
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'SByte' follow.
+         if(typeCode1 == TypeCode.SByte)
+            switch(typeCode2)
+            {
+               case TypeCode.Int16  : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt16' follow.
+         if(typeCode1 == TypeCode.UInt16)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int16' follow.
+         if(typeCode1 == TypeCode.Int16)
+            switch(typeCode2)
+            {
+               case TypeCode.Int32  : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt32' follow.
+         if(typeCode1 == TypeCode.UInt32)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int32' follow.
+         if(typeCode1 == TypeCode.Int32)
+            switch(typeCode2)
+            {
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt64' follow.
+         if(typeCode1 == TypeCode.UInt64)
+            switch(typeCode2)
+            {
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int64' follow.
+         if(typeCode1 == TypeCode.Int64)
+            switch(typeCode2)
+            {
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Single' follow.
+         if(typeCode1 == TypeCode.Single)
+            switch(typeCode2)
+            {
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+      }
+      return false;
+   }
+}
+
+
+
+public class MyClass1
+{
+   public short myFieldB;
+   public int myFieldA; 
+   public void MyMethod(long i, char k)
+   {
+      Console.WriteLine("\nThis is MyMethod(long i, char k)");
+   }
+   public void MyMethod(long i, long j)
+   {
+      Console.WriteLine("\nThis is MyMethod(long i, long j)");
+   }
+}
+
+public class Binder_Example
+{
+   public static void Main()
+   {
+      // Get the type of 'MyClass1'.
+      Type myType = typeof(MyClass1);
+      // Get the instance of 'MyClass1'.
+      MyClass1 myInstance = new MyClass1();
+      Console.WriteLine("\nDisplaying results of using 'MyBinder' binder\n");
+      // Get the method information for the method 'MyMethod'.
+      MethodInfo myMethod = myType.GetMethod("MyMethod", BindingFlags.Public | BindingFlags.Instance,
+         new MyBinder(), new Type[] {typeof(short), typeof(short)}, null);
+      Console.WriteLine(myMethod);
+      // Invoke the method named 'MyMethod'.
+      myType.InvokeMember("MyMethod", BindingFlags.InvokeMethod, new MyBinder(),
+         myInstance, new Object[] {(int)32, (int)32});
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~Binder();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ReorderArgumentArrayTopic1"></a><a name="ReorderArgumentArray(System.Object[],System.Object)">ReorderArgumentArray</a></i></b><b><i>(<br>   <font color="#008080"><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">ref</a> <i>object[] args</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>state</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Upon returning from  <a href="#BindToMethod(System.Reflection.BindingFlags,System.Reflection.MethodBase[],System.Object[]@,System.Reflection.ParameterModifier[],System.Globalization.CultureInfo,System.String[],System.Object@)">Binder.BindToMethod</a>, restores the <i>args</i> argument to what it was when it came from <b>BindToMethod</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public abstract void ReorderArgumentArray(<br>   <font color="#008080"><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">ref</a> <i>object[] args</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>state</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>args</i><br><dl>
+<dd>
+<param> The actual arguments passed in. Both the types and values of the arguments can be changed.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>state</i><br><dl>
+<dd>
+<param> A binder-provided object that keeps track of argument reordering.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The common language runtime calls this method if <i>state</i> is not <b>null</b> after a return from <b>BindToMethod</b>.</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+using System;
+using System.Reflection;
+using System.Globalization;
+
+
+
+public class MyBinder : Binder 
+{
+
+   public MyBinder() : base()
+   {
+
+   }
+
+   private class BinderState
+   {
+      public object[] args;
+   }
+
+
+
+   public override FieldInfo BindToField(
+      BindingFlags bindingAttr,
+      FieldInfo[] match,
+      object value,
+      CultureInfo culture
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+      
+      // Get a field for which 'value' can be converted to that field type.
+      for(int i = 0; i &lt; match.Length; i++)
+         if(ChangeType(value, match[i].FieldType, culture) != null)
+            return match[i];
+
+      return null;
+   }
+
+
+
+
+   public override MethodBase BindToMethod(
+      BindingFlags bindingAttr,
+      MethodBase[] match,
+      ref object[] args,
+      ParameterModifier[] modifiers,
+      CultureInfo culture,
+      string[] names,
+      out object state
+      )
+   {
+      // Store the arguments to the method in a state object.
+      BinderState myBinderState = new BinderState();
+      object[] arguments = new Object[args.Length];
+      args.CopyTo(arguments, 0);
+      myBinderState.args = arguments;
+      state = myBinderState;
+
+      if(match == null)
+         throw new ArgumentNullException();
+
+      // Find a method that has the same parameters as those of 'args'.
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of parameters that match.
+         int count = 0;
+         ParameterInfo[] parameters = match[i].GetParameters();
+
+         // Go on to the next method if the number of parameters don't match.
+         if(args.Length != parameters.Length)
+            continue;
+
+         // Match each of the parameters that the user expects the method to have.
+         for(int j = 0; j &lt; args.Length; j++)
+         {
+            // If 'names' is not null then reorder 'args'.
+            if(names != null)
+            {
+               if(names.Length != args.Length)
+                  throw new ArgumentException("names and args must have the same number of elements");
+
+               for(int k = 0; k &lt; names.Length; k++)
+                  if(String.Compare(parameters[j].Name, names[k].ToString()) == 0)
+                     args[j] = myBinderState.args[k];
+            }
+
+            // Check if the types specified by the user can be converted to parameter type.
+            if(ChangeType(args[j], parameters[j].ParameterType, culture) != null)
+               count += 1;
+            else
+               break;
+         }
+
+         // Check if the method has been found.
+         if(count == args.Length)
+            return match[i];
+      }
+      return null;
+   }
+
+
+   public override object ChangeType(
+      object value,
+      Type myChangeType,
+      CultureInfo culture
+      )
+   {
+      // Check if the 'value' can be converted to a value of type 'myType'.
+      if(CanConvertFrom(value.GetType(), myChangeType))
+         // Return the converted object.
+         return Convert.ChangeType(value, myChangeType);
+      else
+         // Return null.
+         return null;
+   }
+
+
+   public override void ReorderArgumentArray(
+      ref object[] args,
+      object state
+      )
+   {
+      // Return the args that had been reordered by 'BindToMethod'.
+      ((BinderState)state).args.CopyTo(args, 0);
+   }
+
+
+   public override MethodBase SelectMethod(
+      BindingFlags bindingAttr,
+      MethodBase[] match,
+      Type[] types,
+      ParameterModifier[] modifiers
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of parameters that match.
+         int count = 0; 
+         ParameterInfo[] parameters = match[i].GetParameters();
+
+         // Go on to the next method if the number of parameters don't match.
+         if(types.Length != parameters.Length)
+            continue;
+
+         // Match each of the parameters that the user expects the method to have.
+         for(int j = 0; j &lt; types.Length; j++)
+            // Check if the types specified by the user can be converted to parameter type.
+            if(CanConvertFrom(types[j], parameters[j].ParameterType))
+               count += 1;
+            else
+               break;
+
+         // Check if the method has been found.
+         if(count == types.Length)
+            return match[i];
+      }
+      return null;
+   }
+
+
+   public override PropertyInfo SelectProperty(
+      BindingFlags bindingAttr,
+      PropertyInfo[] match,
+      Type returnType,
+      Type[] indexes,
+      ParameterModifier[] modifiers
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of indexes that match.
+         int count = 0;
+         ParameterInfo[] parameters = match[i].GetIndexParameters();
+
+         // Go on to the next property if the number of indexes don't match.
+         if(indexes.Length != parameters.Length)
+            continue;
+
+         // Match each of the indexes that the user expects the property to have.
+         for(int j = 0; j &lt; indexes.Length; j++)
+            // Check if the types specified by the user can be converted to index type.
+            if(CanConvertFrom(indexes[j], parameters[j].ParameterType))
+               count += 1;
+            else
+               break;
+
+         // Check if the property has been found.
+         if(count == indexes.Length)
+            // Check if the return type can be converted to the properties type.
+            if(CanConvertFrom(returnType, match[i].GetType()))
+               return match[i];
+            else
+               continue;
+      }
+      return null;
+   }
+
+
+   // Checks if 'type1' can be converted to 'type2'. (Checks only for primitive types).
+   private bool CanConvertFrom(Type type1, Type type2)
+   {
+      if(type1.IsPrimitive &amp;&amp; type2.IsPrimitive)
+      {
+         TypeCode typeCode1 = Type.GetTypeCode(type1);
+         TypeCode typeCode2 = Type.GetTypeCode(type2);
+         // If both 'type1' and 'type2' have same type return true.
+         if(typeCode1 == typeCode2)
+            return true;
+         // Possible conversions from 'Char' follow.
+         if(typeCode1 == TypeCode.Char)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt16 : return true;
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Byte' follow.
+         if(typeCode1 == TypeCode.Byte)
+            switch(typeCode2)
+            {
+               case TypeCode.Char   : return true;
+               case TypeCode.UInt16 : return true;
+               case TypeCode.Int16  : return true;
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'SByte' follow.
+         if(typeCode1 == TypeCode.SByte)
+            switch(typeCode2)
+            {
+               case TypeCode.Int16  : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt16' follow.
+         if(typeCode1 == TypeCode.UInt16)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int16' follow.
+         if(typeCode1 == TypeCode.Int16)
+            switch(typeCode2)
+            {
+               case TypeCode.Int32  : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt32' follow.
+         if(typeCode1 == TypeCode.UInt32)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int32' follow.
+         if(typeCode1 == TypeCode.Int32)
+            switch(typeCode2)
+            {
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt64' follow.
+         if(typeCode1 == TypeCode.UInt64)
+            switch(typeCode2)
+            {
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int64' follow.
+         if(typeCode1 == TypeCode.Int64)
+            switch(typeCode2)
+            {
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Single' follow.
+         if(typeCode1 == TypeCode.Single)
+            switch(typeCode2)
+            {
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+      }
+      return false;
+   }
+}
+
+
+
+public class MyClass1
+{
+   public short myFieldB;
+   public int myFieldA; 
+   public void MyMethod(long i, char k)
+   {
+      Console.WriteLine("\nThis is MyMethod(long i, char k)");
+   }
+   public void MyMethod(long i, long j)
+   {
+      Console.WriteLine("\nThis is MyMethod(long i, long j)");
+   }
+}
+
+public class Binder_Example
+{
+   public static void Main()
+   {
+      // Get the type of 'MyClass1'.
+      Type myType = typeof(MyClass1);
+      // Get the instance of 'MyClass1'.
+      MyClass1 myInstance = new MyClass1();
+      Console.WriteLine("\nDisplaying results of using 'MyBinder' binder\n");
+      // Get the method information for the method 'MyMethod'.
+      MethodInfo myMethod = myType.GetMethod("MyMethod", BindingFlags.Public | BindingFlags.Instance,
+         new MyBinder(), new Type[] {typeof(short), typeof(short)}, null);
+      Console.WriteLine(myMethod);
+      // Invoke the method named 'MyMethod'.
+      myType.InvokeMember("MyMethod", BindingFlags.InvokeMethod, new MyBinder(),
+         myInstance, new Object[] {(int)32, (int)32});
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="SelectMethodTopic1"></a><a name="SelectMethod(System.Reflection.BindingFlags,System.Reflection.MethodBase[],System.Type[],System.Reflection.ParameterModifier[])">SelectMethod</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Reflection/types/BindingFlags.html">BindingFlags</a> <i>bindingAttr</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/MethodBase.html">MethodBase[]</a> <i>match</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type[]</a> <i>types</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/ParameterModifier.html">ParameterModifier[]</a> <i>modifiers</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Selects a method from the given set of methods, based on the argument type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public abstract <a href="../../System.Reflection/types/MethodBase.html">MethodBase</a> SelectMethod(<br>   <font color="#008080"><a href="../../System.Reflection/types/BindingFlags.html">BindingFlags</a> <i>bindingAttr</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/MethodBase.html">MethodBase[]</a> <i>match</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type[]</a> <i>types</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/ParameterModifier.html">ParameterModifier[]</a> <i>modifiers</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>bindingAttr</i><br><dl>
+<dd>
+<param> One of the  <a href="../../System.Reflection/types/BindingFlags.html">BindingFlags</a> enumerators.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>match</i><br><dl>
+<dd>
+<param> The set of methods Reflection has determined to be a possible match, typically because they have the correct member name.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>types</i><br><dl>
+<dd>
+<param> The value used to locate a matching method.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>modifiers</i><br><dl>
+<dd>
+<param> An array of parameter modifiers that enable binding to work with parameter signatures in which the types have been modified.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System.Reflection/types/MethodBase.html">MethodBase</a> object containing the matching method, if found; otherwise, <b>null</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method should return <b>null</b> if no method matches the criteria. This method controls the selection provided by the <b>GetConstructor</b> and <b>GetMethod</b> methods on <b>Type</b>.</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+using System;
+using System.Reflection;
+using System.Globalization;
+
+
+
+public class MyBinder : Binder 
+{
+
+   public MyBinder() : base()
+   {
+
+   }
+
+   private class BinderState
+   {
+      public object[] args;
+   }
+
+
+
+   public override FieldInfo BindToField(
+      BindingFlags bindingAttr,
+      FieldInfo[] match,
+      object value,
+      CultureInfo culture
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+      
+      // Get a field for which 'value' can be converted to that field type.
+      for(int i = 0; i &lt; match.Length; i++)
+         if(ChangeType(value, match[i].FieldType, culture) != null)
+            return match[i];
+
+      return null;
+   }
+
+
+
+
+   public override MethodBase BindToMethod(
+      BindingFlags bindingAttr,
+      MethodBase[] match,
+      ref object[] args,
+      ParameterModifier[] modifiers,
+      CultureInfo culture,
+      string[] names,
+      out object state
+      )
+   {
+      // Store the arguments to the method in a state object.
+      BinderState myBinderState = new BinderState();
+      object[] arguments = new Object[args.Length];
+      args.CopyTo(arguments, 0);
+      myBinderState.args = arguments;
+      state = myBinderState;
+
+      if(match == null)
+         throw new ArgumentNullException();
+
+      // Find a method that has the same parameters as those of 'args'.
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of parameters that match.
+         int count = 0;
+         ParameterInfo[] parameters = match[i].GetParameters();
+
+         // Go on to the next method if the number of parameters don't match.
+         if(args.Length != parameters.Length)
+            continue;
+
+         // Match each of the parameters that the user expects the method to have.
+         for(int j = 0; j &lt; args.Length; j++)
+         {
+            // If 'names' is not null then reorder 'args'.
+            if(names != null)
+            {
+               if(names.Length != args.Length)
+                  throw new ArgumentException("names and args must have the same number of elements");
+
+               for(int k = 0; k &lt; names.Length; k++)
+                  if(String.Compare(parameters[j].Name, names[k].ToString()) == 0)
+                     args[j] = myBinderState.args[k];
+            }
+
+            // Check if the types specified by the user can be converted to parameter type.
+            if(ChangeType(args[j], parameters[j].ParameterType, culture) != null)
+               count += 1;
+            else
+               break;
+         }
+
+         // Check if the method has been found.
+         if(count == args.Length)
+            return match[i];
+      }
+      return null;
+   }
+
+
+   public override object ChangeType(
+      object value,
+      Type myChangeType,
+      CultureInfo culture
+      )
+   {
+      // Check if the 'value' can be converted to a value of type 'myType'.
+      if(CanConvertFrom(value.GetType(), myChangeType))
+         // Return the converted object.
+         return Convert.ChangeType(value, myChangeType);
+      else
+         // Return null.
+         return null;
+   }
+
+
+   public override void ReorderArgumentArray(
+      ref object[] args,
+      object state
+      )
+   {
+      // Return the args that had been reordered by 'BindToMethod'.
+      ((BinderState)state).args.CopyTo(args, 0);
+   }
+
+
+   public override MethodBase SelectMethod(
+      BindingFlags bindingAttr,
+      MethodBase[] match,
+      Type[] types,
+      ParameterModifier[] modifiers
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of parameters that match.
+         int count = 0; 
+         ParameterInfo[] parameters = match[i].GetParameters();
+
+         // Go on to the next method if the number of parameters don't match.
+         if(types.Length != parameters.Length)
+            continue;
+
+         // Match each of the parameters that the user expects the method to have.
+         for(int j = 0; j &lt; types.Length; j++)
+            // Check if the types specified by the user can be converted to parameter type.
+            if(CanConvertFrom(types[j], parameters[j].ParameterType))
+               count += 1;
+            else
+               break;
+
+         // Check if the method has been found.
+         if(count == types.Length)
+            return match[i];
+      }
+      return null;
+   }
+
+
+   public override PropertyInfo SelectProperty(
+      BindingFlags bindingAttr,
+      PropertyInfo[] match,
+      Type returnType,
+      Type[] indexes,
+      ParameterModifier[] modifiers
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of indexes that match.
+         int count = 0;
+         ParameterInfo[] parameters = match[i].GetIndexParameters();
+
+         // Go on to the next property if the number of indexes don't match.
+         if(indexes.Length != parameters.Length)
+            continue;
+
+         // Match each of the indexes that the user expects the property to have.
+         for(int j = 0; j &lt; indexes.Length; j++)
+            // Check if the types specified by the user can be converted to index type.
+            if(CanConvertFrom(indexes[j], parameters[j].ParameterType))
+               count += 1;
+            else
+               break;
+
+         // Check if the property has been found.
+         if(count == indexes.Length)
+            // Check if the return type can be converted to the properties type.
+            if(CanConvertFrom(returnType, match[i].GetType()))
+               return match[i];
+            else
+               continue;
+      }
+      return null;
+   }
+
+
+   // Checks if 'type1' can be converted to 'type2'. (Checks only for primitive types).
+   private bool CanConvertFrom(Type type1, Type type2)
+   {
+      if(type1.IsPrimitive &amp;&amp; type2.IsPrimitive)
+      {
+         TypeCode typeCode1 = Type.GetTypeCode(type1);
+         TypeCode typeCode2 = Type.GetTypeCode(type2);
+         // If both 'type1' and 'type2' have same type return true.
+         if(typeCode1 == typeCode2)
+            return true;
+         // Possible conversions from 'Char' follow.
+         if(typeCode1 == TypeCode.Char)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt16 : return true;
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Byte' follow.
+         if(typeCode1 == TypeCode.Byte)
+            switch(typeCode2)
+            {
+               case TypeCode.Char   : return true;
+               case TypeCode.UInt16 : return true;
+               case TypeCode.Int16  : return true;
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'SByte' follow.
+         if(typeCode1 == TypeCode.SByte)
+            switch(typeCode2)
+            {
+               case TypeCode.Int16  : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt16' follow.
+         if(typeCode1 == TypeCode.UInt16)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int16' follow.
+         if(typeCode1 == TypeCode.Int16)
+            switch(typeCode2)
+            {
+               case TypeCode.Int32  : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt32' follow.
+         if(typeCode1 == TypeCode.UInt32)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int32' follow.
+         if(typeCode1 == TypeCode.Int32)
+            switch(typeCode2)
+            {
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt64' follow.
+         if(typeCode1 == TypeCode.UInt64)
+            switch(typeCode2)
+            {
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int64' follow.
+         if(typeCode1 == TypeCode.Int64)
+            switch(typeCode2)
+            {
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Single' follow.
+         if(typeCode1 == TypeCode.Single)
+            switch(typeCode2)
+            {
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+      }
+      return false;
+   }
+}
+
+
+
+public class MyClass1
+{
+   public short myFieldB;
+   public int myFieldA; 
+   public void MyMethod(long i, char k)
+   {
+      Console.WriteLine("\nThis is MyMethod(long i, char k)");
+   }
+   public void MyMethod(long i, long j)
+   {
+      Console.WriteLine("\nThis is MyMethod(long i, long j)");
+   }
+}
+
+public class Binder_Example
+{
+   public static void Main()
+   {
+      // Get the type of 'MyClass1'.
+      Type myType = typeof(MyClass1);
+      // Get the instance of 'MyClass1'.
+      MyClass1 myInstance = new MyClass1();
+      Console.WriteLine("\nDisplaying results of using 'MyBinder' binder\n");
+      // Get the method information for the method 'MyMethod'.
+      MethodInfo myMethod = myType.GetMethod("MyMethod", BindingFlags.Public | BindingFlags.Instance,
+         new MyBinder(), new Type[] {typeof(short), typeof(short)}, null);
+      Console.WriteLine(myMethod);
+      // Invoke the method named 'MyMethod'.
+      myType.InvokeMember("MyMethod", BindingFlags.InvokeMethod, new MyBinder(),
+         myInstance, new Object[] {(int)32, (int)32});
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="SelectPropertyTopic1"></a><a name="SelectProperty(System.Reflection.BindingFlags,System.Reflection.PropertyInfo[],System.Type,System.Type[],System.Reflection.ParameterModifier[])">SelectProperty</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Reflection/types/BindingFlags.html">BindingFlags</a> <i>bindingAttr</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/PropertyInfo.html">PropertyInfo[]</a> <i>match</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>returnType</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type[]</a> <i>indexes</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/ParameterModifier.html">ParameterModifier[]</a> <i>modifiers</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Selects a property from the given set of properties, based on the specified criteria.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public abstract <a href="../../System.Reflection/types/PropertyInfo.html">PropertyInfo</a> SelectProperty(<br>   <font color="#008080"><a href="../../System.Reflection/types/BindingFlags.html">BindingFlags</a> <i>bindingAttr</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/PropertyInfo.html">PropertyInfo[]</a> <i>match</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>returnType</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type[]</a> <i>indexes</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/ParameterModifier.html">ParameterModifier[]</a> <i>modifiers</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>bindingAttr</i><br><dl>
+<dd>
+<param> One of the  <a href="../../System.Reflection/types/BindingFlags.html">BindingFlags</a> enumerators.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>match</i><br><dl>
+<dd>
+<param> The set of properties Reflection has determined to be a possible match, typically because they have the correct member name.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>returnType</i><br><dl>
+<dd>
+<param> The return value the matching property must have.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>indexes</i><br><dl>
+<dd>
+<param> The index types of the property being searched for. Used for index properties such as the indexer for a class.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>modifiers</i><br><dl>
+<dd>
+<param> An array of parameter modifiers that enable binding to work with parameter signatures in which the types have been modified.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System.Reflection/types/PropertyInfo.html">PropertyInfo</a> object containing the matching property.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method controls the selection provided by the <b>GetProperty</b> method on <b>Type</b>.</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+using System;
+using System.Reflection;
+using System.Globalization;
+
+
+
+public class MyBinder : Binder 
+{
+
+   public MyBinder() : base()
+   {
+
+   }
+
+   private class BinderState
+   {
+      public object[] args;
+   }
+
+
+
+   public override FieldInfo BindToField(
+      BindingFlags bindingAttr,
+      FieldInfo[] match,
+      object value,
+      CultureInfo culture
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+      
+      // Get a field for which 'value' can be converted to that field type.
+      for(int i = 0; i &lt; match.Length; i++)
+         if(ChangeType(value, match[i].FieldType, culture) != null)
+            return match[i];
+
+      return null;
+   }
+
+
+
+
+   public override MethodBase BindToMethod(
+      BindingFlags bindingAttr,
+      MethodBase[] match,
+      ref object[] args,
+      ParameterModifier[] modifiers,
+      CultureInfo culture,
+      string[] names,
+      out object state
+      )
+   {
+      // Store the arguments to the method in a state object.
+      BinderState myBinderState = new BinderState();
+      object[] arguments = new Object[args.Length];
+      args.CopyTo(arguments, 0);
+      myBinderState.args = arguments;
+      state = myBinderState;
+
+      if(match == null)
+         throw new ArgumentNullException();
+
+      // Find a method that has the same parameters as those of 'args'.
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of parameters that match.
+         int count = 0;
+         ParameterInfo[] parameters = match[i].GetParameters();
+
+         // Go on to the next method if the number of parameters don't match.
+         if(args.Length != parameters.Length)
+            continue;
+
+         // Match each of the parameters that the user expects the method to have.
+         for(int j = 0; j &lt; args.Length; j++)
+         {
+            // If 'names' is not null then reorder 'args'.
+            if(names != null)
+            {
+               if(names.Length != args.Length)
+                  throw new ArgumentException("names and args must have the same number of elements");
+
+               for(int k = 0; k &lt; names.Length; k++)
+                  if(String.Compare(parameters[j].Name, names[k].ToString()) == 0)
+                     args[j] = myBinderState.args[k];
+            }
+
+            // Check if the types specified by the user can be converted to parameter type.
+            if(ChangeType(args[j], parameters[j].ParameterType, culture) != null)
+               count += 1;
+            else
+               break;
+         }
+
+         // Check if the method has been found.
+         if(count == args.Length)
+            return match[i];
+      }
+      return null;
+   }
+
+
+   public override object ChangeType(
+      object value,
+      Type myChangeType,
+      CultureInfo culture
+      )
+   {
+      // Check if the 'value' can be converted to a value of type 'myType'.
+      if(CanConvertFrom(value.GetType(), myChangeType))
+         // Return the converted object.
+         return Convert.ChangeType(value, myChangeType);
+      else
+         // Return null.
+         return null;
+   }
+
+
+   public override void ReorderArgumentArray(
+      ref object[] args,
+      object state
+      )
+   {
+      // Return the args that had been reordered by 'BindToMethod'.
+      ((BinderState)state).args.CopyTo(args, 0);
+   }
+
+
+   public override MethodBase SelectMethod(
+      BindingFlags bindingAttr,
+      MethodBase[] match,
+      Type[] types,
+      ParameterModifier[] modifiers
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of parameters that match.
+         int count = 0; 
+         ParameterInfo[] parameters = match[i].GetParameters();
+
+         // Go on to the next method if the number of parameters don't match.
+         if(types.Length != parameters.Length)
+            continue;
+
+         // Match each of the parameters that the user expects the method to have.
+         for(int j = 0; j &lt; types.Length; j++)
+            // Check if the types specified by the user can be converted to parameter type.
+            if(CanConvertFrom(types[j], parameters[j].ParameterType))
+               count += 1;
+            else
+               break;
+
+         // Check if the method has been found.
+         if(count == types.Length)
+            return match[i];
+      }
+      return null;
+   }
+
+
+   public override PropertyInfo SelectProperty(
+      BindingFlags bindingAttr,
+      PropertyInfo[] match,
+      Type returnType,
+      Type[] indexes,
+      ParameterModifier[] modifiers
+      )
+   {
+      if(match == null)
+         throw new ArgumentNullException("match");
+
+      for(int i = 0; i &lt; match.Length; i++)
+      {
+         // Count the number of indexes that match.
+         int count = 0;
+         ParameterInfo[] parameters = match[i].GetIndexParameters();
+
+         // Go on to the next property if the number of indexes don't match.
+         if(indexes.Length != parameters.Length)
+            continue;
+
+         // Match each of the indexes that the user expects the property to have.
+         for(int j = 0; j &lt; indexes.Length; j++)
+            // Check if the types specified by the user can be converted to index type.
+            if(CanConvertFrom(indexes[j], parameters[j].ParameterType))
+               count += 1;
+            else
+               break;
+
+         // Check if the property has been found.
+         if(count == indexes.Length)
+            // Check if the return type can be converted to the properties type.
+            if(CanConvertFrom(returnType, match[i].GetType()))
+               return match[i];
+            else
+               continue;
+      }
+      return null;
+   }
+
+
+   // Checks if 'type1' can be converted to 'type2'. (Checks only for primitive types).
+   private bool CanConvertFrom(Type type1, Type type2)
+   {
+      if(type1.IsPrimitive &amp;&amp; type2.IsPrimitive)
+      {
+         TypeCode typeCode1 = Type.GetTypeCode(type1);
+         TypeCode typeCode2 = Type.GetTypeCode(type2);
+         // If both 'type1' and 'type2' have same type return true.
+         if(typeCode1 == typeCode2)
+            return true;
+         // Possible conversions from 'Char' follow.
+         if(typeCode1 == TypeCode.Char)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt16 : return true;
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Byte' follow.
+         if(typeCode1 == TypeCode.Byte)
+            switch(typeCode2)
+            {
+               case TypeCode.Char   : return true;
+               case TypeCode.UInt16 : return true;
+               case TypeCode.Int16  : return true;
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'SByte' follow.
+         if(typeCode1 == TypeCode.SByte)
+            switch(typeCode2)
+            {
+               case TypeCode.Int16  : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt16' follow.
+         if(typeCode1 == TypeCode.UInt16)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt32 : return true;
+               case TypeCode.Int32  : return true;
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int16' follow.
+         if(typeCode1 == TypeCode.Int16)
+            switch(typeCode2)
+            {
+               case TypeCode.Int32  : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt32' follow.
+         if(typeCode1 == TypeCode.UInt32)
+            switch(typeCode2)
+            {
+               case TypeCode.UInt64 : return true;
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int32' follow.
+         if(typeCode1 == TypeCode.Int32)
+            switch(typeCode2)
+            {
+               case TypeCode.Int64  : return true;
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'UInt64' follow.
+         if(typeCode1 == TypeCode.UInt64)
+            switch(typeCode2)
+            {
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Int64' follow.
+         if(typeCode1 == TypeCode.Int64)
+            switch(typeCode2)
+            {
+               case TypeCode.Single : return true;
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+         // Possible conversions from 'Single' follow.
+         if(typeCode1 == TypeCode.Single)
+            switch(typeCode2)
+            {
+               case TypeCode.Double : return true;
+               default              : return false;
+            }
+      }
+      return false;
+   }
+}
+
+
+
+public class MyClass1
+{
+   public short myFieldB;
+   public int myFieldA; 
+   public void MyMethod(long i, char k)
+   {
+      Console.WriteLine("\nThis is MyMethod(long i, char k)");
+   }
+   public void MyMethod(long i, long j)
+   {
+      Console.WriteLine("\nThis is MyMethod(long i, long j)");
+   }
+}
+
+public class Binder_Example
+{
+   public static void Main()
+   {
+      // Get the type of 'MyClass1'.
+      Type myType = typeof(MyClass1);
+      // Get the instance of 'MyClass1'.
+      MyClass1 myInstance = new MyClass1();
+      Console.WriteLine("\nDisplaying results of using 'MyBinder' binder\n");
+      // Get the method information for the method 'MyMethod'.
+      MethodInfo myMethod = myType.GetMethod("MyMethod", BindingFlags.Public | BindingFlags.Instance,
+         new MyBinder(), new Type[] {typeof(short), typeof(short)}, null);
+      Console.WriteLine(myMethod);
+      // Invoke the method named 'MyMethod'.
+      myType.InvokeMember("MyMethod", BindingFlags.InvokeMethod, new MyBinder(),
+         myInstance, new Object[] {(int)32, (int)32});
+   }
+}
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Reflection/types/PropertyInfo.html">PropertyInfo</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

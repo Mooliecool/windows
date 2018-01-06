@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Xml.XmlNodeChangedEventHandler</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Xml.XmlNodeChangedEventHandler Delegate</h2><b>Assembly: </b>System.Xml.dll<br><b>Namespace: </b>System.Xml<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Represents the method that handles  <a href="../../System.Xml/types/XmlDocument.html#NodeChanged">XmlDocument.NodeChanged</a>,  <a href="../../System.Xml/types/XmlDocument.html#NodeChanging">XmlDocument.NodeChanging</a>,  <a href="../../System.Xml/types/XmlDocument.html#NodeInserted">XmlDocument.NodeInserted</a>,  <a href="../../System.Xml/types/XmlDocument.html#NodeInserting">XmlDocument.NodeInserting</a>,  <a href="../../System.Xml/types/XmlDocument.html#NodeRemoved">XmlDocument.NodeRemoved</a> and  <a href="../../System.Xml/types/XmlDocument.html#NodeRemoving">XmlDocument.NodeRemoving</a> events.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public delegate void XmlNodeChangedEventHandler(object sender, XmlNodeChangedEventArgs e);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+						The declaration of your event handler must have the same parameters as the 
+						<b>XmlNodeChangedEventHandler</b> delegate declaration. <br><br></dd>
+</dl>
+<dl>
+<dd>
+<p><i>sender</i><br><dl>
+<dd>
+<param> The source of the event.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>e</i><br><dl>
+<dd>
+<param> An  <a href="../../System.Xml/types/XmlNodeChangedEventArgs.html">XmlNodeChangedEventArgs</a> containing the event data.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> When you create an <b>XmlNodeChangedEventHandler</b> delegate, you identify the method that handles the event. To associate the event with your event handler, add an instance of the delegate to the event. The event handler is called whenever the event occurs, unless you remove the delegate. For more information about event handler delegates, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconEventsDelegates.asp">MSDN: eventsdelegates</a>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to handle the <b>NodeChanged</b> and <b>NodeInserted</b> events.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample
+{
+  private const String filename = "book.xml";
+
+  public static void Main()
+  {
+     Sample mySample = new Sample();
+     mySample.Run(filename);
+  }
+
+  public void Run(String args)
+  {
+     
+     // Create and load the XML document.
+     Console.WriteLine ("Loading file {0} ...", args);
+     XmlDocument doc = new XmlDocument();
+     doc.Load (args);
+
+     //Create the event handlers.
+     doc.NodeChanged += new XmlNodeChangedEventHandler(this.MyNodeChangedEvent);
+     doc.NodeInserted += new XmlNodeChangedEventHandler(this.MyNodeInsertedEvent);
+
+     // Change the book price.
+     doc.DocumentElement.LastChild.InnerText = "5.95";
+
+     // Add a new element.
+     XmlElement newElem = doc.CreateElement("style");
+     newElem.InnerText = "hardcover";
+     doc.DocumentElement.AppendChild(newElem);
+
+     Console.WriteLine("\r\nDisplay the modified XML...");
+     Console.WriteLine(doc.OuterXml);           
+
+  }
+
+  // Handle the NodeChanged event.
+  public void MyNodeChangedEvent(Object src, XmlNodeChangedEventArgs args)
+  {
+     Console.Write("Node Changed Event: &lt;{0}&gt; changed", args.Node.Name);
+     if (args.Node.Value != null)
+     {
+        Console.WriteLine(" with value  {0}", args.Node.Value);
+     }
+     else
+       Console.WriteLine("");
+  }
+
+  // Handle the NodeInserted event.
+  public void MyNodeInsertedEvent(Object src, XmlNodeChangedEventArgs args)
+  {
+     Console.Write("Node Inserted Event: &lt;{0}&gt; inserted", args.Node.Name);
+     if (args.Node.Value != null)
+     {
+        Console.WriteLine(" with value {0}", args.Node.Value);
+     }
+     else
+        Console.WriteLine("");
+  }
+
+} // End class 
+
+    </pre> The example uses the file, <b>book.xml</b>, as input.<pre>
+&lt;!--sample XML fragment--&gt;
+&lt;book genre='novel' ISBN='1-861003-78' misc='sale-item'&gt;
+  &lt;title&gt;The Handmaid's Tale&lt;/title&gt;
+  &lt;price&gt;14.95&lt;/price&gt;
+&lt;/book&gt;
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Xml/System.Xml.html">System.Xml Namespace</a></dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/Delegate.html">System.Delegate</a></li>
+<ul class="none">
+<li><a href="../../System/types/MulticastDelegate.html">System.MulticastDelegate</a></li>
+<ul class="none">
+<li><b>System.Xml.XmlNodeChangedEventHandler</b></li>
+</ul>
+</ul>
+</ul>
+</ul>
+</p>
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

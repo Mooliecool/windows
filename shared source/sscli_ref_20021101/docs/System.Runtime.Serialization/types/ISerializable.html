@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Runtime.Serialization.ISerializable</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Runtime.Serialization.ISerializable Interface</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Runtime.Serialization<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Allows an object to control its own serialization and deserialization.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public interface ISerializable
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Any class that might be serialized must be marked with the  <a href="../../System/types/SerializableAttribute.html">SerializableAttribute</a>. If a class needs to control its serialization process, it can implement the  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> interface. The  <a href="../../System.Runtime.Serialization/types/Formatter.html">Formatter</a> calls the  <a href="#GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">ISerializable.GetObjectData</a> at serialization time and populates the supplied  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> with all the data required to represent the object. The  <a href="../../System.Runtime.Serialization/types/Formatter.html">Formatter</a> creates a  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> with the type of the object in the graph. Objects that need to send proxies for themselves can use the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html#FullTypeName">SerializationInfo.FullTypeName</a> and  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html#AssemblyName">SerializationInfo.AssemblyName</a> methods on  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> to change the transmitted information.<p> If a parent class of the serialized class implements  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a>, call the implementation of  <a href="#GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">ISerializable.GetObjectData</a> for your base class.</p>
+<p> The  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> interface implies a constructor with the signature Constructor( <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> info,  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> context). At deserialization time, the current constructor is called only after the data in the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> has been deserialized by the formatter. In general this constructor should be protected if the class is not <b>sealed</b>.</p>
+<p> The serialization architecture handles object types that extend  <a href="../../System/types/MarshalByRefObject.html">MarshalByRefObject</a> the same as types that extend  <a href="../../System/types/Object.html">Object</a>. These types can be marked with the  <a href="../../System/types/SerializableAttribute.html">SerializableAttribute</a> and implement the  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> interface as any other object type. Their object state will be captured and persisted onto the stream.</p>
+<p> When these types are being used through  <a href="../../System.Runtime.Remoting/System.Runtime.Remoting.html">System.Runtime.Remoting</a>, the remoting infrastructure provides a surrogate that preempts normal serialization and instead serializes a proxy to the  <a href="../../System/types/MarshalByRefObject.html">MarshalByRefObject</a>. A surrogate is a helper that knows how to serialize and deserialize objects of a particular type. The proxy, invisible to the user in most cases, will be of type  <a href="../../System.Runtime.Remoting/types/ObjRef.html">ObjRef</a>.</p> As a general design pattern, it would be unusual for a class to be both marked with the serializable attribute and extend  <a href="../../System/types/MarshalByRefObject.html">MarshalByRefObject</a>. Developers should think carefully about the possible serialization and remoting scenarios when combining these two characteristics. One example where this might be applicable is with a  <a href="../../System.IO/types/MemoryStream.html">MemoryStream</a>. While the base class of  <a href="../../System.IO/types/MemoryStream.html">MemoryStream</a> ( <a href="../../System.IO/types/Stream.html">Stream</a>) extends from  <a href="../../System/types/MarshalByRefObject.html">MarshalByRefObject</a>, it is possible to capture the state of a  <a href="../../System.IO/types/MemoryStream.html">MemoryStream</a> and restore it at will. It might, therefore, be meaningful to serialize the state of this stream into a database and restore it at some later point in time. However, when used through remoting, an object of this type would be proxied.<p> For more details about serialization of classes that extend  <a href="../../System/types/MarshalByRefObject.html">MarshalByRefObject</a> see  <a href="../../System.Runtime.Remoting.Messaging/types/RemotingSurrogateSelector.html">RemotingSurrogateSelector</a>.</p><br><br><b>Notes to implementors: </b> Implement this interface to allow an object to take part in its own serialization and deserialization.</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example demonstrates the use of the  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> interface to define custom serialization behavior for a class.<pre>
+ using System;
+ using System.IO;
+ using System.Runtime.Serialization;
+ using System.Runtime.Serialization.Formatters.Binary;
+ 
+ namespace Testing 
+ {
+    public class Test {
+       public static void Main(String[] args) {
+       // Creates a new MyClass1 object.
+          MyClass1 f = new MyClass1();
+    
+          // Opens a file and serializes the object into it in binary format.
+          Stream stream = File.Open("MyClass1MyClass2.bin", FileMode.Create);
+          BinaryFormatter bformatter = new BinaryFormatter();
+ 
+          bformatter.Serialize(stream, f);
+          stream.Close();
+    
+          //Empties f.
+          f = null;
+    
+          //Opens file "MyClass1MyClass2.bin" and deserializes the MyClass1 object from it.
+          stream = File.Open("MyClass1MyClass2.bin", FileMode.Open);
+          bformatter = new BinaryFormatter();
+          f = (MyClass1)bformatter.Deserialize(stream);
+          stream.Close();
+       }
+    }
+ 
+
+    [Serializable()] 
+    public class MyClass1: ISerializable {
+
+       public MyClass2 someObject;
+       public int size;
+       public String shape;
+
+       //Default constructor
+       public MyClass1() {
+          someObject = new MyClass2();
+       }
+ 
+       //Deserialization constructor.
+       public MyClass1 (SerializationInfo info, StreamingContext context) {
+          size = (int)info.GetValue("size", typeof(int));
+          shape = (String)info.GetValue("shape", typeof(string));
+
+          //Allows MyClass2 to deserialize itself
+          someObject = new MyClass2(info, context);
+       }
+ 
+       //Serialization function.
+       public void GetObjectData(SerializationInfo info, StreamingContext context){
+          info.AddValue("size", size);
+          info.AddValue("shape", shape);
+
+          //Allows MyClass2 to serialize itself
+          someObject.GetObjectData(info, context);
+       }
+    }
+ 
+    public class MyClass2 {
+ 
+       public double value = 3.14159265;
+
+       public MyClass2() {
+       }
+
+       public MyClass2(SerializationInfo info, StreamingContext context) {
+           value = (double)info.GetValue("MyClass2_value", typeof(double));
+       }
+
+ 
+       public void GetObjectData(SerializationInfo info, StreamingContext context) {
+          info.AddValue("MyClass2_value", value);
+       }
+
+    }
+ }
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Runtime.Serialization/System.Runtime.Serialization.html">System.Runtime.Serialization Namespace</a><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconserialization.asp">MSDN: serialization</a> |  <a href="../../System.Runtime.Remoting.Messaging/types/RemotingSurrogateSelector.html">RemotingSurrogateSelector</a></dd>
+</dl>
+<h3>System.Runtime.Serialization.ISerializable Member List: </h3>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">GetObjectData</a></td>
+<td width="55%"> Populates a  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> with the data needed to serialize the target object.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<hr>
+<h3>System.Runtime.Serialization.ISerializable Member Details</h3><b>Method: <i><a name="GetObjectDataTopic1"></a><a name="GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">GetObjectData</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> <i>info</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> <i>context</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Populates a  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> with the data needed to serialize the target object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            void GetObjectData(<br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> <i>info</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> <i>context</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>info</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> to populate with data.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>context</i><br><dl>
+<dd>
+<param> The destination (see  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a>) for this serialization.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Any objects included in the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> are automatically tracked and serialized by the formatter.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> |  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

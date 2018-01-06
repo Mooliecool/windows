@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.ComponentModel.IEditableObject</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.ComponentModel.IEditableObject Interface</h2><b>Assembly: </b>System.dll<br><b>Namespace: </b>System.ComponentModel<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides functionality to commit or rollback changes to an object that is used as a data source.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public interface IEditableObject
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This interface is typically used to capture the  <a href="#BeginEdit">IEditableObject.BeginEdit</a>,  <a href="#EndEdit">IEditableObject.EndEdit</a>, and  <a href="#CancelEdit">IEditableObject.CancelEdit</a> semantics of a  <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDataDataRowViewmemberstopic.asp">DataRowView</a>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following sample provides a simple implementation of the  <a href="../../System.ComponentModel/types/IEditableObject.html">IEditableObject</a> interface. The <code>
+            Customer
+          </code> class stores customer information and can be used as a collection for a customer database. This sample assumes that you have used the <code>
+            CustomerList
+          </code> class that can be found in sample in the  <a><font color="#FF0000"><i>System.ComponentModel.IBindingList</i> (not supported on the shared source CLI) </font></a> class.<pre>
+	public class Customer : IEditableObject 
+	{
+       
+		struct CustomerData 
+		{
+			internal string id ;
+			internal string firstName ;
+			internal string lastName ;
+		}
+        
+		private CustomersList parent;
+		private CustomerData custData; 
+		private CustomerData backupData; 
+		private bool inTxn = false;
+
+		// Implements IEditableObject
+		void IEditableObject.BeginEdit() 
+		{
+			Console.WriteLine("Start BeginEdit");
+			if (!inTxn) 
+			{
+				this.backupData = custData;
+				inTxn = true;
+				Console.WriteLine("BeginEdit - " + this.backupData.lastName);
+			}
+			Console.WriteLine("End BeginEdit");
+		}
+
+		void IEditableObject.CancelEdit() 
+		{
+			Console.WriteLine("Start CancelEdit");
+			if (inTxn) 
+			{
+				this.custData = backupData;
+				inTxn = false;
+				Console.WriteLine("CancelEdit - " + this.custData.lastName);
+			}
+			Console.WriteLine("End CancelEdit");
+		}
+
+		void IEditableObject.EndEdit() 
+		{
+			Console.WriteLine("Start EndEdit" + this.custData.id + this.custData.lastName);
+			if (inTxn) 
+			{
+				backupData = new CustomerData();
+				inTxn = false;
+				Console.WriteLine("Done EndEdit - " + this.custData.id + this.custData.lastName);
+			}
+			Console.WriteLine("End EndEdit");
+		}
+
+		public Customer(string ID) : base() 
+		{
+			this.custData = new CustomerData();
+			this.custData.id = ID;
+			this.custData.firstName = "";
+			this.custData.lastName = "";
+		}
+
+		public string ID 
+		{
+			get 
+			{
+				return this.custData.id;
+			}
+		}
+        
+		public string FirstName 
+		{
+			get 
+			{
+				return this.custData.firstName;
+			}
+			set 
+			{
+				this.custData.firstName = value;
+			}
+		}
+             
+		public string LastName 
+		{
+			get 
+			{
+				return this.custData.lastName;
+			}
+			set 
+			{
+				this.custData.lastName = value;
+			}
+		}
+       
+		internal CustomersList Parent 
+		{
+			get 
+			{
+				return parent;
+			}
+			set 
+			{
+				parent = value ;
+			}
+		}
+
+		private void OnCustomerChanged() 
+		{
+			if (!inTxn &amp;&amp; Parent != null) 
+			{
+				Parent.CustomerChanged(this);
+			}
+		}
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.ComponentModel/System.ComponentModel.html">System.ComponentModel Namespace</a></dd>
+</dl>
+<h3>System.ComponentModel.IEditableObject Member List: </h3>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#BeginEdit">BeginEdit</a></td>
+<td width="55%"> Begins an edit on an object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CancelEdit">CancelEdit</a></td>
+<td width="55%"> Discards changes since the last  <a href="#BeginEdit">IEditableObject.BeginEdit</a> call.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#EndEdit">EndEdit</a></td>
+<td width="55%"> Pushes changes since the last  <a href="#BeginEdit">IEditableObject.BeginEdit</a> or  <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemComponentModelIBindingListmemberstopic.asp#AddNew">IBindingList.AddNew</a> call into the underlying object.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<hr>
+<h3>System.ComponentModel.IEditableObject Member Details</h3><b>Method: <i><a name="BeginEditTopic1"></a><a name="BeginEdit">BeginEdit</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Begins an edit on an object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            void BeginEdit();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method is typically used to capture the  <a href="#BeginEdit">IEditableObject.BeginEdit</a> semantics of a  <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDataDataRowViewmemberstopic.asp">DataRowView</a>.<p> If  <a href="#BeginEdit">IEditableObject.BeginEdit</a> is called on an object that is already being edited, the second and subsequent calls are ignored.</p><br><br><b>Notes to implementors: </b> An object implementing this interface needs to store updates after  <a href="#BeginEdit">IEditableObject.BeginEdit</a> in such a way that they can be discarded if  <a href="#CancelEdit">IEditableObject.CancelEdit</a> is called.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CancelEditTopic1"></a><a name="CancelEdit">CancelEdit</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Discards changes since the last  <a href="#BeginEdit">IEditableObject.BeginEdit</a> call.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            void CancelEdit();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method is typically used to capture the  <a href="#CancelEdit">IEditableObject.CancelEdit</a> semantics of a  <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDataDataRowViewmemberstopic.asp">DataRowView</a>.<p> This method will be ignored if called on an object that is not being edited.</p><br><br><b>Note </b> If the owning list implements  <a><font color="#FF0000"><i>System.ComponentModel.IBindingList</i> (not supported on the shared source CLI) </font></a>, calling  <a href="#CancelEdit">IEditableObject.CancelEdit</a> on an object created using  <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemComponentModelIBindingListmemberstopic.asp#AddNew">IBindingList.AddNew</a> discards the object.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EndEditTopic1"></a><a name="EndEdit">EndEdit</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Pushes changes since the last  <a href="#BeginEdit">IEditableObject.BeginEdit</a> or  <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemComponentModelIBindingListmemberstopic.asp#AddNew">IBindingList.AddNew</a> call into the underlying object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            void EndEdit();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method is typically used to capture the  <a href="#EndEdit">IEditableObject.EndEdit</a> semantics of a  <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDataDataRowViewmemberstopic.asp">DataRowView</a>.<p> This method will be ignored if called on an object that is not being edited.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

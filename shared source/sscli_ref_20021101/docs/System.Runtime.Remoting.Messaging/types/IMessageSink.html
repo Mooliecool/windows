@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Runtime.Remoting.Messaging.IMessageSink</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Runtime.Remoting.Messaging.IMessageSink Interface</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Runtime.Remoting.Messaging<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Defines the interface for a message sink.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public interface IMessageSink
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> When a method call is made on the proxy, the remoting infrastructure provides the necessary support for passing the arguments to the actual object across the remoting boundaries, calling the actual object method with the arguments, and returning the results back to the client of the proxy object.<p> A remote method call is a message that goes from the client end to the server end and possibly back again. As it crosses remoting boundaries on the way, the remote method call passes through a chain of  <a href="../../System.Runtime.Remoting.Messaging/types/IMessageSink.html">IMessageSink</a> objects. Each sink in the chain receives the message object, performs a specific operation, and delegates to the next sink in the chain. The proxy object contains a reference to the first  <a href="../../System.Runtime.Remoting.Messaging/types/IMessageSink.html">IMessageSink</a> it needs to use to start off the chain.</p>
+<p> For asynchronous calls, at the time of delegation, each sink provides a reply sink (another  <a href="../../System.Runtime.Remoting.Messaging/types/IMessageSink.html">IMessageSink</a>) that will be called by the next sink when the reply is on its way back.</p>
+<p> Different types of sinks perform different operations, depending on the type of message object received. For example, one sink could cause a lock to be taken, another could enforce call security, another could perform flow call control and reliability services, and yet another could transport the call to a different  <a href="../../System/types/AppDomain.html">AppDomain</a>, process, or computer. Two or more message sinks in the chain can interact with each other in regard to each specific action.</p><br><br><b>Notes to implementors: </b> It is important to note that code implementing the current interface must provide implementations for both  <a href="#SyncProcessMessage(System.Runtime.Remoting.Messaging.IMessage)">IMessageSink.SyncProcessMessage</a> and  <a href="#AsyncProcessMessage(System.Runtime.Remoting.Messaging.IMessage,System.Runtime.Remoting.Messaging.IMessageSink)">IMessageSink.AsyncProcessMessage</a>, since synchronous calls can be converted to asynchronous calls and vice versa. Both methods must be implemented, even if the sink does not support asynchronous processing.</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Runtime.Remoting.Messaging/System.Runtime.Remoting.Messaging.html">System.Runtime.Remoting.Messaging Namespace</a></dd>
+</dl>
+<h3>System.Runtime.Remoting.Messaging.IMessageSink Member List: </h3>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#NextSink">NextSink</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the next message sink in the sink chain.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#AsyncProcessMessage(System.Runtime.Remoting.Messaging.IMessage,System.Runtime.Remoting.Messaging.IMessageSink)">AsyncProcessMessage</a></td>
+<td width="55%"> Asynchronously processes the given message.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SyncProcessMessage(System.Runtime.Remoting.Messaging.IMessage)">SyncProcessMessage</a></td>
+<td width="55%"> Synchronously processes the given message.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<hr>
+<h3>System.Runtime.Remoting.Messaging.IMessageSink Member Details</h3><b>Property: <i><a name="NextSinkTopic1"></a><a name="NextSink">NextSink</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the next message sink in the sink chain.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System.Runtime.Remoting.Messaging/types/IMessageSink.html">IMessageSink</a> NextSink {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="AsyncProcessMessageTopic1"></a><a name="AsyncProcessMessage(System.Runtime.Remoting.Messaging.IMessage,System.Runtime.Remoting.Messaging.IMessageSink)">AsyncProcessMessage</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Messaging/types/IMessage.html">IMessage</a> <i>msg</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Messaging/types/IMessageSink.html">IMessageSink</a> <i>replySink</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Asynchronously processes the given message.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System.Runtime.Remoting.Messaging/types/IMessageCtrl.html">IMessageCtrl</a> AsyncProcessMessage(<br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Messaging/types/IMessage.html">IMessage</a> <i>msg</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Messaging/types/IMessageSink.html">IMessageSink</a> <i>replySink</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>msg</i><br><dl>
+<dd>
+<param> The message to process.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>replySink</i><br><dl>
+<dd>
+<param> The reply sink for the reply message.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> Returns an  <a href="../../System.Runtime.Remoting.Messaging/types/IMessageCtrl.html">IMessageCtrl</a> interface that provides a way to control asynchronous messages after they have been dispatched.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method is invoked on the message sink by the remoting infrastructure or by a previous sink for asynchronous messages.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="SyncProcessMessageTopic1"></a><a name="SyncProcessMessage(System.Runtime.Remoting.Messaging.IMessage)">SyncProcessMessage</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Messaging/types/IMessage.html">IMessage</a> <i>msg</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Synchronously processes the given message.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System.Runtime.Remoting.Messaging/types/IMessage.html">IMessage</a> SyncProcessMessage(<br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Messaging/types/IMessage.html">IMessage</a> <i>msg</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>msg</i><br><dl>
+<dd>
+<param> The message to process.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A reply message in response to the request.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#SyncProcessMessage(System.Runtime.Remoting.Messaging.IMessage)">IMessageSink.SyncProcessMessage</a> method is invoked on the message sink by the remoting infrastructure or by a previous sink for synchronous messages.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

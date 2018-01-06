@@ -1,0 +1,1279 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Xml.Schema.XmlSchemaComplexType</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Xml.Schema.XmlSchemaComplexType Class</h2><b>Assembly: </b>System.Xml.dll<br><b>Namespace: </b>System.Xml.Schema<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Class for complex types. Defines a complex type that determines the set of attributes and content of an element. Represents the World Wide Web Consortium (W3C) <b>complexType</b> element.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public class XmlSchemaComplexType : XmlSchemaType
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> An element can be declared with a type attribute that refers to a <b>complexType</b> element that defines the structure, content, and attributes of that element.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a <b>complexType</b> element.<pre>
+using System;
+using System.Xml;  
+using System.Xml.Schema;
+
+class XMLSchemaExamples {
+	public static void Main() {
+ 
+		XmlSchema schema = new XmlSchema();
+
+		// &lt;xs:element name="stringElementWithAnyAttribute"&gt;
+		XmlSchemaElement element = new XmlSchemaElement();
+		schema.Items.Add(element);
+		element.Name = "stringElementWithAnyAttribute";
+		
+		// &lt;xs:complexType&gt;
+		XmlSchemaComplexType complexType = new XmlSchemaComplexType();
+		element.SchemaType = complexType;
+		
+        // &lt;xs:simpleContent&gt;
+		XmlSchemaSimpleContent simpleContent = new XmlSchemaSimpleContent();
+		complexType.ContentModel = simpleContent;
+		
+		// &lt;extension base= "xs:string"&gt;
+		XmlSchemaSimpleContentExtension extension = new XmlSchemaSimpleContentExtension();
+		simpleContent.Content = extension;
+		extension.BaseTypeName = new XmlQualifiedName("string", "http://www.w3.org/2001/XMLSchema");
+		
+		// &lt;xs:anyAttribute namespace="##targetNamespace"/&gt;
+		XmlSchemaAnyAttribute anyAttribute = new XmlSchemaAnyAttribute();
+		extension.AnyAttribute = anyAttribute;
+		anyAttribute.Namespace = "##targetNamespace";
+ 
+        schema.Compile(new ValidationEventHandler(ValidationCallbackOne));
+ 	XmlNamespaceManager nsmgr = new XmlNamespaceManager(new NameTable());
+        nsmgr.AddNamespace("xs", "http://www.w3.org/2001/XMLSchema");
+        schema.Write(Console.Out, nsmgr);
+	}
+
+    public static void ValidationCallbackOne(object sender, ValidationEventArgs args) {
+        Console.WriteLine(args.Message);
+    }
+}
+
+    </pre>
+<p> The following XML file is used for the preceding code example.</p>
+<pre>
+&lt;?xml version="1.0" encoding="IBM437"?&gt;
+&lt;xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"&gt;
+	&lt;xs:element name="stringElementWithAnyAttribute"&gt;
+		&lt;xs:complexType&gt;
+			&lt;xs:simpleContent&gt;
+				&lt;xs:extension base="xs:string"&gt;
+					&lt;xs:anyAttribute namespace="##targetNamespace"/&gt;
+				&lt;/xs:extension&gt;
+			&lt;/xs:simpleContent&gt;
+		&lt;/xs:complexType&gt;
+	&lt;/xs:element&gt;
+&lt;/xs:schema&gt;
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Xml.Schema/System.Xml.Schema.html">System.Xml.Schema Namespace</a></dd>
+</dl>
+<h3>System.Xml.Schema.XmlSchemaComplexType Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%">Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Used to create a <b>complexType</b> element.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Annotation">Annotation</a><br>(inherited from <b>System.Xml.Schema.XmlSchemaAnnotated)</b></td>
+<td width="55%"><b>Read-write</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaAnnotated.html#Annotation">System.Xml.Schema.XmlSchemaAnnotated.Annotation</a></font></b><br><br><br> Gets or sets the <b>annotation</b> property.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AnyAttribute">AnyAttribute</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the value for the <b>XmlSchemaAnyAttribute</b> component of the complex type.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Attributes">Attributes</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the collection of attributes for the complex type.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AttributeUses">AttributeUses</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the collection of all the attributes from this complex type and its base types which holds the post-compilation value of the <b>AttributeUses</b> property.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AttributeWildcard">AttributeWildcard</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the <b>anyAttribute</b> element from this complex type and its base types which holds the post-compilation value of the <b>AttributeWildcard</b> property.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#BaseSchemaType">BaseSchemaType</a><br>(inherited from <b>System.Xml.Schema.XmlSchemaType)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaType.html#BaseSchemaType">System.Xml.Schema.XmlSchemaType.BaseSchemaType</a></font></b><br><br><br> Gets the object of the <b>simpleType</b> element or <b>complexType</b> element. This is a post-schema-validation-infoset variable.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Block">Block</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the <b>block</b> attribute.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#BlockResolved">BlockResolved</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the value after the type has been compiled to the post-schema-validation infoset. This value indicates how the type is enforced when <b>xsi:type</b> is used in the instance document.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ContentModel">ContentModel</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the content model type.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ContentType">ContentType</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the content model of the complex type which holds the post-compilation value.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ContentTypeParticle">ContentTypeParticle</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the particle which holds the post-compilation value of the <b>ContentTypeParticle</b> property. This <b>ContentTypeParticle</b> is determined after the content models of the most derived types and the base complex type have been resolved according to the rules defined in the World Wide Web Consortium (W3C) XML Schema definition language (XSD) specification.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Datatype">Datatype</a><br>(inherited from <b>System.Xml.Schema.XmlSchemaType)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaType.html#Datatype">System.Xml.Schema.XmlSchemaType.Datatype</a></font></b><br><br><br> Gets the data type that holds the post-compilation value.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#DerivedBy">DerivedBy</a><br>(inherited from <b>System.Xml.Schema.XmlSchemaType)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaType.html#DerivedBy">System.Xml.Schema.XmlSchemaType.DerivedBy</a></font></b><br><br><br> When overridden in a derived class, this property gets information that indicates how this element has been derived from a base type. This property holds the post-compilation value.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Final">Final</a><br>(inherited from <b>System.Xml.Schema.XmlSchemaType)</b></td>
+<td width="55%"><b>Read-write</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaType.html#Final">System.Xml.Schema.XmlSchemaType.Final</a></font></b><br><br><br> Gets or sets the <b>final</b> property to indicate that no further derivations are allowed.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#FinalResolved">FinalResolved</a><br>(inherited from <b>System.Xml.Schema.XmlSchemaType)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaType.html#FinalResolved">System.Xml.Schema.XmlSchemaType.FinalResolved</a></font></b><br><br><br> Gets the post-compilation value of the <b>Final</b> property that holds the post-compilation value of the <b>Final</b> property.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Id">Id</a><br>(inherited from <b>System.Xml.Schema.XmlSchemaAnnotated)</b></td>
+<td width="55%"><b>Read-write</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaAnnotated.html#Id">System.Xml.Schema.XmlSchemaAnnotated.Id</a></font></b><br><br><br> Gets or sets the string id.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsAbstract">IsAbstract</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the information that determines if the <b>complexType</b> element can be used in the instance document.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsMixed">IsMixed</a></td>
+<td width="55%"><b>Read-write</b><br><br><b>Overridden: </b><br> Gets or sets information that determines if the complex type has a mixed content model (markup within the content).</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#LineNumber">LineNumber</a><br>(inherited from <b>System.Xml.Schema.XmlSchemaObject)</b></td>
+<td width="55%"><b>Read-write</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaObject.html#LineNumber">System.Xml.Schema.XmlSchemaObject.LineNumber</a></font></b><br><br><br> Gets or sets the line number in the file to which the <b>schema</b> element refers.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#LinePosition">LinePosition</a><br>(inherited from <b>System.Xml.Schema.XmlSchemaObject)</b></td>
+<td width="55%"><b>Read-write</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaObject.html#LinePosition">System.Xml.Schema.XmlSchemaObject.LinePosition</a></font></b><br><br><br> Gets or sets the line position in the file to which the <b>schema</b> element refers.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Name">Name</a><br>(inherited from <b>System.Xml.Schema.XmlSchemaType)</b></td>
+<td width="55%"><b>Read-write</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaType.html#Name">System.Xml.Schema.XmlSchemaType.Name</a></font></b><br><br><br> Gets or sets the name of the type.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Namespaces">Namespaces</a><br>(inherited from <b>System.Xml.Schema.XmlSchemaObject)</b></td>
+<td width="55%"><b>Read-write</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaObject.html#Namespaces">System.Xml.Schema.XmlSchemaObject.Namespaces</a></font></b><br><br><br></td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Particle">Particle</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the compositor type as one of the  <a href="../../System.Xml.Schema/types/XmlSchemaGroupRef.html">XmlSchemaGroupRef</a>,  <a href="../../System.Xml.Schema/types/XmlSchemaChoice.html">XmlSchemaChoice</a>,  <a href="../../System.Xml.Schema/types/XmlSchemaAll.html">XmlSchemaAll</a>, or  <a href="../../System.Xml.Schema/types/XmlSchemaSequence.html">XmlSchemaSequence</a> classes.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#QualifiedName">QualifiedName</a><br>(inherited from <b>System.Xml.Schema.XmlSchemaType)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaType.html#QualifiedName">System.Xml.Schema.XmlSchemaType.QualifiedName</a></font></b><br><br><br> Gets the qualified name for the type built from the <b>Name</b> attribute of this type. This holds the post-compilation value.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SourceUri">SourceUri</a><br>(inherited from <b>System.Xml.Schema.XmlSchemaObject)</b></td>
+<td width="55%"><b>Read-write</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaObject.html#SourceUri">System.Xml.Schema.XmlSchemaObject.SourceUri</a></font></b><br><br><br> Gets or sets the source location for the file that loaded the schema.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#UnhandledAttributes">UnhandledAttributes</a><br>(inherited from <b>System.Xml.Schema.XmlSchemaAnnotated)</b></td>
+<td width="55%"><b>Read-write</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaAnnotated.html#UnhandledAttributes">System.Xml.Schema.XmlSchemaAnnotated.UnhandledAttributes</a></font></b><br><br><br> Gets or sets the qualified attributes that do not belong to the schema target namespace.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System.Xml.Schema/types/XmlSchemaObject.html">System.Xml.Schema.XmlSchemaObject</a></li>
+<ul class="none">
+<li><a href="../../System.Xml.Schema/types/XmlSchemaAnnotated.html">System.Xml.Schema.XmlSchemaAnnotated</a></li>
+<ul class="none">
+<li><a href="../../System.Xml.Schema/types/XmlSchemaType.html">System.Xml.Schema.XmlSchemaType</a></li>
+<ul class="none">
+<li><b>System.Xml.Schema.XmlSchemaComplexType</b></li>
+</ul>
+</ul>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Xml.Schema.XmlSchemaComplexType Member Details</h3><b><i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Used to create a <b>complexType</b> element.</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlSchemaComplexType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="AnnotationTopic1"></a><a name="Annotation">Annotation</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaAnnotated.html#Annotation">System.Xml.Schema.XmlSchemaAnnotated.Annotation</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the <b>annotation</b> property.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchemaAnnotation.html">XmlSchemaAnnotation</a> Annotation {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="AnyAttributeTopic1"></a><a name="AnyAttribute">AnyAttribute</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the value for the <b>XmlSchemaAnyAttribute</b> component of the complex type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchemaAnyAttribute.html">XmlSchemaAnyAttribute</a> AnyAttribute {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If this property is not null, the complex type can contain any attributes from the namespaces specified in the <b>XmlSchemaAnyAttribute</b>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="AttributesTopic1"></a><a name="Attributes">Attributes</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the collection of attributes for the complex type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchemaObjectCollection.html">XmlSchemaObjectCollection</a> Attributes {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="AttributeUsesTopic1"></a><a name="AttributeUses">AttributeUses</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the collection of all the attributes from this complex type and its base types which holds the post-compilation value of the <b>AttributeUses</b> property.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchemaObjectTable.html">XmlSchemaObjectTable</a> AttributeUses {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For example, a combination of all the attributes from the <b>Attributes</b> property from each type in the hierarchy.<p> The value of this property is read-only. This property has the value after the schema has been successfully compiled to determine the complete attribute set that is allowed in an instance document.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="AttributeWildcardTopic1"></a><a name="AttributeWildcard">AttributeWildcard</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the <b>anyAttribute</b> element from this complex type and its base types which holds the post-compilation value of the <b>AttributeWildcard</b> property.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchemaAnyAttribute.html">XmlSchemaAnyAttribute</a> AttributeWildcard {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The value of this property is read-only. This property have values after the schema has been successfully compiled to determine the complete attribute set of the complex type. For example, it might be the <b>anyAttribute</b> element from one of the base types.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="BaseSchemaTypeTopic1"></a><a name="BaseSchemaType">BaseSchemaType</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaType.html#BaseSchemaType">System.Xml.Schema.XmlSchemaType.BaseSchemaType</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the object of the <b>simpleType</b> element or <b>complexType</b> element. This is a post-schema-validation-infoset variable.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> BaseSchemaType {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The base value must be a QName.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="BlockTopic1"></a><a name="Block">Block</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the <b>block</b> attribute.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchemaDerivationMethod.html">XmlSchemaDerivationMethod</a> Block {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Indicates the type of derivation.<p> This attribute can contain the following values: </p><br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  Enum
+                </TH>
+<TH>
+                  Description
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD><b>None</b></TD>
+<TD>
+                  Use the derivation restriction defined by the
+                  <b>BlockDefault</b>
+                  property of the schema, if it
+                  exists.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>Extension</b></TD>
+<TD>
+                  This element cannot be replaced by a type derived by Extension.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>Restriction</b></TD>
+<TD>
+                  This element cannot be replaced by a type derived by Restriction.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>All</b></TD>
+<TD><b>#all</b>
+                  . This
+                  element
+                  cannot be replaced by any type regardless of derivation method.
+                </TD>
+</TR>
+</table>
+<p> The <b>Substitution</b>, <b>List</b>, and <b>Union</b> derivation methods are not supported by this property.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="BlockResolvedTopic1"></a><a name="BlockResolved">BlockResolved</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the value after the type has been compiled to the post-schema-validation infoset. This value indicates how the type is enforced when <b>xsi:type</b> is used in the instance document.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchemaDerivationMethod.html">XmlSchemaDerivationMethod</a> BlockResolved {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This value is either from the type itself or, if not defined at the type level, it is taken from the <b>schema</b> element. For example, if the value is restricted, only the specifically defined type can be used, not types derived from the specifically defined type.<p> This attribute can contain the following values: </p><br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  Enum
+                </TH>
+<TH>
+                  Description
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD><b>None</b></TD>
+<TD>
+                  Use the derivation restriction defined by the
+                  <b>BlockDefault</b>
+                  property of the schema, if it
+                  exists.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>Extension</b></TD>
+<TD>
+                  This element cannot be replaced by a type derived by Extension.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>Restriction</b></TD>
+<TD>
+                  This element cannot be replaced by a type derived by Restriction.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>All</b></TD>
+<TD><b>#all</b>
+                  . This
+                  element
+                  cannot be replaced by any type regardless of derivation method.
+                </TD>
+</TR>
+</table>
+<p> The <b>Substitution</b>, <b>List</b>, and <b>Union</b> derivation methods are not supported by this property.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ContentModelTopic1"></a><a name="ContentModel">ContentModel</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the content model type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchemaContentModel.html">XmlSchemaContentModel</a> ContentModel {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This is mutually exclusive with the  <a href="#Particle">XmlSchemaComplexType.Particle</a> property.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ContentTypeTopic1"></a><a name="ContentType">ContentType</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the content model of the complex type which holds the post-compilation value.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchemaContentType.html">XmlSchemaContentType</a> ContentType {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This is the content in the post-schema validation infoset.<p> If the <b>IsMixed</b> property is set to <b>true</b> on the <b>ContentModel</b> property that has the type <b>XmlSchemaComplexContent</b>, the value returned is <b>Mixed</b>.</p>
+<p> If the <b>IsMixed</b> property is <b>false</b>, the value is either <b>Empty</b> or <b>ElementOnly</b>.</p>
+<p> If the type on the <b>ContentModel</b> property has the type <b>XmlSchemaSimpleContent</b>, then this value is always <b>TextOnly</b>.</p>
+<p> The <b>ContentType</b> property must have one of the values shown in the following table.</p><br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  Enum
+                </TH>
+<TH>
+                  Description
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD><b>TextOnly</b></TD>
+<TD>
+                  Text-only content.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>Empty</b></TD>
+<TD>
+                  Empty content.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>ElementOnly</b></TD>
+<TD>
+                  Element-only content.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>Mixed</b></TD>
+<TD>
+                  Mixed content model.
+                </TD>
+</TR>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ContentTypeParticleTopic1"></a><a name="ContentTypeParticle">ContentTypeParticle</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the particle which holds the post-compilation value of the <b>ContentTypeParticle</b> property. This <b>ContentTypeParticle</b> is determined after the content models of the most derived types and the base complex type have been resolved according to the rules defined in the World Wide Web Consortium (W3C) XML Schema definition language (XSD) specification.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchemaParticle.html">XmlSchemaParticle</a> ContentTypeParticle {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="DatatypeTopic1"></a><a name="Datatype">Datatype</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaType.html#Datatype">System.Xml.Schema.XmlSchemaType.Datatype</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the data type that holds the post-compilation value.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchemaDatatype.html">XmlSchemaDatatype</a> Datatype {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="DerivedByTopic1"></a><a name="DerivedBy">DerivedBy</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaType.html#DerivedBy">System.Xml.Schema.XmlSchemaType.DerivedBy</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, this property gets information that indicates how this element has been derived from a base type. This property holds the post-compilation value.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchemaDerivationMethod.html">XmlSchemaDerivationMethod</a> DerivedBy {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The value can contain a list that is a subset of <b>Extension</b>, <b>Restriction</b>, <b>Substitution</b>, <b>List</b>, or <b>Union</b>. The following table shows the values that this property can contain.<br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  Enum
+                </TH>
+<TH>
+                  Description
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD><b>None</b></TD>
+<TD> No derivation method specified.</TD>
+</TR>
+<TR valign="top">
+<TD><b>Substitution</b></TD>
+<TD>
+                  Derived by
+                  Substitution.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>Extension</b></TD>
+<TD>
+                  Derived by Extension.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>Restriction</b></TD>
+<TD>
+                  Derived by Restriction.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>List</b></TD>
+<TD>
+                  Derived by List.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>Union</b></TD>
+<TD>
+                  Derived by Union.
+                </TD>
+</TR>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="FinalTopic1"></a><a name="Final">Final</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaType.html#Final">System.Xml.Schema.XmlSchemaType.Final</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the <b>final</b> property to indicate that no further derivations are allowed.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchemaDerivationMethod.html">XmlSchemaDerivationMethod</a> Final {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The following table shows the values that this property can contain for simple type.<br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  Enum
+                </TH>
+<TH>
+                  Description
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD><b>Empty</b></TD>
+<TD>
+                  Overrides the schema
+                  <b>blockDefault</b>
+                  setting allowing any derivations, by restriction, extension, or substitution to take
+                  place.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>None</b></TD>
+<TD>
+                  No
+                  derivation method is specified. This is the default. Derivation rules are taken
+                  from the schema blockDefault setting.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>Substitution</b></TD>
+<TD>
+                  Cannot be replaced by a type derived by Substitution.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>Extension</b></TD>
+<TD>
+                  Cannot be replaced by a type derived by Extension.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>Restriction</b></TD>
+<TD>
+                  Cannot be replaced by a type derived by Restriction.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>All</b></TD>
+<TD><b>#all</b>
+                  . Cannot be replaced by a type derived by any
+                  derivation method.
+                </TD>
+</TR>
+</table>
+<p> The following table shows the values that this property can contain for complex type.</p><br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  Enum
+                </TH>
+<TH>
+                  Description
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD><b>Empty</b></TD>
+<TD>
+                  Overrides the schema
+                  <b>blockDefault</b>
+                  setting allowing any derivations, by restriction, extension, or substitution to take place.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>None</b></TD>
+<TD>
+                  No
+                  derivation method is specified. This is the default. Derivation
+                  rules are taken from the schema
+                  <b>blockDefault</b>
+                  setting.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>Substitution</b></TD>
+<TD>
+                  Cannot be replaced by a type derived by Substitution.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>Extension</b></TD>
+<TD>
+                  Cannot be replaced by a type derived by Extension.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>Restriction</b></TD>
+<TD>
+                  Cannot be replaced by a type derived by Restriction.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>All</b></TD>
+<TD><b>#all</b>
+                  . Cannot
+                  be replaced by a type derived by any derivation method.
+                </TD>
+</TR>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="FinalResolvedTopic1"></a><a name="FinalResolved">FinalResolved</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaType.html#FinalResolved">System.Xml.Schema.XmlSchemaType.FinalResolved</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the post-compilation value of the <b>Final</b> property that holds the post-compilation value of the <b>Final</b> property.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchemaDerivationMethod.html">XmlSchemaDerivationMethod</a> FinalResolved {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This value indicates how the type is restricted when the type is extended through restriction. If the type is marked as <b>final</b>, this type cannot be extended.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IdTopic1"></a><a name="Id">Id</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaAnnotated.html#Id">System.Xml.Schema.XmlSchemaAnnotated.Id</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the string id.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> Id {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The id value must be of type <b>ID</b> and be unique within the document containing this element.<p> Optional.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsAbstractTopic1"></a><a name="IsAbstract">IsAbstract</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the information that determines if the <b>complexType</b> element can be used in the instance document.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> IsAbstract {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Property: <i><a name="IsMixedTopic1"></a><a name="IsMixed">IsMixed</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets information that determines if the complex type has a mixed content model (markup within the content).</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Boolean.html">bool</a> IsMixed {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Indicates if character data can appear between the child elements of this <b>complexType</b>. If the <b>simpleContent</b> element is a child element, the <b>mixed</b> attribute is not allowed (<b>false</b>). If the <b>complexContent</b> element is a child element, the <b>mixed</b> attribute can be overridden by the <b>mixed</b> attribute on the <b>complexContent</b> element.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="LineNumberTopic1"></a><a name="LineNumber">LineNumber</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaObject.html#LineNumber">System.Xml.Schema.XmlSchemaObject.LineNumber</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the line number in the file to which the <b>schema</b> element refers.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> LineNumber {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd><b>LineNumber</b> is used to store the line number when a schema is read from a file. This is reported through  <a href="../../System.Xml.Schema/types/XmlSchemaException.html">XmlSchemaException</a> for error handling.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="LinePositionTopic1"></a><a name="LinePosition">LinePosition</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaObject.html#LinePosition">System.Xml.Schema.XmlSchemaObject.LinePosition</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the line position in the file to which the <b>schema</b> element refers.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> LinePosition {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This is used to store the line position when a schema is read from a file. This is reported through  <a href="../../System.Xml.Schema/types/XmlSchemaException.html">XmlSchemaException</a> for error handling.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NameTopic1"></a><a name="Name">Name</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaType.html#Name">System.Xml.Schema.XmlSchemaType.Name</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the name of the type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> Name {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The name must be an NCName (no-colon name) as defined in the World Wide Web Consortium (W3C) XML Namespaces specification. Optional. If specified, the name must be unique among all <b>simpleType</b> and <b>complexType</b> elements.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NamespacesTopic1"></a><a name="Namespaces">Namespaces</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaObject.html#Namespaces">System.Xml.Schema.XmlSchemaObject.Namespaces</a></font></b></dd>
+</dl><br><dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> Namespaces {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ParticleTopic1"></a><a name="Particle">Particle</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the compositor type as one of the  <a href="../../System.Xml.Schema/types/XmlSchemaGroupRef.html">XmlSchemaGroupRef</a>,  <a href="../../System.Xml.Schema/types/XmlSchemaChoice.html">XmlSchemaChoice</a>,  <a href="../../System.Xml.Schema/types/XmlSchemaAll.html">XmlSchemaAll</a>, or  <a href="../../System.Xml.Schema/types/XmlSchemaSequence.html">XmlSchemaSequence</a> classes.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchemaParticle.html">XmlSchemaParticle</a> Particle {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Particles must be one of the following compositors: <br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  Element
+                </TH>
+<TH>
+                  Description
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD><b>group</b></TD>
+<TD>
+                  The complex type contains the elements
+                  defined in the referenced group.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>sequence</b></TD>
+<TD>
+                  The complex type contains the elements defined in the specified
+                  sequence.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>choice</b></TD>
+<TD>
+                  The complex type allows one of the elements specified in the
+                  <b>choice</b>
+                  element.
+                </TD>
+</TR>
+<TR valign="top">
+<TD><b>all</b></TD>
+<TD>
+                  The complex type allows all of the elements specified in the
+                  <b>all</b>
+                  element to
+                  appear once or not at all.
+                </TD>
+</TR>
+</table>
+<p> This is mutually exclusive with the  <a href="#ContentModel">XmlSchemaComplexType.ContentModel</a> property.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="QualifiedNameTopic1"></a><a name="QualifiedName">QualifiedName</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaType.html#QualifiedName">System.Xml.Schema.XmlSchemaType.QualifiedName</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the qualified name for the type built from the <b>Name</b> attribute of this type. This holds the post-compilation value.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml/types/XmlQualifiedName.html">XmlQualifiedName</a> QualifiedName {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="SourceUriTopic1"></a><a name="SourceUri">SourceUri</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaObject.html#SourceUri">System.Xml.Schema.XmlSchemaObject.SourceUri</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the source location for the file that loaded the schema.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> SourceUri {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Provides information for exception handling.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="UnhandledAttributesTopic1"></a><a name="UnhandledAttributes">UnhandledAttributes</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Xml.Schema/types/XmlSchemaAnnotated.html#UnhandledAttributes">System.Xml.Schema.XmlSchemaAnnotated.UnhandledAttributes</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the qualified attributes that do not belong to the schema target namespace.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml/types/XmlAttribute.html">XmlAttribute[]</a> UnhandledAttributes {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~XmlSchemaComplexType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

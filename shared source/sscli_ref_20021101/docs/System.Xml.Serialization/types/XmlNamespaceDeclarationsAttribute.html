@@ -1,0 +1,457 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Xml.Serialization.XmlNamespaceDeclarationsAttribute</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Xml.Serialization.XmlNamespaceDeclarationsAttribute Class</h2><b>Assembly: </b>System.Xml.dll<br><b>Namespace: </b>System.Xml.Serialization<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Specifies that the target property, parameter, return value or class member contains prefixes associated with namespaces that are used within an XML document.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.ReturnValue)]<br><b>public class XmlNamespaceDeclarationsAttribute : Attribute</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Xml.Serialization/types/XmlNamespaceDeclarationsAttribute.html">XmlNamespaceDeclarationsAttribute</a> attribute can only be applied once in a class to a field or property that returns an  <a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> object.<p> The  <a href="../../System.Xml.Serialization/types/XmlNamespaceDeclarationsAttribute.html">XmlNamespaceDeclarationsAttribute</a> allows you to store the prefixes, and the associated namespaces, used in an XML document. For example, one common usage of the attribute is to store XPath data, as it is defined by the World Wide Web Consortium (www.w3.org) document named "XML Language (XPath) Version 1.0". In brief, an XPath is a string containing many namespace prefixes and local names, along with some other syntax.</p>
+<p> The XPath language allows for the association of a prefix with a path, and using the prefix within the XML document. For example, the following XML document named "select" contains a prefix ("cal") associated with a specific URI (http://www.cohowinery.com/calendar/). The element contains an attribute named "path" that contains the XPath.</p>
+<pre>
+          &lt;select xmlns:cal ="http://www.cohowinery.com/calendar/" path="cal:appointments/@startTime" /&gt;
+        </pre>
+<p> The schema for this might be: </p>
+<pre>
+          &lt;element name="select"&gt;
+             &lt;complexType&gt;
+                &lt;simpleContent&gt;
+                   &lt;attribute name="path" /&gt;
+                &lt;/simpleContent&gt;
+             &lt;/complexType&gt;
+          &lt;/element&gt;
+        </pre>
+<p> Without the  <a href="../../System.Xml.Serialization/types/XmlNamespaceDeclarationsAttribute.html">XmlNamespaceDeclarationsAttribute</a>, the association between the prefix and the namespace would be lost.</p>
+<p> To retain the association between the prefix and the namespace URI, add a member that returns an  <a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> object and apply the  <a href="../../System.Xml.Serialization/types/XmlNamespaceDeclarationsAttribute.html">XmlNamespaceDeclarationsAttribute</a> attribute to the member, as shown in the following C# and Visual Basic code: </p>
+<pre>
+          // C#
+          public class Select {
+            [XmlAttribute] public string path;
+            [XmlNamespaceDeclarations] public XmlSerializerNamespaces xmlns;
+          }
+          ' Visual Basic
+          Public Class Select
+             &lt;XmlAttribute&gt; Public path As String
+             &lt;XmlNamespaceDeclarations&gt; Public xmlns As XmlSerializerNamespaces
+          End Class
+        </pre>
+<p> When serialized, the schema for the generated XML document will contain the XML Schema definition (XSD) element named <code>
+            appinfo
+          </code>. The element further contains a metadata element named <code>
+            keepNamespaceDeclarations
+          </code>, set to the name of the member that contains the namespace declarations. The schema for such an XML document is shown below: </p>
+<pre>
+          &lt;xs:element name="select"&gt;
+             &lt;xs:complexType&gt;
+                &lt;xs:annotation&gt; 
+                   &lt;xs:appinfo&gt;
+                    &lt;keepNamespaceDeclarations&gt;xmlns&lt;/keepNamespaceDeclarations&gt;
+                   &lt;/xs:appinfo&gt; 
+                &lt;/xs:annotation&gt; 
+                &lt;xs:simpleContent&gt;
+                   &lt;xs:attribute name="path" /&gt;
+                &lt;/xs:simpleContent&gt;
+             &lt;/xs:complexType&gt;
+          &lt;/xs:element&gt;
+        </pre>
+<p> On deserialization, the <code>
+            xmlns
+          </code> field will contain an  <a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> object containing all namespace prefix definitions.</p>
+<p> On serialization, the user can add prefix-namespace pairs to the  <a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> object using the  <a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html#Add(System.String,System.String)">XmlSerializerNamespaces.Add</a> method. This is shown in the C# and Visual Basic code below: </p>
+<pre>
+          // C#
+          using System;
+          using System.IO;
+          using System.Xml.Serialization;
+          [XmlRoot("select")]
+          public class Select {
+             [XmlAttribute]
+             public string xpath;
+             [XmlNamespaceDeclarations]
+             public XmlSerializerNamespaces xmlns;
+          }
+          public class Test {
+             public static void Main(string[] args) {
+                Select mySelect = new Select();
+                mySelect.xpath = "myNS:ref/@common:y";
+                mySelect.xmlns = new XmlSerializerNamespaces();
+                mySelect.xmlns.Add("MyNS", "myNS.tempuri.org");
+                mySelect.xmlns.Add("common", "common.tempuri.org");
+                XmlSerializer ser = new XmlSerializer(typeof(Select));
+                ser.Serialize(Console.Out, mySelect);
+             }
+          }
+          // Output:
+          // &lt;?xml version="1.0" encoding="IBM437"?&gt;
+          // &lt;select xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+          // xmlns:common="common.tempuri.org" xmlns:MyNS="myNS.tempuri.org" xpath="myNS:ref/@common:y" /&gt;
+          ' Visual Basic
+          Imports System
+          Imports System.IO
+          Imports System.Xml.Serialization
+          &lt;XmlRoot("select")&gt; _
+          Public Class SelectPath
+             &lt;XmlAttribute&gt; _
+             Public xpath As String 
+             &lt;XmlNamespaceDeclarations&gt; _
+             public xmlns As XmlSerializerNamespaces 
+          End Class
+          Public Class Test 
+             Public Shared Sub Main() 
+                Dim mySelect As SelectPath = New SelectPath()
+                mySelect.xpath = "myNS:ref/@common:y"
+                mySelect.xmlns = New XmlSerializerNamespaces()
+                mySelect.xmlns.Add("MyNS", "myNS.tempuri.org")
+                mySelect.xmlns.Add("common", "common.tempuri.org")
+                Dim ser As XmlSerializer = New XmlSerializer(mySelect.GetType)
+                ser.Serialize(Console.Out, mySelect)
+             End Sub
+          End Class
+          'Output:
+          ' &lt;?xml version="1.0" encoding="IBM437"?&gt;
+          ' &lt;select xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+          ' xmlns:common="common.tempuri.org" xmlns:MyNS="myNS.tempuri.org" xpath="myNS:ref/@common:y" /&gt;
+        </pre>
+<p> Also note that the member to which the attribute is applied will contain only the prefix-namespace pairs belonging to the XML element defined by the class. For example, in the XML document shown below, only the prefix pair "cal" will be captured, but not the "x" prefix. To get that data, add a member with the  <a href="../../System.Xml.Serialization/types/XmlNamespaceDeclarationsAttribute.html">XmlNamespaceDeclarationsAttribute</a> to the class representing the <code>
+            root
+          </code> element.</p>
+<pre>
+          &lt;?xml version="1.0"?&gt;
+          &lt;x:root xmlns:x="http://www.cohowinery.com/x/"&gt;
+            &lt;x:select xmlns:cal="http://www.cohowinery.com/calendar/" path="cal:appointments/@cal:startTime" /&gt;
+          &lt;/x:root&gt;
+        </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Xml.Serialization/System.Xml.Serialization.html">System.Xml.Serialization Namespace</a></dd>
+</dl>
+<h3>System.Xml.Serialization.XmlNamespaceDeclarationsAttribute Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%">Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlNamespaceDeclarationsAttribute.html">XmlNamespaceDeclarationsAttribute</a> class.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#TypeId">TypeId</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#TypeId">System.Attribute.TypeId</a></font></b><br><br><br> When implemented in a derived class, gets a unique identifier for this <b>Attribute</b>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#GetHashCode">System.Attribute.GetHashCode</a></font></b><br><br><br> Returns the hash code for this instance.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsDefaultAttribute">IsDefaultAttribute</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#IsDefaultAttribute">System.Attribute.IsDefaultAttribute</a></font></b><br><br><br> When overridden in a derived class, returns an indication whether the value of this instance is the default value for the derived class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Match(System.Object)">Match</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#Match(System.Object)">System.Attribute.Match</a></font></b><br><br><br> When overridden in a derived class, returns a value indicating whether this instance equals a specified object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/Attribute.html">System.Attribute</a></li>
+<ul class="none">
+<li><b>System.Xml.Serialization.XmlNamespaceDeclarationsAttribute</b></li>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Xml.Serialization.XmlNamespaceDeclarationsAttribute Member Details</h3><b><i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlNamespaceDeclarationsAttribute.html">XmlNamespaceDeclarationsAttribute</a> class.</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlNamespaceDeclarationsAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Xml.Serialization/types/XmlNamespaceDeclarationsAttribute.html">XmlNamespaceDeclarationsAttribute</a> can only be applied to a target that returns an  <a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> object.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="TypeIdTopic1"></a><a name="TypeId">TypeId</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#TypeId">System.Attribute.TypeId</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When implemented in a derived class, gets a unique identifier for this <b>Attribute</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> TypeId {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> As implemented, this identifier is merely the  <a href="../../System/types/Type.html">Type</a> of the attribute. However, it is intended that the unique identifier be used to identify two attributes of the same type.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~XmlNamespaceDeclarationsAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#GetHashCode">System.Attribute.GetHashCode</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the hash code for this instance.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A 32-bit signed integer hash code.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IsDefaultAttributeTopic1"></a><a name="IsDefaultAttribute">IsDefaultAttribute</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#IsDefaultAttribute">System.Attribute.IsDefaultAttribute</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, returns an indication whether the value of this instance is the default value for the derived class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsDefaultAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if this instance is the default attribute for the class; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The default implementation of this class returns <b>false</b>, and must be implemented in the derived class to be useful to that class.<p> The implementation of this method in a derived class compares the value of this instance to a standard, default value obtained by some means, then returns a Boolean value that indicates whether the value of this instance is equal to the standard. The standard value is typically coded as a constant in the implementation, or stored programmatically in a field used by the implementation.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MatchTopic1"></a><a name="Match(System.Object)">Match</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#Match(System.Object)">System.Attribute.Match</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, returns a value indicating whether this instance equals a specified object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Match(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> An  <a href="../../System/types/Object.html">Object</a> to compare with this instance of <b>Attribute</b>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if this instance equals <i>obj</i>; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method determines if one <b>Attribute</b> equals another. Its default implementation is the same as  <a href="#Equals(System.Object)">Attribute.Equals</a>, which performs a value and reference comparison. Override this method to implement support for attribute values, such as flags or bitfields, that consist of components that are meaningful in themselves. For example, consider an attribute whose value is a binary field divided into a bitfield of flags. Two instances of this attribute have one flag in set in common while all the other flags differ. The <b>Equal</b> method cannot determine that the two instances have the same flag set, but the <b>Match</b> method can.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

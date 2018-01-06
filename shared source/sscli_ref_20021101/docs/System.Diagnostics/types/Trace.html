@@ -1,0 +1,2033 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Diagnostics.Trace</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Diagnostics.Trace Class</h2><b>Assembly: </b>System.dll<br><b>Namespace: </b>System.Diagnostics<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides a set of methods and properties that help you trace the execution of your code. This class cannot be inherited.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public sealed class Trace
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Thread Safety</b><br><dl>
+<dd> This type is safe for multithreaded operations.</dd>
+</dl><b>Remarks</b><dl>
+<dd> You can use the properties and methods in the  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> class to instrument release builds. Instrumentation allows you to monitor the health of your application running in real-life settings. Tracing helps you isolate problems and fix them without disturbing a running system.<br><br><b>Note </b> To enable debugging in C#, add the <b>/d:TRACE</b> flag to the compiler command line when you compile your code, or you can add <b>#define TRACE</b> to the top of your file. In Visual Basic, add the <b>/d:TRACE=True</b> flag to the compiler command line. To provide equivalent funtionality in the Managed Extensions for C++, you must enclose calls to methods of this class in a <b>#ifdef TRACE ... #endif</b> block. This syntax is compiler-specific. If you are using a compiler other than the ones specified above, you must refer to the compiler's documentation to enable conditional compiling because of the conditional compilation attributes placed on the methods of the  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> class.<p> In Visual Studio .NET projects,  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> is enabled by default. Therefore, code is generated for all  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> methods in both release and debug builds. This allows an end user to turn on tracing to help identify the problem without the program having to be recompiled. By contrast,  <a href="../../System.Diagnostics/types/Debug.html">Debug</a> is disabled in release builds by default, so no executable code is generated for  <a href="../../System.Diagnostics/types/Debug.html">Debug</a> methods. To disable  <a href="../../System.Diagnostics/types/Trace.html">Trace</a>, see the Visual Studio .NET documentation.</p>
+<p> This class provides methods to display an  <a href="#Assert(System.Boolean)">Trace.Assert</a> dialog box, and to emit an assertion that will always  <a href="#Fail(System.String)">Trace.Fail</a>. This class provides write methods in the following variations:  <a href="#Write(System.String)">Trace.Write</a>,  <a href="#WriteLine(System.String)">Trace.WriteLine</a>,  <a href="#WriteIf(System.Boolean,System.String)">Trace.WriteIf</a>, and  <a href="#WriteLineIf(System.Boolean,System.String)">Trace.WriteLineIf</a>.</p>
+<p> The  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> and  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> classes provide means to dynamically control the tracing output. You can modify the values of these switches without recompiling your application. For information on using the configuration file to set a switch, see the  <a href="../../System.Diagnostics/types/Switch.html">Switch</a> class and TraceSwitch Configuration topic in the Visual Studio .NET documentation.</p>
+<p> You can customize the tracing output's target by adding  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> instances to or removing instances from the  <a href="#Listeners">Trace.Listeners</a> collection. By default, trace output is emitted using the  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> class.</p>
+<p> The  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> class provides properties to get or set the level of  <a href="#Indent">Trace.Indent</a>, the  <a href="#IndentSize">Trace.IndentSize</a>, and whether to  <a href="#AutoFlush">Trace.AutoFlush</a> after each write.</p>
+<p> To set the  <a href="#AutoFlush">Trace.AutoFlush</a> and  <a href="#IndentSize">Trace.IndentSize</a> for  <a href="../../System.Diagnostics/types/Trace.html">Trace</a>, you can edit the configuration file that corresponds to the name of your application. The configuration file should be formatted like the following example: </p>
+<pre>
+          &lt;configuration&gt;
+             &lt;system.diagnostics&gt;
+                &lt;trace autoflush="false" indentsize="3" /&gt;
+             &lt;/system.diagnostics&gt;
+          &lt;/configuration&gt;
+        </pre>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example uses  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> to indicate the beginning and the end of a program's execution. The example also uses  <a href="#Indent">Trace.Indent</a> and  <a href="#Unindent">Trace.Unindent</a> to distinguish the tracing output.<pre>
+public int Main(string[] args)
+{
+   Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
+   Trace.AutoFlush = true;
+   Trace.Indent();
+   Trace.WriteLine("Entering Main");
+   Console.WriteLine("Hello World.");
+   Trace.WriteLine("Exiting Main"); 
+   Trace.Unindent();
+   return 0;
+}
+
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Diagnostics/System.Diagnostics.html">System.Diagnostics Namespace</a> |  <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Switch.html">Switch</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDiagnosticsEventLogTraceListenermemberstopic.asp">EventLogTraceListener</a> |  <a href="../../System.Diagnostics/types/TraceListenerCollection.html">TraceListenerCollection</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a></dd>
+</dl>
+<h3>System.Diagnostics.Trace Member List: </h3>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#AutoFlush">AutoFlush</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets whether  <a href="#Flush">Trace.Flush</a> should be called on the  <a href="#Listeners">Trace.Listeners</a> after every write.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IndentLevel">IndentLevel</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the indent level.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IndentSize">IndentSize</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the number of spaces in an indent.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Listeners">Listeners</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the collection of listeners that is monitoring the trace output.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Assert(System.Boolean)">Assert</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Assert(bool condition)<br><br></code> Checks for a condition, and outputs the call stack if the condition is <b>false</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Assert(System.Boolean,System.String)">Assert</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Assert(bool condition, string message)<br><br></code> Checks for a condition, and displays a message if the condition is <b>false</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Assert(System.Boolean,System.String,System.String)">Assert</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Assert(bool condition, string message, string detailMessage)<br><br></code> Checks for a condition, and displays both messages if the condition is <b>false</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Close">Close</a></td>
+<td width="55%"> Flushes the output buffer, and then closes the  <a href="#Listeners">Trace.Listeners</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Fail(System.String)">Fail</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Fail(string message)<br><br></code> Emits the specified error message.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Fail(System.String,System.String)">Fail</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Fail(string message, string detailMessage)<br><br></code> Emits an error message, and a detailed error message.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Flush">Flush</a></td>
+<td width="55%"> Flushes the output buffer, and causes buffered data to be written to the  <a href="#Listeners">Trace.Listeners</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Indent">Indent</a></td>
+<td width="55%"> Increases the current  <a href="#IndentLevel">Trace.IndentLevel</a> by one.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Unindent">Unindent</a></td>
+<td width="55%"> Decreases the current  <a href="#IndentLevel">Trace.IndentLevel</a> by one.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Write(System.Object)">Write</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Write(object value)<br><br></code> Writes the value of the object's  <a href="../../System/types/Object.html#ToString">Object.ToString</a> method to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Write(System.String)">Write</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Write(string message)<br><br></code> Writes a message to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Write(System.Object,System.String)">Write</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Write(object value, string category)<br><br></code> Writes a category name and the value of the object's  <a href="../../System/types/Object.html#ToString">Object.ToString</a> method to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Write(System.String,System.String)">Write</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Write(string message, string category)<br><br></code> Writes a category name and a message to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteIf(System.Boolean,System.Object)">WriteIf</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteIf(bool condition, object value)<br><br></code> Writes the value of the object's  <a href="../../System/types/Object.html#ToString">Object.ToString</a> method to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection if a condition is <b>true</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteIf(System.Boolean,System.String)">WriteIf</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteIf(bool condition, string message)<br><br></code> Writes a message to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection if a condition is <b>true</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteIf(System.Boolean,System.Object,System.String)">WriteIf</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteIf(bool condition, object value, string category)<br><br></code> Writes a category name and the value of the object's  <a href="../../System/types/Object.html#ToString">Object.ToString</a> method to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection if a condition is <b>true</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteIf(System.Boolean,System.String,System.String)">WriteIf</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteIf(bool condition, string message, string category)<br><br></code> Writes a category name and message to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection if a condition is <b>true</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteLine(System.Object)">WriteLine</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteLine(object value)<br><br></code> Writes the value of the object's  <a href="../../System/types/Object.html#ToString">Object.ToString</a> method to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteLine(System.String)">WriteLine</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteLine(string message)<br><br></code> Writes a message to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteLine(System.Object,System.String)">WriteLine</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteLine(object value, string category)<br><br></code> Writes a category name and the value of the object's  <a href="../../System/types/Object.html#ToString">Object.ToString</a> method to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteLine(System.String,System.String)">WriteLine</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteLine(string message, string category)<br><br></code> Writes a category name and message to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteLineIf(System.Boolean,System.Object)">WriteLineIf</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteLineIf(bool condition, object value)<br><br></code> Writes the value of the object's  <a href="../../System/types/Object.html#ToString">Object.ToString</a> method to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection if a condition is <b>true</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteLineIf(System.Boolean,System.String)">WriteLineIf</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteLineIf(bool condition, string message)<br><br></code> Writes a message to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection if a condition is <b>true</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteLineIf(System.Boolean,System.Object,System.String)">WriteLineIf</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteLineIf(bool condition, object value, string category)<br><br></code> Writes a category name and the value of the object's  <a href="../../System/types/Object.html#ToString">Object.ToString</a> method to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection if a condition is <b>true</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteLineIf(System.Boolean,System.String,System.String)">WriteLineIf</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>WriteLineIf(bool condition, string message, string category)<br><br></code> Writes a category name and message to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection if a condition is <b>true</b>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Diagnostics.Trace</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Diagnostics.Trace Member Details</h3><b>Property: <i><a name="AutoFlushTopic1"></a><a name="AutoFlush">AutoFlush</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets whether  <a href="#Flush">Trace.Flush</a> should be called on the  <a href="#Listeners">Trace.Listeners</a> after every write.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Boolean.html">bool</a> AutoFlush {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The default is <b>false</b>.<p> Flushing the stream will not flush its underlying encoder unless you explicitly call  <a href="#Flush">Trace.Flush</a> or  <a href="#Close">Trace.Close</a>. Setting  <a href="#AutoFlush">Trace.AutoFlush</a> to <b>true</b> means that data will be flushed from the buffer to the stream, but the encoder state will not be flushed. This allows the encoder to keep its state (partial characters) so that it can encode the next block of characters correctly. This scenario affects UTF8 and UTF7 where certain characters can only be encoded after the encoder receives the adjacent character or characters.</p>
+<p> To set the  <a href="#AutoFlush">Trace.AutoFlush</a> and  <a href="#IndentSize">Trace.IndentSize</a> for  <a href="../../System.Diagnostics/types/Trace.html">Trace</a>, you can also edit the configuration file that corresponds to the name of your application. The configuration file should be formatted like the following example: </p>
+<pre>
+              &lt;configuration&gt;
+                  &lt;system.diagnostics&gt;
+                     &lt;trace autoflush="false" indentsize="3" /&gt;
+                  &lt;/system.diagnostics&gt;
+               &lt;/configuration&gt;
+            </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IndentLevelTopic1"></a><a name="IndentLevel">IndentLevel</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the indent level.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Int32.html">int</a> IndentLevel {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property is stored on per-thread/per-request basis.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example increments and decrements the indent level and emits tracing messages.<pre>
+Trace.WriteLine("List of errors:");
+ Trace.Indent();
+ Trace.WriteLine("Error 1: File not found");
+ Trace.WriteLine("Error 2: Directory not found");
+ Trace.Unindent();
+ Trace.WriteLine("End of list of errors");
+   
+
+    </pre>
+<p> This example produces the following output: </p>
+<pre>
+
+List of errors:
+     Error 1: File not found
+     Error 2: Directory not found
+End of list of errors
+   
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#IndentSize">Trace.IndentSize</a> |  <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IndentSizeTopic1"></a><a name="IndentSize">IndentSize</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the number of spaces in an indent.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Int32.html">int</a> IndentSize {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> A  <a href="../../System.Diagnostics/types/TextWriterTraceListener.html">TextWriterTraceListener</a> interprets this number as spaces. An  <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDiagnosticsEventLogTraceListenermemberstopic.asp">EventLogTraceListener</a> ignores this value.<p> This property is stored on per-thread/per-request basis.</p>
+<p> To set the  <a href="#AutoFlush">Trace.AutoFlush</a> and  <a href="#IndentSize">Trace.IndentSize</a> for  <a href="../../System.Diagnostics/types/Trace.html">Trace</a>, you can also edit the configuration file that corresponds to the name of your application. The configuration file should be formatted like the following example: </p>
+<pre>
+              &lt;configuration&gt;
+                  &lt;system.diagnostics&gt;
+                     &lt;trace autoflush="false" indentsize="3" /&gt;
+                  &lt;/system.diagnostics&gt;
+               &lt;/configuration&gt;
+            </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#IndentLevel">Trace.IndentLevel</a> |  <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ListenersTopic1"></a><a name="Listeners">Listeners</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the collection of listeners that is monitoring the trace output.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Diagnostics/types/TraceListenerCollection.html">TraceListenerCollection</a> Listeners {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The listeners produce formatted output from the trace output. By default, the collection contains an instance of the  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> class. If you want to remove the default listener, call the  <a href="../../System.Diagnostics/types/TraceListenerCollection.html#Remove">TraceListenerCollection.Remove</a> method, and pass it the instance of the  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a>. To redirect output to the console window, add an instance of the  <a href="../../System.Diagnostics/types/TextWriterTraceListener.html">TextWriterTraceListener</a> that uses the <b>Console.Out</b> stream.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Diagnostics/types/TextWriterTraceListener.html">TextWriterTraceListener</a> that outputs to the console screen. The code then adds the new listener to the  <a href="#Listeners">Trace.Listeners</a>.<pre>
+/* Create a listener, which outputs to the console screen, and 
+  * add it to the trace listeners. */
+ TextWriterTraceListener myWriter = new 
+    TextWriterTraceListener(System.Console.Out);
+ Trace.Listeners.Add(myWriter);
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AssertTopic1"></a><a name="Assert(System.Boolean)">Assert</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Checks for a condition, and outputs the call stack if the condition is <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void Assert(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>condition</i><br><dl>
+<dd>
+<param><b>true</b> to prevent a message being displayed; otherwise, <b>false</b>.<b>true</b> to prevent a message being displayed; otherwise, <b>false</b>.</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#Assert(System.Boolean)">Trace.Assert</a> outputs the call stack with file and line number for each line in the call stack.<p> Typically, you use  <a href="#Assert(System.Boolean)">Trace.Assert</a> to identify logic errors during program development. <a href="#Assert(System.Boolean)">Trace.Assert</a> will evaluate the <i>condition</i>. If the result is <b>false</b>, it sends diagnostic messages to the  <a href="#Listeners">Trace.Listeners</a>.</p>
+<p> The default behavior displays a message box when the application runs in user-interface mode, and to output the message to the default trace output. You can customize this behavior by adding a  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> to, or removing one from, the  <a href="#Listeners">Trace.Listeners</a> collection.</p>
+<p> To set an assert, you can also edit the configuration file that corresponds to the name of your application. Within this file, you can enable and disable the assert or set the name of its log file. The configuration file should be formatted like the following example: </p>
+<pre>
+              &lt;configuration&gt;
+                 &lt;system.diagnostics&gt;
+                    &lt;switches&gt;
+                       &lt;add name="mySwitch" value="4"/&gt;
+                    &lt;/switches&gt;
+                    &lt;trace autoflush="false" indentsize="4"/&gt;
+                    &lt;assert assertuienabled="true" logfilename=".\TraceLog.txt"/&gt;
+                 &lt;/system.diagnostics&gt;
+              &lt;/configuration&gt;
+            </pre>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates an index for an array. Then some action is performed that sets the value of the index. Next the code calls  <a href="#Assert(System.Boolean)">Trace.Assert</a> to verify the index value is valid. If it is not valid, the  <a href="#Assert(System.Boolean)">Trace.Assert</a> outputs the call stack.<pre>
+// Create an index for an array.
+ protected int index;
+ 
+ protected void Method()
+ { 
+ // Perform some action that sets the index.
+ 
+ // Test that the index value is valid. 
+ Trace.Assert(index &gt; -1);
+ }  
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AssertTopic2"></a><a name="Assert(System.Boolean,System.String)">Assert</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Checks for a condition, and displays a message if the condition is <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void Assert(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>condition</i><br><dl>
+<dd>
+<param><b>true</b> to prevent a message being displayed; otherwise, <b>false</b>.<b>true</b> to prevent a message being displayed; otherwise, <b>false</b>.</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>message</i><br><dl>
+<dd>
+<param> A message to display. A message to display.</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Typically, you use  <a href="#Assert(System.Boolean)">Trace.Assert</a> to identify logic errors during program development. <a href="#Assert(System.Boolean)">Trace.Assert</a> will evaluate the <i>condition</i> parameter. If the result is <b>false</b>, it sends diagnostic messages to the  <a href="#Listeners">Trace.Listeners</a>. The default behavior displays a message box when the application runs in user-interface mode, and to output the message to the default trace output. You can customize this behavior by adding a  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> to, or removing one from, the  <a href="#Listeners">Trace.Listeners</a> collection.<p> To set an assert, you can also edit the configuration file that corresponds to the name of your application. Within this file, you can enable and disable the assert or set the name of its log file. The configuration file should be formatted like the following example: </p>
+<pre>
+              &lt;configuration&gt;
+                 &lt;system.diagnostics&gt;
+                    &lt;switches&gt;
+                       &lt;add name="mySwitch" value="4"/&gt;
+                    &lt;/switches&gt;
+                    &lt;trace autoflush="false" indentsize="4"/&gt;
+                    &lt;assert assertuienabled="true" logfilename=".\TraceLog.txt"/&gt;
+                 &lt;/system.diagnostics&gt;
+              &lt;/configuration&gt;
+            </pre>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example checks to see that the <code>
+                type
+              </code> parameter is valid. If the <code>
+                type
+              </code> passed in is <b>null</b>, the  <a href="#Assert(System.Boolean)">Trace.Assert</a> outputs a message.<pre>
+public static void MyMethod(Type type, Type baseType) {
+    Trace.Assert(type != null, "Type parameter is null");
+ 
+   // Perform some processing.
+ }
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AssertTopic3"></a><a name="Assert(System.Boolean,System.String,System.String)">Assert</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>detailMessage</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Checks for a condition, and displays both messages if the condition is <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void Assert(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>detailMessage</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>condition</i><br><dl>
+<dd>
+<param><b>true</b> to prevent a message being displayed; otherwise, <b>false</b>.<b>true</b> to prevent a message being displayed; otherwise, <b>false</b>.</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>message</i><br><dl>
+<dd>
+<param> A message to display. A message to display.</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>detailMessage</i><br><dl>
+<dd>
+<param> A detailed message to display.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Typically, you use  <a href="#Assert(System.Boolean)">Trace.Assert</a> to identify logic errors during program development. <a href="#Assert(System.Boolean)">Trace.Assert</a> will evaluate the condition. If the result is <b>false</b>, it sends diagnostic messages to the  <a href="#Listeners">Trace.Listeners</a>.<p> The default behavior is to display a message box when the application runs in user-interface mode, and to output the message to the default trace output. You can customize this behavior by adding a  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> to, or removing one from, the  <a href="#Listeners">Trace.Listeners</a> collection.</p>
+<p> To set an assert, you can also edit the configuration file that corresponds to the name of your application. Within this file, you can enable and disable the assert or set the name of its log file. The configuration file should be formatted like the following example: </p>
+<pre>
+              &lt;configuration&gt;
+                 &lt;system.diagnostics&gt;
+                    &lt;switches&gt;
+                       &lt;add name="mySwitch" value="4"/&gt;
+                    &lt;/switches&gt;
+                    &lt;trace autoflush="false" indentsize="4"/&gt;
+                    &lt;assert assertuienabled="true" logfilename=".\TraceLog.txt"/&gt;
+                 &lt;/system.diagnostics&gt;
+              &lt;/configuration&gt;
+            </pre>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example checks to see that the <code>
+                type
+              </code> parameter is valid. If the <code>
+                type
+              </code> passed in is <b>null</b>, the  <a href="#Assert(System.Boolean)">Trace.Assert</a> outputs a message.<pre>
+public static void MyMethod(Type type, Type baseType) {
+    Trace.Assert(type != null, "Type parameter is null", 
+       "Can't get object for null type");
+ 
+   // Perform some processing.
+ }
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CloseTopic1"></a><a name="Close">Close</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Flushes the output buffer, and then closes the  <a href="#Listeners">Trace.Listeners</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void Close();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Use this method when the output is going to a file, such as to the  <a href="../../System.Diagnostics/types/TextWriterTraceListener.html">TextWriterTraceListener</a>.<p> Flushing the stream will not flush its underlying encoder unless you explicitly call  <a href="#Flush">Trace.Flush</a> or  <a href="#Close">Trace.Close</a>. Setting  <a href="#AutoFlush">Trace.AutoFlush</a> to <b>true</b> means that data will be flushed from the buffer to the stream, but the encoder state will not be flushed. This allows the encoder to keep its state (partial characters) so that it can encode the next block of characters correctly. This scenario affects UTF8 and UTF7 where certain characters can only be encoded after the encoder receives the adjacent character or characters.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Diagnostics/types/TextWriterTraceListener.html">TextWriterTraceListener</a> named <code>
+                myTextListener
+              </code>.<code>
+                myTextListener
+              </code> uses a  <a href="../../System.IO/types/StreamWriter.html">StreamWriter</a> called <code>
+                myOutputWriter
+              </code> to write to a file named <code>
+                TestFile.txt
+              </code>. The example creates the file, stream and text writer, writes one line of text to the file, and then flushes and closes the output.<pre>
+public static void Main(string[] args) {
+    // Create a file for output named TestFile.txt.
+    String myFileName = "TestFile.txt";
+    if(!File.Exists(myFileName))
+    {
+       Stream myFile = File.Create(myFileName);
+ 
+    // Assign output file to output stream.
+    StreamWriter myOutputWriter;
+    myOutputWriter = File.AppendText(myFileName);
+ 
+    /* Create a new text writer using the output stream, and 
+     * add it to the trace listeners. */
+    TextWriterTraceListener myTextListener = new 
+       TextWriterTraceListener(myOutputWriter);
+    Trace.Listeners.Add(myTextListener);
+ 
+    // Write output to the file.
+    Trace.WriteLine("Test output");
+ 
+    // Flush and close the output stream.
+    Trace.Flush();
+    Trace.Close();
+   }
+ }
+ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="FailTopic1"></a><a name="Fail(System.String)">Fail</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Emits the specified error message.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void Fail(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>message</i><br><dl>
+<dd>
+<param> A message to emit.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The default behavior for the default trace listener is to output the <i>message</i> parameter to a message box when the application runs in user-interface mode, and to the  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> instances in the  <a href="#Listeners">Trace.Listeners</a> collection. You can customize this behavior by adding a  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> to, or by removing one from, the  <a href="#Listeners">Trace.Listeners</a> collection.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example uses the  <a href="#Fail(System.String)">Trace.Fail</a> method to print a message during exception handling.<pre>
+        catch (Exception) {
+            Trace.Fail("Cannot find SpecialController, proceeding with StandardController");
+        }
+
+    </pre>
+<p> You can also use the  <a href="#Fail(System.String)">Trace.Fail</a> method in a switch statement.</p>
+<pre>
+        switch (option) {
+            case Option.First:
+               result = 1.0;
+               break;
+         
+            // Insert additional cases.
+            default:
+               Trace.Fail("Unknown Option " + option);
+               result = 1.0;
+               break;
+        }
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="FailTopic2"></a><a name="Fail(System.String,System.String)">Fail</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>detailMessage</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Emits an error message, and a detailed error message.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void Fail(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>detailMessage</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>message</i><br><dl>
+<dd>
+<param> A message to emit.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>detailMessage</i><br><dl>
+<dd>
+<param> A detailed message to emit.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The default behavior is for the default trace listener to output the <i>message</i> parameter and the <i>detailedMessage</i> parameter to a message box when the application runs in user-interface mode, and to the  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> instances in the  <a href="#Listeners">Trace.Listeners</a> collection. You can customize this behavior by adding a  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> to, or by removing one from, the  <a href="#Listeners">Trace.Listeners</a> collection.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example uses the  <a href="#Fail(System.String)">Trace.Fail</a> method to print a message during exception handling.<pre>
+        catch (Exception) {
+            Trace.Fail("Invalid value: " + value.ToString(), 
+               "Resetting value to newValue.");
+            value = newValue;
+        }
+
+    </pre>
+<p> You can also use the  <a href="#Fail(System.String)">Trace.Fail</a> method in a switch statement.</p>
+<pre>
+        switch (option) {
+            case Option.First:
+               result = 1.0;
+               break;
+         
+            // Insert additional cases.
+         
+            default:
+               Trace.Fail("Unknown Option " + option, "Result set to 1.0");
+               result = 1.0;
+               break;
+        }
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~Trace();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FlushTopic1"></a><a name="Flush">Flush</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Flushes the output buffer, and causes buffered data to be written to the  <a href="#Listeners">Trace.Listeners</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void Flush();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Flushing the stream will not flush its underlying encoder unless you explicitly call  <a href="#Flush">Trace.Flush</a> or  <a href="#Close">Trace.Close</a>. Setting  <a href="#AutoFlush">Trace.AutoFlush</a> to <b>true</b> means that data will be flushed from the buffer to the stream, but the encoder state will not be flushed. This allows the encoder to keep its state (partial characters) so that it can encode the next block of characters correctly. This scenario affects UTF8 and UTF7 where certain characters can only be encoded after the encoder receives the adjacent character or characters.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Diagnostics/types/TextWriterTraceListener.html">TextWriterTraceListener</a> named <code>
+                myTextListener
+              </code>.<code>
+                myTextListener
+              </code> uses a  <a href="../../System.IO/types/StreamWriter.html">StreamWriter</a> called <code>
+                myOutputWriter
+              </code> to write to a file named <code>
+                TestFile.txt
+              </code>. The example creates the file, stream and text writer, writes one line of text to the file, and then flushes and closes the output.<pre>
+public static void Main(string[] args) {
+    // Create a file for output named TestFile.txt.
+    String myFileName = "TestFile.txt";
+    if(!File.Exists(myFileName))
+    {
+       Stream myFile = File.Create(myFileName);
+ 
+    // Assign output file to output stream.
+    StreamWriter myOutputWriter;
+    myOutputWriter = File.AppendText(myFileName);
+ 
+    /* Create a new text writer using the output stream, and 
+     * add it to the trace listeners. */
+    TextWriterTraceListener myTextListener = new 
+       TextWriterTraceListener(myOutputWriter);
+    Trace.Listeners.Add(myTextListener);
+ 
+    // Write output to the file.
+    Trace.WriteLine("Test output");
+ 
+    // Flush and close the output stream.
+    Trace.Flush();
+    Trace.Close();
+   }
+ }
+ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IndentTopic1"></a><a name="Indent">Indent</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Increases the current  <a href="#IndentLevel">Trace.IndentLevel</a> by one.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void Indent();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example increments and decrements the indent level and emits tracing messages.<pre>
+Trace.WriteLine("List of errors:");
+ Trace.Indent();
+ Trace.WriteLine("Error 1: File not found");
+ Trace.WriteLine("Error 2: Directory not found");
+ Trace.Unindent();
+ Trace.WriteLine("End of list of errors");
+   
+
+    </pre>
+<p> This example produces the following output: </p>
+<pre>
+
+List of errors:
+     Error 1: File not found
+     Error 2: Directory not found
+End of list of errors
+   
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Unindent">Trace.Unindent</a> |  <a href="#IndentLevel">Trace.IndentLevel</a> |  <a href="#IndentSize">Trace.IndentSize</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="UnindentTopic1"></a><a name="Unindent">Unindent</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Decreases the current  <a href="#IndentLevel">Trace.IndentLevel</a> by one.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void Unindent();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example increments and decrements the indent level and emits tracing messages.<pre>
+Trace.WriteLine("List of errors:");
+ Trace.Indent();
+ Trace.WriteLine("Error 1: File not found");
+ Trace.WriteLine("Error 2: Directory not found");
+ Trace.Unindent();
+ Trace.WriteLine("End of list of errors");
+   
+
+    </pre>
+<p> This example produces the following output: </p>
+<pre>
+
+List of errors:
+     Error 1: File not found
+     Error 2: Directory not found
+End of list of errors
+   
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Indent">Trace.Indent</a> |  <a href="#IndentLevel">Trace.IndentLevel</a> |  <a href="#IndentSize">Trace.IndentSize</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteTopic1"></a><a name="Write(System.Object)">Write</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes the value of the object's  <a href="../../System/types/Object.html#ToString">Object.ToString</a> method to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void Write(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> An  <a href="../../System/types/Object.html">Object</a> whose name is sent to the  <a href="#Listeners">Trace.Listeners</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, the output is written to an instance of  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a>.<p> This method calls the  <a href="../../System.Diagnostics/types/TraceListener.html#Write(System.String)">TraceListener.Write</a> method of the trace listener.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> named <code>
+                generalSwitch
+              </code>. This switch is set outside the code sample.<p> If the switch is set to the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a><b>Error</b> or higher, the example outputs the first name of the <i>value</i> parameter to the  <a href="#Listeners">Trace.Listeners</a>. For information on adding a listener to the  <a href="#Listeners">Trace.Listeners</a> collection, see the  <a href="../../System.Diagnostics/types/TraceListenerCollection.html">TraceListenerCollection</a> class.</p>
+<p> Then, if the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a> is set to <b>Verbose</b>, the example outputs a message on the same line as the first message. The second message is followed by a line terminator.</p>
+<pre>
+// Class-level declaration.
+ // Create a TraceSwitch.
+ static TraceSwitch generalSwitch = new TraceSwitch("General", "Entire Application");
+ 
+ static public void MyErrorMethod(Object myObject) {
+    // Write the message if the TraceSwitch level is set to Error or higher.
+    if(generalSwitch.TraceError)
+       Trace.Write(myObject);
+ 
+    // Write a second message if the TraceSwitch level is set to Verbose.
+    if(generalSwitch.TraceVerbose)
+       Trace.WriteLine(" is not a valid value for this method.");
+ }
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteTopic2"></a><a name="Write(System.String)">Write</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes a message to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void Write(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>message</i><br><dl>
+<dd>
+<param> A message to write. A message to write.</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, the output is written to an instance of  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a>.<p> This method calls the  <a href="../../System.Diagnostics/types/TraceListener.html#Write(System.String)">TraceListener.Write</a> method of the trace listener.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> named <code>
+                generalSwitch
+              </code>. This switch is set outside the code sample.<p> If the switch is set to the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a><b>Error</b> or higher, the example outputs the first error message to the  <a href="#Listeners">Trace.Listeners</a>. For information on adding a listener to the  <a href="#Listeners">Trace.Listeners</a> collection, see the  <a href="../../System.Diagnostics/types/TraceListenerCollection.html">TraceListenerCollection</a> class.</p>
+<p> Then, if the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a> is set to <b>Verbose</b>, the example outputs the second error message on the same line as the first message. A line terminator follows the second message.</p>
+<pre>
+// Class-level declaration.
+ // Create a TraceSwitch.
+ static TraceSwitch generalSwitch = new TraceSwitch("General", "Entire Application");
+ 
+ static public void MyErrorMethod() {
+    // Write the message if the TraceSwitch level is set to Error or higher.
+    if(generalSwitch.TraceError)
+       Trace.Write("My error message. ");
+ 
+    // Write a second message if the TraceSwitch level is set to Verbose.
+    if(generalSwitch.TraceVerbose)
+       Trace.WriteLine("My second error message.");
+ }
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteTopic3"></a><a name="Write(System.Object,System.String)">Write</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>category</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes a category name and the value of the object's  <a href="../../System/types/Object.html#ToString">Object.ToString</a> method to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void Write(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>category</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> An  <a href="../../System/types/Object.html">Object</a> name is sent to the  <a href="#Listeners">Trace.Listeners</a>. An  <a href="../../System/types/Object.html">Object</a> name is sent to the  <a href="#Listeners">Trace.Listeners</a>.</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>category</i><br><dl>
+<dd>
+<param> A category name used to organize the output.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, the output is written to an instance of  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a>.<p> The <i>category</i> parameter can be used to group output messages.</p>
+<p> This method calls the  <a href="../../System.Diagnostics/types/TraceListener.html#Write(System.String)">TraceListener.Write</a> method of the trace listener.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> named <code>
+                generalSwitch
+              </code>. This switch is set outside the code sample.<p> If the switch is set to the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a><b>Verbose</b>, the example outputs the name of the <code>
+                myObject
+              </code> and the <code>
+                category
+              </code> to the  <a href="#Listeners">Trace.Listeners</a>. For information on adding a listener to the  <a href="#Listeners">Trace.Listeners</a> collection, see the  <a href="../../System.Diagnostics/types/TraceListenerCollection.html">TraceListenerCollection</a> class.</p>
+<p> Then, if the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a> is set to <b>Error</b> or higher, the example outputs the second error message on the same line as the first message. The second message is followed by a line terminator.</p>
+<pre>
+// Class-level declaration.
+ // Create a TraceSwitch.
+ static TraceSwitch generalSwitch = new TraceSwitch("General", "Entire Application");
+ 
+ static public void MyErrorMethod(Object myObject, String category) {
+    // Write the message if the TraceSwitch level is set to Verbose.
+    if(generalSwitch.TraceVerbose)
+       Trace.Write(myObject, category);
+ 
+    // Write a second message if the TraceSwitch level is set to Error or higher.
+    if(generalSwitch.TraceError)
+       Trace.WriteLine(" Object is not valid for this category.");
+ }
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteTopic4"></a><a name="Write(System.String,System.String)">Write</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>category</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes a category name and a message to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void Write(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>category</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>message</i><br><dl>
+<dd>
+<param> A message to write.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>category</i><br><dl>
+<dd>
+<param> A category name used to organize the output.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, the output is written to an instance of  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a>.<p> The <i>category</i> parameter can be used to group output messages.</p>
+<p> This method calls the  <a href="../../System.Diagnostics/types/TraceListener.html#Write(System.String)">TraceListener.Write</a> method of the trace listener.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> named <code>
+                generalSwitch
+              </code>. This switch is set outside the code sample.<p> If the switch is set to the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a><b>Verbose</b>, the example outputs the first error message to the  <a href="#Listeners">Trace.Listeners</a>. For information on adding a listener to the  <a href="#Listeners">Trace.Listeners</a> collection, see the  <a href="../../System.Diagnostics/types/TraceListenerCollection.html">TraceListenerCollection</a> class.</p>
+<p> Then, if the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a> is set to <b>Error</b> or higher, the example outputs the second error message on the same line as the first message. The second message is followed by a line terminator.</p>
+<pre>
+// Class-level declaration.
+ // Create a TraceSwitch.
+ static TraceSwitch generalSwitch = new TraceSwitch("General", "Entire Application");
+ 
+ static public void MyErrorMethod(Object myObject, String category) {
+    // Write the message if the TraceSwitch level is set to Verbose.
+    if(generalSwitch.TraceVerbose)
+       Trace.Write(myObject.ToString() + " is not a valid object for category: ", 
+          category);
+ 
+    // Write a second message if the TraceSwitch level is set to Error or higher.
+    if(generalSwitch.TraceError)
+       Trace.WriteLine(" Please use a different category.");
+ }
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteIfTopic1"></a><a name="WriteIf(System.Boolean,System.Object)">WriteIf</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes the value of the object's  <a href="../../System/types/Object.html#ToString">Object.ToString</a> method to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection if a condition is <b>true</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void WriteIf(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>condition</i><br><dl>
+<dd>
+<param><b>true</b> to cause a message to be written; otherwise, <b>false</b>.<b>true</b> to cause a message to be written; otherwise, <b>false</b>.</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> An  <a href="../../System/types/Object.html">Object</a> whose name is sent to the  <a href="#Listeners">Trace.Listeners</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, the output is written to an instance of  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a>.<p> This method calls the  <a href="../../System.Diagnostics/types/TraceListener.html#Write(System.String)">TraceListener.Write</a> method of the trace listener.</p><br><br><b>Notes to implementors: </b> You can minimize the performance penalty of instrumenting your application by using <b>If...Then</b> statements instead of using  <a href="#WriteIf(System.Boolean,System.String)">Trace.WriteIf</a> statements. The following two code examples send the same debugging message. However, the first example is much faster when tracing is off, because if <code>
+                mySwitch.TraceError
+              </code> evaluates to <b>false</b> you do not call  <a href="#Write(System.String)">Trace.Write</a>. The second example always calls  <a href="#WriteIf(System.Boolean,System.String)">Trace.WriteIf</a>, even when <code>
+                mySwitch.TraceError
+              </code><b></b> is <b>false</b> and no tracing output is produced. This can result in unnecessary execution of arbitrarily complex code.<p> First example.</p>
+<pre>
+              if(mySwitch.TraceError) 
+                  Trace.Write("aNumber = " + aNumber + " out of range");
+            </pre>
+<p> Second example.</p>
+<pre>
+              Trace.WriteIf(mySwitch.TraceError, "aNumber = " + aNumber + " out of range");
+            </pre>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> named <code>
+                generalSwitch
+              </code>. This switch is set outside the code sample.<p> If the switch is set to the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a><b>Error</b> or higher, the example outputs the first name of the value parameter to the  <a href="#Listeners">Trace.Listeners</a>. For information on adding a listener to the  <a href="#Listeners">Trace.Listeners</a> collection, see the  <a href="../../System.Diagnostics/types/TraceListenerCollection.html">TraceListenerCollection</a> class.</p>
+<p> Then, if the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a> is set to <b>Verbose</b>, the example outputs a message on the same line as the first message. The second message is followed by a line terminator.</p>
+<pre>
+// Class-level declaration.
+ // Create a TraceSwitch.
+ static TraceSwitch generalSwitch = new TraceSwitch("General", "Entire Application");
+ 
+ static public void MyErrorMethod(Object myObject) {
+    // Write the message if the TraceSwitch level is set to Error or higher.
+    Trace.WriteIf(generalSwitch.TraceError, myObject);
+ 
+    // Write a second message if the TraceSwitch level is set to Verbose.
+    Trace.WriteLineIf(generalSwitch.TraceVerbose, " is not a valid value for this method.");
+ }
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteIfTopic2"></a><a name="WriteIf(System.Boolean,System.String)">WriteIf</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes a message to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection if a condition is <b>true</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void WriteIf(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>condition</i><br><dl>
+<dd>
+<param><b>true</b> to cause a message to be written; otherwise, <b>false</b>.<b>true</b> to cause a message to be written; otherwise, <b>false</b>.</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>message</i><br><dl>
+<dd>
+<param> A message to write. A message to write.</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, the output is written to an instance of  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a>.<p> This method calls the  <a href="../../System.Diagnostics/types/TraceListener.html#Write(System.String)">TraceListener.Write</a> method of the trace listener.</p><br><br><b>Notes to implementors: </b> You can minimize the performance penalty of instrumenting your application by using <b>If...Then</b> statements instead of using  <a href="#WriteIf(System.Boolean,System.String)">Trace.WriteIf</a> statements. The following two code examples send the same debugging message. However, the first example is much faster when tracing is off, because if <code>
+                mySwitch.TraceError
+              </code> evaluates to <b>false</b> you do not call  <a href="#Write(System.String)">Trace.Write</a>. The second example always calls  <a href="#WriteIf(System.Boolean,System.String)">Trace.WriteIf</a>, even when <code>
+                mySwitch.TraceError
+              </code><b></b> is <b>false</b> and no tracing output is produced. This can result in unnecessary execution of arbitrarily complex code.<p> First example.</p>
+<pre>
+              if(mySwitch.TraceError) 
+                  Trace.Write("aNumber = " + aNumber + " out of range");
+            </pre>
+<p> Second example.</p>
+<pre>
+              Trace.WriteIf(mySwitch.TraceError, "aNumber = " + aNumber + " out of range");
+            </pre>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> named <code>
+                generalSwitch
+              </code>. This switch is set outside the code sample.<p> If the switch is set to the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a><b>Error</b> or higher, the example outputs the first error message to the  <a href="#Listeners">Trace.Listeners</a>. For information on adding a listener to the  <a href="#Listeners">Trace.Listeners</a> collection, see the  <a href="../../System.Diagnostics/types/TraceListenerCollection.html">TraceListenerCollection</a> class.</p>
+<p> Then, if the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a> is set to <b>Verbose</b>, the example outputs the second error message on the same line as the first message. The second message is followed by a line terminator.</p>
+<pre>
+// Class-level declaration.
+ // Create a TraceSwitch.
+ static TraceSwitch generalSwitch = new TraceSwitch("General", "Entire Application");
+ 
+ static public void MyErrorMethod() {
+    // Write the message if the TraceSwitch level is set to Error or higher.
+    Trace.WriteIf(generalSwitch.TraceError, "My error message. ");
+ 
+    // Write a second message if the TraceSwitch level is set to Verbose.
+    Trace.WriteLineIf(generalSwitch.TraceVerbose, "My second error message.");
+ }
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteIfTopic3"></a><a name="WriteIf(System.Boolean,System.Object,System.String)">WriteIf</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>category</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes a category name and the value of the object's  <a href="../../System/types/Object.html#ToString">Object.ToString</a> method to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection if a condition is <b>true</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void WriteIf(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>category</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>condition</i><br><dl>
+<dd>
+<param><b>true</b> to cause a message to be written; otherwise, <b>false</b>.<b>true</b> to cause a message to be written; otherwise, <b>false</b>.</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> An  <a href="../../System/types/Object.html">Object</a> whose name is sent to the  <a href="#Listeners">Trace.Listeners</a>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>category</i><br><dl>
+<dd>
+<param> A category name used to organize the output.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, the output is written to an instance of  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a>.<p> The <i>category</i> parameter can be used to group output messages.</p>
+<p> This method calls the  <a href="../../System.Diagnostics/types/TraceListener.html#Write(System.String)">TraceListener.Write</a> method of the trace listener.</p><br><br><b>Notes to implementors: </b> You can minimize the performance penalty of instrumenting your application by using <b>If...Then</b> statements instead of using  <a href="#WriteIf(System.Boolean,System.String)">Trace.WriteIf</a> statements. The following two code examples send the same debugging message. However, the first example is much faster when tracing is off, because if <code>
+                mySwitch.TraceError
+              </code> evaluates to <b>false</b> you do not call  <a href="#Write(System.String)">Trace.Write</a>. The second example always calls  <a href="#WriteIf(System.Boolean,System.String)">Trace.WriteIf</a>, even when <code>
+                mySwitch.TraceError
+              </code> is <b>false</b> and no tracing output is produced. This can result in unnecessary execution of arbitrarily complex code.<p> First example.</p>
+<pre>
+              if(mySwitch.TraceError) 
+                  Trace.Write("aNumber = " + aNumber + " out of range");
+            </pre>
+<p> Second example.</p>
+<pre>
+              Trace.WriteIf(mySwitch.TraceError, "aNumber = " + aNumber + " out of range");
+            </pre>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> named <code>
+                generalSwitch
+              </code>. This switch is set outside the code sample.<p> If the switch is set to the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a><b>Verbose</b>, the example outputs the name of the <code>
+                myObject
+              </code> and the <code>
+                category
+              </code> to the  <a href="#Listeners">Trace.Listeners</a>. For information on adding a listener to the  <a href="#Listeners">Trace.Listeners</a> collection, see the  <a href="../../System.Diagnostics/types/TraceListenerCollection.html">TraceListenerCollection</a> class.</p>
+<p> Then, if the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a> is set to <b>Error</b> or higher, the example outputs the second error message on the same line as the first message. The second message is followed by a line terminator.</p>
+<pre>
+// Class-level declaration.
+ // Create a TraceSwitch.
+ static TraceSwitch generalSwitch = new TraceSwitch("General", "Entire Application");
+ 
+ static public void MyErrorMethod(Object myObject, String category) {
+    // Write the message if the TraceSwitch level is set to Verbose.
+    Trace.WriteIf(generalSwitch.TraceVerbose, myObject, category);
+ 
+    // Write a second message if the TraceSwitch level is set to Error or higher.
+    Trace.WriteLineIf(generalSwitch.TraceError, " Object is not valid for this category.");
+ }
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteIfTopic4"></a><a name="WriteIf(System.Boolean,System.String,System.String)">WriteIf</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>category</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes a category name and message to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection if a condition is <b>true</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void WriteIf(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>category</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>condition</i><br><dl>
+<dd>
+<param><b>true</b> to cause a message to be written; otherwise, <b>false</b>.<b>true</b> to cause a message to be written; otherwise, <b>false</b>.</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>message</i><br><dl>
+<dd>
+<param> A message to write. A message to write.</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>category</i><br><dl>
+<dd>
+<param> A category name used to organize the output.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, the output is written to an instance of  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a>.<p> The <i>category</i> parameter can be used to group output messages.</p>
+<p> This method calls the  <a href="../../System.Diagnostics/types/TraceListener.html#Write(System.String)">TraceListener.Write</a> method of the trace listener.</p><br><br><b>Notes to implementors: </b> You can minimize the performance penalty of instrumenting your application by using <b>If...Then</b> statements instead of using  <a href="#WriteIf(System.Boolean,System.String)">Trace.WriteIf</a> statements. The following two code examples send the same debugging message. However, the first example is much faster when tracing is off, because if <code>
+                mySwitch.TraceError
+              </code> evaluates to <b>false</b> you do not call  <a href="#Write(System.String)">Trace.Write</a>. The second example always calls  <a href="#WriteIf(System.Boolean,System.String)">Trace.WriteIf</a>, even when <code>
+                mySwitch.TraceError
+              </code><b></b> is <b>false</b> and no tracing output is produced. This can result in unnecessary execution of arbitrarily complex code.<p> First example.</p>
+<pre>
+              if(mySwitch.TraceError) 
+                  Trace.Write("aNumber = " + aNumber + " out of range");
+            </pre>
+<p> Second example.</p>
+<pre>
+              Trace.WriteIf(mySwitch.TraceError, "aNumber = " + aNumber + " out of range");
+            </pre>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> named <code>
+                generalSwitch
+              </code>. This switch is set outside the code sample.<p> If the switch is set to the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a><b>Verbose</b>, the example outputs the first error message to the  <a href="#Listeners">Trace.Listeners</a>. For information on adding a listener to the  <a href="#Listeners">Trace.Listeners</a> collection, see the  <a href="../../System.Diagnostics/types/TraceListenerCollection.html">TraceListenerCollection</a> class.</p>
+<p> Then, if the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a> is set to <b>Error</b> or higher, the example outputs the second error message on the same line as the first message. The second message is followed by a line terminator.</p>
+<pre>
+// Class-level declaration.
+ // Create a TraceSwitch.
+ static TraceSwitch generalSwitch = new TraceSwitch("General", "Entire Application");
+ 
+ static public void MyErrorMethod(Object myObject, String category) {
+    // Write the message if the TraceSwitch level is set to Verbose.
+    Trace.WriteIf(generalSwitch.TraceVerbose, myObject.ToString() + 
+       " is not a valid object for category: ", category);
+ 
+    // Write a second message if the TraceSwitch level is set to Error or higher.
+    Trace.WriteLineIf(generalSwitch.TraceError, " Please use a different category.");
+ }
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteLineTopic1"></a><a name="WriteLine(System.Object)">WriteLine</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes the value of the object's  <a href="../../System/types/Object.html#ToString">Object.ToString</a> method to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void WriteLine(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> An  <a href="../../System/types/Object.html">Object</a> whose name is sent to the  <a href="#Listeners">Trace.Listeners</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, the output is written to an instance of  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a>.<p> This method calls the  <a href="../../System.Diagnostics/types/TraceListener.html#WriteLine(System.String)">TraceListener.WriteLine</a> method of the trace listener.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> named <code>
+                generalSwitch
+              </code>. This switch is set outside the code sample.<p> If the switch is set to the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a><b>Error</b> or higher, the example outputs the first error message to the  <a href="#Listeners">Trace.Listeners</a>. For information on adding a listener to the  <a href="#Listeners">Trace.Listeners</a> collection, see the  <a href="../../System.Diagnostics/types/TraceListenerCollection.html">TraceListenerCollection</a> class.</p>
+<p> Then, if the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a> is set to <b>Verbose</b>, the example outputs the name of the object on the same line as the first message. The second message is followed by a line terminator.</p>
+<pre>
+// Class-level declaration.
+ // Create a TraceSwitch.
+ static TraceSwitch generalSwitch = new TraceSwitch("General", "Entire Application");
+ 
+ static public void MyErrorMethod(Object myObject) {
+    // Write the message if the TraceSwitch level is set to Error or higher.
+    if(generalSwitch.TraceError)
+       Trace.Write("Invalid object. ");
+ 
+    // Write a second message if the TraceSwitch level is set to Verbose.
+    if(generalSwitch.TraceVerbose)
+       Trace.WriteLine(myObject);
+ }
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteLineTopic2"></a><a name="WriteLine(System.String)">WriteLine</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes a message to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void WriteLine(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>message</i><br><dl>
+<dd>
+<param> A message to write.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, the output is written to an instance of  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a>.<p> This method calls the  <a href="../../System.Diagnostics/types/TraceListener.html#WriteLine(System.String)">TraceListener.WriteLine</a> method of the trace listener.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> named <code>
+                generalSwitch
+              </code>. This switch is set outside the code sample.<p> If the switch is set to the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a><b>Error</b> or higher, the example outputs the first error message to the  <a href="#Listeners">Trace.Listeners</a>. For information on adding a listener to the  <a href="#Listeners">Trace.Listeners</a> collection, see the  <a href="../../System.Diagnostics/types/TraceListenerCollection.html">TraceListenerCollection</a> class.</p>
+<p> Then, if the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a> is set to <b>Verbose</b>, the example outputs the second error message on the same line as the first message. The second message is followed by a line terminator.</p>
+<pre>
+// Class-level declaration.
+ // Create a TraceSwitch.
+ static TraceSwitch generalSwitch = new TraceSwitch("General", "Entire Application");
+ 
+ static public void MyErrorMethod() {
+    // Write the message if the TraceSwitch level is set to Error or higher.
+    if(generalSwitch.TraceError)
+       Trace.Write("My error message. ");
+ 
+    // Write a second message if the TraceSwitch level is set to Verbose.
+    if(generalSwitch.TraceVerbose)
+       Trace.WriteLine("My second error message.");
+ }
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteLineTopic3"></a><a name="WriteLine(System.Object,System.String)">WriteLine</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>category</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes a category name and the value of the object's  <a href="../../System/types/Object.html#ToString">Object.ToString</a> method to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void WriteLine(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>category</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> An  <a href="../../System/types/Object.html">Object</a> whose name is sent to the  <a href="#Listeners">Trace.Listeners</a>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>category</i><br><dl>
+<dd>
+<param> A category name used to organize the output.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, the output is written to an instance of  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a>.<p> The <i>category</i> parameter can be used to group output messages.</p>
+<p> This method calls the  <a href="../../System.Diagnostics/types/TraceListener.html#WriteLine(System.String)">TraceListener.WriteLine</a> method of the trace listener.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> named <code>
+                generalSwitch
+              </code>. This switch is set outside the code sample.<p> If the switch is set to the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a><b>Error</b> or higher, the example outputs the first error message to the  <a href="#Listeners">Trace.Listeners</a>. For information on adding a listener to the  <a href="#Listeners">Trace.Listeners</a> collection, see the  <a href="../../System.Diagnostics/types/TraceListenerCollection.html">TraceListenerCollection</a> class.</p>
+<p> Then, if the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a> is set to <b>Verbose</b>, the example outputs the second error message on the same line as the first message. The second message is followed by a line terminator.</p>
+<pre>
+// Class-level declaration.
+ // Create a TraceSwitch.
+ static TraceSwitch generalSwitch = new TraceSwitch("General", "Entire Application");
+ 
+ static public void MyErrorMethod(Object myObject, String category) {
+    // Write the message if the TraceSwitch level is set to Error or higher.
+    if(generalSwitch.TraceError)
+       Trace.Write("Invalid object for category. ");
+ 
+    // Write a second message if the TraceSwitch level is set to Verbose.
+    if(generalSwitch.TraceVerbose)
+       Trace.WriteLine(myObject, category);
+ }
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteLineTopic4"></a><a name="WriteLine(System.String,System.String)">WriteLine</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>category</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes a category name and message to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void WriteLine(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>category</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>message</i><br><dl>
+<dd>
+<param> A message to write.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>category</i><br><dl>
+<dd>
+<param> A category name used to organize the output.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, the output is written to an instance of  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a>.<p> The <i>category</i> parameter can be used to group output messages.</p>
+<p> This method calls the  <a href="../../System.Diagnostics/types/TraceListener.html#WriteLine(System.String)">TraceListener.WriteLine</a> method of the trace listener.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> named <code>
+                generalSwitch
+              </code>. This switch is set outside the code sample.<p> If the switch is set to the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a><b>Error</b> or higher, the example outputs the first error message to the  <a href="#Listeners">Trace.Listeners</a>. For information on adding a listener to the  <a href="#Listeners">Trace.Listeners</a> collection, see the  <a href="../../System.Diagnostics/types/TraceListenerCollection.html">TraceListenerCollection</a> class.</p>
+<p> Then, if the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a> is set to <b>Verbose</b>, the example outputs the second error message and the <code>
+                category
+              </code> on the same line as the first message. The second message is followed by a line terminator.</p>
+<pre>
+// Class-level declaration.
+ // Create a TraceSwitch.
+ static TraceSwitch generalSwitch = new TraceSwitch("General", "Entire Application");
+ 
+ static public void MyErrorMethod(String category) {
+    // Write the message if the TraceSwitch level is set to Error or higher.
+    if(generalSwitch.TraceError)
+       Trace.Write("My error message. ");
+ 
+    // Write a second message if the TraceSwitch level is set to Verbose.
+    if(generalSwitch.TraceVerbose)
+       Trace.WriteLine("My second error message.", category);
+ }
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteLineIfTopic1"></a><a name="WriteLineIf(System.Boolean,System.Object)">WriteLineIf</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes the value of the object's  <a href="../../System/types/Object.html#ToString">Object.ToString</a> method to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection if a condition is <b>true</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void WriteLineIf(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>condition</i><br><dl>
+<dd>
+<param><b>true</b> to cause a message to be written; otherwise, <b>false</b>.<b>true</b> to cause a message to be written; otherwise, <b>false</b>.</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> An  <a href="../../System/types/Object.html">Object</a> whose name is sent to the  <a href="#Listeners">Trace.Listeners</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, the output is written to an instance of  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a>.<p> This method calls the  <a href="../../System.Diagnostics/types/TraceListener.html#WriteLine(System.String)">TraceListener.WriteLine</a> method of the trace listener.</p><br><br><b>Notes to implementors: </b> You can minimize the performance penalty of instrumenting your application by using <b>If...Then</b> statements instead of using  <a href="#WriteLineIf(System.Boolean,System.String)">Trace.WriteLineIf</a> statements. The following two code examples send the same debugging message. However, the first example is much faster when tracing is off, because if <code>
+                mySwitch.TraceError
+              </code> evaluates to <b>false</b> you do not call  <a href="#WriteLine(System.String)">Trace.WriteLine</a>. The second example always calls  <a href="#WriteLineIf(System.Boolean,System.String)">Trace.WriteLineIf</a>, even when <code>
+                mySwitch.TraceError
+              </code><b></b> is <b>false</b> and no tracing output is produced. This can result in unnecessary execution of arbitrarily complex code.<p> First example.</p>
+<pre>
+              if(mySwitch.TraceError) 
+                  Trace.WriteLine("aNumber = " + aNumber + " out of range");
+            </pre>
+<p> Second example.</p>
+<pre>
+              Trace.WriteLineIf(mySwitch.TraceError, "aNumber = " + aNumber + " out of range");
+            </pre>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> named <code>
+                generalSwitch
+              </code>. This switch is set outside the code sample.<p> If the switch is set to the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a><b>Error</b> or higher, the example outputs the first error message to the  <a href="#Listeners">Trace.Listeners</a>. For information on adding a listener to the  <a href="#Listeners">Trace.Listeners</a> collection, see the  <a href="../../System.Diagnostics/types/TraceListenerCollection.html">TraceListenerCollection</a> class.</p>
+<p> Then, if the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a> is set to <b>Verbose</b>, the example outputs the name of the object on the same line as the first message. The second message is followed by a line terminator.</p>
+<pre>
+// Class-level declaration.
+ // Create a TraceSwitch.
+ static TraceSwitch generalSwitch = new TraceSwitch("General", "Entire Application");
+ 
+ static public void MyErrorMethod(Object myObject) {
+    // Write the message if the TraceSwitch level is set to Error or higher.
+    Trace.WriteIf(generalSwitch.TraceError, "Invalid object. ");
+ 
+    // Write a second message if the TraceSwitch level is set to Verbose.
+    Trace.WriteLineIf(generalSwitch.TraceVerbose, myObject);
+ }
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteLineIfTopic2"></a><a name="WriteLineIf(System.Boolean,System.String)">WriteLineIf</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes a message to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection if a condition is <b>true</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void WriteLineIf(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>condition</i><br><dl>
+<dd>
+<param><b>true</b> to cause a message to be written; otherwise, <b>false</b>.<b>true</b> to cause a message to be written; otherwise, <b>false</b>.</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>message</i><br><dl>
+<dd>
+<param> A message to write. A message to write.</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, the output is written to an instance of  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a>.<p> This method calls the  <a href="../../System.Diagnostics/types/TraceListener.html#WriteLine(System.String)">TraceListener.WriteLine</a> method of the trace listener.</p><br><br><b>Notes to implementors: </b> You can minimize the performance penalty of instrumenting your application by using <b>If...Then</b> statements instead of using  <a href="#WriteLineIf(System.Boolean,System.String)">Trace.WriteLineIf</a> statements. The following two code examples send the same debugging message. However, the first example is much faster when tracing is off, because if <code>
+                mySwitch.TraceError
+              </code> evaluates to <b>false</b> you do not call  <a href="#WriteLine(System.String)">Trace.WriteLine</a>. The second example always calls  <a href="#WriteLineIf(System.Boolean,System.String)">Trace.WriteLineIf</a>, even when <code>
+                mySwitch.TraceError
+              </code><b></b> is <b>false</b> and no tracing output is produced. This can result in unnecessary execution of arbitrarily complex code.<p> First example.</p>
+<pre>
+              if(mySwitch.TraceError) 
+                  Trace.WriteLine("aNumber = " + aNumber + " out of range");
+            </pre>
+<p> Second example.</p>
+<pre>
+              Trace.WriteLineIf(mySwitch.TraceError, "aNumber = " + aNumber + " out of range");
+            </pre>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> named <code>
+                generalSwitch
+              </code>. This switch is set outside the code sample.<p> If the switch is set to the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a><b>Error</b> or higher, the example outputs the first error message to the  <a href="#Listeners">Trace.Listeners</a>. For information on adding a listener to the  <a href="#Listeners">Trace.Listeners</a> collection, see the  <a href="../../System.Diagnostics/types/TraceListenerCollection.html">TraceListenerCollection</a> class.</p>
+<p> Then, if the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a> is set to <b>Verbose</b>, the example outputs the second error message on the same line as the first message. The second message is followed by a line terminator.</p>
+<pre>
+// Class-level declaration.
+ // Create a TraceSwitch.
+ static TraceSwitch generalSwitch = new TraceSwitch("General", "Entire Application");
+ 
+ static public void MyErrorMethod() {
+    // Write the message if the TraceSwitch level is set to Error or higher.
+    Trace.WriteIf(generalSwitch.TraceError, "My error message. ");
+ 
+    // Write a second message if the TraceSwitch level is set to Verbose.
+    Trace.WriteLineIf(generalSwitch.TraceVerbose, "My second error message.");
+ }
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteLineIfTopic3"></a><a name="WriteLineIf(System.Boolean,System.Object,System.String)">WriteLineIf</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>category</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes a category name and the value of the object's  <a href="../../System/types/Object.html#ToString">Object.ToString</a> method to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection if a condition is <b>true</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void WriteLineIf(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>category</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>condition</i><br><dl>
+<dd>
+<param><b>true</b> to cause a message to be written; otherwise, <b>false</b>.<b>true</b> to cause a message to be written; otherwise, <b>false</b>.</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> An  <a href="../../System/types/Object.html">Object</a> whose name is sent to the  <a href="#Listeners">Trace.Listeners</a>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>category</i><br><dl>
+<dd>
+<param> A category name used to organize the output. A category name used to organize the output.</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, the output is written to an instance of  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a>.<p> The <i>category</i> parameter can be used to group output messages.</p>
+<p> This method calls the  <a href="../../System.Diagnostics/types/TraceListener.html#WriteLine(System.String)">TraceListener.WriteLine</a> method of the trace listener.</p><br><br><b>Notes to implementors: </b> You can minimize the performance penalty of instrumenting your application by using <b>If...Then</b> statements instead of using  <a href="#WriteLineIf(System.Boolean,System.String)">Trace.WriteLineIf</a> statements. The following two code examples send the same debugging message. However, the first example is much faster when tracing is off, because if <code>
+                mySwitch.TraceError
+              </code> evaluates to <b>false</b> you do not call  <a href="#WriteLine(System.String)">Trace.WriteLine</a>. The second example always calls  <a href="#WriteLineIf(System.Boolean,System.String)">Trace.WriteLineIf</a>, even when <code>
+                mySwitch.TraceError
+              </code><b></b> is <b>false</b> and no tracing output is produced. This can result in unnecessary execution of arbitrarily complex code.<p> First example.</p>
+<pre>
+              if(mySwitch.TraceError) 
+                  Trace.WriteLine("aNumber = " + aNumber + " out of range");
+            </pre>
+<p> Second example.</p>
+<pre>
+              Trace.WriteLineIf(mySwitch.TraceError, "aNumber = " + aNumber + " out of range");
+            </pre>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> named <code>
+                generalSwitch
+              </code>. This switch is set outside the code sample.<p> If the switch is set to the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a><b>Error</b> or higher, the example outputs the first error message to the  <a href="#Listeners">Trace.Listeners</a>. For information on adding a listener to the  <a href="#Listeners">Trace.Listeners</a> collection, see the  <a href="../../System.Diagnostics/types/TraceListenerCollection.html">TraceListenerCollection</a> class.</p>
+<p> Then, if the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a> is set to <b>Verbose</b>, the example outputs the second error message on the same line as the first message. The second message is followed by a line terminator.</p>
+<pre>
+// Class-level declaration.
+ // Create a TraceSwitch.
+ static TraceSwitch generalSwitch = new TraceSwitch("General", "Entire Application");
+ 
+ static public void MyErrorMethod(Object myObject, String category) {
+    // Write the message if the TraceSwitch level is set to Error or higher.
+    Trace.WriteIf(generalSwitch.TraceError, "Invalid object for category. ");
+ 
+    // Write a second message if the TraceSwitch level is set to Verbose.
+    Trace.WriteLineIf(generalSwitch.TraceVerbose, myObject, category);
+ }
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="WriteLineIfTopic4"></a><a name="WriteLineIf(System.Boolean,System.String,System.String)">WriteLineIf</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>category</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes a category name and message to the trace listeners in the  <a href="#Listeners">Trace.Listeners</a> collection if a condition is <b>true</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Conditional("")]<br><b>public static void WriteLineIf(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>condition</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>message</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>category</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>condition</i><br><dl>
+<dd>
+<param><b>true</b> to cause a message to be written; otherwise, <b>false</b>.<b>true</b> to cause a message to be written; otherwise, <b>false</b>.</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>message</i><br><dl>
+<dd>
+<param> A message to write. A message to write.</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>category</i><br><dl>
+<dd>
+<param> A category name used to organize the output.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, the output is written to an instance of  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a>.<p> The <i>category</i> parameter can be used to group output messages.</p>
+<p> This method calls the  <a href="../../System.Diagnostics/types/TraceListener.html#WriteLine(System.String)">TraceListener.WriteLine</a> method of the trace listener.</p><br><br><b>Notes to implementors: </b> You can minimize the performance penalty of instrumenting your application by using <b>If...Then</b> statements instead of using  <a href="#WriteLineIf(System.Boolean,System.String)">Trace.WriteLineIf</a> statements. The following two code examples send the same debugging message. However, the first example is much faster when tracing is off, because if <code>
+                mySwitch.TraceError
+              </code> evaluates to <b>false</b> you do not call  <a href="#WriteLine(System.String)">Trace.WriteLine</a>. The second example always calls  <a href="#WriteLineIf(System.Boolean,System.String)">Trace.WriteLineIf</a>, even when <code>
+                mySwitch.TraceError
+              </code><b></b> is <b>false</b> and no tracing output is produced. This can result in unnecessary execution of arbitrarily complex code.<p> First example.</p>
+<pre>
+              if(mySwitch.TraceError) 
+                  Trace.WriteLine("aNumber = " + aNumber + " out of range");
+            </pre>
+<p> Second example.</p>
+<pre>
+              Trace.WriteLineIf(mySwitch.TraceError, "aNumber = " + aNumber + " out of range");
+            </pre>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> named <code>
+                generalSwitch
+              </code>. This switch is set outside the code sample.<p> If the switch is set to the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a><b>Error</b> or higher, the example outputs the first error message to the  <a href="#Listeners">Trace.Listeners</a>. For information on adding a listener to the  <a href="#Listeners">Trace.Listeners</a> collection, see the  <a href="../../System.Diagnostics/types/TraceListenerCollection.html">TraceListenerCollection</a> class.</p>
+<p> Then, if the  <a href="../../System.Diagnostics/types/TraceLevel.html">TraceLevel</a> is set to <b>Verbose</b>, the example outputs the second error message and the <code>
+                category
+              </code> on the same line as the first message. The second message is followed by a line terminator.</p>
+<pre>
+// Class-level declaration.
+ // Create a TraceSwitch.
+ static TraceSwitch generalSwitch = new TraceSwitch("General", "Entire Application");
+ 
+ static public void MyErrorMethod(String category) {
+    // Write the message if the TraceSwitch level is set to Error or higher.
+    Trace.WriteIf(generalSwitch.TraceError, "My error message. ");
+ 
+    // Write a second message if the TraceSwitch level is set to Verbose.
+    Trace.WriteLineIf(generalSwitch.TraceVerbose, "My second error message.", category);
+ }
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/TraceListener.html">TraceListener</a> |  <a href="../../System.Diagnostics/types/DefaultTraceListener.html">DefaultTraceListener</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a> |  <a href="../../System.Diagnostics/types/ConditionalAttribute.html">ConditionalAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

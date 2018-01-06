@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Xml.IXmlLineInfo</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Xml.IXmlLineInfo Interface</h2><b>Assembly: </b>System.Xml.dll<br><b>Namespace: </b>System.Xml<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides an interface to enable a class to return line and position information.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public interface IXmlLineInfo
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example parses an XML fragment. Each node is displayed including its depth, line number, and line position.<pre>
+using System;
+using System.IO;
+using System.Xml;
+
+public class Sample{
+
+  public static void Main(){
+
+    // Create the XML fragment to be parsed.
+    string xmlFrag  = 
+    @"&lt;book&gt;
+           &lt;misc&gt;
+              &lt;style&gt;paperback&lt;/style&gt;
+              &lt;pages&gt;240&lt;/pages&gt;
+           &lt;/misc&gt;
+        &lt;/book&gt;
+    ";
+
+    // Create the XmlNamespaceManager.
+    XmlNamespaceManager nsmgr = new XmlNamespaceManager(new NameTable());
+
+    // Create the XmlParserContext.
+    XmlParserContext context = new XmlParserContext(null, nsmgr, null, XmlSpace.None);
+
+    // Create the reader.
+    XmlValidatingReader reader = new XmlValidatingReader(xmlFrag, XmlNodeType.Element, context);
+
+    IXmlLineInfo lineInfo = ((IXmlLineInfo)reader);
+    if (lineInfo.HasLineInfo()){
+       
+      // Parse the XML and display each node.
+      while (reader.Read()){
+       switch (reader.NodeType){
+         case XmlNodeType.Element:
+           Console.Write("{0} {1},{2}  ", reader.Depth, lineInfo.LineNumber, lineInfo.LinePosition);
+           Console.WriteLine("&lt;{0}&gt;", reader.Name);
+           break;
+         case XmlNodeType.Text:
+           Console.Write("{0} {1},{2}  ", reader.Depth, lineInfo.LineNumber, lineInfo.LinePosition);
+           Console.WriteLine("  {0}", reader.Value);
+           break;
+         case XmlNodeType.EndElement:
+           Console.Write("{0} {1},{2}  ", reader.Depth, lineInfo.LineNumber, lineInfo.LinePosition);
+           Console.WriteLine("&lt;/{0}&gt;", reader.Name);
+           break;
+       }       
+     }           
+    }
+
+    // Close the reader.
+    reader.Close();       
+  }
+}
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Xml/System.Xml.html">System.Xml Namespace</a></dd>
+</dl>
+<h3>System.Xml.IXmlLineInfo Member List: </h3>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#LineNumber">LineNumber</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the current line number.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#LinePosition">LinePosition</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the current line position.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#HasLineInfo">HasLineInfo</a></td>
+<td width="55%"></td>
+</tr>
+</table>
+</dd>
+</dl>
+<hr>
+<h3>System.Xml.IXmlLineInfo Member Details</h3><b>Property: <i><a name="LineNumberTopic1"></a><a name="LineNumber">LineNumber</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the current line number.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System/types/Int32.html">int</a> LineNumber {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property is used primarily for error reporting, but can be called at any time. The starting value is 1. Combined with  <a href="#LinePosition">IXmlLineInfo.LinePosition</a>, a value of 1,1 indicates the start of a document.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="LinePositionTopic1"></a><a name="LinePosition">LinePosition</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the current line position.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System/types/Int32.html">int</a> LinePosition {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property is used primarily for error reporting, but can be called at any time. The starting value is 1. Combined with  <a href="#LineNumber">IXmlLineInfo.LineNumber</a>, a value of 1,1 indicates the start of a document.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="HasLineInfoTopic1"></a><a name="HasLineInfo">HasLineInfo</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether the class can return line information.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System/types/Boolean.html">bool</a> HasLineInfo();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if  <a href="#LineNumber">IXmlLineInfo.LineNumber</a> and  <a href="#LinePosition">IXmlLineInfo.LinePosition</a> can be provided; otherwise, <b>false</b>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

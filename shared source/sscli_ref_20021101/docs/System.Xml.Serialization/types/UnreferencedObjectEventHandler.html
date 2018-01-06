@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Xml.Serialization.UnreferencedObjectEventHandler</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Xml.Serialization.UnreferencedObjectEventHandler Delegate</h2><b>Assembly: </b>System.Xml.dll<br><b>Namespace: </b>System.Xml.Serialization<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Represents the method that will handle the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#UnreferencedObject">XmlSerializer.UnreferencedObject</a> event of an  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public delegate void UnreferencedObjectEventHandler(object sender, UnreferencedObjectEventArgs e);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+						The declaration of your event handler must have the same parameters as the 
+						<b>UnreferencedObjectEventHandler</b> delegate declaration. <br><br></dd>
+</dl>
+<dl>
+<dd>
+<p><i>sender</i><br><dl>
+<dd>
+<param> The source of the event.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>e</i><br><dl>
+<dd>
+<param> An  <a href="../../System.Xml.Serialization/types/UnreferencedObjectEventArgs.html">UnreferencedObjectEventArgs</a> that contains the event data.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> When you create an  <a href="../../System.Xml.Serialization/types/UnreferencedObjectEventHandler.html">UnreferencedObjectEventHandler</a> delegate, you identify the method that will handle the event. To associate the event with your event handler, add an instance of the delegate to the event. The event handler is called whenever the event occurs, unless you remove the delegate. For more information about event handler delegates, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconEventsDelegates.asp">MSDN: eventsdelegates</a>.<p> The  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#UnreferencedObject">XmlSerializer.UnreferencedObject</a> event can occur only when you call the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> method.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example adds an  <a href="../../System.Xml.Serialization/types/UnreferencedObjectEventHandler.html">UnreferencedObjectEventHandler</a> to an  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>. The event is handled by the <code>
+            Serializer_UnreferencedObject
+          </code> method. To run the example, cut and paste the following XML into a file named UnrefObj.xml.<pre>
+          &lt;wrapper&gt;
+            &lt;Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="id1" n1:GroupName=".NET" xmlns:n1="http://www.cpandl.com"&gt;
+             &lt;/Group&gt;
+          &lt;Vehicle id="id2" n1:type="Vehicle" xmlns:n1="http://www.w3.org/2001/XMLSchema-instance"&gt;
+              &lt;licenseNumber xmlns:q1="http://www.w3.org/2001/XMLSchema" n1:type="q1:string"&gt;ABCD&lt;/licenseNumber&gt;
+            &lt;/Vehicle&gt;
+          &lt;Vehicle id="id3" n1:type="Vehicle" xmlns:n1="http://www.w3.org/2001/XMLSchema-instance"&gt;
+              &lt;licenseNumber xmlns:q1="http://www.w3.org/2001/XMLSchema" n1:type="q1:string"&gt;1234&lt;/licenseNumber&gt;
+            &lt;/Vehicle&gt;
+          &lt;/wrapper&gt;
+        </pre>
+<pre>
+using System;
+using System.IO;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
+using System.Xml.Schema;
+
+// You must use the SoapIncludeAttribute to inform the XmlSerializer
+// that the Vehicle type should be recognized when deserializing.
+[SoapInclude(typeof(Vehicle))]
+public class Group
+{
+   public string GroupName;
+   public Vehicle GroupVehicle;
+}
+ [SoapInclude(typeof(Vehicle))]
+public class Vehicle
+{
+   public string licenseNumber;
+}
+
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.DeserializeObject("UnrefObj.xml");
+   }
+   
+   public void DeserializeObject(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlTypeMapping myMapping = 
+      (new SoapReflectionImporter().ImportTypeMapping(
+      typeof(Group)));
+      XmlSerializer mySerializer =  
+      new XmlSerializer(myMapping);
+ 
+      mySerializer.UnreferencedObject += 
+      new UnreferencedObjectEventHandler
+      (Serializer_UnreferencedObject);
+
+      // Reading the file requires an  XmlTextReader.
+      XmlTextReader reader= 
+      new XmlTextReader(filename);
+      reader.ReadStartElement();
+
+      // Deserialize and cast the object.
+      Group myGroup; 
+      myGroup = (Group) mySerializer.Deserialize(reader);
+      reader.ReadEndElement();
+      reader.Close();
+   }
+
+   private void Serializer_UnreferencedObject
+   (object sender, UnreferencedObjectEventArgs e){
+      Console.WriteLine("UnreferencedObject:");
+      Console.WriteLine("ID: " + e.UnreferencedId);
+      Console.WriteLine("UnreferencedObject: " + e.UnreferencedObject);
+      Vehicle xxx = (Vehicle) e.UnreferencedObject;
+      Console.WriteLine("License: " + xxx.licenseNumber);
+   }
+}
+
+// The file named "UnrefObj.xml" should contain this XML:
+
+// &lt;wrapper&gt;
+
+//  &lt;Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+//xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="id1" 
+//n1:GroupName=".NET" xmlns:n1="http://www.cpandl.com"&gt;
+//   &lt;/Group&gt;
+
+//&lt;Vehicle id="id2" n1:type="Vehicle" 
+//xmlns:n1="http://www.w3.org/2001/XMLSchema-instance"&gt;
+//   &lt;licenseNumber xmlns:q1="http://www.w3.org/2001/XMLSchema" 
+//n1:type="q1:string"&gt;ABCD&lt;/licenseNumber&gt;
+//   &lt;/Vehicle&gt;
+
+//&lt;Vehicle id="id3" n1:type="Vehicle" 
+//xmlns:n1="http://www.w3.org/2001/XMLSchema-instance"&gt;
+//    &lt;licenseNumber xmlns:q1="http://www.w3.org/2001/XMLSchema" 
+//n1:type="q1:string"&gt;1234&lt;/licenseNumber&gt;
+//  &lt;/Vehicle&gt;
+
+//&lt;/wrapper&gt;
+
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Xml.Serialization/System.Xml.Serialization.html">System.Xml.Serialization Namespace</a></dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/Delegate.html">System.Delegate</a></li>
+<ul class="none">
+<li><a href="../../System/types/MulticastDelegate.html">System.MulticastDelegate</a></li>
+<ul class="none">
+<li><b>System.Xml.Serialization.UnreferencedObjectEventHandler</b></li>
+</ul>
+</ul>
+</ul>
+</ul>
+</p>
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Security.IStackWalk</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Security.IStackWalk Interface</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Security<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Manages the stack walk that determines whether all callers in the call stack have the required permissions to access a protected resource.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public interface IStackWalk
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Partially trusted code always presents a security risk. It can sometimes be manipulated to perform actions on behalf of malicious code that does not have permission to access a resource. In this way, malicious code can achieve higher security access than it should be allowed.<p> The common language runtime protects managed code from these attacks by running a stack walk on all calls. The stack walk requires that all code in the call stack has permission to access a protected resource. Because the code attempting the attack will always be somewhere in the call stack, it will be unable to exceed its own security permissions.</p>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Security/System.Security.html">System.Security Namespace</a></dd>
+</dl>
+<h3>System.Security.IStackWalk Member List: </h3>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Assert">Assert</a></td>
+<td width="55%"> Asserts that the calling code can access the resource identified by the current permission object, even if callers higher in the stack have not been granted permission to access the resource.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Demand">Demand</a></td>
+<td width="55%"> Determines at run time whether all callers in the call stack have been granted the permission specified by the current permission object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Deny">Deny</a></td>
+<td width="55%"> Causes every  <a href="#Demand">IStackWalk.Demand</a> for the current object that passes through the calling code to fail.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#PermitOnly">PermitOnly</a></td>
+<td width="55%"> Causes every  <a href="#Demand">IStackWalk.Demand</a> for all objects except the current one that passes through the calling code to fail, even if code higher in the call stack has been granted permission to access other resources.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<hr>
+<h3>System.Security.IStackWalk Member Details</h3><b>Method: <i><a name="AssertTopic1"></a><a name="Assert">Assert</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Asserts that the calling code can access the resource identified by the current permission object, even if callers higher in the stack have not been granted permission to access the resource.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            void Assert();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td> The calling code does not have  <a href="../../System.Security.Permissions/types/SecurityPermissionFlag.html#Assertion">SecurityPermissionFlag.Assertion</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Calling  <a href="#Assert">IStackWalk.Assert</a> stops the permission check on callers higher in the call stack. Therefore, even if these callers do not have the requisite permissions, they can still access resources. An assertion is effective only if the code that calls  <a href="#Assert">IStackWalk.Assert</a> passes the security check for the permission that it is asserting.<p> A call to  <a href="#Assert">IStackWalk.Assert</a> is effective until the calling code returns to its caller or until a subsequent call to  <a href="#Assert">IStackWalk.Assert</a> renders the previous assertion ineffective. Also,  <a href="../../System.Security/types/CodeAccessPermission.html#RevertAssert">CodeAccessPermission.RevertAssert</a> or  <a href="../../System.Security/types/CodeAccessPermission.html#RevertAll">CodeAccessPermission.RevertAll</a> removes a pending  <a href="#Assert">IStackWalk.Assert</a>.</p>
+<p> <a href="#Assert">IStackWalk.Assert</a> is ignored for a permission not granted because a demand for that permission will not succeed. However, if code lower on the call stack calls  <a href="#Demand">IStackWalk.Demand</a> for that permission, a  <a href="../../System.Security/types/SecurityException.html">SecurityException</a> is thrown when the stack walk reaches the code that tried to call  <a href="#Assert">IStackWalk.Assert</a>. This happens because the code that called  <a href="#Assert">IStackWalk.Assert</a> has not been granted the permission, even though it tried to  <a href="#Assert">IStackWalk.Assert</a> it.</p> Because calling  <a href="#Assert">IStackWalk.Assert</a> removes the requirement that all code in the call chain must be granted permission to access the specified resource, it can open up security vulnerabilities if used incorrectly or inappropriately. Therefore, it should be used with great caution.</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconassert.asp">MSDN: assert</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconoverridingsecuritychecks.asp">MSDN: overridingsecuritychecks</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="DemandTopic1"></a><a name="Demand">Demand</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines at run time whether all callers in the call stack have been granted the permission specified by the current permission object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            void Demand();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td> A caller higher in the call stack does not have the permission specified by the current permission object.<p> -or- </p>
+<p> A caller in the call stack has called  <a href="#Deny">IStackWalk.Deny</a> on the current permission object.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method is typically used by secure libraries to ensure that callers have permission to access a resource. For example, a file class in a secure class library calls  <a href="#Demand">IStackWalk.Demand</a> for the necessary  <a href="../../System.Security.Permissions/types/FileIOPermission.html">FileIOPermission</a> before performing a file operation requested by the caller.<p> The permissions of the code that calls this method are not examined; the check begins from the immediate caller of that code and proceeds up the stack. <a href="#Demand">IStackWalk.Demand</a> succeeds only if no  <a href="../../System.Security/types/SecurityException.html">SecurityException</a> is raised.</p>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconmakingsecuritydemands.asp">MSDN: makingsecuritydemands</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="DenyTopic1"></a><a name="Deny">Deny</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Causes every  <a href="#Demand">IStackWalk.Demand</a> for the current object that passes through the calling code to fail.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            void Deny();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method prevents callers higher in the call stack from accessing the protected resource through the code that calls this method, even if those callers have been granted permission to access it. The call stack is typically represented as growing down, so that methods higher in the call stack call methods lower in the call stack.<p> <a href="#Deny">IStackWalk.Deny</a> can limit the liability of the programmer or prevent accidental security vulnerabilities because it prevents the method that calls  <a href="#Deny">IStackWalk.Deny</a> from being used to access the resource protected by the denied permission. If a method calls  <a href="#Deny">IStackWalk.Deny</a> on a permission, and if a  <a href="#Demand">IStackWalk.Demand</a> for that permission is invoked by a caller lower in the call stack, that security check will fail when it reaches the  <a href="#Deny">IStackWalk.Deny</a>.</p>
+<p> <a href="#Deny">IStackWalk.Deny</a> is ignored for a permission not granted because a demand for that permission will not succeed.</p><br><br><b>Notes to inheritors: </b> You cannot override this method.</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpcondeny.asp">MSDN: deny</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconoverridingsecuritychecks.asp">MSDN: overridingsecuritychecks</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="PermitOnlyTopic1"></a><a name="PermitOnly">PermitOnly</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Causes every  <a href="#Demand">IStackWalk.Demand</a> for all objects except the current one that passes through the calling code to fail, even if code higher in the call stack has been granted permission to access other resources.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            void PermitOnly();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#PermitOnly">IStackWalk.PermitOnly</a> is similar to  <a href="#Deny">IStackWalk.Deny</a>, in that both cause stack walks to fail when they would otherwise succeed. The difference is that  <a href="#Deny">IStackWalk.Deny</a> specifies permissions that will cause the stack walk to fail, but  <a href="#PermitOnly">IStackWalk.PermitOnly</a> specifies the only permissions that do not cause the stack walk to fail. Call this method to ensure that your code can be used to access only the specified resources.<p> <a href="#PermitOnly">IStackWalk.PermitOnly</a> is ignored for a permission not granted because a demand for that permission will not succeed. However, if code lower on the call stack later calls  <a href="#Demand">IStackWalk.Demand</a> for that permission, a  <a href="../../System.Security/types/SecurityException.html">SecurityException</a> is thrown when the stack walk reaches the code that tried to call  <a href="#PermitOnly">IStackWalk.PermitOnly</a>. This is because the code that called  <a href="#PermitOnly">IStackWalk.PermitOnly</a> has not been granted the permission, even though it called  <a href="#PermitOnly">IStackWalk.PermitOnly</a> for that permission. The call stack is typically represented as growing down, so that methods higher in the call stack call methods lower in the call stack.</p>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconpermitonly.asp">MSDN: permitonly</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconoverridingsecuritychecks.asp">MSDN: overridingsecuritychecks</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

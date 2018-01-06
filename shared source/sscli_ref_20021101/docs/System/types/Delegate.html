@@ -1,0 +1,1573 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Delegate</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Delegate Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Represents a delegate, which is a data structure that refers to a static method or to a class instance and an instance method of that class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public abstract class Delegate : ICloneable, ISerializable</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System/types/Delegate.html">Delegate</a> class is the base class for delegate types. However, only the system and compilers can derive explicitly from the  <a href="../../System/types/Delegate.html">Delegate</a> class or from the  <a href="../../System/types/MulticastDelegate.html">MulticastDelegate</a> class. It is also not permissible to derive a new type from a delegate type. The  <a href="../../System/types/Delegate.html">Delegate</a> class is not considered a delegate type; it is a class used to derive delegate types.<p> Most languages implement a <b>delegate</b> keyword, and compilers for those languages are able to derive from the  <a href="../../System/types/MulticastDelegate.html">MulticastDelegate</a> class; therefore, users should use the <b>delegate</b> keyword provided by the language.</p>
+<p> The declaration of a delegate type establishes a contract that specifies the signature of one or more methods. A delegate is an instance of a delegate type, and references one or more of the following: </p>
+<UL>
+<li> A target object that is not <b>null</b> and an instance method of the target object </li>
+<li> A static method </li>
+</UL>
+<p> A delegate can reference a method only if the signature of the method exactly matches the signature specified by the delegate type. When a delegate references an instance method, the delegate stores a reference to the method's entry point and a reference to an object, called the target, which is the class instance that the method is invoked on. The target of an instance method cannot be <b>null</b>. When a delegate references a static method, the delegate stores a reference to the method's entry point. The target of a static method is <b>null</b>.</p>
+<p> The invocation list of a delegate is an ordered set of delegates in which each element of the list invokes exactly one of the methods invoked by the delegate. An invocation list can contain duplicate methods. During an invocation, a delegate invokes methods in the order in which they appear in the invocation list. A delegate attempts to invoke every method in its invocation list; duplicates are invoked once for each time they appear in the invocation list. Delegates are immutable; once created, the invocation list of a delegate does not change.</p>
+<p> A delegate is either multicast (combinable) or singlecast (noncombinable). Multicast or combinable delegates invoke one or more methods, and can be used in combining operations. Singlecast or noncombinable delegates invoke exactly one method and cannot be used in combining operations. The invocation list of a singlecast delegate <i>A</i> contains a single element: a reference to <i>A</i>.</p>
+<p> Combining operations, such as  <a href="#Combine(System.Delegate,System.Delegate)">Delegate.Combine</a> and  <a href="#Remove(System.Delegate,System.Delegate)">Delegate.Remove</a>, do not alter existing delegates. Instead, such an operation returns a new delegate that contains the results of the operation, an unchanged delegate, or <b>null</b>. A combining operation returns <b>null</b> when the result of the operation is a delegate that does not reference at least one method. A combining operation returns an unchanged delegate when the requested operation has no effect.</p>
+<p> If an invoked method throws an exception, the method stops executing, the exception is passed back to the caller of the delegate, and remaining methods in the invocation list are not invoked. Catching the exception in the caller does not alter this behavior.</p>
+<p> When the signature of the methods invoked by a delegate includes a return value, the delegate returns the return value of the last element in the invocation list. When the signature includes a parameter that is passed by reference, the final value of the parameter is the result of every method in the invocation list executing sequentially and updating the parameter's value.</p>
+<p> Compilers provide two additional methods to the delegate: <b>BeginInvoke</b> and <b>EndInvoke</b>. For more information on these methods, see .</p>
+<p> The closest equivalent of a delegate in C or C++ is a function pointer. However, a function pointer can only reference static functions, whereas a delegate can reference both static and instance methods. When the delegate references an instance method, the delegate stores not only a reference to the method's entry point, but also a reference to the class instance for which to invoke the method. Unlike function pointers, delegates are object-oriented, type-safe, and secure.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to define a standard delegate.<pre>
+ using System;
+ public class SamplesDelegate  {
+ 
+    // Declares a delegate for a method that takes in an int and returns a String.
+    public delegate String myMethodDelegate( int myInt );
+ 
+    // Defines some methods to which the delegate can point.
+    public class mySubClass  {
+ 
+       public static String myStringMethod ( int myInt )  {
+          if ( myInt &gt; 0 )
+             return( "positive" );
+          if ( myInt &lt; 0 )
+             return( "negative" );
+          return ( "zero" );
+       }
+ 
+       public static String mySignMethod ( int myInt )  {
+          if ( myInt &gt; 0 )
+             return( "+" );
+          if ( myInt &lt; 0 )
+             return( "-" );
+          return ( "" );
+       }
+    }
+ 
+    public static void Main()  {
+ 
+       // Creates one delegate for each method.
+       myMethodDelegate myD1 = new myMethodDelegate( mySubClass.myStringMethod );
+       myMethodDelegate myD2 = new myMethodDelegate( mySubClass.mySignMethod );
+ 
+       // Invokes the delegates.
+       Console.WriteLine( "{0} is {1}; use the sign \"{2}\".\n", 5, myD1( 5 ), myD2( 5 ) );
+       Console.WriteLine( "{0} is {1}; use the sign \"{2}\".\n", -3, myD1( -3 ), myD2( -3 ) );
+       Console.WriteLine( "{0} is {1}; use the sign \"{2}\".\n", 0, myD1( 0 ), myD2( 0 ) );
+    }
+ 
+ }
+ /*
+ Output:
+ 
+ 5 is positive; use the sign "+".
+ -3 is negative; use the sign "-".
+ 0 is zero; use the sign "".
+  */ 
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System/System.html">System Namespace</a> |  <a href="../../System/types/MulticastDelegate.html">MulticastDelegate</a></dd>
+</dl>
+<h3>System.Delegate Member List: </h3>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Method">Method</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the static method represented by the delegate.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Target">Target</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the class instance on which the current delegate invokes the instance method.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Clone">Clone</a></td>
+<td width="55%"> Creates a shallow copy of the delegate.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Combine(System.Delegate[])">Combine</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Combine(Delegate[] delegates)<br><br></code> Concatenates the invocation lists of an array of multicast (combinable) delegates.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Combine(System.Delegate,System.Delegate)">Combine</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Combine(Delegate a, Delegate b)<br><br></code> Concatenates the invocation lists of two multicast (combinable) delegates.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CreateDelegate(System.Type,System.Reflection.MethodInfo)">CreateDelegate</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>CreateDelegate(Type type, MethodInfo method)<br><br></code> Creates a delegate of the specified type to represent the specified static method.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CreateDelegate(System.Type,System.Object,System.String)">CreateDelegate</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>CreateDelegate(Type type, object target, string method)<br><br></code> Creates a delegate of the specified type that represents the specified instance method to invoke on the specified class instance.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CreateDelegate(System.Type,System.Type,System.String)">CreateDelegate</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>CreateDelegate(Type type, Type target, string method)<br><br></code> Creates a delegate of the specified type that represents the specified static method of the specified class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CreateDelegate(System.Type,System.Object,System.String,System.Boolean)">CreateDelegate</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>CreateDelegate(Type type, object target, string method, bool ignoreCase)<br><br></code> Creates a delegate of the specified type that represents the specified instance method to invoke on the specified class instance with the specified case-sensitivity.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#DynamicInvoke(System.Object[])">DynamicInvoke</a></td>
+<td width="55%"> Dynamically invokes (late-bound) the method represented by the current delegate.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a></td>
+<td width="55%"><b>Overridden: </b><br> Determines whether the specified object and the current singlecast (noncombinable) delegate share the same target, method, and invocation list.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a></td>
+<td width="55%"><b>Overridden: </b><br> Returns a hash code for the delegate.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetInvocationList">GetInvocationList</a></td>
+<td width="55%"> Returns the invocation list of the delegate.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">GetObjectData</a></td>
+<td width="55%"> Implements the  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> interface and returns the data needed to serialize the delegate.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Remove(System.Delegate,System.Delegate)">Remove</a></td>
+<td width="55%"> Removes the invocation list of a delegate from the invocation list of another delegate.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Operators and Type Conversions</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#op_Equality(System.Delegate,System.Delegate)">op_Equality</a></td>
+<td width="55%"> Determines whether the specified delegates are equal.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#op_Inequality(System.Delegate,System.Delegate)">op_Inequality</a></td>
+<td width="55%"> Determines whether the specified delegates are not equal.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(object target, string method)<br><br></code> Initializes a delegate that invokes the specified instance method on the specified class instance.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(Type target, string method)<br><br></code> Initializes a delegate that invokes the specified static method from the specified class.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#CombineImpl(System.Delegate)">CombineImpl</a></td>
+<td width="55%"> Concatenates the invocation lists of the specified multicast (combinable) delegate and the current multicast (combinable) delegate.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#DynamicInvokeImpl(System.Object[])">DynamicInvokeImpl</a></td>
+<td width="55%"> Dynamically invokes (late-bound) the method represented by the current delegate.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetMethodImpl">GetMethodImpl</a></td>
+<td width="55%"> Gets the static method represented by the current delegate.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#RemoveImpl(System.Delegate)">RemoveImpl</a></td>
+<td width="55%"> Removes the invocation list of a delegate from the invocation list of another delegate.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Delegate</b><ul class="none">
+<li><a href="../../System/types/MulticastDelegate.html">System.MulticastDelegate</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Delegate Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a delegate that invokes the specified instance method on the specified class instance.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected Delegate(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>target</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>method</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>target</i><br><dl>
+<dd>
+<param> The class instance on which the delegate invokes <i>method</i>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>method</i><br><dl>
+<dd>
+<param> The name of the instance method that the delegate represents.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>target</i> is <b>null</b>.<p> -or- </p>
+<p><i>method</i> is <b>null</b>.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This constructor is called by a compiler-generated delegate type to create a delegate based on the name of an instance method and an instance of the class that defines that method.<p> This constructor creates delegates for instance methods only. An instance method is a method that is associated with an instance of a class; a static method is a method that is associated with the class itself.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/Object.html">Object</a> |  <a href="../../System/types/String.html">String</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a delegate that invokes the specified static method from the specified class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected Delegate(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>target</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>method</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>target</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Type.html">Type</a> representing the class that defines <i>method</i>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>method</i><br><dl>
+<dd>
+<param> The name of the static method that the delegate represents.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>target</i> is <b>null</b>.<p> -or- </p>
+<p><i>method</i> is <b>null</b>.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This constructor is called by a compiler-generated delegate type to create a delegate based on the name of a static method and the  <a href="../../System/types/Type.html">Type</a> representing the class that defines that method.<p> This constructor creates delegates for static methods only. An instance method is a method that is associated with an instance of a class; a static method is a method that is associated with the class itself.</p>
+<p> To get the  <a href="../../System/types/Type.html">Type</a> that represents a class, use the  <a href="../../System/types/Type.html#GetType(System.String,System.Boolean,System.Boolean)">Type.GetType</a> method with the fully qualified (including namespace) name of the class. For example, passing "System.Threading.ThreadStart" to  <a href="../../System/types/Type.html#GetType(System.String,System.Boolean,System.Boolean)">Type.GetType</a> returns a  <a href="../../System/types/Type.html">Type</a> for the  <a href="../../System.Threading/types/ThreadStart.html">ThreadStart</a> class.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/Type.html">Type</a> |  <a href="../../System/types/String.html">String</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="MethodTopic1"></a><a name="Method">Method</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the static method represented by the delegate.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Reflection/types/MethodInfo.html">MethodInfo</a> Method {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/MemberAccessException.html">MemberAccessException</a></td>
+<td> The caller does not have access to the method represented by the delegate (for example, if the method is private).</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property applies only if the current delegate represents a static method.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Reflection/types/MethodInfo.html">MethodInfo</a> |  <a href="#GetMethodImpl">Delegate.GetMethodImpl</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="TargetTopic1"></a><a name="Target">Target</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the class instance on which the current delegate invokes the instance method.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> Target {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> An instance method is a method that is associated with an instance of a class; a static method is a method that is associated with the class itself.<p> If the delegate invokes one or more instance methods, this property returns the target of the last instance method in the invocation list.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CloneTopic1"></a><a name="Clone">Clone</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates a shallow copy of the delegate.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> Clone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A shallow copy of the delegate.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System/types/ICloneable.html#Clone">ICloneable.Clone</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The clone has the same  <a href="../../System/types/Type.html">Type</a>, target, method, and invocation list as the original delegate.<p> A shallow copy creates a new instance of the same type as the original object, and then copies the non-static fields of the original object. If the field is a value type, a bit-by-bit copy of the field is performed. If the field is a reference type, the reference is copied but the referred object is not; therefore, the reference in the original object and the reference in the clone point to the same object. In contrast, a deep copy of an object duplicates everything directly or indirectly referenced by the fields in the object.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="CombineTopic1"></a><a name="Combine(System.Delegate[])">Combine</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate[]</a> <i>delegates</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Concatenates the invocation lists of an array of multicast (combinable) delegates.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Delegate.html">Delegate</a> Combine(<br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate[]</a> <i>delegates</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>delegates</i><br><dl>
+<dd>
+<param> The array of multicast (combinable) delegates to combine.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A new multicast (combinable) delegate with an invocation list that concatenates the invocation lists of the delegates in the <i>delegates</i> array.<p> -or- </p>
+<p><b>null</b>, if <i>delegates</i> is <b>null</b>, if <i>delegates</i> contains zero elements, or if every entry in <i>delegates</i> is <b>null</b>.</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> Not all the non-null entries in <i>delegates</i> are instances of the same delegate type.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/MulticastNotSupportedException.html">MulticastNotSupportedException</a></td>
+<td> One or more non-null entries in <i>delegates</i> are singlecast (noncombinable) delegates.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the <i>delegates</i> array contains entries that are <b>null</b>, those entries are ignored.<p> The invocation list can contain duplicate entries; that is, entries that refer to the same method on the same object.</p>
+<p> <a href="#Combine(System.Delegate,System.Delegate)">Delegate.Combine</a> is useful for creating event handlers that call multiple methods each time an event occurs.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/MulticastDelegate.html">MulticastDelegate</a> |  <a href="#CombineImpl(System.Delegate)">Delegate.CombineImpl</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="CombineTopic2"></a><a name="Combine(System.Delegate,System.Delegate)">Combine</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate</a> <i>a</i>,</font><br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate</a> <i>b</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Concatenates the invocation lists of two multicast (combinable) delegates.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Delegate.html">Delegate</a> Combine(<br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate</a> <i>a</i>,</font><br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate</a> <i>b</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>a</i><br><dl>
+<dd>
+<param> The multicast (combinable) delegate whose invocation list comes first.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>b</i><br><dl>
+<dd>
+<param> The multicast (combinable) delegate whose invocation list comes last.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A new multicast (combinable) delegate with an invocation list that concatenates the invocation lists of <i>a</i> and <i>b</i> in that order.<p> -or- </p>
+<p><i>a</i>, if <i>b</i> is <b>null</b>.</p>
+<p> -or- </p>
+<p><i>b</i>, if <i>a</i> is <b>null</b>.</p>
+<p> -or- </p>
+<p><b>null</b>, if both <i>a</i> and <i>b</i> are <b>null</b>.</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> Both <i>a</i> and <i>b</i> are not <b>null</b>, and <i>a</i> and <i>b</i> are not instances of the same delegate type.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/MulticastNotSupportedException.html">MulticastNotSupportedException</a></td>
+<td> Both <i>a</i> and <i>b</i> are not <b>null</b> and are singlecast (noncombinable) delegates.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The invocation list can contain duplicate entries; that is, entries that refer to the same method on the same object.<p> <a href="#Combine(System.Delegate,System.Delegate)">Delegate.Combine</a> is useful for creating event handlers that call multiple methods each time an event occurs.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/MulticastDelegate.html">MulticastDelegate</a> |  <a href="#CombineImpl(System.Delegate)">Delegate.CombineImpl</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CombineImplTopic1"></a><a name="CombineImpl(System.Delegate)">CombineImpl</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate</a> <i>d</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Concatenates the invocation lists of the specified multicast (combinable) delegate and the current multicast (combinable) delegate.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual <a href="../../System/types/Delegate.html">Delegate</a> CombineImpl(<br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate</a> <i>d</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>d</i><br><dl>
+<dd>
+<param> The multicast (combinable) delegate whose invocation list to append to the end of the invocation list of the current multicast (combinable) delegate.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A new multicast (combinable) delegate with an invocation list that concatenates the invocation list of the current multicast (combinable) delegate and the invocation list of <i>d</i>.<p> -or- </p>
+<p> The current multicast (combinable) delegate, if <i>d</i> is <b>null</b>.</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/MulticastNotSupportedException.html">MulticastNotSupportedException</a></td>
+<td> Always thrown.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method applies only if the current delegate is multicast (combinable).<p> The current implementation simply throws a  <a href="../../System/types/MulticastNotSupportedException.html">MulticastNotSupportedException</a>.</p>
+<p> The invocation list can contain duplicate entries; that is, entries that refer to the same method on the same object.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Combine(System.Delegate,System.Delegate)">Delegate.Combine</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="CreateDelegateTopic1"></a><a name="CreateDelegate(System.Type,System.Reflection.MethodInfo)">CreateDelegate</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/MethodInfo.html">MethodInfo</a> <i>method</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates a delegate of the specified type to represent the specified static method.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Delegate.html">Delegate</a> CreateDelegate(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System.Reflection/types/MethodInfo.html">MethodInfo</a> <i>method</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Type.html">Type</a> of delegate to create.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>method</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Reflection/types/MethodInfo.html">MethodInfo</a> describing the static method for which the delegate is to be created.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A delegate of the specified type to represent the specified static method.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>type</i> is <b>null</b>. -or- <p><i>method</i> is <b>null</b>.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>type</i> does not inherit from either  <a href="../../System/types/Delegate.html">Delegate</a> or  <a href="../../System/types/MulticastDelegate.html">MulticastDelegate</a>.<p> -or- </p>
+<p><i>method</i> is not a static method.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidProgramException.html">InvalidProgramException</a></td>
+<td> The <b>Invoke</b> method of <i>type</i> is not found.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/MemberAccessException.html">MemberAccessException</a></td>
+<td> The caller does not have access to the method represented by the delegate (for example, if the method is private).</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td><i>method</i> is outside the current assembly and the caller does not have  <a href="../../System.Security.Permissions/types/ReflectionPermission.html">ReflectionPermission</a> for the assembly containing <i>method</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method creates delegates for static methods only. An instance method is a method that is associated with an instance of a class; a static method is a method that is associated with the class itself.<p> To get the  <a href="../../System/types/Type.html">Type</a> that represents a class, use the  <a href="../../System/types/Type.html#GetType(System.String,System.Boolean,System.Boolean)">Type.GetType</a> method with the fully qualified (including namespace) name of the class. For example, passing "System.Threading.ThreadStart" to  <a href="../../System/types/Type.html#GetType(System.String,System.Boolean,System.Boolean)">Type.GetType</a> returns a  <a href="../../System/types/Type.html">Type</a> for the  <a href="../../System.Threading/types/ThreadStart.html">ThreadStart</a> class.</p>
+</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/ReflectionPermissionFlag.html#MemberAccess">ReflectionPermissionFlag.MemberAccess</a> for access to the method represented by the delegate.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/Type.html">Type</a> |  <a href="../../System/types/MulticastDelegate.html">MulticastDelegate</a> |  <a href="../../System.Security.Permissions/types/ReflectionPermission.html">ReflectionPermission</a> |  <a href="../../System.Reflection/types/MethodInfo.html">MethodInfo</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="CreateDelegateTopic2"></a><a name="CreateDelegate(System.Type,System.Object,System.String)">CreateDelegate</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>target</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>method</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates a delegate of the specified type that represents the specified instance method to invoke on the specified class instance.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Delegate.html">Delegate</a> CreateDelegate(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>target</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>method</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Type.html">Type</a> of delegate to create.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>target</i><br><dl>
+<dd>
+<param> The class instance on which <i>method</i> is invoked.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>method</i><br><dl>
+<dd>
+<param> The name of the instance method that the delegate is to represent.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A delegate of the specified type that represents the specified instance method to invoke on the specified class instance.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>type</i> is <b>null</b>.<p> -or- </p>
+<p><i>target</i> is <b>null</b>.</p>
+<p> -or- </p>
+<p><i>method</i> is <b>null</b>.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>type</i> does not inherit from either  <a href="../../System/types/Delegate.html">Delegate</a> or  <a href="../../System/types/MulticastDelegate.html">MulticastDelegate</a>.<p> -or- </p>
+<p><i>method</i> is not an instance method.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/MemberAccessException.html">MemberAccessException</a></td>
+<td> The caller does not have access to the method represented by the delegate (for example, if the method is private).</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td><i>method</i> is outside the current assembly and the caller does not have  <a href="../../System.Security.Permissions/types/ReflectionPermission.html">ReflectionPermission</a> for the assembly containing <i>method</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method creates delegates for instance methods only. An instance method is a method that is associated with an instance of a class; a static method is a method that is associated with the class itself.<p> To get the  <a href="../../System/types/Type.html">Type</a> that represents a class, use the  <a href="../../System/types/Type.html#GetType(System.String,System.Boolean,System.Boolean)">Type.GetType</a> method with the fully qualified (including namespace) name of the class. For example, passing "System.Threading.ThreadStart" to  <a href="../../System/types/Type.html#GetType(System.String,System.Boolean,System.Boolean)">Type.GetType</a> returns a  <a href="../../System/types/Type.html">Type</a> for the  <a href="../../System.Threading/types/ThreadStart.html">ThreadStart</a> class.</p>
+</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/ReflectionPermissionFlag.html#MemberAccess">ReflectionPermissionFlag.MemberAccess</a> for access to the method represented by the delegate.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/Type.html">Type</a> |  <a href="../../System/types/MulticastDelegate.html">MulticastDelegate</a> |  <a href="../../System.Security.Permissions/types/ReflectionPermission.html">ReflectionPermission</a> |  <a href="../../System/types/Object.html">Object</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="CreateDelegateTopic3"></a><a name="CreateDelegate(System.Type,System.Type,System.String)">CreateDelegate</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>target</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>method</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates a delegate of the specified type that represents the specified static method of the specified class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Delegate.html">Delegate</a> CreateDelegate(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>target</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>method</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Type.html">Type</a> of delegate to create.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>target</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Type.html">Type</a> representing the class that implements <i>method</i>. The  <a href="../../System/types/Type.html">Type</a> representing the class that implements <i>method</i>.</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>method</i><br><dl>
+<dd>
+<param> The name of the static method that the delegate is to represent.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A delegate of the specified type that represents the specified static method of the specified class.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>type</i> is <b>null</b>. -or- <p><i>target</i> is <b>null</b>.</p>
+<p> -or- </p>
+<p><i>method</i> is <b>null</b>.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>type</i> does not inherit from either  <a href="../../System/types/Delegate.html">Delegate</a> or  <a href="../../System/types/MulticastDelegate.html">MulticastDelegate</a>.<p> -or- </p>
+<p><i>method</i> is not a static method.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/MemberAccessException.html">MemberAccessException</a></td>
+<td> The caller does not have access to the method represented by the delegate (for example, if the method is private).</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td><i>method</i> is outside the current assembly and the caller does not have  <a href="../../System.Security.Permissions/types/ReflectionPermission.html">ReflectionPermission</a> for the assembly containing <i>method</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method creates delegates for static methods only. An instance method is a method that is associated with an instance of a class; a static method is a method that is associated with the class itself.<p> To get the  <a href="../../System/types/Type.html">Type</a> that represents a class, use the  <a href="../../System/types/Type.html#GetType(System.String,System.Boolean,System.Boolean)">Type.GetType</a> method with the fully qualified (including namespace) name of the class. For example, passing "System.Threading.ThreadStart" to  <a href="../../System/types/Type.html#GetType(System.String,System.Boolean,System.Boolean)">Type.GetType</a> returns a  <a href="../../System/types/Type.html">Type</a> for the  <a href="../../System.Threading/types/ThreadStart.html">ThreadStart</a> class.</p>
+</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/ReflectionPermissionFlag.html#MemberAccess">ReflectionPermissionFlag.MemberAccess</a> for access to the method represented by the delegate.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/Type.html">Type</a> |  <a href="../../System/types/MulticastDelegate.html">MulticastDelegate</a> |  <a href="../../System.Security.Permissions/types/ReflectionPermission.html">ReflectionPermission</a> |  <a href="../../System/types/Object.html">Object</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="CreateDelegateTopic4"></a><a name="CreateDelegate(System.Type,System.Object,System.String,System.Boolean)">CreateDelegate</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>target</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>method</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>ignoreCase</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates a delegate of the specified type that represents the specified instance method to invoke on the specified class instance with the specified case-sensitivity.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Delegate.html">Delegate</a> CreateDelegate(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>target</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>method</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>ignoreCase</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Type.html">Type</a> of delegate to create.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>target</i><br><dl>
+<dd>
+<param> The class instance on which <i>method</i> is invoked.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>method</i><br><dl>
+<dd>
+<param> The name of the instance method that the delegate is to represent.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>ignoreCase</i><br><dl>
+<dd>
+<param> A Boolean indicating whether to ignore the case when comparing the name of the method.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A delegate of the specified type that represents the specified instance method to invoke on the specified class instance.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>type</i> is <b>null</b>.<p> -or- </p>
+<p><i>target</i> is <b>null</b>.</p>
+<p> -or- </p>
+<p><i>method</i> is <b>null</b>.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>type</i> does not inherit from either  <a href="../../System/types/Delegate.html">Delegate</a> or  <a href="../../System/types/MulticastDelegate.html">MulticastDelegate</a>.<p> -or- </p>
+<p><i>method</i> is not an instance method.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/MemberAccessException.html">MemberAccessException</a></td>
+<td> The caller does not have access to the method represented by the delegate (for example, if the method is private).</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td><i>method</i> is outside the current assembly and the caller does not have  <a href="../../System.Security.Permissions/types/ReflectionPermission.html">ReflectionPermission</a> for the assembly containing <i>method</i>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method creates delegates for instance methods only. An instance method is a method that is associated with an instance of a class; a static method is a method that is associated with the class itself.<p> To get the  <a href="../../System/types/Type.html">Type</a> that represents a class, use the  <a href="../../System/types/Type.html#GetType(System.String,System.Boolean,System.Boolean)">Type.GetType</a> method with the fully qualified (including namespace) name of the class. For example, passing "System.Threading.ThreadStart" to  <a href="../../System/types/Type.html#GetType(System.String,System.Boolean,System.Boolean)">Type.GetType</a> returns a  <a href="../../System/types/Type.html">Type</a> for the  <a href="../../System.Threading/types/ThreadStart.html">ThreadStart</a> class.</p>
+</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/ReflectionPermissionFlag.html#MemberAccess">ReflectionPermissionFlag.MemberAccess</a> for access to the method represented by the delegate.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/Type.html">Type</a> |  <a href="../../System/types/MulticastDelegate.html">MulticastDelegate</a> |  <a href="../../System.Security.Permissions/types/ReflectionPermission.html">ReflectionPermission</a> |  <a href="../../System/types/Object.html">Object</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="DynamicInvokeTopic1"></a><a name="DynamicInvoke(System.Object[])">DynamicInvoke</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object[]</a> <i>args</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Dynamically invokes (late-bound) the method represented by the current delegate.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> DynamicInvoke(<br>   <font color="#008080"><a href="../../System/types/Object.html">object[]</a> <i>args</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>args</i><br><dl>
+<dd>
+<param> An array of objects that are the arguments to pass to the method represented by the current delegate.<p> -or- </p>
+<p><b>null</b>, if the method represented by the current delegate does not require arguments.</p> An array of objects that are the arguments to pass to the method represented by the current delegate.<p> -or- </p>
+<p><b>null</b>, if the method represented by the current delegate does not require arguments.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The object returned by the method represented by the delegate.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/MemberAccessException.html">MemberAccessException</a></td>
+<td> The caller does not have access to the method represented by the delegate (for example, if the method is private).<p> -or- </p>
+<p> The number, order, or type of parameters listed in <i>args</i> is invalid.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Reflection/types/TargetException.html">TargetException</a></td>
+<td> The method represented by the delegate is an instance method and the target object is <b>null</b>.<p> -or- </p>
+<p> The method represented by the delegate is invoked on an object or a class that does not support it.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Reflection/types/TargetInvocationException.html">TargetInvocationException</a></td>
+<td> One of the encapsulated methods throws an exception.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method calls the  <a href="#DynamicInvokeImpl(System.Object[])">Delegate.DynamicInvokeImpl</a> method.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#DynamicInvokeImpl(System.Object[])">Delegate.DynamicInvokeImpl</a> |  <a href="../../System/types/Object.html">Object</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="DynamicInvokeImplTopic1"></a><a name="DynamicInvokeImpl(System.Object[])">DynamicInvokeImpl</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object[]</a> <i>args</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Dynamically invokes (late-bound) the method represented by the current delegate.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual <a href="../../System/types/Object.html">object</a> DynamicInvokeImpl(<br>   <font color="#008080"><a href="../../System/types/Object.html">object[]</a> <i>args</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>args</i><br><dl>
+<dd>
+<param> An array of objects that are the arguments to pass to the method represented by the current delegate.<p> -or- </p>
+<p><b>null</b>, if the method represented by the current delegate does not require arguments.</p> An array of objects that are the arguments to pass to the method represented by the current delegate.<p> -or- </p>
+<p><b>null</b>, if the method represented by the current delegate does not require arguments.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The object returned by the method represented by the delegate.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/MemberAccessException.html">MemberAccessException</a></td>
+<td> The caller does not have access to the method represented by the delegate (for example, if the method is private).<p> -or- </p>
+<p> The number, order, or type of parameters listed in <i>args</i> is invalid.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Reflection/types/TargetException.html">TargetException</a></td>
+<td> The method represented by the delegate is an instance method and the target object is <b>null</b>.<p> -or- </p>
+<p> The method represented by the delegate is invoked on an object or a class that does not support it.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Reflection/types/TargetInvocationException.html">TargetInvocationException</a></td>
+<td> One of the encapsulated methods throws an exception.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method implements the  <a href="#DynamicInvoke(System.Object[])">Delegate.DynamicInvoke</a> method.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#DynamicInvoke(System.Object[])">Delegate.DynamicInvoke</a> |  <a href="../../System/types/Object.html">Object</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines whether the specified object and the current singlecast (noncombinable) delegate share the same target, method, and invocation list.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> The object to compare with the current singlecast (noncombinable) delegate.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if <i>obj</i> and the current delegate have the same target, method, and invocation list; otherwise, <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/MemberAccessException.html">MemberAccessException</a></td>
+<td> The caller does not have access to the method represented by the delegate (for example, if the method is private).</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method applies only if the current delegate is singlecast (noncombinable).<p> Two delegates with the same methods, the same targets, and the same invocation lists are considered equal, even if they are not both multicast (combinable) or both singlecast (noncombinable).</p>
+<p> The methods and targets are compared for equality as follows: </p>
+<UL>
+<li> If the two methods being compared are both static and are the same method on the same class, the methods are considered equal and the targets are also considered equal.</li>
+<li> If the two methods being compared are instance methods and are the same method on the same object, the methods are considered equal and the targets are also considered equal.</li>
+<li> Otherwise, the methods are not considered to be equal and the targets are also not considered to be equal.</li>
+</UL>
+<p> Two invocation lists are considered identical only if they have the same order and the corresponding elements from the two lists represent the same method and target.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/Object.html">Object</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~Delegate();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns a hash code for the delegate.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A hash code for the delegate.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The return value of this method must not be persisted for two reasons. First, the hash function of a class might be altered to generate a better distribution, rendering any values from the old hash function useless. Second, the default implementation of this class does not guarantee that the same value will be returned by different instances.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/Object.html#GetHashCode">Object.GetHashCode</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetInvocationListTopic1"></a><a name="GetInvocationList">GetInvocationList</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the invocation list of the delegate.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Delegate.html">Delegate[]</a> GetInvocationList();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An array of singlecast (noncombinable) delegates representing the invocation list of the current delegate. If the current delegate is singlecast (noncombinable), the array contains only one element, which is a reference to the current delegate. If the current delegate is multicast (combinable), the array contains one or more elements.</dd>
+</dl><b>Remarks</b><dl>
+<dd> Because the returned array contains only singlecast (noncombinable) delegates, the invocation list of each element is guaranteed to have exactly one entry.<p> The order of the delegates in the array is the same order in which the current delegate invokes the methods that those delegates represent.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetMethodImplTopic1"></a><a name="GetMethodImpl">GetMethodImpl</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the static method represented by the current delegate.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual <a href="../../System.Reflection/types/MethodInfo.html">MethodInfo</a> GetMethodImpl();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System.Reflection/types/MethodInfo.html">MethodInfo</a> describing the static method represented by the current delegate.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/MemberAccessException.html">MemberAccessException</a></td>
+<td> The caller does not have access to the method represented by the delegate (for example, if the method is private).</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method applies only if the current delegate represents a static method.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Reflection/types/MethodInfo.html">MethodInfo</a> |  <a href="#Method">Delegate.Method</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetObjectDataTopic1"></a><a name="GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">GetObjectData</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> <i>info</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> <i>context</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Implements the  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> interface and returns the data needed to serialize the delegate.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void GetObjectData(<br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> <i>info</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> <i>context</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>info</i><br><dl>
+<dd>
+<param> A  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> containing information required to serialize the delegate.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>context</i><br><dl>
+<dd>
+<param> A  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> containing the source and destination of the serialized stream associated with the delegate.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>info</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Serialization/types/ISerializable.html#GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">ISerializable.GetObjectData</a></dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> |  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> |  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="op_EqualityTopic1"></a><a name="op_Equality(System.Delegate,System.Delegate)">op_Equality</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate</a> <i>d1</i>,</font><br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate</a> <i>d2</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines whether the specified delegates are equal.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static bool operator ==(<br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate</a> <i>d1</i>,</font><br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate</a> <i>d2</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>d1</i><br><dl>
+<dd>
+<param> The first delegate to compare.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>d2</i><br><dl>
+<dd>
+<param> The second delegate to compare.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if <i>d1</i> is equal to <i>d2</i>; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> Two delegates with the same methods, the same targets, and the same invocation lists are considered equal, even if they are not both multicast (combinable) or both singlecast (noncombinable).<p> The methods and targets are compared for equality as follows: </p>
+<UL>
+<li> If the two methods being compared are both static and are the same method on the same class, the methods are considered equal and the targets are also considered equal.</li>
+<li> If the two methods being compared are instance methods and are the same method on the same object, the methods are considered equal and the targets are also considered equal.</li>
+<li> Otherwise, the methods are not considered to be equal and the targets are also not considered to be equal.</li>
+</UL>
+<p> Two invocation lists are considered identical if they have the same order and the corresponding elements from the two lists represent the same method and target.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Equals(System.Object)">Delegate.Equals</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="op_InequalityTopic1"></a><a name="op_Inequality(System.Delegate,System.Delegate)">op_Inequality</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate</a> <i>d1</i>,</font><br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate</a> <i>d2</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines whether the specified delegates are not equal.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static bool operator !=(<br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate</a> <i>d1</i>,</font><br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate</a> <i>d2</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>d1</i><br><dl>
+<dd>
+<param> The first delegate to compare.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>d2</i><br><dl>
+<dd>
+<param> The second delegate to compare.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if <i>d1</i> is not equal to <i>d2</i>; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> Two delegates are considered not equal if they have different methods, different targets, or different invocation lists.<p> The methods and targets are compared for equality as follows: </p>
+<UL>
+<li> If the two methods being compared are both static and are the same method on the same class, the methods are considered equal and the targets are also considered equal.</li>
+<li> If the two methods being compared are instance methods and are the same method on the same object, the methods are considered equal and the targets are also considered equal.</li>
+<li> Otherwise, the methods are not considered to be equal and the targets are also not considered to be equal.</li>
+</UL>
+<p> Two invocation lists are not equal if they have different sizes, if they are ordered differently, or if at least one element from one list represents a method or target that is different from that represented by its corresponding element in the other list.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Equals(System.Object)">Delegate.Equals</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="RemoveTopic1"></a><a name="Remove(System.Delegate,System.Delegate)">Remove</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate</a> <i>source</i>,</font><br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Removes the invocation list of a delegate from the invocation list of another delegate.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Delegate.html">Delegate</a> Remove(<br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate</a> <i>source</i>,</font><br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>source</i><br><dl>
+<dd>
+<param> The delegate from which to remove the invocation list of <i>value</i>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The delegate that supplies the invocation list to remove from the invocation list of <i>source</i>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A new delegate with an invocation list formed by taking the invocation list of <i>source</i> and removing the invocation list of <i>value</i>, if the invocation list of <i>value</i> is found within the invocation list of <i>source</i>.<p> -or- </p>
+<p><i>source</i>, if <i>value</i> is <b>null</b>, or if the invocation list of <i>value</i> is not found within the invocation list of <i>source</i>.</p>
+<p> -or- </p>
+<p><b>null</b>, if the invocation list of <i>value</i> is equal to the invocation list of <i>source</i>, or if <i>source</i> is <b>null</b>.</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/MemberAccessException.html">MemberAccessException</a></td>
+<td> The caller does not have access to the method represented by the delegate (for example, if the method is private).</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the invocation list of <i>value</i> matches a contiguous set of elements in the invocation list of <i>source</i>, then the invocation list of <i>value</i> is said to occur within the invocation list of <i>source</i>. If the invocation list of <i>value</i> occurs more than once in the invocation list of <i>source</i>, the last occurrence is removed.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#RemoveImpl(System.Delegate)">Delegate.RemoveImpl</a> |  <a href="#Equals(System.Object)">Delegate.Equals</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="RemoveImplTopic1"></a><a name="RemoveImpl(System.Delegate)">RemoveImpl</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate</a> <i>d</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Removes the invocation list of a delegate from the invocation list of another delegate.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual <a href="../../System/types/Delegate.html">Delegate</a> RemoveImpl(<br>   <font color="#008080"><a href="../../System/types/Delegate.html">Delegate</a> <i>d</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>d</i><br><dl>
+<dd>
+<param> The delegate that supplies the invocation list to remove from the invocation list of the current delegate.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A new delegate with an invocation list formed by taking the invocation list of the current delegate and removing the invocation list of <i>value</i>, if the invocation list of <i>value</i> is found within the current delegate's invocation list.<p> -or- </p>
+<p> The current delegate, if <i>value</i> is <b>null</b>, or if the invocation list of <i>value</i> is not found within the current delegate's invocation list.</p>
+<p> -or- </p>
+<p><b>null</b>, if the invocation list of <i>value</i> is equal to the current delegate's invocation list.</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/MemberAccessException.html">MemberAccessException</a></td>
+<td> The caller does not have access to the method represented by the delegate (for example, if the method is private).</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the invocation list of <i>value</i> matches a contiguous set of elements in the current delegate's invocation list, then the invocation list of <i>value</i> is said to occur within the current delegate's invocation list. If the invocation list of <i>value</i> occurs more than once in the current delegate's invocation list, the last occurrence is removed.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Remove(System.Delegate,System.Delegate)">Delegate.Remove</a> |  <a href="#Equals(System.Object)">Delegate.Equals</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

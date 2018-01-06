@@ -1,0 +1,941 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Runtime.Remoting.Contexts.SynchronizationAttribute</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Runtime.Remoting.Contexts.SynchronizationAttribute Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Runtime.Remoting.Contexts<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Enforces a synchronization domain for the current context and all contexts that share the same instance.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[AttributeUsage(AttributeTargets.Class)]<br>[Serializable]<br><b>public class SynchronizationAttribute : ContextAttribute</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> When this attribute is applied to an object, only one thread can be executing in all contexts that share an instance of this property. This is done by contributing sinks that intercept and serialize incoming calls for the respective contexts. If the property is marked for reentry, then callouts are intercepted too. The callout interception allows other waiting threads to enter the synchronization domain for maximal throughput.<br><br><b>Note </b> There are two classes named <b>SynchronizationAttribute</b>: one in the  <a href="../../System.Runtime.Remoting.Contexts/System.Runtime.Remoting.Contexts.html">System.Runtime.Remoting.Contexts</a> namespace, and the other in the  <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemEnterpriseServicesmemberstopic.asp">System.EnterpriseServices</a> namespace. The  <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemEnterpriseServicesSynchronizationAttributememberstopic.asp">SynchronizationAttribute</a> class supports only synchronous calls, and can be used only with serviced components. (For more information on serviced components, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconservicedcomponentoverview.asp">MSDN: servicedcomponentoverview</a>.) The  <a href="../../System.Runtime.Remoting.Contexts/types/SynchronizationAttribute.html">SynchronizationAttribute</a> supports both synchronous and asynchronous calls, and can be used only with context bound objects. (For more information on context bound objects, see the  <a href="../../System/types/ContextBoundObject.html">ContextBoundObject</a> class.) </dd>
+</dl><b>Example</b><dl>
+<dd> The following code example demonstrates the use of the  <a href="../../System.Runtime.Remoting.Contexts/types/SynchronizationAttribute.html">SynchronizationAttribute</a>. For the complete example code, see the example for the  <a href="../../System.Runtime.Remoting.Messaging/types/AsyncResult.html">AsyncResult</a> class.<pre>
+// Context-bound type with the Synchronization context attribute.
+[Synchronization()]
+public class SampleSyncronized : ContextBoundObject {
+
+    // A method that does some work, and returns the square of the given number.
+    public int Square(int i)  {
+
+        Console.Write("The hash of the thread executing ");
+        Console.WriteLine("SampleSyncronized.Square is: {0}", 
+                             Thread.CurrentThread.GetHashCode());
+        return i*i;
+    }
+}
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Runtime.Remoting.Contexts/System.Runtime.Remoting.Contexts.html">System.Runtime.Remoting.Contexts Namespace</a></dd>
+</dl>
+<h3>System.Runtime.Remoting.Contexts.SynchronizationAttribute Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor()<br><br></code>Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Initializes a new instance of the  <a href="../../System.Runtime.Remoting.Contexts/types/SynchronizationAttribute.html">SynchronizationAttribute</a> class with default values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(bool reEntrant)<br><br></code> Initializes a new instance of the  <a href="../../System.Runtime.Remoting.Contexts/types/SynchronizationAttribute.html">SynchronizationAttribute</a> class with a Boolean value indicating whether reentry is required.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor3">ctor #3</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(int flag)<br><br></code> Initializes a new instance of the  <a href="../../System.Runtime.Remoting.Contexts/types/SynchronizationAttribute.html">SynchronizationAttribute</a> class with a flag indicating the behavior of the object to which this attribute is applied.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor4">ctor #4</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(int flag, bool reEntrant)<br><br></code> Initializes a new instance of the  <a href="../../System.Runtime.Remoting.Contexts/types/SynchronizationAttribute.html">SynchronizationAttribute</a> class with a flag indicating the behavior of the object to which this attribute is applied, and a Boolean value indicating whether reentry is required.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Fields</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#NOT_SUPPORTED">NOT_SUPPORTED</a></td>
+<td width="55%"> Indicates that the class to which this attribute is applied cannot be created in a context that has synchronization. This field is constant.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#REQUIRED">REQUIRED</a></td>
+<td width="55%"> Indicates that the class to which this attribute is applied must be created in a context that has synchronization. This field is constant.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#REQUIRES_NEW">REQUIRES_NEW</a></td>
+<td width="55%"> Indicates that the class to which this attribute is applied must be created in a context with a new instance of the synchronization property each time. This field is constant.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SUPPORTED">SUPPORTED</a></td>
+<td width="55%"> Indicates that the class to which this attribute is applied is not dependent on whether the context has synchronization. This field is constant.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#IsReEntrant">IsReEntrant</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets or sets a Boolean value indicating whether reentry is required.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Locked">Locked</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets a Boolean value indicating whether the  <a href="../../System.Runtime.Remoting.Contexts/types/Context.html">Context</a> implementing this instance of  <a href="../../System.Runtime.Remoting.Contexts/types/SynchronizationAttribute.html">SynchronizationAttribute</a> is locked.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Name">Name</a>  (inherited)</td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Runtime.Remoting.Contexts/types/IContextProperty.html#Name">System.Runtime.Remoting.Contexts.IContextProperty.Name</a></font></b><br><br><br> Gets the name of the property under which it will be added to the context.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#TypeId">TypeId</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#TypeId">System.Attribute.TypeId</a></font></b><br><br><br> When implemented in a derived class, gets a unique identifier for this <b>Attribute</b>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Freeze(System.Runtime.Remoting.Contexts.Context)">Freeze</a>  (inherited)</td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System.Runtime.Remoting.Contexts/types/IContextProperty.html#Freeze(System.Runtime.Remoting.Contexts.Context)">System.Runtime.Remoting.Contexts.IContextProperty.Freeze</a></font></b><br><br><br> Called when the context is frozen.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetClientContextSink(System.Runtime.Remoting.Messaging.IMessageSink)">GetClientContextSink</a></td>
+<td width="55%"> Creates a CallOut sink and chains it in front of the provided chain of sinks at the context boundary on the client end of a remoting call.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#GetHashCode">System.Attribute.GetHashCode</a></font></b><br><br><br> Returns the hash code for this instance.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetPropertiesForNewContext(System.Runtime.Remoting.Activation.IConstructionCallMessage)">GetPropertiesForNewContext</a></td>
+<td width="55%"><b>Overridden: </b><br> Adds the <b>Synchronized</b> context property to the specified  <a href="../../System.Runtime.Remoting.Activation/types/IConstructionCallMessage.html">IConstructionCallMessage</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetServerContextSink(System.Runtime.Remoting.Messaging.IMessageSink)">GetServerContextSink</a></td>
+<td width="55%"> Creates a synchronized dispatch sink and chains it in front of the provided chain of sinks at the context boundary on the server end of a remoting call.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsContextOK(System.Runtime.Remoting.Contexts.Context,System.Runtime.Remoting.Activation.IConstructionCallMessage)">IsContextOK</a></td>
+<td width="55%"><b>Overridden: </b><br> Returns a Boolean value indicating whether the context parameter meets the context attribute's requirements.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsDefaultAttribute">IsDefaultAttribute</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#IsDefaultAttribute">System.Attribute.IsDefaultAttribute</a></font></b><br><br><br> When overridden in a derived class, returns an indication whether the value of this instance is the default value for the derived class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsNewContextOK(System.Runtime.Remoting.Contexts.Context)">IsNewContextOK</a>  (inherited)</td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System.Runtime.Remoting.Contexts/types/IContextProperty.html#IsNewContextOK(System.Runtime.Remoting.Contexts.Context)">System.Runtime.Remoting.Contexts.IContextProperty.IsNewContextOK</a></font></b><br><br><br> Returns a Boolean value indicating whether the context property is OK with the new context.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Match(System.Object)">Match</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#Match(System.Object)">System.Attribute.Match</a></font></b><br><br><br> When overridden in a derived class, returns a value indicating whether this instance equals a specified object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Fields</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#AttributeName">AttributeName</a>  (inherited)</td>
+<td width="55%">This member is inherited from a type or implements a member of an interface which internally supports the .NET Framework infrastructure and is not intended to be used directly from your code.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/Attribute.html">System.Attribute</a></li>
+<ul class="none">
+<li><a href="../../System.Runtime.Remoting.Contexts/types/ContextAttribute.html">System.Runtime.Remoting.Contexts.ContextAttribute</a></li>
+<ul class="none">
+<li><b>System.Runtime.Remoting.Contexts.SynchronizationAttribute</b></li>
+</ul>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Runtime.Remoting.Contexts.SynchronizationAttribute Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Runtime.Remoting.Contexts/types/SynchronizationAttribute.html">SynchronizationAttribute</a> class with default values.</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public SynchronizationAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Runtime.Remoting.Contexts/types/SynchronizationAttribute.html">SynchronizationAttribute</a> class with a Boolean value indicating whether reentry is required.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public SynchronizationAttribute(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>reEntrant</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>reEntrant</i><br><dl>
+<dd>
+<param> A Boolean value indicating whether reentry is required.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If reentry is required, callouts out of the  <a href="../../System.Runtime.Remoting.Contexts/types/Context.html">Context</a> to which the current attribute is applied must be intercepted and serialized.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic3"></a><a name="ctor3">ctor #3</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Runtime.Remoting.Contexts/types/SynchronizationAttribute.html">SynchronizationAttribute</a> class with a flag indicating the behavior of the object to which this attribute is applied.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public SynchronizationAttribute(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>flag</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>flag</i><br><dl>
+<dd>
+<param> An integer value indicating the behavior of the object to which this attribute is applied.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The <i>flag</i> parameter was not one of the defined flags.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The <i>flag</i> parameter must be either  <a href="#NOT_SUPPORTED">SynchronizationAttribute.NOT_SUPPORTED</a>,  <a href="#SUPPORTED">SynchronizationAttribute.SUPPORTED</a>,  <a href="#REQUIRED">SynchronizationAttribute.REQUIRED</a>, or  <a href="#REQUIRES_NEW">SynchronizationAttribute.REQUIRES_NEW</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic4"></a><a name="ctor4">ctor #4</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Runtime.Remoting.Contexts/types/SynchronizationAttribute.html">SynchronizationAttribute</a> class with a flag indicating the behavior of the object to which this attribute is applied, and a Boolean value indicating whether reentry is required.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public SynchronizationAttribute(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>flag</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>reEntrant</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>flag</i><br><dl>
+<dd>
+<param> An integer value indicating the behavior of the object to which this attribute is applied.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>reEntrant</i><br><dl>
+<dd>
+<param><b>true</b> if reentry is required, and callouts must be intercepted and serialized; otherwise, <b>false</b>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The <i>flag</i> parameter was not one of the defined flags.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The <i>flag</i> parameter must be either  <a href="#NOT_SUPPORTED">SynchronizationAttribute.NOT_SUPPORTED</a>,  <a href="#SUPPORTED">SynchronizationAttribute.SUPPORTED</a>,  <a href="#REQUIRED">SynchronizationAttribute.REQUIRED</a>, or  <a href="#REQUIRES_NEW">SynchronizationAttribute.REQUIRES_NEW</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="AttributeNameTopic1"></a><a name="AttributeName">AttributeName</a></i></b><b><i></i></b><dl>
+<dd><b><font color="#800080"> Inherited<br></font></b>This member is inherited from a type or implements a member of an interface which internally supports the .NET Framework infrastructure and is not intended to be used directly from your code.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="NOT_SUPPORTEDTopic1"></a><a name="NOT_SUPPORTED">NOT_SUPPORTED</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Indicates that the class to which this attribute is applied cannot be created in a context that has synchronization. This field is constant.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public const <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">int</a> NOT_SUPPORTED;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="REQUIREDTopic1"></a><a name="REQUIRED">REQUIRED</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Indicates that the class to which this attribute is applied must be created in a context that has synchronization. This field is constant.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public const <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">int</a> REQUIRED;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="REQUIRES_NEWTopic1"></a><a name="REQUIRES_NEW">REQUIRES_NEW</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Indicates that the class to which this attribute is applied must be created in a context with a new instance of the synchronization property each time. This field is constant.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public const <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">int</a> REQUIRES_NEW;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="SUPPORTEDTopic1"></a><a name="SUPPORTED">SUPPORTED</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Indicates that the class to which this attribute is applied is not dependent on whether the context has synchronization. This field is constant.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public const <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">int</a> SUPPORTED;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsReEntrantTopic1"></a><a name="IsReEntrant">IsReEntrant</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets a Boolean value indicating whether reentry is required.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsReEntrant {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If reentry is required, callouts out of the  <a href="../../System.Runtime.Remoting.Contexts/types/Context.html">Context</a> to which the current attribute is applied must be intercepted and serialized.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="LockedTopic1"></a><a name="Locked">Locked</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets a Boolean value indicating whether the  <a href="../../System.Runtime.Remoting.Contexts/types/Context.html">Context</a> implementing this instance of  <a href="../../System.Runtime.Remoting.Contexts/types/SynchronizationAttribute.html">SynchronizationAttribute</a> is locked.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Locked {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> When a synchronized  <a href="../../System.Runtime.Remoting.Contexts/types/Context.html">Context</a> is locked, only the thread currently executing in it has access to objects in the  <a href="../../System.Runtime.Remoting.Contexts/types/Context.html">Context</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NameTopic1"></a><a name="Name">Name</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Runtime.Remoting.Contexts/types/IContextProperty.html#Name">System.Runtime.Remoting.Contexts.IContextProperty.Name</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the name of the property under which it will be added to the context.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System/types/String.html">string</a> Name {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="TypeIdTopic1"></a><a name="TypeId">TypeId</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#TypeId">System.Attribute.TypeId</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When implemented in a derived class, gets a unique identifier for this <b>Attribute</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> TypeId {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> As implemented, this identifier is merely the  <a href="../../System/types/Type.html">Type</a> of the attribute. However, it is intended that the unique identifier be used to identify two attributes of the same type.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>o</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>o</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~SynchronizationAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FreezeTopic1"></a><a name="Freeze(System.Runtime.Remoting.Contexts.Context)">Freeze</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Contexts/types/Context.html">Context</a> <i>newContext</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Runtime.Remoting.Contexts/types/IContextProperty.html#Freeze(System.Runtime.Remoting.Contexts.Context)">System.Runtime.Remoting.Contexts.IContextProperty.Freeze</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Called when the context is frozen.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            void Freeze(<br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Contexts/types/Context.html">Context</a> <i>newContext</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>newContext</i><br><dl>
+<dd>
+<param> The context to freeze.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Context properties cannot be added after the context has been frozen.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetClientContextSinkTopic1"></a><a name="GetClientContextSink(System.Runtime.Remoting.Messaging.IMessageSink)">GetClientContextSink</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Messaging/types/IMessageSink.html">IMessageSink</a> <i>nextSink</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates a CallOut sink and chains it in front of the provided chain of sinks at the context boundary on the client end of a remoting call.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System.Runtime.Remoting.Messaging/types/IMessageSink.html">IMessageSink</a> GetClientContextSink(<br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Messaging/types/IMessageSink.html">IMessageSink</a> <i>nextSink</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>nextSink</i><br><dl>
+<dd>
+<param> The chain of sinks composed so far.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The composite sink chain with the new CallOut sink.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Remoting.Contexts/types/IContributeClientContextSink.html#GetClientContextSink(System.Runtime.Remoting.Messaging.IMessageSink)">IContributeClientContextSink.GetClientContextSink</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The current method is an implementation of  <a href="../../System.Runtime.Remoting.Contexts/types/IContributeClientContextSink.html#GetClientContextSink(System.Runtime.Remoting.Messaging.IMessageSink)">IContributeClientContextSink.GetClientContextSink</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#GetHashCode">System.Attribute.GetHashCode</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the hash code for this instance.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A 32-bit signed integer hash code.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="GetPropertiesForNewContextTopic1"></a><a name="GetPropertiesForNewContext(System.Runtime.Remoting.Activation.IConstructionCallMessage)">GetPropertiesForNewContext</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Activation/types/IConstructionCallMessage.html">IConstructionCallMessage</a> <i>ctorMsg</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds the <b>Synchronized</b> context property to the specified  <a href="../../System.Runtime.Remoting.Activation/types/IConstructionCallMessage.html">IConstructionCallMessage</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void GetPropertiesForNewContext(<br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Activation/types/IConstructionCallMessage.html">IConstructionCallMessage</a> <i>ctorMsg</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>ctorMsg</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Runtime.Remoting.Activation/types/IConstructionCallMessage.html">IConstructionCallMessage</a> to which to add the property.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Remoting.Contexts/types/IContextAttribute.html#GetPropertiesForNewContext(System.Runtime.Remoting.Activation.IConstructionCallMessage)">IContextAttribute.GetPropertiesForNewContext</a></dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetServerContextSinkTopic1"></a><a name="GetServerContextSink(System.Runtime.Remoting.Messaging.IMessageSink)">GetServerContextSink</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Messaging/types/IMessageSink.html">IMessageSink</a> <i>nextSink</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates a synchronized dispatch sink and chains it in front of the provided chain of sinks at the context boundary on the server end of a remoting call.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System.Runtime.Remoting.Messaging/types/IMessageSink.html">IMessageSink</a> GetServerContextSink(<br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Messaging/types/IMessageSink.html">IMessageSink</a> <i>nextSink</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>nextSink</i><br><dl>
+<dd>
+<param> The chain of sinks composed so far.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The composite sink chain with the new synchronized dispatch sink.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Remoting.Contexts/types/IContributeServerContextSink.html#GetServerContextSink(System.Runtime.Remoting.Messaging.IMessageSink)">IContributeServerContextSink.GetServerContextSink</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The current method is an implementation of  <a href="../../System.Runtime.Remoting.Contexts/types/IContributeServerContextSink.html#GetServerContextSink(System.Runtime.Remoting.Messaging.IMessageSink)">IContributeServerContextSink.GetServerContextSink</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="IsContextOKTopic1"></a><a name="IsContextOK(System.Runtime.Remoting.Contexts.Context,System.Runtime.Remoting.Activation.IConstructionCallMessage)">IsContextOK</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Contexts/types/Context.html">Context</a> <i>ctx</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Activation/types/IConstructionCallMessage.html">IConstructionCallMessage</a> <i>msg</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns a Boolean value indicating whether the context parameter meets the context attribute's requirements.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Boolean.html">bool</a> IsContextOK(<br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Contexts/types/Context.html">Context</a> <i>ctx</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Activation/types/IConstructionCallMessage.html">IConstructionCallMessage</a> <i>msg</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>ctx</i><br><dl>
+<dd>
+<param> The context to check. The context to check.</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>msg</i><br><dl>
+<dd>
+<param> Information gathered at construction time of the context bound object marked by this attribute. The  <a href="../../System.Runtime.Remoting.Contexts/types/SynchronizationAttribute.html">SynchronizationAttribute</a> can inspect, add to, and remove properties from the context while determining if the context is acceptable to it.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the passed in context is OK; otherwise, <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>ctx</i> or <i>msg</i> parameter is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Remoting.Contexts/types/IContextAttribute.html#IsContextOK(System.Runtime.Remoting.Contexts.Context,System.Runtime.Remoting.Activation.IConstructionCallMessage)">IContextAttribute.IsContextOK</a></dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IsDefaultAttributeTopic1"></a><a name="IsDefaultAttribute">IsDefaultAttribute</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#IsDefaultAttribute">System.Attribute.IsDefaultAttribute</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, returns an indication whether the value of this instance is the default value for the derived class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsDefaultAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if this instance is the default attribute for the class; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The default implementation of this class returns <b>false</b>, and must be implemented in the derived class to be useful to that class.<p> The implementation of this method in a derived class compares the value of this instance to a standard, default value obtained by some means, then returns a Boolean value that indicates whether the value of this instance is equal to the standard. The standard value is typically coded as a constant in the implementation, or stored programmatically in a field used by the implementation.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IsNewContextOKTopic1"></a><a name="IsNewContextOK(System.Runtime.Remoting.Contexts.Context)">IsNewContextOK</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Contexts/types/Context.html">Context</a> <i>newCtx</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Runtime.Remoting.Contexts/types/IContextProperty.html#IsNewContextOK(System.Runtime.Remoting.Contexts.Context)">System.Runtime.Remoting.Contexts.IContextProperty.IsNewContextOK</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns a Boolean value indicating whether the context property is OK with the new context.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System/types/Boolean.html">bool</a> IsNewContextOK(<br>   <font color="#008080"><a href="../../System.Runtime.Remoting.Contexts/types/Context.html">Context</a> <i>newCtx</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>newCtx</i><br><dl>
+<dd>
+<param> The new  <a href="../../System.Runtime.Remoting.Contexts/types/Context.html">Context</a> in which the  <a href="../../System.Runtime.Remoting.Contexts/types/ContextProperty.html">ContextProperty</a> has been created.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the context property can coexist with the other context properties in the given context; <b>false</b> otherwise.</dd>
+</dl><b>Remarks</b><dl>
+<dd> Once all the context properties have been added to the new context, they are all asked whether they are OK in the new context. The context property could look at the other context properties from the parameter new context and determine whether it is compatible with these other context properties. Returns <b>false</b> if not OK in the context.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MatchTopic1"></a><a name="Match(System.Object)">Match</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#Match(System.Object)">System.Attribute.Match</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, returns a value indicating whether this instance equals a specified object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Match(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> An  <a href="../../System/types/Object.html">Object</a> to compare with this instance of <b>Attribute</b>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if this instance equals <i>obj</i>; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method determines if one <b>Attribute</b> equals another. Its default implementation is the same as  <a href="#Equals(System.Object)">Attribute.Equals</a>, which performs a value and reference comparison. Override this method to implement support for attribute values, such as flags or bitfields, that consist of components that are meaningful in themselves. For example, consider an attribute whose value is a binary field divided into a bitfield of flags. Two instances of this attribute have one flag in set in common while all the other flags differ. The <b>Equal</b> method cannot determine that the two instances have the same flag set, but the <b>Match</b> method can.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

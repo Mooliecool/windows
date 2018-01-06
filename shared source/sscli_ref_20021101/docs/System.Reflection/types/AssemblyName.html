@@ -1,0 +1,2106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Reflection.AssemblyName</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Reflection.AssemblyName Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Reflection<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Fully describes an assembly's unique identity.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public sealed class AssemblyName : ICloneable, ISerializable, IDeserializationCallback</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The assembly cache manager uses <b>AssemblyName</b> objects for binding and retrieving information about an assembly. An assembly's identity consists of a simple name, a version number, a cryptographic key pair, and supported culture. The simple name is unencrypted name, as distinguished from the strong name. The strong name is an assembly name secured with a public and private cryptographic key pair.<p> All compilers that support the common language runtime will emit the simple name of a nested class, and reflection constructs a mangled name when queried, in accordance with the following conventions.</p><br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+              Delimiter
+            </TH>
+<TH>
+              Meaning
+            </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+              Backslash (\)
+            </TD>
+<TD>
+              Escape character.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              Comma (,)
+            </TD>
+<TD>
+              Precedes the Assembly name.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              Plus sign (+)
+            </TD>
+<TD>
+              Precedes a nested class.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              Period (.)
+            </TD>
+<TD>
+              Denotes namespace identifiers.
+            </TD>
+</TR>
+</table>
+<p> For example, the fully qualified name for a class might look like this: </p>
+<p> TopNamespace.SubNameSpace.ContainingClass+NestedClass,MyAssembly </p>
+<p> If the namespace were TopNamespace.Sub+Namespace, then the string would have to precede the plus sign (+) with an escape character (\) to prevent it from being interpreted as a nesting separator. Reflection emits this string as follows: </p>
+<p> TopNamespace.Sub\+Namespace.ContainingClass+NestedClass,MyAssembly </p>
+<p> A "++" becomes "\+\+", and a "\" becomes "\\".</p>
+<p> This qualified name can be persisted and later used to load the  <a href="../../System/types/Type.html">Type</a>. To search for and load a  <a href="../../System/types/Type.html">Type</a>, use  <a href="../../System/types/Type.html#GetType(System.String,System.Boolean,System.Boolean)">Type.GetType</a> either with the type name only or with the assembly qualified type name. <a href="../../System/types/Type.html#GetType(System.String,System.Boolean,System.Boolean)">Type.GetType</a> with the type name only will look for the  <a href="../../System/types/Type.html">Type</a> in the caller's assembly and then in the System assembly. <a href="../../System/types/Type.html#GetType(System.String,System.Boolean,System.Boolean)">Type.GetType</a> with the assembly qualified type name will look for the  <a href="../../System/types/Type.html">Type</a> in any assembly.</p>
+<p> Type names may include trailing characters that denote additional information about the type, such as whether the type is a reference type, a pointer type or an array type. To retrieve the type name without these trailing characters, use <code>
+            t.GetElementType().ToString()
+          </code>, where <i>t</i> is the type.</p>
+<p> Spaces are relevant in all type name components except the assembly name. In the assembly name, spaces before the ',' separator are relevant, but spaces after the ',' separator are ignored.</p>
+<p> A fully specified <b>AssemblyName</b> must have, in this order, the name, culture, originator, major version, minor version, build number, and revision number parameters. The last four are packaged in the  <a href="../../System/types/Version.html">Version</a> type. However, an <b>AssemblyName</b> may specify a partial query when an insufficient number of parameters is supplied to explicitly determine a unique assembly. The assembly cache manager returns the first assembly that matches the specified <b>AssemblyName</b>. The parameter order for partial assembly name references must be the order specified above. For example, you may specify and match on the name, culture, and originator with the version parameters omitted, but you may not match on the name and originator, omitting both the culture and the version. When used for binding, the name is the minimum requirement.</p>
+<p> To create a simple name, create an <b>AssemblyName</b> object using the default constructor and set the  <a href="#Name">AssemblyName.Name</a>. The other properties are optional.</p>
+<p> To create a full strong name, create an <b>AssemblyName</b> object using the default constructor and set the  <a href="#Name">AssemblyName.Name</a> and  <a href="#KeyPair">AssemblyName.KeyPair</a>. The other properties are optional. Use  <a href="#SetPublicKey(System.Byte[])">AssemblyName.SetPublicKey</a> and  <a href="#SetPublicKeyToken(System.Byte[])">AssemblyName.SetPublicKeyToken</a> to set the public key and the strong name. The strong name signing always uses the  <a><font color="#FF0000"><i>System.Security.Cryptography.SHA1</i> (not supported on the shared source CLI) </font></a> hash algorithm.</p>
+<p> For a partial specified strong name, create an <b>AssemblyName</b> object using the default constructor and set the name and public key. The other properties are optional. An assembly created using such an <b>AssemblyName</b> can be signed later using the Assembly Generation tool (al.exe).</p>
+<p> It is possible to specify a public key and a <b>KeyPair</b> with inconsistent values. This can be useful in developer scenarios. In this case, the public key gotten with  <a href="#GetPublicKey">AssemblyName.GetPublicKey</a> specifies the correct public key, while the <b>KeyPair</b> specifies the public and private keys used during development. When the runtime detects a mismatch between the <b>KeyPair</b> and the public key, it looks up in the registry the correct key that matches the public key.</p>
+<p> The format of the display name of an <b>AssemblyName</b> is a comma-delimited Unicode string that begins with the name, as follows: </p><code>
+          Name &lt;,Culture = CultureInfo&gt; &lt;,Version = Major.Minor.Build.Revision&gt; &lt;, StrongName&gt;
+          &lt;,PublicKeyToken&gt; '\0'
+        </code><p><code>
+            Name
+          </code> is the textual name of the assembly.<code>
+            CultureInfo
+          </code> is the RFC1766-format-defined culture.<code>
+            Major
+          </code>, <code>
+            Minor
+          </code>, <code>
+            Build
+          </code>, and <code>
+            Revision
+          </code> are the major version, minor version, build number, and revision number of the assembly.<code>
+            StrongName
+          </code> is the hexadecimal-encoded low-order 64 bits of the hash value of the public key generated using the SHA-1 hashing algorithm and the public key specified by <b>SetPublicKey</b>.<code>
+            PublicKeyToken
+          </code> is the hexadecimal-encoded public key specified by the <b>SetPublicKey</b>.</p>
+<p> Quoted values are optional. Hexadecimal encoding is defined as the conversion of each byte of a binary object to two hexadecimal characters, progressing from least to most significant byte. Additional display values will be added as deemed necessary.</p>
+<p> If the full public key is known, then PublicKey may be substituted for StrongName.</p>
+<p> Also note that except for <code>
+            Name
+          </code>, which must come first, the lexical order of parameters is unimportant. However, any parameter (<code>
+            Version
+          </code>, <code>
+            Culture
+          </code>, <code>
+            StrongName
+          </code> or <code>
+            PublicKey
+          </code>) not specifically set is considered to be omitted, and the <b>AssemblyName</b> is then considered partial. When specifying partial information, Name parameters must be specified in the order described above.</p>
+<p> When supplying a display name, the convention <code>
+            StrongName=null
+          </code> or <code>
+            PublicKey= null
+          </code> indicates that binding and matching against a simply named assembly is required. Additionally, the convention <code>
+            Culture= ""
+          </code> (double quote representing an empty string) indicates matching against the default culture.</p>
+<p> The following code example shows an <b>AssemblyName</b> for a simply named assembly with default culture.</p>
+<p><code>
+            com.microsoft.crypto,
+            Culture=""
+          </code></p>
+<p> The following code example shows a fully specified reference for a strongly named assembly with culture "en".</p>
+<p><code>
+            com.microsoft.crypto, Culture=en, PublicKeyToken=a5d015c7d5a0b012, Version=1.0.0.0
+          </code></p>
+<p> The following code examples each show a partially specified <b>AssemblyName</b>, which can be satisfied by either a strong or a simply named assembly.</p>
+<p><code>
+            com.microsoft.crypto
+          </code></p>
+<p><code>
+            com.microsoft.crypto, Culture=""
+          </code></p>
+<p><code>
+            com.microsoft.crypto, Culture=en
+          </code></p>
+<p> The following code examples each show a partially specified <b>AssemblyName</b>, which must be satisfied by a simply named assembly.</p>
+<p><code>
+            com.microsoft.crypto, Culture="", PublicKeyToken=null
+          </code></p>
+<p><code>
+            com.microsoft.crypto, Culture=en, PublicKeyToken=null
+          </code></p>
+<p> The following code examples each show a partially specified <b>AssemblyName</b>, which must be satisfied by a strongly named assembly.</p>
+<p><code>
+            com.microsoft.crypto, Culture="", PublicKeyToken=a5d015c7d5a0b012
+          </code></p>
+<p><code>
+            com.microsoft.crypto, Culture=en, PublicKeyToken=a5d015c7d5a0b012, Version=1.0.0.0
+          </code></p>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Reflection/System.Reflection.html">System.Reflection Namespace</a> |  <a href="../../System/types/Version.html">Version</a> |  <a href="#GetPublicKey">AssemblyName.GetPublicKey</a> |  <a href="#GetPublicKeyToken">AssemblyName.GetPublicKeyToken</a> |  <a href="#SetPublicKey(System.Byte[])">AssemblyName.SetPublicKey</a> |  <a href="#SetPublicKeyToken(System.Byte[])">AssemblyName.SetPublicKeyToken</a> |  <a href="../../System/types/Type.html#FullName">Type.FullName</a> |  <a href="../../System/types/Type.html#GetType(System.String,System.Boolean,System.Boolean)">Type.GetType</a> |  <a href="../../System/types/Type.html#AssemblyQualifiedName">Type.AssemblyQualifiedName</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconSpecifyingFullyQualifiedTypeNames.asp">MSDN: specifyingfullyqualifiedtypenames</a></dd>
+</dl>
+<h3>System.Reflection.AssemblyName Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%">Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Initializes a new instance of the  <a href="../../System.Reflection/types/AssemblyName.html">AssemblyName</a> class.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#CodeBase">CodeBase</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the location of the assembly as a URL.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CultureInfo">CultureInfo</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the culture supported by the assembly.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#EscapedCodeBase">EscapedCodeBase</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the URI, including escape characters, that represents the codebase.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Flags">Flags</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the attributes of the assembly.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#FullName">FullName</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the full name of the assembly, also known as the display name.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#HashAlgorithm">HashAlgorithm</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the hash algorithm used by the assembly manifest.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#KeyPair">KeyPair</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the public and private cryptographic key pair generated by the originator of the assembly.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Name">Name</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the simple, unencrypted name of the assembly.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Version">Version</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the major, minor, revision, and build numbers of the assembly.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#VersionCompatibility">VersionCompatibility</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the information related to the assembly's compatibility with other assemblies.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Clone">Clone</a></td>
+<td width="55%"> Makes a copy of this <b>AssemblyName</b> object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetAssemblyName(System.String)">GetAssemblyName</a></td>
+<td width="55%"> Gets the <b>AssemblyName</b> for a given file.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">GetObjectData</a></td>
+<td width="55%"> Gets serialization information with all of the data needed to reinstantiate this <b>AssemblyName</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetPublicKey">GetPublicKey</a></td>
+<td width="55%"> Gets the public key identifying the originator of the assembly.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetPublicKeyToken">GetPublicKeyToken</a></td>
+<td width="55%"> Gets a strong name consisting of a public key, a given name, and version parts.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#OnDeserialization(System.Object)">OnDeserialization</a></td>
+<td width="55%"> Implements the  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> interface and is called back by the deserialization event when deserialization is complete.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SetPublicKey(System.Byte[])">SetPublicKey</a></td>
+<td width="55%"> Sets the public key identifying the originator of the assembly.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SetPublicKeyToken(System.Byte[])">SetPublicKeyToken</a></td>
+<td width="55%"> Sets a strong name consisting of a public key, a given name, and version parts.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a></td>
+<td width="55%"><b>Overridden: </b><br> Returns the full name of the assembly, also known as the display name.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Reflection.AssemblyName</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Reflection.AssemblyName Member Details</h3><b><i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Reflection/types/AssemblyName.html">AssemblyName</a> class.</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public AssemblyName();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd>
+<pre>
+
+using System;
+using System.Reflection;
+using System.Threading;
+using System.Reflection.Emit;
+
+public class AssemblyName_Constructor
+{
+   public static void MakeAssembly(AssemblyName myAssemblyName, string fileName)
+   {
+      // Get the assembly builder from the application domain associated with the current thread.
+      AssemblyBuilder myAssemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(myAssemblyName, AssemblyBuilderAccess.RunAndSave);
+      // Create a dynamic module in the assembly.
+      ModuleBuilder myModuleBuilder = myAssemblyBuilder.DefineDynamicModule("MyModule", fileName);
+      // Create a type in the module.
+      TypeBuilder myTypeBuilder = myModuleBuilder.DefineType("MyType");
+      // Create a method called 'Main'.
+      MethodBuilder myMethodBuilder = myTypeBuilder.DefineMethod("Main", MethodAttributes.Public | MethodAttributes.HideBySig |
+         MethodAttributes.Static, typeof(void), null);
+      // Get the Intermediate Language generator for the method.
+      ILGenerator myILGenerator = myMethodBuilder.GetILGenerator();
+      // Use the utility method to generate the IL instructions that print a string to the console.
+      myILGenerator.EmitWriteLine("Hello World!");
+      // Generate the 'ret' IL instruction.
+      myILGenerator.Emit(OpCodes.Ret);
+      // End the creation of the type.
+      myTypeBuilder.CreateType();
+      // Set the method with name 'Main' as the entry point in the assembly.
+      myAssemblyBuilder.SetEntryPoint(myMethodBuilder);
+      myAssemblyBuilder.Save(fileName);
+   }
+
+   public static void Main()
+   {
+
+
+      // Create a dynamic assembly with name 'MyAssembly' and build version '1.0.0.2001'.
+      AssemblyName myAssemblyName = new AssemblyName(); 
+      myAssemblyName.Name = "MyAssembly";
+      myAssemblyName.Version = new Version("1.0.0.2001");
+      MakeAssembly(myAssemblyName, "MyAssembly.exe");
+
+      // Get all the assemblies currently loaded in the application domain.
+      Assembly[] myAssemblies = Thread.GetDomain().GetAssemblies();
+
+      // Get the dynamic assembly named 'MyAssembly'. 
+      Assembly myAssembly = null;
+      for(int i = 0; i &lt; myAssemblies.Length; i++)
+      {
+         if(String.Compare(myAssemblies[i].GetName().Name, "MyAssembly") == 0)
+            myAssembly = myAssemblies[i];
+      }
+      if(myAssembly != null)
+      {
+         Console.WriteLine("\nDisplaying the assembly name\n");
+         Console.WriteLine(myAssembly);
+      }
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CodeBaseTopic1"></a><a name="CodeBase">CodeBase</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the location of the assembly as a URL.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> CodeBase {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td> The caller does not have the required permission.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+
+using System;
+using System.Reflection;
+using System.Threading;
+using System.IO;
+using System.Globalization;
+using System.Reflection.Emit;
+using System.Configuration.Assemblies;
+
+public class AssemblyName_CodeBase
+{
+   public static void MakeAssembly(AssemblyName myAssemblyName, string fileName)
+   {
+      // Get the assembly builder from the application domain associated with the current thread.
+      AssemblyBuilder myAssemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(myAssemblyName, AssemblyBuilderAccess.RunAndSave);
+      // Create a dynamic module in the assembly.
+      ModuleBuilder myModuleBuilder = myAssemblyBuilder.DefineDynamicModule("MyModule", fileName);
+      // Create a type in the module.
+      TypeBuilder myTypeBuilder = myModuleBuilder.DefineType("MyType");
+      // Create a method called 'Main'.
+      MethodBuilder myMethodBuilder = myTypeBuilder.DefineMethod("Main", MethodAttributes.Public | MethodAttributes.HideBySig |
+         MethodAttributes.Static, typeof(void), null);
+      // Get the Intermediate Language generator for the method.
+      ILGenerator myILGenerator = myMethodBuilder.GetILGenerator();
+      // Use the utility method to generate the IL instructions that print a string to the console.
+      myILGenerator.EmitWriteLine("Hello World!");
+      // Generate the 'ret' IL instruction.
+      myILGenerator.Emit(OpCodes.Ret);
+      // End the creation of the type.
+      myTypeBuilder.CreateType();
+      // Set the method with name 'Main' as the entry point in the assembly.
+      myAssemblyBuilder.SetEntryPoint(myMethodBuilder);
+      myAssemblyBuilder.Save(fileName);
+   }
+
+   public static void Main()
+   {
+
+
+
+      // Create a dynamic assembly with name 'MyAssembly' and build version '1.0.0.2001'.
+      AssemblyName myAssemblyName = new AssemblyName();
+      // Set the codebase to the physical directory were the assembly resides.
+      myAssemblyName.CodeBase = String.Concat("file:///", Directory.GetCurrentDirectory());
+      // Set the culture information of the assembly to 'English-American'.
+      myAssemblyName.CultureInfo = new CultureInfo("en-US");
+      // Set the hash algoritm to 'SHA1'.
+      myAssemblyName.HashAlgorithm = AssemblyHashAlgorithm.SHA1;
+      myAssemblyName.Name = "MyAssembly";
+      myAssemblyName.Version = new Version("1.0.0.2001");
+      MakeAssembly(myAssemblyName, "MyAssembly.exe");
+
+      // Get all the assemblies currently loaded in the application domain.
+      Assembly[] myAssemblies = Thread.GetDomain().GetAssemblies();
+
+      // Get the dynamic assembly named 'MyAssembly'. 
+      Assembly myAssembly = null;
+      for(int i = 0; i &lt; myAssemblies.Length; i++)
+      {
+         if(String.Compare(myAssemblies[i].GetName().Name, "MyAssembly") == 0)
+            myAssembly = myAssemblies[i];
+      }
+      // Display the full assembly information to the console.
+      if(myAssembly != null)
+      {
+         Console.WriteLine("\nDisplaying the full assembly name\n");
+         Console.WriteLine(myAssembly.GetName().FullName);
+      }
+   }
+}
+
+    </pre>
+</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/FileIOPermission.html">FileIOPermission</a> for access to the path. Associated enumeration:  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#PathDiscovery">FileIOPermissionAccess.PathDiscovery</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CultureInfoTopic1"></a><a name="CultureInfo">CultureInfo</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the culture supported by the assembly.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> CultureInfo {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+
+using System;
+using System.Reflection;
+using System.Threading;
+using System.IO;
+using System.Globalization;
+using System.Reflection.Emit;
+using System.Configuration.Assemblies;
+
+public class AssemblyName_CodeBase
+{
+   public static void MakeAssembly(AssemblyName myAssemblyName, string fileName)
+   {
+      // Get the assembly builder from the application domain associated with the current thread.
+      AssemblyBuilder myAssemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(myAssemblyName, AssemblyBuilderAccess.RunAndSave);
+      // Create a dynamic module in the assembly.
+      ModuleBuilder myModuleBuilder = myAssemblyBuilder.DefineDynamicModule("MyModule", fileName);
+      // Create a type in the module.
+      TypeBuilder myTypeBuilder = myModuleBuilder.DefineType("MyType");
+      // Create a method called 'Main'.
+      MethodBuilder myMethodBuilder = myTypeBuilder.DefineMethod("Main", MethodAttributes.Public | MethodAttributes.HideBySig |
+         MethodAttributes.Static, typeof(void), null);
+      // Get the Intermediate Language generator for the method.
+      ILGenerator myILGenerator = myMethodBuilder.GetILGenerator();
+      // Use the utility method to generate the IL instructions that print a string to the console.
+      myILGenerator.EmitWriteLine("Hello World!");
+      // Generate the 'ret' IL instruction.
+      myILGenerator.Emit(OpCodes.Ret);
+      // End the creation of the type.
+      myTypeBuilder.CreateType();
+      // Set the method with name 'Main' as the entry point in the assembly.
+      myAssemblyBuilder.SetEntryPoint(myMethodBuilder);
+      myAssemblyBuilder.Save(fileName);
+   }
+
+   public static void Main()
+   {
+
+
+
+      // Create a dynamic assembly with name 'MyAssembly' and build version '1.0.0.2001'.
+      AssemblyName myAssemblyName = new AssemblyName();
+      // Set the codebase to the physical directory were the assembly resides.
+      myAssemblyName.CodeBase = String.Concat("file:///", Directory.GetCurrentDirectory());
+      // Set the culture information of the assembly to 'English-American'.
+      myAssemblyName.CultureInfo = new CultureInfo("en-US");
+      // Set the hash algoritm to 'SHA1'.
+      myAssemblyName.HashAlgorithm = AssemblyHashAlgorithm.SHA1;
+      myAssemblyName.Name = "MyAssembly";
+      myAssemblyName.Version = new Version("1.0.0.2001");
+      MakeAssembly(myAssemblyName, "MyAssembly.exe");
+
+      // Get all the assemblies currently loaded in the application domain.
+      Assembly[] myAssemblies = Thread.GetDomain().GetAssemblies();
+
+      // Get the dynamic assembly named 'MyAssembly'. 
+      Assembly myAssembly = null;
+      for(int i = 0; i &lt; myAssemblies.Length; i++)
+      {
+         if(String.Compare(myAssemblies[i].GetName().Name, "MyAssembly") == 0)
+            myAssembly = myAssemblies[i];
+      }
+      // Display the full assembly information to the console.
+      if(myAssembly != null)
+      {
+         Console.WriteLine("\nDisplaying the full assembly name\n");
+         Console.WriteLine(myAssembly.GetName().FullName);
+      }
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="EscapedCodeBaseTopic1"></a><a name="EscapedCodeBase">EscapedCodeBase</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the URI, including escape characters, that represents the codebase.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> EscapedCodeBase {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td> The caller does not have the required permission.</td>
+</tr>
+</table>
+</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/FileIOPermission.html">FileIOPermission</a> for access to the path. Associated enumeration:  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#PathDiscovery">FileIOPermissionAccess.PathDiscovery</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="FlagsTopic1"></a><a name="Flags">Flags</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the attributes of the assembly.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Reflection/types/AssemblyNameFlags.html">AssemblyNameFlags</a> Flags {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+
+using System;
+using System.Reflection;
+using System.Threading;
+using System.IO;
+using System.Globalization;
+using System.Reflection.Emit;
+using System.Configuration.Assemblies;
+using System.Text;
+
+public class AssemblyName_CodeBase
+{
+   public static void MakeAssembly(AssemblyName myAssemblyName, string fileName)
+   {
+      // Get the assembly builder from the application domain associated with the current thread.
+      AssemblyBuilder myAssemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(myAssemblyName, AssemblyBuilderAccess.RunAndSave);
+      // Create a dynamic module in the assembly.
+      ModuleBuilder myModuleBuilder = myAssemblyBuilder.DefineDynamicModule("MyModule", fileName);
+      // Create a type in the module.
+      TypeBuilder myTypeBuilder = myModuleBuilder.DefineType("MyType");
+      // Create a method called 'Main'.
+      MethodBuilder myMethodBuilder = myTypeBuilder.DefineMethod("Main", MethodAttributes.Public | MethodAttributes.HideBySig |
+         MethodAttributes.Static, typeof(void), null);
+      // Get the Intermediate Language generator for the method.
+      ILGenerator myILGenerator = myMethodBuilder.GetILGenerator();
+      // Use the utility method to generate the IL instructions that print a string to the console.
+      myILGenerator.EmitWriteLine("Hello World!");
+      // Generate the 'ret' IL instruction.
+      myILGenerator.Emit(OpCodes.Ret);
+      // End the creation of the type.
+      myTypeBuilder.CreateType();
+      // Set the method with name 'Main' as the entry point in the assembly.
+      myAssemblyBuilder.SetEntryPoint(myMethodBuilder);
+      myAssemblyBuilder.Save(fileName);
+   }
+
+   public static void Main()
+   {
+      // Create a dynamic assembly with name 'MyAssembly' and build version '1.0.0.2001'.
+      AssemblyName myAssemblyName = new AssemblyName();
+      // Set the codebase to the physical directory were the assembly resides.
+      myAssemblyName.CodeBase = String.Concat("file:///", Directory.GetCurrentDirectory());
+      // Set the culture information of the assembly to 'English-American'.
+      myAssemblyName.CultureInfo = new CultureInfo("en-US");
+      // Set the hash algoritm to 'SHA1'.
+      myAssemblyName.HashAlgorithm = AssemblyHashAlgorithm.SHA1;
+      myAssemblyName.VersionCompatibility = AssemblyVersionCompatibility.SameProcess;
+      myAssemblyName.Flags = AssemblyNameFlags.PublicKey;
+      // Provide this assembly with a strong name.
+      myAssemblyName.KeyPair = new StrongNameKeyPair(File.Open("KeyPair.snk", FileMode.Open));
+      myAssemblyName.Name = "MyAssembly";
+      myAssemblyName.Version = new Version("1.0.0.2001");
+      MakeAssembly(myAssemblyName, "MyAssembly.exe");
+      
+      // Get the assemblies loaded in the current application domain.
+      Assembly[] myAssemblies = Thread.GetDomain().GetAssemblies();
+
+      // Get the dynamic assembly named 'MyAssembly'. 
+      Assembly myAssembly = null;
+      for(int i = 0; i &lt; myAssemblies.Length; i++)
+         if(String.Compare(myAssemblies[i].GetName().Name, "MyAssembly") == 0)
+            myAssembly = myAssemblies[i];
+
+      // Display the full assembly information to the console.
+      if(myAssembly != null)
+      {
+         Console.WriteLine("\nDisplaying the full assembly name\n");
+         Console.WriteLine(myAssembly.GetName().FullName);
+         Console.WriteLine("\nDisplaying the public key\n");
+         Console.WriteLine(Encoding.ASCII.GetString(myAssembly.GetName().GetPublicKey()));
+         Console.WriteLine("\nDisplaying the public key token\n");
+         Console.WriteLine(Encoding.ASCII.GetString(myAssembly.GetName().GetPublicKeyToken()));
+      }
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="FullNameTopic1"></a><a name="FullName">FullName</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the full name of the assembly, also known as the display name.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> FullName {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+
+using System;
+using System.Reflection;
+using System.Threading;
+using System.IO;
+using System.Globalization;
+using System.Reflection.Emit;
+using System.Configuration.Assemblies;
+
+public class AssemblyName_CodeBase
+{
+   public static void MakeAssembly(AssemblyName myAssemblyName, string fileName)
+   {
+      // Get the assembly builder from the application domain associated with the current thread.
+      AssemblyBuilder myAssemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(myAssemblyName, AssemblyBuilderAccess.RunAndSave);
+      // Create a dynamic module in the assembly.
+      ModuleBuilder myModuleBuilder = myAssemblyBuilder.DefineDynamicModule("MyModule", fileName);
+      // Create a type in the module.
+      TypeBuilder myTypeBuilder = myModuleBuilder.DefineType("MyType");
+      // Create a method called 'Main'.
+      MethodBuilder myMethodBuilder = myTypeBuilder.DefineMethod("Main", MethodAttributes.Public | MethodAttributes.HideBySig |
+         MethodAttributes.Static, typeof(void), null);
+      // Get the Intermediate Language generator for the method.
+      ILGenerator myILGenerator = myMethodBuilder.GetILGenerator();
+      // Use the utility method to generate the IL instructions that print a string to the console.
+      myILGenerator.EmitWriteLine("Hello World!");
+      // Generate the 'ret' IL instruction.
+      myILGenerator.Emit(OpCodes.Ret);
+      // End the creation of the type.
+      myTypeBuilder.CreateType();
+      // Set the method with name 'Main' as the entry point in the assembly.
+      myAssemblyBuilder.SetEntryPoint(myMethodBuilder);
+      myAssemblyBuilder.Save(fileName);
+   }
+
+   public static void Main()
+   {
+
+
+
+      // Create a dynamic assembly with name 'MyAssembly' and build version '1.0.0.2001'.
+      AssemblyName myAssemblyName = new AssemblyName();
+      // Set the codebase to the physical directory were the assembly resides.
+      myAssemblyName.CodeBase = String.Concat("file:///", Directory.GetCurrentDirectory());
+      // Set the culture information of the assembly to 'English-American'.
+      myAssemblyName.CultureInfo = new CultureInfo("en-US");
+      // Set the hash algoritm to 'SHA1'.
+      myAssemblyName.HashAlgorithm = AssemblyHashAlgorithm.SHA1;
+      myAssemblyName.Name = "MyAssembly";
+      myAssemblyName.Version = new Version("1.0.0.2001");
+      MakeAssembly(myAssemblyName, "MyAssembly.exe");
+
+      // Get all the assemblies currently loaded in the application domain.
+      Assembly[] myAssemblies = Thread.GetDomain().GetAssemblies();
+
+      // Get the dynamic assembly named 'MyAssembly'. 
+      Assembly myAssembly = null;
+      for(int i = 0; i &lt; myAssemblies.Length; i++)
+      {
+         if(String.Compare(myAssemblies[i].GetName().Name, "MyAssembly") == 0)
+            myAssembly = myAssemblies[i];
+      }
+      // Display the full assembly information to the console.
+      if(myAssembly != null)
+      {
+         Console.WriteLine("\nDisplaying the full assembly name\n");
+         Console.WriteLine(myAssembly.GetName().FullName);
+      }
+   }
+}
+
+    </pre>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconSpecifyingFullyQualifiedTypeNames.asp">MSDN: specifyingfullyqualifiedtypenames</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="HashAlgorithmTopic1"></a><a name="HashAlgorithm">HashAlgorithm</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the hash algorithm used by the assembly manifest.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Configuration.Assemblies/types/AssemblyHashAlgorithm.html">AssemblyHashAlgorithm</a> HashAlgorithm {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+
+using System;
+using System.Reflection;
+using System.Threading;
+using System.IO;
+using System.Globalization;
+using System.Reflection.Emit;
+using System.Configuration.Assemblies;
+
+public class AssemblyName_CodeBase
+{
+   public static void MakeAssembly(AssemblyName myAssemblyName, string fileName)
+   {
+      // Get the assembly builder from the application domain associated with the current thread.
+      AssemblyBuilder myAssemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(myAssemblyName, AssemblyBuilderAccess.RunAndSave);
+      // Create a dynamic module in the assembly.
+      ModuleBuilder myModuleBuilder = myAssemblyBuilder.DefineDynamicModule("MyModule", fileName);
+      // Create a type in the module.
+      TypeBuilder myTypeBuilder = myModuleBuilder.DefineType("MyType");
+      // Create a method called 'Main'.
+      MethodBuilder myMethodBuilder = myTypeBuilder.DefineMethod("Main", MethodAttributes.Public | MethodAttributes.HideBySig |
+         MethodAttributes.Static, typeof(void), null);
+      // Get the Intermediate Language generator for the method.
+      ILGenerator myILGenerator = myMethodBuilder.GetILGenerator();
+      // Use the utility method to generate the IL instructions that print a string to the console.
+      myILGenerator.EmitWriteLine("Hello World!");
+      // Generate the 'ret' IL instruction.
+      myILGenerator.Emit(OpCodes.Ret);
+      // End the creation of the type.
+      myTypeBuilder.CreateType();
+      // Set the method with name 'Main' as the entry point in the assembly.
+      myAssemblyBuilder.SetEntryPoint(myMethodBuilder);
+      myAssemblyBuilder.Save(fileName);
+   }
+
+   public static void Main()
+   {
+
+
+
+      // Create a dynamic assembly with name 'MyAssembly' and build version '1.0.0.2001'.
+      AssemblyName myAssemblyName = new AssemblyName();
+      // Set the codebase to the physical directory were the assembly resides.
+      myAssemblyName.CodeBase = String.Concat("file:///", Directory.GetCurrentDirectory());
+      // Set the culture information of the assembly to 'English-American'.
+      myAssemblyName.CultureInfo = new CultureInfo("en-US");
+      // Set the hash algoritm to 'SHA1'.
+      myAssemblyName.HashAlgorithm = AssemblyHashAlgorithm.SHA1;
+      myAssemblyName.Name = "MyAssembly";
+      myAssemblyName.Version = new Version("1.0.0.2001");
+      MakeAssembly(myAssemblyName, "MyAssembly.exe");
+
+      // Get all the assemblies currently loaded in the application domain.
+      Assembly[] myAssemblies = Thread.GetDomain().GetAssemblies();
+
+      // Get the dynamic assembly named 'MyAssembly'. 
+      Assembly myAssembly = null;
+      for(int i = 0; i &lt; myAssemblies.Length; i++)
+      {
+         if(String.Compare(myAssemblies[i].GetName().Name, "MyAssembly") == 0)
+            myAssembly = myAssemblies[i];
+      }
+      // Display the full assembly information to the console.
+      if(myAssembly != null)
+      {
+         Console.WriteLine("\nDisplaying the full assembly name\n");
+         Console.WriteLine(myAssembly.GetName().FullName);
+      }
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="KeyPairTopic1"></a><a name="KeyPair">KeyPair</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the public and private cryptographic key pair generated by the originator of the assembly.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Reflection/types/StrongNameKeyPair.html">StrongNameKeyPair</a> KeyPair {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> When the runtime loads an assembly, it does not set the <b>AssemblyName.KeyPair</b> property. The getter for the property is only useful if the user set the property after the assembly was loaded and wants to subsequently retrieve the property.</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+
+using System;
+using System.Reflection;
+using System.Threading;
+using System.IO;
+using System.Globalization;
+using System.Reflection.Emit;
+using System.Configuration.Assemblies;
+using System.Text;
+
+public class AssemblyName_CodeBase
+{
+   public static void MakeAssembly(AssemblyName myAssemblyName, string fileName)
+   {
+      // Get the assembly builder from the application domain associated with the current thread.
+      AssemblyBuilder myAssemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(myAssemblyName, AssemblyBuilderAccess.RunAndSave);
+      // Create a dynamic module in the assembly.
+      ModuleBuilder myModuleBuilder = myAssemblyBuilder.DefineDynamicModule("MyModule", fileName);
+      // Create a type in the module.
+      TypeBuilder myTypeBuilder = myModuleBuilder.DefineType("MyType");
+      // Create a method called 'Main'.
+      MethodBuilder myMethodBuilder = myTypeBuilder.DefineMethod("Main", MethodAttributes.Public | MethodAttributes.HideBySig |
+         MethodAttributes.Static, typeof(void), null);
+      // Get the Intermediate Language generator for the method.
+      ILGenerator myILGenerator = myMethodBuilder.GetILGenerator();
+      // Use the utility method to generate the IL instructions that print a string to the console.
+      myILGenerator.EmitWriteLine("Hello World!");
+      // Generate the 'ret' IL instruction.
+      myILGenerator.Emit(OpCodes.Ret);
+      // End the creation of the type.
+      myTypeBuilder.CreateType();
+      // Set the method with name 'Main' as the entry point in the assembly.
+      myAssemblyBuilder.SetEntryPoint(myMethodBuilder);
+      myAssemblyBuilder.Save(fileName);
+   }
+
+   public static void Main()
+   {
+      // Create a dynamic assembly with name 'MyAssembly' and build version '1.0.0.2001'.
+      AssemblyName myAssemblyName = new AssemblyName();
+      // Set the codebase to the physical directory were the assembly resides.
+      myAssemblyName.CodeBase = String.Concat("file:///", Directory.GetCurrentDirectory());
+      // Set the culture information of the assembly to 'English-American'.
+      myAssemblyName.CultureInfo = new CultureInfo("en-US");
+      // Set the hash algoritm to 'SHA1'.
+      myAssemblyName.HashAlgorithm = AssemblyHashAlgorithm.SHA1;
+      myAssemblyName.VersionCompatibility = AssemblyVersionCompatibility.SameProcess;
+      myAssemblyName.Flags = AssemblyNameFlags.PublicKey;
+      // Provide this assembly with a strong name.
+      myAssemblyName.KeyPair = new StrongNameKeyPair(File.Open("KeyPair.snk", FileMode.Open));
+      myAssemblyName.Name = "MyAssembly";
+      myAssemblyName.Version = new Version("1.0.0.2001");
+      MakeAssembly(myAssemblyName, "MyAssembly.exe");
+      
+      // Get the assemblies loaded in the current application domain.
+      Assembly[] myAssemblies = Thread.GetDomain().GetAssemblies();
+
+      // Get the dynamic assembly named 'MyAssembly'. 
+      Assembly myAssembly = null;
+      for(int i = 0; i &lt; myAssemblies.Length; i++)
+         if(String.Compare(myAssemblies[i].GetName().Name, "MyAssembly") == 0)
+            myAssembly = myAssemblies[i];
+
+      // Display the full assembly information to the console.
+      if(myAssembly != null)
+      {
+         Console.WriteLine("\nDisplaying the full assembly name\n");
+         Console.WriteLine(myAssembly.GetName().FullName);
+         Console.WriteLine("\nDisplaying the public key\n");
+         Console.WriteLine(Encoding.ASCII.GetString(myAssembly.GetName().GetPublicKey()));
+         Console.WriteLine("\nDisplaying the public key token\n");
+         Console.WriteLine(Encoding.ASCII.GetString(myAssembly.GetName().GetPublicKeyToken()));
+      }
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NameTopic1"></a><a name="Name">Name</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the simple, unencrypted name of the assembly.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> Name {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Assembly names are limited to the number of characters as defined by MAX_PATH.</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+
+using System;
+using System.Reflection;
+using System.Threading;
+using System.Reflection.Emit;
+
+public class AssemblyName_Constructor
+{
+   public static void MakeAssembly(AssemblyName myAssemblyName, string fileName)
+   {
+      // Get the assembly builder from the application domain associated with the current thread.
+      AssemblyBuilder myAssemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(myAssemblyName, AssemblyBuilderAccess.RunAndSave);
+      // Create a dynamic module in the assembly.
+      ModuleBuilder myModuleBuilder = myAssemblyBuilder.DefineDynamicModule("MyModule", fileName);
+      // Create a type in the module.
+      TypeBuilder myTypeBuilder = myModuleBuilder.DefineType("MyType");
+      // Create a method called 'Main'.
+      MethodBuilder myMethodBuilder = myTypeBuilder.DefineMethod("Main", MethodAttributes.Public | MethodAttributes.HideBySig |
+         MethodAttributes.Static, typeof(void), null);
+      // Get the Intermediate Language generator for the method.
+      ILGenerator myILGenerator = myMethodBuilder.GetILGenerator();
+      // Use the utility method to generate the IL instructions that print a string to the console.
+      myILGenerator.EmitWriteLine("Hello World!");
+      // Generate the 'ret' IL instruction.
+      myILGenerator.Emit(OpCodes.Ret);
+      // End the creation of the type.
+      myTypeBuilder.CreateType();
+      // Set the method with name 'Main' as the entry point in the assembly.
+      myAssemblyBuilder.SetEntryPoint(myMethodBuilder);
+      myAssemblyBuilder.Save(fileName);
+   }
+
+   public static void Main()
+   {
+
+
+      // Create a dynamic assembly with name 'MyAssembly' and build version '1.0.0.2001'.
+      AssemblyName myAssemblyName = new AssemblyName(); 
+      myAssemblyName.Name = "MyAssembly";
+      myAssemblyName.Version = new Version("1.0.0.2001");
+      MakeAssembly(myAssemblyName, "MyAssembly.exe");
+
+      // Get all the assemblies currently loaded in the application domain.
+      Assembly[] myAssemblies = Thread.GetDomain().GetAssemblies();
+
+      // Get the dynamic assembly named 'MyAssembly'. 
+      Assembly myAssembly = null;
+      for(int i = 0; i &lt; myAssemblies.Length; i++)
+      {
+         if(String.Compare(myAssemblies[i].GetName().Name, "MyAssembly") == 0)
+            myAssembly = myAssemblies[i];
+      }
+      if(myAssembly != null)
+      {
+         Console.WriteLine("\nDisplaying the assembly name\n");
+         Console.WriteLine(myAssembly);
+      }
+   }
+}
+
+    </pre>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconSpecifyingFullyQualifiedTypeNames.asp">MSDN: specifyingfullyqualifiedtypenames</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="VersionTopic1"></a><a name="Version">Version</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the major, minor, revision, and build numbers of the assembly.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Version.html">Version</a> Version {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+
+using System;
+using System.Reflection;
+using System.Threading;
+using System.Reflection.Emit;
+
+public class AssemblyName_Constructor
+{
+   public static void MakeAssembly(AssemblyName myAssemblyName, string fileName)
+   {
+      // Get the assembly builder from the application domain associated with the current thread.
+      AssemblyBuilder myAssemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(myAssemblyName, AssemblyBuilderAccess.RunAndSave);
+      // Create a dynamic module in the assembly.
+      ModuleBuilder myModuleBuilder = myAssemblyBuilder.DefineDynamicModule("MyModule", fileName);
+      // Create a type in the module.
+      TypeBuilder myTypeBuilder = myModuleBuilder.DefineType("MyType");
+      // Create a method called 'Main'.
+      MethodBuilder myMethodBuilder = myTypeBuilder.DefineMethod("Main", MethodAttributes.Public | MethodAttributes.HideBySig |
+         MethodAttributes.Static, typeof(void), null);
+      // Get the Intermediate Language generator for the method.
+      ILGenerator myILGenerator = myMethodBuilder.GetILGenerator();
+      // Use the utility method to generate the IL instructions that print a string to the console.
+      myILGenerator.EmitWriteLine("Hello World!");
+      // Generate the 'ret' IL instruction.
+      myILGenerator.Emit(OpCodes.Ret);
+      // End the creation of the type.
+      myTypeBuilder.CreateType();
+      // Set the method with name 'Main' as the entry point in the assembly.
+      myAssemblyBuilder.SetEntryPoint(myMethodBuilder);
+      myAssemblyBuilder.Save(fileName);
+   }
+
+   public static void Main()
+   {
+
+
+      // Create a dynamic assembly with name 'MyAssembly' and build version '1.0.0.2001'.
+      AssemblyName myAssemblyName = new AssemblyName(); 
+      myAssemblyName.Name = "MyAssembly";
+      myAssemblyName.Version = new Version("1.0.0.2001");
+      MakeAssembly(myAssemblyName, "MyAssembly.exe");
+
+      // Get all the assemblies currently loaded in the application domain.
+      Assembly[] myAssemblies = Thread.GetDomain().GetAssemblies();
+
+      // Get the dynamic assembly named 'MyAssembly'. 
+      Assembly myAssembly = null;
+      for(int i = 0; i &lt; myAssemblies.Length; i++)
+      {
+         if(String.Compare(myAssemblies[i].GetName().Name, "MyAssembly") == 0)
+            myAssembly = myAssemblies[i];
+      }
+      if(myAssembly != null)
+      {
+         Console.WriteLine("\nDisplaying the assembly name\n");
+         Console.WriteLine(myAssembly);
+      }
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="VersionCompatibilityTopic1"></a><a name="VersionCompatibility">VersionCompatibility</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the information related to the assembly's compatibility with other assemblies.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Configuration.Assemblies/types/AssemblyVersionCompatibility.html">AssemblyVersionCompatibility</a> VersionCompatibility {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd><b>VersionCompatibility</b> information indicates, for example, that the assembly cannot execute side-by-side with other versions due to conflicts over a device driver.<p> Currently, <b>VersionCompatibility</b> always returns <b>SameMachine</b>, and is not used by the loader. This property is reserved for a future feature.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+
+using System;
+using System.Reflection;
+using System.Threading;
+using System.IO;
+using System.Globalization;
+using System.Reflection.Emit;
+using System.Configuration.Assemblies;
+using System.Text;
+
+public class AssemblyName_CodeBase
+{
+   public static void MakeAssembly(AssemblyName myAssemblyName, string fileName)
+   {
+      // Get the assembly builder from the application domain associated with the current thread.
+      AssemblyBuilder myAssemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(myAssemblyName, AssemblyBuilderAccess.RunAndSave);
+      // Create a dynamic module in the assembly.
+      ModuleBuilder myModuleBuilder = myAssemblyBuilder.DefineDynamicModule("MyModule", fileName);
+      // Create a type in the module.
+      TypeBuilder myTypeBuilder = myModuleBuilder.DefineType("MyType");
+      // Create a method called 'Main'.
+      MethodBuilder myMethodBuilder = myTypeBuilder.DefineMethod("Main", MethodAttributes.Public | MethodAttributes.HideBySig |
+         MethodAttributes.Static, typeof(void), null);
+      // Get the Intermediate Language generator for the method.
+      ILGenerator myILGenerator = myMethodBuilder.GetILGenerator();
+      // Use the utility method to generate the IL instructions that print a string to the console.
+      myILGenerator.EmitWriteLine("Hello World!");
+      // Generate the 'ret' IL instruction.
+      myILGenerator.Emit(OpCodes.Ret);
+      // End the creation of the type.
+      myTypeBuilder.CreateType();
+      // Set the method with name 'Main' as the entry point in the assembly.
+      myAssemblyBuilder.SetEntryPoint(myMethodBuilder);
+      myAssemblyBuilder.Save(fileName);
+   }
+
+   public static void Main()
+   {
+      // Create a dynamic assembly with name 'MyAssembly' and build version '1.0.0.2001'.
+      AssemblyName myAssemblyName = new AssemblyName();
+      // Set the codebase to the physical directory were the assembly resides.
+      myAssemblyName.CodeBase = String.Concat("file:///", Directory.GetCurrentDirectory());
+      // Set the culture information of the assembly to 'English-American'.
+      myAssemblyName.CultureInfo = new CultureInfo("en-US");
+      // Set the hash algoritm to 'SHA1'.
+      myAssemblyName.HashAlgorithm = AssemblyHashAlgorithm.SHA1;
+      myAssemblyName.VersionCompatibility = AssemblyVersionCompatibility.SameProcess;
+      myAssemblyName.Flags = AssemblyNameFlags.PublicKey;
+      // Provide this assembly with a strong name.
+      myAssemblyName.KeyPair = new StrongNameKeyPair(File.Open("KeyPair.snk", FileMode.Open));
+      myAssemblyName.Name = "MyAssembly";
+      myAssemblyName.Version = new Version("1.0.0.2001");
+      MakeAssembly(myAssemblyName, "MyAssembly.exe");
+      
+      // Get the assemblies loaded in the current application domain.
+      Assembly[] myAssemblies = Thread.GetDomain().GetAssemblies();
+
+      // Get the dynamic assembly named 'MyAssembly'. 
+      Assembly myAssembly = null;
+      for(int i = 0; i &lt; myAssemblies.Length; i++)
+         if(String.Compare(myAssemblies[i].GetName().Name, "MyAssembly") == 0)
+            myAssembly = myAssemblies[i];
+
+      // Display the full assembly information to the console.
+      if(myAssembly != null)
+      {
+         Console.WriteLine("\nDisplaying the full assembly name\n");
+         Console.WriteLine(myAssembly.GetName().FullName);
+         Console.WriteLine("\nDisplaying the public key\n");
+         Console.WriteLine(Encoding.ASCII.GetString(myAssembly.GetName().GetPublicKey()));
+         Console.WriteLine("\nDisplaying the public key token\n");
+         Console.WriteLine(Encoding.ASCII.GetString(myAssembly.GetName().GetPublicKeyToken()));
+      }
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CloneTopic1"></a><a name="Clone">Clone</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Makes a copy of this <b>AssemblyName</b> object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> Clone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An <b>Object</b> that is a copy of this <b>AssemblyName</b> object.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System/types/ICloneable.html#Clone">ICloneable.Clone</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> A new object is created, identical to the original.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~AssemblyName();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetAssemblyNameTopic1"></a><a name="GetAssemblyName(System.String)">GetAssemblyName</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>assemblyFile</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the <b>AssemblyName</b> for a given file.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Reflection/types/AssemblyName.html">AssemblyName</a> GetAssemblyName(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>assemblyFile</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>assemblyFile</i><br><dl>
+<dd>
+<param> The assembly file for which to get the <b>AssemblyName</b>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An <b>AssemblyName</b> object representing the given file.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>assemblyFile</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>assemblyFile</i> is empty.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/FileNotFoundException.html">FileNotFoundException</a></td>
+<td><i>assemblyFile</i> is not found.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td> The caller does not have path discovery permission.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/FileLoadException.html">FileLoadException</a></td>
+<td> An assembly or module was loaded twice with two different evidences.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/BadImageFormatException.html">BadImageFormatException</a></td>
+<td><i>assemblyFile</i> is not a valid assembly.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This will only work if the file contains an assembly manifest. This method causes the file to be opened and closed, but the assembly is not added to this domain.</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+
+using System;
+using System.Reflection;
+using System.Text.RegularExpressions;
+
+public class AssemblyName_GetAssemblyName
+{
+   public static void Main()
+   {
+
+
+      // Get the type of 'System.Object'.
+      Type myType = typeof(System.Object);
+      
+      // Get the path of 'System.dll'.
+      string system = Regex.Replace(myType.Assembly.CodeBase, "mscorlib.dll", "System.dll");
+      system = Regex.Replace(system, "file:///", "");
+
+      // Get the assembly information and display to the console.
+      AssemblyName myAssemblyName = AssemblyName.GetAssemblyName(system);
+      Console.WriteLine("\nDisplaying the assembly information of 'System.dll'\n");
+      Console.WriteLine(myAssemblyName.ToString());
+   }
+}
+
+    </pre>
+</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/FileIOPermission.html">FileIOPermission</a> for access to information in the path. Associated enumeration:  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#PathDiscovery">FileIOPermissionAccess.PathDiscovery</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetObjectDataTopic1"></a><a name="GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">GetObjectData</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> <i>info</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> <i>context</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets serialization information with all of the data needed to reinstantiate this <b>AssemblyName</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void GetObjectData(<br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> <i>info</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> <i>context</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>info</i><br><dl>
+<dd>
+<param> The object to be populated with serialization information.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>context</i><br><dl>
+<dd>
+<param> The destination context of the serialization.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>info</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Serialization/types/ISerializable.html#GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">ISerializable.GetObjectData</a></dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetPublicKeyTopic1"></a><a name="GetPublicKey">GetPublicKey</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the public key identifying the originator of the assembly.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Byte.html">byte[]</a> GetPublicKey();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An array of type <b>byte</b> containing the public key of the assembly originator.</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+
+using System;
+using System.Reflection;
+using System.Threading;
+using System.IO;
+using System.Globalization;
+using System.Reflection.Emit;
+using System.Configuration.Assemblies;
+using System.Text;
+
+public class AssemblyName_CodeBase
+{
+   public static void MakeAssembly(AssemblyName myAssemblyName, string fileName)
+   {
+      // Get the assembly builder from the application domain associated with the current thread.
+      AssemblyBuilder myAssemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(myAssemblyName, AssemblyBuilderAccess.RunAndSave);
+      // Create a dynamic module in the assembly.
+      ModuleBuilder myModuleBuilder = myAssemblyBuilder.DefineDynamicModule("MyModule", fileName);
+      // Create a type in the module.
+      TypeBuilder myTypeBuilder = myModuleBuilder.DefineType("MyType");
+      // Create a method called 'Main'.
+      MethodBuilder myMethodBuilder = myTypeBuilder.DefineMethod("Main", MethodAttributes.Public | MethodAttributes.HideBySig |
+         MethodAttributes.Static, typeof(void), null);
+      // Get the Intermediate Language generator for the method.
+      ILGenerator myILGenerator = myMethodBuilder.GetILGenerator();
+      // Use the utility method to generate the IL instructions that print a string to the console.
+      myILGenerator.EmitWriteLine("Hello World!");
+      // Generate the 'ret' IL instruction.
+      myILGenerator.Emit(OpCodes.Ret);
+      // End the creation of the type.
+      myTypeBuilder.CreateType();
+      // Set the method with name 'Main' as the entry point in the assembly.
+      myAssemblyBuilder.SetEntryPoint(myMethodBuilder);
+      myAssemblyBuilder.Save(fileName);
+   }
+
+   public static void Main()
+   {
+      // Create a dynamic assembly with name 'MyAssembly' and build version '1.0.0.2001'.
+      AssemblyName myAssemblyName = new AssemblyName();
+      // Set the codebase to the physical directory were the assembly resides.
+      myAssemblyName.CodeBase = String.Concat("file:///", Directory.GetCurrentDirectory());
+      // Set the culture information of the assembly to 'English-American'.
+      myAssemblyName.CultureInfo = new CultureInfo("en-US");
+      // Set the hash algoritm to 'SHA1'.
+      myAssemblyName.HashAlgorithm = AssemblyHashAlgorithm.SHA1;
+      myAssemblyName.VersionCompatibility = AssemblyVersionCompatibility.SameProcess;
+      myAssemblyName.Flags = AssemblyNameFlags.PublicKey;
+      // Provide this assembly with a strong name.
+      myAssemblyName.KeyPair = new StrongNameKeyPair(File.Open("KeyPair.snk", FileMode.Open));
+      myAssemblyName.Name = "MyAssembly";
+      myAssemblyName.Version = new Version("1.0.0.2001");
+      MakeAssembly(myAssemblyName, "MyAssembly.exe");
+      
+      // Get the assemblies loaded in the current application domain.
+      Assembly[] myAssemblies = Thread.GetDomain().GetAssemblies();
+
+      // Get the dynamic assembly named 'MyAssembly'. 
+      Assembly myAssembly = null;
+      for(int i = 0; i &lt; myAssemblies.Length; i++)
+         if(String.Compare(myAssemblies[i].GetName().Name, "MyAssembly") == 0)
+            myAssembly = myAssemblies[i];
+
+      // Display the full assembly information to the console.
+      if(myAssembly != null)
+      {
+         Console.WriteLine("\nDisplaying the full assembly name\n");
+         Console.WriteLine(myAssembly.GetName().FullName);
+         Console.WriteLine("\nDisplaying the public key\n");
+         Console.WriteLine(Encoding.ASCII.GetString(myAssembly.GetName().GetPublicKey()));
+         Console.WriteLine("\nDisplaying the public key token\n");
+         Console.WriteLine(Encoding.ASCII.GetString(myAssembly.GetName().GetPublicKeyToken()));
+      }
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetPublicKeyTokenTopic1"></a><a name="GetPublicKeyToken">GetPublicKeyToken</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a strong name consisting of a public key, a given name, and version parts.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Byte.html">byte[]</a> GetPublicKeyToken();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An array of type <b>byte</b> containing the components of the strong name.</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+
+using System;
+using System.Reflection;
+using System.Threading;
+using System.IO;
+using System.Globalization;
+using System.Reflection.Emit;
+using System.Configuration.Assemblies;
+using System.Text;
+
+public class AssemblyName_CodeBase
+{
+   public static void MakeAssembly(AssemblyName myAssemblyName, string fileName)
+   {
+      // Get the assembly builder from the application domain associated with the current thread.
+      AssemblyBuilder myAssemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(myAssemblyName, AssemblyBuilderAccess.RunAndSave);
+      // Create a dynamic module in the assembly.
+      ModuleBuilder myModuleBuilder = myAssemblyBuilder.DefineDynamicModule("MyModule", fileName);
+      // Create a type in the module.
+      TypeBuilder myTypeBuilder = myModuleBuilder.DefineType("MyType");
+      // Create a method called 'Main'.
+      MethodBuilder myMethodBuilder = myTypeBuilder.DefineMethod("Main", MethodAttributes.Public | MethodAttributes.HideBySig |
+         MethodAttributes.Static, typeof(void), null);
+      // Get the Intermediate Language generator for the method.
+      ILGenerator myILGenerator = myMethodBuilder.GetILGenerator();
+      // Use the utility method to generate the IL instructions that print a string to the console.
+      myILGenerator.EmitWriteLine("Hello World!");
+      // Generate the 'ret' IL instruction.
+      myILGenerator.Emit(OpCodes.Ret);
+      // End the creation of the type.
+      myTypeBuilder.CreateType();
+      // Set the method with name 'Main' as the entry point in the assembly.
+      myAssemblyBuilder.SetEntryPoint(myMethodBuilder);
+      myAssemblyBuilder.Save(fileName);
+   }
+
+   public static void Main()
+   {
+      // Create a dynamic assembly with name 'MyAssembly' and build version '1.0.0.2001'.
+      AssemblyName myAssemblyName = new AssemblyName();
+      // Set the codebase to the physical directory were the assembly resides.
+      myAssemblyName.CodeBase = String.Concat("file:///", Directory.GetCurrentDirectory());
+      // Set the culture information of the assembly to 'English-American'.
+      myAssemblyName.CultureInfo = new CultureInfo("en-US");
+      // Set the hash algoritm to 'SHA1'.
+      myAssemblyName.HashAlgorithm = AssemblyHashAlgorithm.SHA1;
+      myAssemblyName.VersionCompatibility = AssemblyVersionCompatibility.SameProcess;
+      myAssemblyName.Flags = AssemblyNameFlags.PublicKey;
+      // Provide this assembly with a strong name.
+      myAssemblyName.KeyPair = new StrongNameKeyPair(File.Open("KeyPair.snk", FileMode.Open));
+      myAssemblyName.Name = "MyAssembly";
+      myAssemblyName.Version = new Version("1.0.0.2001");
+      MakeAssembly(myAssemblyName, "MyAssembly.exe");
+      
+      // Get the assemblies loaded in the current application domain.
+      Assembly[] myAssemblies = Thread.GetDomain().GetAssemblies();
+
+      // Get the dynamic assembly named 'MyAssembly'. 
+      Assembly myAssembly = null;
+      for(int i = 0; i &lt; myAssemblies.Length; i++)
+         if(String.Compare(myAssemblies[i].GetName().Name, "MyAssembly") == 0)
+            myAssembly = myAssemblies[i];
+
+      // Display the full assembly information to the console.
+      if(myAssembly != null)
+      {
+         Console.WriteLine("\nDisplaying the full assembly name\n");
+         Console.WriteLine(myAssembly.GetName().FullName);
+         Console.WriteLine("\nDisplaying the public key\n");
+         Console.WriteLine(Encoding.ASCII.GetString(myAssembly.GetName().GetPublicKey()));
+         Console.WriteLine("\nDisplaying the public key token\n");
+         Console.WriteLine(Encoding.ASCII.GetString(myAssembly.GetName().GetPublicKeyToken()));
+      }
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="OnDeserializationTopic1"></a><a name="OnDeserialization(System.Object)">OnDeserialization</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>sender</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Implements the  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> interface and is called back by the deserialization event when deserialization is complete.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void OnDeserialization(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>sender</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>sender</i><br><dl>
+<dd>
+<param> The source of the deserialization event.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Serialization/types/IDeserializationCallback.html#OnDeserialization(System.Object)">IDeserializationCallback.OnDeserialization</a></dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> |  <a href="#GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">AssemblyName.GetObjectData</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="SetPublicKeyTopic1"></a><a name="SetPublicKey(System.Byte[])">SetPublicKey</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>publicKey</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Sets the public key identifying the originator of the assembly.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void SetPublicKey(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>publicKey</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>publicKey</i><br><dl>
+<dd>
+<param> A byte array containing the public key identifying the originator of the assembly.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+using System;
+using System.Reflection;
+using System.Threading;
+using System.IO;
+using System.Globalization;
+using System.Reflection.Emit;
+using System.Configuration.Assemblies;
+using System.Text;
+
+public class AssemblyName_CodeBase
+{
+   public static void MakeAssembly(AssemblyName myAssemblyName, string fileName)
+   {
+      // Get the assembly builder from the application domain associated with the current thread.
+      AssemblyBuilder myAssemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(myAssemblyName, AssemblyBuilderAccess.RunAndSave);
+      // Create a dynamic module in the assembly.
+      ModuleBuilder myModuleBuilder = myAssemblyBuilder.DefineDynamicModule("MyModule", fileName);
+      // Create a type in the module.
+      TypeBuilder myTypeBuilder = myModuleBuilder.DefineType("MyType");
+      // Create a method called 'Main'.
+      MethodBuilder myMethodBuilder = myTypeBuilder.DefineMethod("Main", MethodAttributes.Public | MethodAttributes.HideBySig |
+         MethodAttributes.Static, typeof(void), null);
+      // Get the Intermediate Language generator for the method.
+      ILGenerator myILGenerator = myMethodBuilder.GetILGenerator();
+      // Use the utility method to generate the IL instructions that print a string to the console.
+      myILGenerator.EmitWriteLine("Hello World!");
+      // Generate the 'ret' IL instruction.
+      myILGenerator.Emit(OpCodes.Ret);
+      // End the creation of the type.
+      myTypeBuilder.CreateType();
+      // Set the method with name 'Main' as the entry point in the assembly.
+      myAssemblyBuilder.SetEntryPoint(myMethodBuilder);
+      myAssemblyBuilder.Save(fileName);
+   }
+
+   public static void Main()
+   {
+      // Create a dynamic assembly with name 'MyAssembly' and build version '1.0.0.2001'.
+      AssemblyName myAssemblyName = new AssemblyName();
+      // Set the codebase to the physical directory were the assembly resides.
+      myAssemblyName.CodeBase = String.Concat("file:///", Directory.GetCurrentDirectory());
+      // Set the culture information of the assembly to 'English-American'.
+      myAssemblyName.CultureInfo = new CultureInfo("en-US");
+      // Set the hash algoritm to 'SHA1'.
+      myAssemblyName.HashAlgorithm = AssemblyHashAlgorithm.SHA1;
+      myAssemblyName.VersionCompatibility = AssemblyVersionCompatibility.SameProcess;
+      myAssemblyName.Flags = AssemblyNameFlags.PublicKey;
+      // Get the whole contents of the 'PublicKey.snk' into a byte array.
+      FileStream publicKeyStream = File.Open("PublicKey.snk", FileMode.Open);
+      byte[] publicKey = new byte[publicKeyStream.Length];
+      publicKeyStream.Read(publicKey, 0, (int)publicKeyStream.Length);
+      // Provide the assembly with a public key.
+      myAssemblyName.SetPublicKey(publicKey);
+      // Get the whole contents of the 'PublicKeyToken.snk' into a byte array.
+      FileStream publicKeyTokenStream = File.Open("PublicKeyToken.snk", FileMode.Open);
+      byte[] publicKeyToken = new Byte[publicKeyTokenStream.Length];
+      publicKeyTokenStream.Read(publicKeyToken, 0, (int)publicKeyToken.Length);
+      // Provide the assembly with a public key token.
+      myAssemblyName.SetPublicKeyToken(publicKeyToken);
+      myAssemblyName.Name = "MyAssembly";
+      myAssemblyName.Version = new Version("1.0.0.2001");
+      MakeAssembly(myAssemblyName, "MyAssembly.exe");
+      
+      // Get the assemblies loaded in the current application domain.
+      Assembly[] myAssemblies = Thread.GetDomain().GetAssemblies();
+
+      // Get the dynamic assembly named 'MyAssembly'. 
+      Assembly myAssembly = null;
+      for(int i = 0; i &lt; myAssemblies.Length; i++)
+         if(String.Compare(myAssemblies[i].GetName().Name, "MyAssembly") == 0)
+            myAssembly = myAssemblies[i];
+  
+      // Display the full assembly information to the console.
+      if(myAssembly != null)
+      {
+         Console.WriteLine("\nDisplaying the full assembly name\n");
+         string assemblyName = myAssembly.GetName().FullName;
+         Console.WriteLine(assemblyName);
+         Console.WriteLine("\nDisplaying the public key for the assembly\n");
+         byte[] publicKeyBytes = myAssembly.GetName().GetPublicKey();
+         Console.WriteLine(Encoding.ASCII.GetString(publicKeyBytes));
+         Console.WriteLine("\nDisplaying the public key token for the assembly\n");
+         byte[] publicKeyTokenBytes = myAssembly.GetName().GetPublicKeyToken();
+         Console.WriteLine(Encoding.ASCII.GetString(publicKeyTokenBytes));
+      }
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="SetPublicKeyTokenTopic1"></a><a name="SetPublicKeyToken(System.Byte[])">SetPublicKeyToken</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>publicKeyToken</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Sets a strong name consisting of a public key, a given name, and version parts.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void SetPublicKeyToken(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>publicKeyToken</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>publicKeyToken</i><br><dl>
+<dd>
+<param> A byte array containing the strong name of the assembly.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+using System;
+using System.Reflection;
+using System.Threading;
+using System.IO;
+using System.Globalization;
+using System.Reflection.Emit;
+using System.Configuration.Assemblies;
+using System.Text;
+
+public class AssemblyName_CodeBase
+{
+   public static void MakeAssembly(AssemblyName myAssemblyName, string fileName)
+   {
+      // Get the assembly builder from the application domain associated with the current thread.
+      AssemblyBuilder myAssemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(myAssemblyName, AssemblyBuilderAccess.RunAndSave);
+      // Create a dynamic module in the assembly.
+      ModuleBuilder myModuleBuilder = myAssemblyBuilder.DefineDynamicModule("MyModule", fileName);
+      // Create a type in the module.
+      TypeBuilder myTypeBuilder = myModuleBuilder.DefineType("MyType");
+      // Create a method called 'Main'.
+      MethodBuilder myMethodBuilder = myTypeBuilder.DefineMethod("Main", MethodAttributes.Public | MethodAttributes.HideBySig |
+         MethodAttributes.Static, typeof(void), null);
+      // Get the Intermediate Language generator for the method.
+      ILGenerator myILGenerator = myMethodBuilder.GetILGenerator();
+      // Use the utility method to generate the IL instructions that print a string to the console.
+      myILGenerator.EmitWriteLine("Hello World!");
+      // Generate the 'ret' IL instruction.
+      myILGenerator.Emit(OpCodes.Ret);
+      // End the creation of the type.
+      myTypeBuilder.CreateType();
+      // Set the method with name 'Main' as the entry point in the assembly.
+      myAssemblyBuilder.SetEntryPoint(myMethodBuilder);
+      myAssemblyBuilder.Save(fileName);
+   }
+
+   public static void Main()
+   {
+      // Create a dynamic assembly with name 'MyAssembly' and build version '1.0.0.2001'.
+      AssemblyName myAssemblyName = new AssemblyName();
+      // Set the codebase to the physical directory were the assembly resides.
+      myAssemblyName.CodeBase = String.Concat("file:///", Directory.GetCurrentDirectory());
+      // Set the culture information of the assembly to 'English-American'.
+      myAssemblyName.CultureInfo = new CultureInfo("en-US");
+      // Set the hash algoritm to 'SHA1'.
+      myAssemblyName.HashAlgorithm = AssemblyHashAlgorithm.SHA1;
+      myAssemblyName.VersionCompatibility = AssemblyVersionCompatibility.SameProcess;
+      myAssemblyName.Flags = AssemblyNameFlags.PublicKey;
+      // Get the whole contents of the 'PublicKey.snk' into a byte array.
+      FileStream publicKeyStream = File.Open("PublicKey.snk", FileMode.Open);
+      byte[] publicKey = new byte[publicKeyStream.Length];
+      publicKeyStream.Read(publicKey, 0, (int)publicKeyStream.Length);
+      // Provide the assembly with a public key.
+      myAssemblyName.SetPublicKey(publicKey);
+      // Get the whole contents of the 'PublicKeyToken.snk' into a byte array.
+      FileStream publicKeyTokenStream = File.Open("PublicKeyToken.snk", FileMode.Open);
+      byte[] publicKeyToken = new Byte[publicKeyTokenStream.Length];
+      publicKeyTokenStream.Read(publicKeyToken, 0, (int)publicKeyToken.Length);
+      // Provide the assembly with a public key token.
+      myAssemblyName.SetPublicKeyToken(publicKeyToken);
+      myAssemblyName.Name = "MyAssembly";
+      myAssemblyName.Version = new Version("1.0.0.2001");
+      MakeAssembly(myAssemblyName, "MyAssembly.exe");
+      
+      // Get the assemblies loaded in the current application domain.
+      Assembly[] myAssemblies = Thread.GetDomain().GetAssemblies();
+
+      // Get the dynamic assembly named 'MyAssembly'. 
+      Assembly myAssembly = null;
+      for(int i = 0; i &lt; myAssemblies.Length; i++)
+         if(String.Compare(myAssemblies[i].GetName().Name, "MyAssembly") == 0)
+            myAssembly = myAssemblies[i];
+  
+      // Display the full assembly information to the console.
+      if(myAssembly != null)
+      {
+         Console.WriteLine("\nDisplaying the full assembly name\n");
+         string assemblyName = myAssembly.GetName().FullName;
+         Console.WriteLine(assemblyName);
+         Console.WriteLine("\nDisplaying the public key for the assembly\n");
+         byte[] publicKeyBytes = myAssembly.GetName().GetPublicKey();
+         Console.WriteLine(Encoding.ASCII.GetString(publicKeyBytes));
+         Console.WriteLine("\nDisplaying the public key token for the assembly\n");
+         byte[] publicKeyTokenBytes = myAssembly.GetName().GetPublicKeyToken();
+         Console.WriteLine(Encoding.ASCII.GetString(publicKeyTokenBytes));
+      }
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the full name of the assembly, also known as the display name.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/String.html">string</a> ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A <b>String</b> that is the full name of the assembly, or the class name if the full name of the assembly cannot be determined.</dd>
+</dl><b>Remarks</b><dl>
+<dd> See the description of  <a href="../../System.Reflection/types/AssemblyName.html">AssemblyName</a> for the format of the returned string.</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+
+using System;
+using System.Reflection;
+using System.Text.RegularExpressions;
+
+public class AssemblyName_GetAssemblyName
+{
+   public static void Main()
+   {
+
+
+      // Get the type of 'System.Object'.
+      Type myType = typeof(System.Object);
+      
+      // Get the path of 'System.dll'.
+      string system = Regex.Replace(myType.Assembly.CodeBase, "mscorlib.dll", "System.dll");
+      system = Regex.Replace(system, "file:///", "");
+
+      // Get the assembly information and display to the console.
+      AssemblyName myAssemblyName = AssemblyName.GetAssemblyName(system);
+      Console.WriteLine("\nDisplaying the assembly information of 'System.dll'\n");
+      Console.WriteLine(myAssemblyName.ToString());
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

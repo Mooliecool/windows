@@ -1,0 +1,2342 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Uri</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Uri Class</h2><b>Assembly: </b>System.dll<br><b>Namespace: </b>System<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides an object representation of a uniform resource identifier (URI) and easy access to the parts of the URI.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public class Uri : MarshalByRefObject, ISerializable</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> A URI is a compact representation of a resource available to your application on the Internet. The  <a href="../../System/types/Uri.html">Uri</a> class defines the properties and methods for handling URIs, including parsing, comparing, and combining. The  <a href="../../System/types/Uri.html">Uri</a> class properties are read-only, to modify a  <a href="../../System/types/Uri.html">Uri</a> instance use the  <a href="../../System/types/UriBuilder.html">UriBuilder</a> class.<p> The  <a href="../../System/types/Uri.html">Uri</a> class stores only absolute URIs (for example, "http://www.contoso.com/index.htm"). Relative URIs (for example, "/new/index.htm") must be expanded with respect to a base URI so that they are absolute. The  <a href="#MakeRelative(System.Uri)">Uri.MakeRelative</a> method is provided to convert absolute URIs to relative URIs when necessary.</p>
+<p> The  <a href="../../System/types/Uri.html">Uri</a> constructors will not escape URI strings if the string is a well-formed URI including a scheme identifier that contains escape sequences. The constructors will escape relative URI strings that contain a percent sign (%).</p>
+<p> URIs are stored as canonical URIs in escaped encoding, with all characters with ASCII values greater than 127 replaced with their hexidecimal equivalents. To put the URI in canonical form, the  <a href="../../System/types/Uri.html">Uri</a> constructor performs the following steps.</p>
+<UL>
+<li> Converts the URI scheme to lower case.</li>
+<li> Converts the host name to lower case.</li>
+<li> Removes default and empty port numbers.</li>
+<li> Simplifies the URI by removing superfluous segments such as "/" and "/test" segments.</li>
+</UL>
+<p> You can transform the contents of the  <a href="../../System/types/Uri.html">Uri</a> class from an escape encoded URI reference to a readable URI reference using the  <a href="#ToString">Uri.ToString</a> method.</p>
+<p> Some URIs include a fragment identifier or query. A fragment identifier is any text that follows a number sign (#) in the URI and is stored in the  <a href="#Fragment">Uri.Fragment</a> property. Query information is any text that follows a question mark (?) in the URI, and is stored in the  <a href="#Query">Uri.Query</a> property.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates an instance of the  <a href="../../System/types/Uri.html">Uri</a> class and uses it to create a  <a href="../../System.Net/types/WebRequest.html">WebRequest</a>.<pre>
+Uri siteUri = new Uri("http://www.contoso.com/");
+ 
+ WebRequest wr = WebRequest.Create(siteUri);
+
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System/System.html">System Namespace</a> |  <a href="../../System/types/UriBuilder.html">UriBuilder</a></dd>
+</dl>
+<h3>System.Uri Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(string uriString)<br><br></code> Initializes a new instance of the  <a href="../../System/types/Uri.html">Uri</a> class with the specified URI.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor3">ctor #3</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(string uriString, bool dontEscape)<br><br></code> Initializes a new instance of the  <a href="../../System/types/Uri.html">Uri</a> class with the specified URI, with control of character escaping.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor4">ctor #4</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(Uri baseUri, string relativeUri)<br><br></code> Initializes a new instance of the  <a href="../../System/types/Uri.html">Uri</a> class based on the specified base and relative URIs.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor5">ctor #5</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(Uri baseUri, string relativeUri, bool dontEscape)<br><br></code> Initializes a new instance of the  <a href="../../System/types/Uri.html">Uri</a> class based on the specified base and releative URIs, with control of character escaping.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Fields</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#SchemeDelimiter">SchemeDelimiter</a></td>
+<td width="55%"> Specifies the characters that separate the communication protocol scheme from the address portion of the URI. This field is read-only.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#UriSchemeFile">UriSchemeFile</a></td>
+<td width="55%"> Specifies that the URI is a pointer to a file. This field is read-only.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#UriSchemeFtp">UriSchemeFtp</a></td>
+<td width="55%"> Specifies that the URI is accessed through the File Transfer Protocol (FTP). This field is read-only.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#UriSchemeGopher">UriSchemeGopher</a></td>
+<td width="55%"> Specifies that the URI is accessed through the Gopher protocol. This field is read-only.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#UriSchemeHttp">UriSchemeHttp</a></td>
+<td width="55%"> Specifies that the URI is accessed through the Hypertext Transfer Protocol (HTTP). This field is read-only.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#UriSchemeHttps">UriSchemeHttps</a></td>
+<td width="55%"> Specifies that the URI is accessed through the Secure Hypertext Transfer Protocol (HTTPS). This field is read-only.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#UriSchemeMailto">UriSchemeMailto</a></td>
+<td width="55%"> Specifies that the URI is an email address and is accessed through the Simple Network Mail Protocol (SNMP). This field is read-only.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#UriSchemeNews">UriSchemeNews</a></td>
+<td width="55%"> Specifes that the URI is an Internet news group and is accessed through the Network News Transport Protocol (NNTP). This field is read-only.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#UriSchemeNntp">UriSchemeNntp</a></td>
+<td width="55%"> Specifes that the URI is an Internet news group and is accessed through the Network News Transport Protocol (NNTP). This field is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#AbsolutePath">AbsolutePath</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the absolute path of the URI.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AbsoluteUri">AbsoluteUri</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the absolute URI.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Authority">Authority</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the Domain Name System (DNS) host name or IP address and the port number for a server.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Fragment">Fragment</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the escaped fragment.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Host">Host</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the Domain Name System (DNS) host name, or IP address of the server specified in the URI.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#HostNameType">HostNameType</a></td>
+<td width="55%"><b>Read-only</b><br><br> Returns the type of the host name specified in the URI.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsDefaultPort">IsDefaultPort</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a value indicating whether the port value of the URI is the default for this scheme.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsFile">IsFile</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a value indicating whether the specified  <a href="../../System/types/Uri.html">Uri</a> is a file URI.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsLoopback">IsLoopback</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a value indicating whether the specified  <a href="../../System/types/Uri.html">Uri</a> references the local host.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsUnc">IsUnc</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a value indicating whether the specified  <a href="../../System/types/Uri.html">Uri</a> is a universal naming convention (UNC) path.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#LocalPath">LocalPath</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a local operating-system representation of a file name.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#PathAndQuery">PathAndQuery</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the  <a href="#AbsolutePath">Uri.AbsolutePath</a> and  <a href="#Query">Uri.Query</a> properties separated by a question mark (?).</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Port">Port</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the port number of the specified URI.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Query">Query</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets any query information included in the specified URI.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Scheme">Scheme</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the scheme name of the specified URI.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Segments">Segments</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets an array of the segments that make up the specified URI.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#UserEscaped">UserEscaped</a></td>
+<td width="55%"><b>Read-only</b><br><br> Indicates that the URI string was escaped before the  <a href="../../System/types/Uri.html">Uri</a> instance was created.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#UserInfo">UserInfo</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the user name, password, and other user-specific information associated with the specified URI.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#CheckHostName(System.String)">CheckHostName</a></td>
+<td width="55%"> Determines whether the specified host name is valid.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CheckSchemeName(System.String)">CheckSchemeName</a></td>
+<td width="55%"> Determines whether the specified scheme name is valid.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CreateObjRef(System.Type)">CreateObjRef</a><br>(inherited from <b>System.MarshalByRefObject)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/MarshalByRefObject.html#CreateObjRef(System.Type)">System.MarshalByRefObject.CreateObjRef</a></font></b><br><br><br> Creates an object that contains all the relevant information required to generate a proxy used to communicate with a remote object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a></td>
+<td width="55%"><b>Overridden: </b><br> Compares two  <a href="../../System/types/Uri.html">Uri</a> instances for equality.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#FromHex(System.Char)">FromHex</a></td>
+<td width="55%"> Returns the decimal value of a hexadecimal digit.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a></td>
+<td width="55%"><b>Overridden: </b><br> Returns the hash code for the specified URI.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetLeftPart(System.UriPartial)">GetLeftPart</a></td>
+<td width="55%"> Returns the specified portion of a URI.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetLifetimeService">GetLifetimeService</a><br>(inherited from <b>System.MarshalByRefObject)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/MarshalByRefObject.html#GetLifetimeService">System.MarshalByRefObject.GetLifetimeService</a></font></b><br><br><br> Retrieves the current lifetime service object that controls the lifetime policy for this instance.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#HexEscape(System.Char)">HexEscape</a></td>
+<td width="55%"> Converts a specified character into its hexadecimal equivalent.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#HexUnescape(System.String,System.Int32)">HexUnescape</a></td>
+<td width="55%"> Converts a specified hexadecimal representation of a character to the character.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#InitializeLifetimeService">InitializeLifetimeService</a><br>(inherited from <b>System.MarshalByRefObject)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/MarshalByRefObject.html#InitializeLifetimeService">System.MarshalByRefObject.InitializeLifetimeService</a></font></b><br><br><br> Obtains a lifetime service object to control the lifetime policy for this instance.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsHexDigit(System.Char)">IsHexDigit</a></td>
+<td width="55%"> Determines whether a specified character is a valid hexadecimal digit.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsHexEncoding(System.String,System.Int32)">IsHexEncoding</a></td>
+<td width="55%"> Determines whether a string is hexadecimal encoded.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MakeRelative(System.Uri)">MakeRelative</a></td>
+<td width="55%"> Determines the difference between two  <a href="../../System/types/Uri.html">Uri</a> instances.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a></td>
+<td width="55%"><b>Overridden: </b><br> Returns the display string for the specified  <a href="../../System/types/Uri.html">Uri</a> instance.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(SerializationInfo serializationInfo, StreamingContext streamingContext)<br><br></code> Initializes a new instance of the  <a href="../../System/types/Uri.html">Uri</a> class from the specified instances of the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> and  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> classes.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Canonicalize">Canonicalize</a></td>
+<td width="55%"></td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CheckSecurity">CheckSecurity</a></td>
+<td width="55%"></td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Escape">Escape</a></td>
+<td width="55%"></td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#EscapeString(System.String)">EscapeString</a></td>
+<td width="55%"> Converts a string to its escaped representation.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsBadFileSystemCharacter(System.Char)">IsBadFileSystemCharacter</a></td>
+<td width="55%"></td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsExcludedCharacter(System.Char)">IsExcludedCharacter</a></td>
+<td width="55%"></td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsReservedCharacter(System.Char)">IsReservedCharacter</a></td>
+<td width="55%"></td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Parse">Parse</a></td>
+<td width="55%"></td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Unescape(System.String)">Unescape</a></td>
+<td width="55%"></td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/MarshalByRefObject.html">System.MarshalByRefObject</a></li>
+<ul class="none">
+<li><b>System.Uri</b></li>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Uri Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System/types/Uri.html">Uri</a> class with the specified URI.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public Uri(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>uriString</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>uriString</i><br><dl>
+<dd>
+<param> A URI.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/UriFormatException.html">UriFormatException</a></td>
+<td><i>uriString</i> is empty.<p> -or- </p>
+<p> The scheme specified in <i>uriString</i> is invalid.</p>
+<p> -or- </p>
+<p><i>uriString</i> contains too many slashes.</p>
+<p> -or- </p>
+<p> The password specified in <i>uriString</i> is invalid.</p>
+<p> -or- </p>
+<p> The host name specified in <i>uriString</i> is invalid.</p>
+<p> -or- </p>
+<p> The file name specified in <i>uriString</i> is invalid.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This constructor creates a  <a href="../../System/types/Uri.html">Uri</a> instance from a URI string. It parses the URI, puts it in canonical format, and makes any required escape encodings.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System/types/Uri.html">Uri</a> instance with the URI "http://www.contoso.com/".<pre>
+Uri myUri = new Uri("http://www.contoso.com/");
+
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System/types/Uri.html">Uri</a> class from the specified instances of the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> and  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> classes.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected Uri(<br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> <i>serializationInfo</i>,</font><br>   <font color="#008080"><a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> <i>streamingContext</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>serializationInfo</i><br><dl>
+<dd>
+<param> An instance of the  <a href="../../System.Runtime.Serialization/types/SerializationInfo.html">SerializationInfo</a> class containing the information required to serialize the new  <a href="../../System/types/Uri.html">Uri</a> instance.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>streamingContext</i><br><dl>
+<dd>
+<param> An instance of the  <a href="../../System.Runtime.Serialization/types/StreamingContext.html">StreamingContext</a> class containing the source of the serialized stream associated with the new  <a href="../../System/types/Uri.html">Uri</a> instance.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This constructor implements the  <a href="../../System.Runtime.Serialization/types/ISerializable.html">ISerializable</a> interface for the  <a href="../../System/types/Uri.html">Uri</a> class.</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconserialization.asp">MSDN: serialization</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic3"></a><a name="ctor3">ctor #3</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System/types/Uri.html">Uri</a> class with the specified URI, with control of character escaping.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public Uri(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>uriString</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>dontEscape</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>uriString</i><br><dl>
+<dd>
+<param> The URI.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>dontEscape</i><br><dl>
+<dd>
+<param><b>true</b> if the URI contains escape characters; otherwise, <b>false</b>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>uriString</i> is empty.<p> -or- </p>
+<p><i>uriString</i> is <b>null</b>.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/UriFormatException.html">UriFormatException</a></td>
+<td> The scheme specified in <i>uriString</i> is invalid.<p> -or- </p>
+<p><i>uriString</i> contains too many slashes.</p>
+<p> -or- </p>
+<p> The password specified in <i>uriString</i> is invalid.</p>
+<p> -or- </p>
+<p> The host name specified in <i>uriString</i> is invalid.</p>
+<p> -or- </p>
+<p> The file name specified in <i>uriString</i> is invalid.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This constructor creates a  <a href="../../System/types/Uri.html">Uri</a> instance from a URI string. It parses the URI, and puts it in canonical format. The caller must set <i>dontEscape</i> to <b>true</b> if the URI is already escaped, or false if the constructor should transform the URI to its escaped encoding.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System/types/Uri.html">Uri</a> instance for the URI http://www.contoso.com/Hello%20World.htm. Because the URI contains escaped characters, the third parameter, <i>dontEscape</i>, is set to <b>true</b>.<pre>
+Uri myUri = new Uri("http://www.contoso.com/Hello%20World.htm", true);
+
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic4"></a><a name="ctor4">ctor #4</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System/types/Uri.html">Uri</a> class based on the specified base and relative URIs.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public Uri(Uri baseUri, string relativeUri(<br>   <font color="#008080"><a href="../../System/types/Uri.html">Uri</a> <i>baseUri</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>relativeUri</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>baseUri</i><br><dl>
+<dd>
+<param> The base URI.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>relativeUri</i><br><dl>
+<dd>
+<param> The relative URI to add to the base URI.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/UriFormatException.html">UriFormatException</a></td>
+<td> The URI formed by combining <i>baseUri</i> and <i>relativeUri</i> is empty.<p> -or- </p>
+<p> The scheme specified in the URI formed by combining <i>baseUri</i> and <i>relativeUri</i> is invalid.</p>
+<p> -or- </p>
+<p> The URI formed by combining <i>baseUri</i> and <i>relativeUri</i> contains too many slashes.</p>
+<p> -or- </p>
+<p> The password specified in the URI formed by combining <i>baseUri</i> and <i>relativeUri</i> is invalid.</p>
+<p> -or- </p>
+<p> The host name specified in the URI formed by combining <i>baseUri</i> and <i>relativeUri</i> is invalid.</p>
+<p> -or- </p>
+<p> The file name specified in the URI formed by combining <i>baseUri</i> and <i>relativeUri</i> is invalid.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This constructor creates a  <a href="../../System/types/Uri.html">Uri</a> instance by combining the <i>baseUri</i> and the <i>relativeUri</i>. If <i>relativeUri</i> is an absolute URI (containing a scheme, hostname, and optionally a port number) the  <a href="../../System/types/Uri.html">Uri</a> instance is created using only <i>relativeUri</i>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a new instance of the  <a href="../../System/types/Uri.html">Uri</a> class by combining the relative URIs http://www.contoso.com and catalog/showew.htm to form the absolute URI http://www.contoso.com/catalog/shownew.htm .<pre>
+Uri baseUri = new Uri("http://www.contoso.com");
+ Uri myUri = new Uri(baseUri, "catalog/shownew.htm");
+
+Console.WriteLine(myUri.ToString());
+   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic5"></a><a name="ctor5">ctor #5</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System/types/Uri.html">Uri</a> class based on the specified base and releative URIs, with control of character escaping.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public Uri(Uri baseUri, string relativeUri(<br>   <font color="#008080"><a href="../../System/types/Uri.html">Uri</a> <i>baseUri</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>relativeUri</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>dontEscape</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>baseUri</i><br><dl>
+<dd>
+<param> The base URI.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>relativeUri</i><br><dl>
+<dd>
+<param> The relative URI to add to the base URI.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>dontEscape</i><br><dl>
+<dd>
+<param><b>true</b> if the URI contains escape characters; otherwise, <b>false</b>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/UriFormatException.html">UriFormatException</a></td>
+<td> The URI formed by combining <i>baseUri</i> and <i>relativeUri</i> is empty.<p> -or- </p>
+<p> The scheme specified in the URI formed by combining <i>baseUri</i> and <i>relativeUri</i> is invalid.</p>
+<p> -or- </p>
+<p> Ehe URI formed by combining <i>baseUri</i> and <i>relativeUri</i> contains too many slashes.</p>
+<p> -or- </p>
+<p> The password specified in the URI formed by combining <i>baseUri</i> and <i>relativeUri</i> is invalid.</p>
+<p> -or- </p>
+<p> The host name specified in the URI formed by combining <i>baseUri</i> and <i>relativeUri</i> is invalid.</p>
+<p> -or- </p>
+<p> The file name specified in the URI formed by combining <i>baseUri</i> and <i>relativeUri</i> is invalid.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This constructor creates a  <a href="../../System/types/Uri.html">Uri</a> instance by combining <i>baseUri</i> and <i>relativeUri</i>. If the URI passed in <i>relativeUri</i> is an absolute URI (containing a scheme, hostname, and optionally a port number) the  <a href="../../System/types/Uri.html">Uri</a> instance is created using only <i>relativeUri</i>. The caller must set <i>dontEscape</i> to <b>true</b> if the URI is already escaped.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a new instance of the  <a href="../../System/types/Uri.html">Uri</a> class by combining the relative URIs http://www.contoso.com and Hello%20World.htm to form an absolute URI. Because the URI contains escaped characters, the third parameter, <i>dontEscape</i>, is set to <b>true</b>.<pre>
+Uri baseUri = new Uri("http://www.contoso.com");
+ Uri myUri = new Uri(baseUri, "Hello%20World.htm",true);
+   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="SchemeDelimiterTopic1"></a><a name="SchemeDelimiter">SchemeDelimiter</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Specifies the characters that separate the communication protocol scheme from the address portion of the URI. This field is read-only.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static readonly <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">string</a> SchemeDelimiter;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="UriSchemeFileTopic1"></a><a name="UriSchemeFile">UriSchemeFile</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Specifies that the URI is a pointer to a file. This field is read-only.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static readonly <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">string</a> UriSchemeFile;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="UriSchemeFtpTopic1"></a><a name="UriSchemeFtp">UriSchemeFtp</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Specifies that the URI is accessed through the File Transfer Protocol (FTP). This field is read-only.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static readonly <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">string</a> UriSchemeFtp;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="UriSchemeGopherTopic1"></a><a name="UriSchemeGopher">UriSchemeGopher</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Specifies that the URI is accessed through the Gopher protocol. This field is read-only.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static readonly <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">string</a> UriSchemeGopher;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="UriSchemeHttpTopic1"></a><a name="UriSchemeHttp">UriSchemeHttp</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Specifies that the URI is accessed through the Hypertext Transfer Protocol (HTTP). This field is read-only.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static readonly <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">string</a> UriSchemeHttp;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="UriSchemeHttpsTopic1"></a><a name="UriSchemeHttps">UriSchemeHttps</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Specifies that the URI is accessed through the Secure Hypertext Transfer Protocol (HTTPS). This field is read-only.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static readonly <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">string</a> UriSchemeHttps;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="UriSchemeMailtoTopic1"></a><a name="UriSchemeMailto">UriSchemeMailto</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Specifies that the URI is an email address and is accessed through the Simple Network Mail Protocol (SNMP). This field is read-only.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static readonly <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">string</a> UriSchemeMailto;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="UriSchemeNewsTopic1"></a><a name="UriSchemeNews">UriSchemeNews</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Specifes that the URI is an Internet news group and is accessed through the Network News Transport Protocol (NNTP). This field is read-only.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static readonly <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">string</a> UriSchemeNews;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Field: <i><a name="UriSchemeNntpTopic1"></a><a name="UriSchemeNntp">UriSchemeNntp</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Specifes that the URI is an Internet news group and is accessed through the Network News Transport Protocol (NNTP). This field is read-only.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static readonly <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">string</a> UriSchemeNntp;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="AbsolutePathTopic1"></a><a name="AbsolutePath">AbsolutePath</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the absolute path of the URI.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> AbsolutePath {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#AbsolutePath">Uri.AbsolutePath</a> property contains the path information that the server uses to resolve requests for information. Typically this is the path to the desired information on the server's file system, although it also can indicate the application or script the server must run to provide the information.<p> The path information does not include the scheme, host name, or query portion of the URI. The  <a href="#AbsolutePath">Uri.AbsolutePath</a> property always returns at least a slash (/).</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes the path /catalog/shownew.htm to the console.<pre>
+Uri baseUri = new Uri("http://www.contoso.com/");
+ Uri myUri = new Uri(baseUri, "catalog/shownew.htm?date=today");
+ 
+ Console.WriteLine(myUri.AbsolutePath);
+   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="AbsoluteUriTopic1"></a><a name="AbsoluteUri">AbsoluteUri</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the absolute URI.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> AbsoluteUri {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#AbsoluteUri">Uri.AbsoluteUri</a> property includes the entire URI stored in the  <a href="../../System/types/Uri.html">Uri</a> instance, including all fragments and query strings.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes the complete contents of the  <a href="../../System/types/Uri.html">Uri</a> instance to the console. In the example shown, http://www.contoso.com/catalog/shownew.htm?date=today is written to the console: <pre>
+Uri baseUri= new Uri("http://www.contoso.com");
+ Uri myUri = new Uri(baseUri,"catalog/shownew.htm?date=today");
+ Console.WriteLine(myUri.AbsoluteUri);
+   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="AuthorityTopic1"></a><a name="Authority">Authority</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the Domain Name System (DNS) host name or IP address and the port number for a server.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> Authority {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The Authority property returns the fully qualified DNS host name or IP address of the server specified in the URI, along with the port number for nondefault ports.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes the host name (www.contoso.com ) and port number (8080) of the server to the console.<pre>
+ Uri baseUri = new Uri("http://www.contoso.com:8080/");
+ Uri myUri = new Uri(baseUri,"shownew.htm?date=today");
+ 
+ Console.WriteLine(myUri.Authority);
+   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="FragmentTopic1"></a><a name="Fragment">Fragment</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the escaped fragment.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> Fragment {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#Fragment">Uri.Fragment</a> property gets any text following a fragment marker (#) in the URI, including the fragment marker itself. Given the URI http://www.contoso.com/index.htm#main , the fragment property would get #main.<p> The  <a href="#Fragment">Uri.Fragment</a> property is not considered in any  <a href="#Equals(System.Object)">Uri.Equals</a> comparison.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="HostTopic1"></a><a name="Host">Host</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the Domain Name System (DNS) host name, or IP address of the server specified in the URI.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> Host {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#Host">Uri.Host</a> property gets the fully qualified DNS host name or IP address of the server specified in the URI.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes the host name (www.contoso.com ) of the server to the console.<pre>
+Uri baseUri = new Uri("http://www.contoso.com:8080/");
+Uri myUri = new Uri(baseUri, "shownew.htm?date=today");
+ 
+ Console.WriteLine(myUri.Host);
+   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="HostNameTypeTopic1"></a><a name="HostNameType">HostNameType</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the type of the host name specified in the URI.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/UriHostNameType.html">UriHostNameType</a> HostNameType {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsDefaultPortTopic1"></a><a name="IsDefaultPort">IsDefaultPort</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether the port value of the URI is the default for this scheme.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> IsDefaultPort {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsFileTopic1"></a><a name="IsFile">IsFile</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether the specified  <a href="../../System/types/Uri.html">Uri</a> is a file URI.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> IsFile {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#IsFile">Uri.IsFile</a> property is <b>true</b> when the  <a href="#Scheme">Uri.Scheme</a> property equals  <a href="#UriSchemeFile">Uri.UriSchemeFile</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsLoopbackTopic1"></a><a name="IsLoopback">IsLoopback</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether the specified  <a href="../../System/types/Uri.html">Uri</a> references the local host.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> IsLoopback {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd><b>IsLoopback</b> returns <b>true</b> if the specified <b>Uri</b> address is either 127.0.0.1, loopback, or localhost. All other addresses return <b>false</b>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsUncTopic1"></a><a name="IsUnc">IsUnc</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether the specified  <a href="../../System/types/Uri.html">Uri</a> is a universal naming convention (UNC) path.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> IsUnc {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#IsUnc">Uri.IsUnc</a> property is <b>true</b> if the specified  <a href="../../System/types/Uri.html">Uri</a> instance is a UNC path (suc as \\server\folder ).</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="LocalPathTopic1"></a><a name="LocalPath">LocalPath</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a local operating-system representation of a file name.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> LocalPath {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="PathAndQueryTopic1"></a><a name="PathAndQuery">PathAndQuery</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the  <a href="#AbsolutePath">Uri.AbsolutePath</a> and  <a href="#Query">Uri.Query</a> properties separated by a question mark (?).</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> PathAndQuery {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#PathAndQuery">Uri.PathAndQuery</a> property contains the absolute path on the server and the query information sent with the request. It is identical to concatenating the  <a href="#AbsolutePath">Uri.AbsolutePath</a> and  <a href="#Query">Uri.Query</a> properties.<p> The  <a href="#PathAndQuery">Uri.PathAndQuery</a> property is escaped according to RFC 2396.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes the URI's path (/catalog/shownew.htm) and query (date= today) information to the console.<pre>
+Uri baseUri = new Uri("http://www.contoso.com/");
+ Uri myUri = new Uri(baseUri, "catalog/shownew.htm?date=today");
+ 
+ Console.WriteLine(myUri.PathAndQuery);
+   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="PortTopic1"></a><a name="Port">Port</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the port number of the specified URI.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> Port {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The port number defines the protocol port used for contacting the server referenced in the URI. If a port is not is not specified as part of the URI, the  <a href="#Port">Uri.Port</a> property returns the default value for the protocol.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes the URI's port number to the console. In this case, the value is the default port number for HTTP, port 80.<pre>
+Uri baseUri = new Uri("http://www.contoso.com/");
+ Uri myUri = new Uri(baseUri,"catalog/shownew.htm?date=today");
+ 
+ Console.WriteLine(myUri.Port);
+   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="QueryTopic1"></a><a name="Query">Query</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets any query information included in the specified URI.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> Query {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#Query">Uri.Query</a> property contains any query information included in the URI. Query information is separated from the path information by a question mark (?) and continues to the end of the URI. The query information returned includes the leading question mark.<p> The query information is escaped according to RFC 2396.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes the query ?date= today to the console.<pre>
+Uri baseUri = new Uri("http://www.contoso.com/");
+ Uri myUri = new Uri(baseUri, "catalog/shownew.htm?date=today");
+ 
+ Console.WriteLine(myUri.Query);
+   
+	. . . 
+Uri baseUri = new Uri("http://www.contoso.com/");
+ Uri myUri = new Uri(baseUri, "catalog/shownew.htm?date=today");
+ 
+ Console.WriteLine(myUri.Query);
+   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="SchemeTopic1"></a><a name="Scheme">Scheme</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the scheme name of the specified URI.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> Scheme {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The following table lists the valid scheme names for the  <a href="#Scheme">Uri.Scheme</a> property.<br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  Scheme
+                </TH>
+<TH>
+                  Description
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+                  file
+                </TD>
+<TD>
+                  The
+                  resource is a file on the local computer.
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  ftp
+                </TD>
+<TD>
+                  The resource is through FTP.
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  gopher
+                </TD>
+<TD>
+                  The
+                  resource is accessed through the Gopher protocol.
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  http
+                </TD>
+<TD>
+                  The resource is accessed through HTTP.
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  https
+                </TD>
+<TD>
+                  The resource is accessed
+                  through secure HTTP.
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  mailto
+                </TD>
+<TD>
+                  The resource is an e-mail
+                  address and accessed through SMTP.
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  news
+                </TD>
+<TD>
+                  The resources is accessed through NNTP.
+                </TD>
+</TR>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes the scheme name (http) to the console for the URI http://www.contoso.com/ .<pre>
+Uri baseUri = new Uri("http://www.contoso.com/");
+ Uri myUri = new Uri(baseUri, "catalog/shownew.htm?date=today");
+ 
+ Console.WriteLine(myUri.Scheme);
+   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="SegmentsTopic1"></a><a name="Segments">Segments</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an array of the segments that make up the specified URI.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string[]</a> Segments {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="UserEscapedTopic1"></a><a name="UserEscaped">UserEscaped</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Indicates that the URI string was escaped before the  <a href="../../System/types/Uri.html">Uri</a> instance was created.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> UserEscaped {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#UserEscaped">Uri.UserEscaped</a> property is set to <b>true</b> to indicate that the string used to create the  <a href="../../System/types/Uri.html">Uri</a> instance was escaped before it was passed to the constructor; that is, the <i>dontEscape</i> parameter of the constructor call was set to <b>true</b>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example writes the value (<b>true</b>) of the  <a href="#UserEscaped">Uri.UserEscaped</a> property to the console.<pre>
+Uri myUri = new Uri("http://www.contoso.com/thick%20and%20thin.htm",true);
+
+ Console.WriteLine(myUri.UserEscaped);
+   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="UserInfoTopic1"></a><a name="UserInfo">UserInfo</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the user name, password, and other user-specific information associated with the specified URI.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> UserInfo {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CanonicalizeTopic1"></a><a name="Canonicalize">Canonicalize</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd></dd>
+</dl>
+<dl>
+<dd>
+<font color="#FF0000"><b><i>
+								This type supports the Shared Source CLI infrastructure and is not intended to be used directly from your code.
+							</i></b></font>
+</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual void Canonicalize();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CheckHostNameTopic1"></a><a name="CheckHostName(System.String)">CheckHostName</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines whether the specified host name is valid.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/UriHostNameType.html">UriHostNameType</a> CheckHostName(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>name</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>name</i><br><dl>
+<dd>
+<param> The host name to validate.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the host name is valid; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#CheckHostName(System.String)">Uri.CheckHostName</a> method checks that the host name provided meets the requirements for a valid Internet host name. It does not, however, perform a host-name lookup to verify the existence of the host.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example checks the host name is checked for validity.<pre>
+Console.WriteLine(Uri.CheckHostName("www.contoso.com"));
+   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CheckSchemeNameTopic1"></a><a name="CheckSchemeName(System.String)">CheckSchemeName</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>schemeName</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines whether the specified scheme name is valid.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Boolean.html">bool</a> CheckSchemeName(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>schemeName</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>schemeName</i><br><dl>
+<dd>
+<param> The scheme name to validate.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the scheme name is valid; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The CheckSchemeName method checks the scheme name for validity according to RFC 2396. The scheme name must begin with a letter, and must contain only letters, digits, and the characters ".", "+", or "-".</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CheckSecurityTopic1"></a><a name="CheckSecurity">CheckSecurity</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd></dd>
+</dl>
+<dl>
+<dd>
+<font color="#FF0000"><b><i>
+								This type supports the Shared Source CLI infrastructure and is not intended to be used directly from your code.
+							</i></b></font>
+</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual void CheckSecurity();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CreateObjRefTopic1"></a><a name="CreateObjRef(System.Type)">CreateObjRef</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>requestedType</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/MarshalByRefObject.html#CreateObjRef(System.Type)">System.MarshalByRefObject.CreateObjRef</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates an object that contains all the relevant information required to generate a proxy used to communicate with a remote object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System.Runtime.Remoting/types/ObjRef.html">ObjRef</a> CreateObjRef(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>requestedType</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>requestedType</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Type.html">Type</a> of the object that the new  <a href="../../System.Runtime.Remoting/types/ObjRef.html">ObjRef</a> will reference.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> Information required to generate a proxy.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Remoting/types/RemotingException.html">RemotingException</a></td>
+<td> This instance is not a valid remoting object.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>comparand</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Compares two  <a href="../../System/types/Uri.html">Uri</a> instances for equality.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>comparand</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>comparand</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Uri.html">Uri</a> instance to compare with the current instance.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the two  <a href="../../System/types/Uri.html">Uri</a> instances contain the same URI; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#Equals(System.Object)">Uri.Equals</a> method compares two URI instances without regard to any fragments that they might contain. For instance, given the URIs http://www.contoso.com/index.htm#search and http://www.contoso.com/index.htm the  <a href="#Equals(System.Object)">Uri.Equals</a> method would return <b>true</b>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EscapeTopic1"></a><a name="Escape">Escape</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd></dd>
+</dl>
+<dl>
+<dd>
+<font color="#FF0000"><b><i>
+								This type supports the Shared Source CLI infrastructure and is not intended to be used directly from your code.
+							</i></b></font>
+</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual void Escape();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EscapeStringTopic1"></a><a name="EscapeString(System.String)">EscapeString</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>str</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Converts a string to its escaped representation.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected static <a href="../../System/types/String.html">string</a> EscapeString(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>str</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>str</i><br><dl>
+<dd>
+<param> The string to transform to its escaped representation.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The escaped representation of the string.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#EscapeString(System.String)">Uri.EscapeString</a> method converts all characters with an ASCII value greater than 127 to hexidecimal representation.<p> The string is escaped according to RFC 2396.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~Uri();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FromHexTopic1"></a><a name="FromHex(System.Char)">FromHex</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>digit</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the decimal value of a hexadecimal digit.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Int32.html">int</a> FromHex(<br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>digit</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>digit</i><br><dl>
+<dd>
+<param> The hexadecimal digit (0-9, a-f, A-F) to convert.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A number from 1 - 15 that corresponds to the specified hexadecimal digit.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>digit</i> is not a valid hexadecimal digit (0-9, a-f, A-F).</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#FromHex(System.Char)">Uri.FromHex</a> method converts a character representing a hexadecimal digit (0-9, a-f, A-F) to its decimal value (0-15). If digit is not a valid hexadecimal digit,  <a href="../../System/types/ArgumentException.html">ArgumentException</a> is thrown.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the hash code for the specified URI.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The hash value generated for the URI.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#GetHashCode">Uri.GetHashCode</a> method generates the URI's hash value without including any fragment identifiers. For example, the URIs http://www.contoso.com/index.htm#search and http://www.contoso.com/index.htm yield the same hash code.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetLeftPartTopic1"></a><a name="GetLeftPart(System.UriPartial)">GetLeftPart</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/UriPartial.html">UriPartial</a> <i>part</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the specified portion of a URI.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> GetLeftPart(<br>   <font color="#008080"><a href="../../System/types/UriPartial.html">UriPartial</a> <i>part</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>part</i><br><dl>
+<dd>
+<param> One of the  <a href="../../System/types/UriPartial.html">UriPartial</a> values that specifies the the end of the portion of the URI to return.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A string containing the specified portion of the URI.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#GetLeftPart(System.UriPartial)">Uri.GetLeftPart</a> method returns a string containing the left-most portion of the URI, ending with the portion specified by <i>part</i>. The string returned includes delimiters but does not include any fragments or queries or their delimiters, except in certain cases.<p> <a href="#GetLeftPart(System.UriPartial)">Uri.GetLeftPart</a> includes delimiters in the following cases: </p>
+<UL>
+<li> <a href="../../System/types/UriPartial.html#Scheme">UriPartial.Scheme</a> has the scheme delimiter added.</li>
+<li> <a href="../../System/types/UriPartial.html#Authority">UriPartial.Authority</a> does not have the path delimiter added.</li>
+<li> <a href="../../System/types/UriPartial.html#Path">UriPartial.Path</a> includes any delimiters in the original URI up to the query or fragment delimiter.</li>
+</UL>
+<p> The following examples show a URI and the results of calling  <a href="#GetLeftPart(System.UriPartial)">Uri.GetLeftPart</a> with  <a href="../../System/types/UriPartial.html#Scheme">UriPartial.Scheme</a>,  <a href="../../System/types/UriPartial.html#Authority">UriPartial.Authority</a>, or  <a href="../../System/types/UriPartial.html#Path">UriPartial.Path</a>.</p><br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  URI
+                </TH>
+<TH>
+                  Scheme
+                </TH>
+<TH>
+                  Authority
+                </TH>
+<TH>
+                  Path
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+                  http://www.contoso.com/index.htm#main
+                </TD>
+<TD>
+                  http://
+                </TD>
+<TD>
+                  http://www.contoso.com
+                </TD>
+<TD>
+                  http://www.contoso.com/
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  mailto:user@contoso.com?subject=uri
+                </TD>
+<TD>
+                  mailto:
+                </TD>
+<TD></TD>
+<TD>
+                  mailto:user@contoso.com
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  nntp://news.contoso.com/123456@contoso.com
+                </TD>
+<TD>
+                  nntp://
+                </TD>
+<TD>
+                  nntp://news.contoso.com
+                </TD>
+<TD>
+                  nntp://news.contoso.com/123456@contoso.com
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  news:123456@contoso.com
+                </TD>
+<TD>
+                  news:
+                </TD>
+<TD></TD>
+<TD>
+                  news:123456@contoso.com
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  file://server/filename.ext
+                </TD>
+<TD>
+                  file://
+                </TD>
+<TD>
+                  file://server
+                </TD>
+<TD>
+                  file://server/filename.ext
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  file:/filename.ext
+                </TD>
+<TD>
+                  file:
+                </TD>
+<TD></TD>
+<TD>
+                  file:/filename.ext
+                </TD>
+</TR>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetLifetimeServiceTopic1"></a><a name="GetLifetimeService">GetLifetimeService</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/MarshalByRefObject.html#GetLifetimeService">System.MarshalByRefObject.GetLifetimeService</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves the current lifetime service object that controls the lifetime policy for this instance.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> GetLifetimeService();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An object of type  <a href="../../System.Runtime.Remoting.Lifetime/types/ILease.html">ILease</a> used to control the lifetime policy for this instance.</dd>
+</dl><b>Remarks</b><dl>
+<dd> For more information about lifetime services, see the  <a href="../../System.Runtime.Remoting.Lifetime/types/LifetimeServices.html">LifetimeServices</a> class.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="HexEscapeTopic1"></a><a name="HexEscape(System.Char)">HexEscape</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>character</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Converts a specified character into its hexadecimal equivalent.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/String.html">string</a> HexEscape(<br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>character</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>character</i><br><dl>
+<dd>
+<param> The character to convert to hexadecimal representation.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The hexadecimal representation of the specified character.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>character</i> is greater than 255.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="HexUnescapeTopic1"></a><a name="HexUnescape(System.String,System.Int32)">HexUnescape</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>pattern</i>,</font><br>   <font color="#008080"><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">ref</a> <i>int index</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Converts a specified hexadecimal representation of a character to the character.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Char.html">char</a> HexUnescape(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>pattern</i>,</font><br>   <font color="#008080"><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">ref</a> <i>int index</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>pattern</i><br><dl>
+<dd>
+<param> The hexadecimal representation of a character.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The location in <i>pattern</i> where the hexadecimal representation of a character begins.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The character represented by the hexadecimal encoding at position <i>index</i>. If the character at <i>index</i> is not hexadecimal encoded, the character at <i>index</i> is returned. The value of <i>index</i> is incremented to point to the character following the one returned.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="InitializeLifetimeServiceTopic1"></a><a name="InitializeLifetimeService">InitializeLifetimeService</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/MarshalByRefObject.html#InitializeLifetimeService">System.MarshalByRefObject.InitializeLifetimeService</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Obtains a lifetime service object to control the lifetime policy for this instance.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> InitializeLifetimeService();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An object of type  <a href="../../System.Runtime.Remoting.Lifetime/types/ILease.html">ILease</a> used to control the lifetime policy for this instance. This is the current lifetime service object for this instance if one exists; otherwise, a new lifetime service object initialized to the value of the  <a href="../../System.Runtime.Remoting.Lifetime/types/LifetimeServices.html#LeaseManagerPollTime">LifetimeServices.LeaseManagerPollTime</a> property.</dd>
+</dl><b>Remarks</b><dl>
+<dd> For more information about lifetime services, see the  <a href="../../System.Runtime.Remoting.Lifetime/types/LifetimeServices.html">LifetimeServices</a> class.</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example demonstrates creating a lease.<pre>
+ public class MyClass : MarshalByRefObject
+ {
+   public override Object InitializeLifetimeService()
+   {
+     ILease lease = (ILease)base.InitializeLifetimeService();
+     if (lease.CurrentState == LeaseState.Initial)
+     {
+          lease.InitialLeaseTime = TimeSpan.FromMinutes(1);
+          lease.SponsorshipTimeout = TimeSpan.FromMinutes(2);
+           lease.RenewOnCallTime = TimeSpan.FromSeconds(2);
+     }
+       return lease;
+   }
+ }
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IsBadFileSystemCharacterTopic1"></a><a name="IsBadFileSystemCharacter(System.Char)">IsBadFileSystemCharacter</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>character</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd></dd>
+</dl>
+<dl>
+<dd>
+<font color="#FF0000"><b><i>
+								This type supports the Shared Source CLI infrastructure and is not intended to be used directly from your code.
+							</i></b></font>
+</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual bool IsBadFileSystemCharacter(<br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>character</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>character</i><br><dl>
+<dd>
+<param>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IsExcludedCharacterTopic1"></a><a name="IsExcludedCharacter(System.Char)">IsExcludedCharacter</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>character</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd></dd>
+</dl>
+<dl>
+<dd>
+<font color="#FF0000"><b><i>
+								This type supports the Shared Source CLI infrastructure and is not intended to be used directly from your code.
+							</i></b></font>
+</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected static bool IsExcludedCharacter(<br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>character</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>character</i><br><dl>
+<dd>
+<param>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IsHexDigitTopic1"></a><a name="IsHexDigit(System.Char)">IsHexDigit</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>character</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines whether a specified character is a valid hexadecimal digit.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Boolean.html">bool</a> IsHexDigit(<br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>character</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>character</i><br><dl>
+<dd>
+<param> The character to validate.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the character is a valid hexadecimal digit; otherwise <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> Hexadecimal digits are the digits 0-9 and the letters A-F or a-f.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IsHexEncodingTopic1"></a><a name="IsHexEncoding(System.String,System.Int32)">IsHexEncoding</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>pattern</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines whether a string is hexadecimal encoded.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System/types/Boolean.html">bool</a> IsHexEncoding(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>pattern</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>pattern</i><br><dl>
+<dd>
+<param> The string to check.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The location in <i>pattern </i> to check for hexadecimal encoding.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if <i>pattern</i> is hexadecimal encoded at the specified location; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#IsHexEncoding(System.String,System.Int32)">Uri.IsHexEncoding</a> method checks for hexadecimal encoding that follows the pattern "%hexhex" in a string, where "hex" is a digit from 0-9 or or a letter from A-F (case-insensitive).</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IsReservedCharacterTopic1"></a><a name="IsReservedCharacter(System.Char)">IsReservedCharacter</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>character</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd></dd>
+</dl>
+<dl>
+<dd>
+<font color="#FF0000"><b><i>
+								This type supports the Shared Source CLI infrastructure and is not intended to be used directly from your code.
+							</i></b></font>
+</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual bool IsReservedCharacter(<br>   <font color="#008080"><a href="../../System/types/Char.html">char</a> <i>character</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>character</i><br><dl>
+<dd>
+<param>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MakeRelativeTopic1"></a><a name="MakeRelative(System.Uri)">MakeRelative</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Uri.html">Uri</a> <i>toUri</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines the difference between two  <a href="../../System/types/Uri.html">Uri</a> instances.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> MakeRelative(<br>   <font color="#008080"><a href="../../System/types/Uri.html">Uri</a> <i>toUri</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>toUri</i><br><dl>
+<dd>
+<param> The URI to compare to the current URI.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> If the two URIs are the same except for the path information, then that difference; if the two have additional differences, the absolute URI of <i>toUri</i>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ParseTopic1"></a><a name="Parse">Parse</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd></dd>
+</dl>
+<dl>
+<dd>
+<font color="#FF0000"><b><i>
+								This type supports the Shared Source CLI infrastructure and is not intended to be used directly from your code.
+							</i></b></font>
+</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual void Parse();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the display string for the specified  <a href="../../System/types/Uri.html">Uri</a> instance.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/String.html">string</a> ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The string containing the unescaped display name of the  <a href="../../System/types/Uri.html">Uri</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="UnescapeTopic1"></a><a name="Unescape(System.String)">Unescape</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd></dd>
+</dl>
+<dl>
+<dd>
+<font color="#FF0000"><b><i>
+								This type supports the Shared Source CLI infrastructure and is not intended to be used directly from your code.
+							</i></b></font>
+</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual string Unescape(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>path</i><br><dl>
+<dd>
+<param>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

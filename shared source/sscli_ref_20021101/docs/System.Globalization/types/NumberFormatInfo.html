@@ -1,0 +1,2177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Globalization.NumberFormatInfo</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Globalization.NumberFormatInfo Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Globalization<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Defines how numeric values are formatted and displayed, depending on the culture.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public sealed class NumberFormatInfo : ICloneable, IFormatProvider</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Thread Safety</b><br><dl>
+<dd> This type is safe for multithreaded operations.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This class contains information, such as currency, decimal separators, and other numeric symbols.<p> To create a  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> for a specific culture, create a  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> for that culture and retrieve the  <a href="../../System.Globalization/types/CultureInfo.html#NumberFormat">CultureInfo.NumberFormat</a> property. To create a  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> for the culture of the current thread, use the  <a href="#CurrentInfo">NumberFormatInfo.CurrentInfo</a> property. To create a  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> for the invariant culture, use the  <a href="#InvariantInfo">NumberFormatInfo.InvariantInfo</a> property for a read-only version, or use the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> constructor for a writable version. It is not possible to create a  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> for a neutral culture.</p>
+<p> The user might choose to override some of the values associated with the current culture of Windows through Regional and Language Options (or Regional Options or Regional Settings) in Control Panel. For example, the user might choose to display the date in a different format or to use a currency other than the default for the culture. If the  <a href="../../System.Globalization/types/CultureInfo.html#UseUserOverride">CultureInfo.UseUserOverride</a> property is set to <b>true</b>, the properties of the  <a href="../../System.Globalization/types/CultureInfo.html#DateTimeFormat">CultureInfo.DateTimeFormat</a> instance, the  <a href="../../System.Globalization/types/CultureInfo.html#NumberFormat">CultureInfo.NumberFormat</a> instance, and the  <a href="../../System.Globalization/types/CultureInfo.html#TextInfo">CultureInfo.TextInfo</a> instance are also retrieved from the user settings. If the user settings are incompatible with the culture associated with the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> (for example, if the selected calendar is not one of the  <a href="../../System.Globalization/types/CultureInfo.html#OptionalCalendars">CultureInfo.OptionalCalendars</a>), the results of the methods and the values of the properties are undefined.</p>
+<p> Numeric values are formatted using standard or custom patterns stored in the properties of a  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a>. To modify how a value is displayed, the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> must be writable so custom patterns can be saved in its properties.</p>
+<p> The following table lists the standard format characters for each standard pattern and the associated  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> property that can be set to modify the standard pattern.</p><br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+              Format Character
+            </TH>
+<TH>
+              Description and Associated Properties
+            </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+              c, C
+            </TD>
+<TD>
+              Currency format.
+               <a href="#CurrencyNegativePattern">NumberFormatInfo.CurrencyNegativePattern</a>
+              ,
+               <a href="#CurrencyPositivePattern">NumberFormatInfo.CurrencyPositivePattern</a>
+              ,
+               <a href="#CurrencySymbol">NumberFormatInfo.CurrencySymbol</a>
+              ,
+               <a href="#CurrencyGroupSizes">NumberFormatInfo.CurrencyGroupSizes</a>
+              ,
+               <a href="#CurrencyGroupSeparator">NumberFormatInfo.CurrencyGroupSeparator</a>
+              ,
+               <a href="#CurrencyDecimalDigits">NumberFormatInfo.CurrencyDecimalDigits</a>
+              ,
+               <a href="#CurrencyDecimalSeparator">NumberFormatInfo.CurrencyDecimalSeparator</a>
+              .
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              d, D
+            </TD>
+<TD>
+              Decimal format.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              e, E
+            </TD>
+<TD>
+              Scientific (exponential) format.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              f, F
+            </TD>
+<TD>
+              Fixed-point format.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              g, G
+            </TD>
+<TD>
+              General format.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              n, N
+            </TD>
+<TD>
+              Number format.
+               <a href="#NumberNegativePattern">NumberFormatInfo.NumberNegativePattern</a>
+              ,
+               <a href="#NumberGroupSizes">NumberFormatInfo.NumberGroupSizes</a>
+              ,
+               <a href="#NumberGroupSeparator">NumberFormatInfo.NumberGroupSeparator</a>
+              ,
+               <a href="#NumberDecimalDigits">NumberFormatInfo.NumberDecimalDigits</a>
+              ,
+               <a href="#NumberDecimalSeparator">NumberFormatInfo.NumberDecimalSeparator</a>
+              .
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              r, R
+            </TD>
+<TD>
+              Roundtrip format, which ensures that numbers converted to strings will have the same value when they are converted back to numbers.
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              x, X
+            </TD>
+<TD>
+              Hexadecimal format.
+            </TD>
+</TR>
+</table>
+<p> A  <a href="../../System.Globalization/types/DateTimeFormatInfo.html">DateTimeFormatInfo</a> or a  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> can be created only for the invariant culture or for specific cultures, not for neutral cultures. For more information about the invariant culture, specific cultures, and neutral cultures, see the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> class.</p>
+<p> This class implements the  <a href="../../System/types/ICloneable.html">ICloneable</a> interface to enable duplication of  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> objects. It also implements  <a href="../../System/types/IFormatProvider.html">IFormatProvider</a> to supply formatting information to applications.</p>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Globalization/System.Globalization.html">System.Globalization Namespace</a> |  <a href="../../System/types/Decimal.html">Decimal</a> |  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconformattingoverview.asp">MSDN: formattingoverview</a></dd>
+</dl>
+<h3>System.Globalization.NumberFormatInfo Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%">Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Initializes a new writable instance of the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> class that is culture-independent (invariant).</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#CurrencyDecimalDigits">CurrencyDecimalDigits</a></td>
+<td width="55%"><b>Read-write</b><br><br> Indicates the number of decimal places to use in currency values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CurrencyDecimalSeparator">CurrencyDecimalSeparator</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the string to use as the decimal separator in currency values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CurrencyGroupSeparator">CurrencyGroupSeparator</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the string that separates groups of digits to the left of the decimal in currency values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CurrencyGroupSizes">CurrencyGroupSizes</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the number of digits in each group to the left of the decimal in currency values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CurrencyNegativePattern">CurrencyNegativePattern</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the format pattern for negative currency values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CurrencyPositivePattern">CurrencyPositivePattern</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the format pattern for positive currency values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CurrencySymbol">CurrencySymbol</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the string to use as the currency symbol.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CurrentInfo">CurrentInfo</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a read-only  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> that formats values based on the current culture.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#InvariantInfo">InvariantInfo</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the default read-only  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> that is culture-independent (invariant).</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsReadOnly">IsReadOnly</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a value indicating whether the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#NaNSymbol">NaNSymbol</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the string that represents the IEEE NaN (not a number) value.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#NegativeInfinitySymbol">NegativeInfinitySymbol</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the string that represents negative infinity.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#NegativeSign">NegativeSign</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the string that denotes that the associated number is negative.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#NumberDecimalDigits">NumberDecimalDigits</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the number of decimal places to use in numeric values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#NumberDecimalSeparator">NumberDecimalSeparator</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the string to use as the decimal separator in numeric values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#NumberGroupSeparator">NumberGroupSeparator</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the string that separates groups of digits to the left of the decimal in numeric values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#NumberGroupSizes">NumberGroupSizes</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the number of digits in each group to the left of the decimal in numeric values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#NumberNegativePattern">NumberNegativePattern</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the format pattern for negative numeric values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#PercentDecimalDigits">PercentDecimalDigits</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the number of decimal places to use in percent values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#PercentDecimalSeparator">PercentDecimalSeparator</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the string to use as the decimal separator in percent values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#PercentGroupSeparator">PercentGroupSeparator</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the string that separates groups of digits to the left of the decimal in percent values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#PercentGroupSizes">PercentGroupSizes</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the number of digits in each group to the left of the decimal in percent values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#PercentNegativePattern">PercentNegativePattern</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the format pattern for negative percent values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#PercentPositivePattern">PercentPositivePattern</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the format pattern for positive percent values.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#PercentSymbol">PercentSymbol</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the string to use as the percent symbol.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#PerMilleSymbol">PerMilleSymbol</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the string to use as the per mille symbol.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#PositiveInfinitySymbol">PositiveInfinitySymbol</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the string that represents positive infinity.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#PositiveSign">PositiveSign</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the string that denotes that the associated number is positive.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Clone">Clone</a></td>
+<td width="55%"> Creates a shallow copy of the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetFormat(System.Type)">GetFormat</a></td>
+<td width="55%"> Gets an object of the specified type that provides a number formatting service.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetInstance(System.IFormatProvider)">GetInstance</a></td>
+<td width="55%"> Gets the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> associated with the specified  <a href="../../System/types/IFormatProvider.html">IFormatProvider</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ReadOnly(System.Globalization.NumberFormatInfo)">ReadOnly</a></td>
+<td width="55%"> Returns a read-only  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> wrapper.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Globalization.NumberFormatInfo</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Globalization.NumberFormatInfo Member Details</h3><b><i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new writable instance of the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> class that is culture-independent (invariant).</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public NumberFormatInfo();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The properties of the new instance can be modified if you want user-defined formatting.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CurrencyDecimalDigitsTopic1"></a><a name="CurrencyDecimalDigits">CurrencyDecimalDigits</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Indicates the number of decimal places to use in currency values.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> CurrencyDecimalDigits {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The property is being set to a value that is less than 0 or greater than 99.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#CurrencyDecimalSeparator">NumberFormatInfo.CurrencyDecimalSeparator</a> |  <a href="#CurrencyGroupSeparator">NumberFormatInfo.CurrencyGroupSeparator</a> |  <a href="#CurrencyGroupSizes">NumberFormatInfo.CurrencyGroupSizes</a> |  <a href="#CurrencySymbol">NumberFormatInfo.CurrencySymbol</a> |  <a href="#CurrencyNegativePattern">NumberFormatInfo.CurrencyNegativePattern</a> |  <a href="#CurrencyPositivePattern">NumberFormatInfo.CurrencyPositivePattern</a> |  <a href="#NumberDecimalDigits">NumberFormatInfo.NumberDecimalDigits</a> |  <a href="#PercentDecimalDigits">NumberFormatInfo.PercentDecimalDigits</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CurrencyDecimalSeparatorTopic1"></a><a name="CurrencyDecimalSeparator">CurrencyDecimalSeparator</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the string to use as the decimal separator in currency values.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> CurrencyDecimalSeparator {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The property is being set to a value that is the same as  <a href="#NumberGroupSeparator">NumberFormatInfo.NumberGroupSeparator</a>,  <a href="#CurrencyGroupSeparator">NumberFormatInfo.CurrencyGroupSeparator</a>, or  <a href="#PercentGroupSeparator">NumberFormatInfo.PercentGroupSeparator</a>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The initial value of this property is derived from the settings in Regional and Language Options (or Regional Options or Regional Settings) in Control Panel. However, if any of the group separators ( <a href="#NumberGroupSeparator">NumberFormatInfo.NumberGroupSeparator</a>,  <a href="#CurrencyGroupSeparator">NumberFormatInfo.CurrencyGroupSeparator</a>, or  <a href="#PercentGroupSeparator">NumberFormatInfo.PercentGroupSeparator</a>) is the same as any of the decimal separators ( <a href="#NumberDecimalSeparator">NumberFormatInfo.NumberDecimalSeparator</a>,  <a href="#CurrencyDecimalSeparator">NumberFormatInfo.CurrencyDecimalSeparator</a>, or  <a href="#PercentDecimalSeparator">NumberFormatInfo.PercentDecimalSeparator</a>), parsing ambiguous strings produces unpredictable results. If you explicitly set any of the group separator properties in NumberFormatInfo to a value that is the same as any of the decimal separators or if you explicitly set any of the decimal separators to a value that is the same as any of the group separators, ArgumentException is thrown.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#CurrencyDecimalDigits">NumberFormatInfo.CurrencyDecimalDigits</a> |  <a href="#CurrencyGroupSeparator">NumberFormatInfo.CurrencyGroupSeparator</a> |  <a href="#CurrencyGroupSizes">NumberFormatInfo.CurrencyGroupSizes</a> |  <a href="#CurrencySymbol">NumberFormatInfo.CurrencySymbol</a> |  <a href="#CurrencyNegativePattern">NumberFormatInfo.CurrencyNegativePattern</a> |  <a href="#CurrencyPositivePattern">NumberFormatInfo.CurrencyPositivePattern</a> |  <a href="#NumberDecimalSeparator">NumberFormatInfo.NumberDecimalSeparator</a> |  <a href="#PercentDecimalSeparator">NumberFormatInfo.PercentDecimalSeparator</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CurrencyGroupSeparatorTopic1"></a><a name="CurrencyGroupSeparator">CurrencyGroupSeparator</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the string that separates groups of digits to the left of the decimal in currency values.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> CurrencyGroupSeparator {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The property is being set to a value that is the same as  <a href="#NumberDecimalSeparator">NumberFormatInfo.NumberDecimalSeparator</a>,  <a href="#CurrencyDecimalSeparator">NumberFormatInfo.CurrencyDecimalSeparator</a>, or  <a href="#PercentDecimalSeparator">NumberFormatInfo.PercentDecimalSeparator</a>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The initial value of this property is derived from the settings in Regional and Language Options (or Regional Options or Regional Settings) in Control Panel. However, if any of the group separators ( <a href="#NumberGroupSeparator">NumberFormatInfo.NumberGroupSeparator</a>,  <a href="#CurrencyGroupSeparator">NumberFormatInfo.CurrencyGroupSeparator</a>, or  <a href="#PercentGroupSeparator">NumberFormatInfo.PercentGroupSeparator</a>) is the same as any of the decimal separators ( <a href="#NumberDecimalSeparator">NumberFormatInfo.NumberDecimalSeparator</a>,  <a href="#CurrencyDecimalSeparator">NumberFormatInfo.CurrencyDecimalSeparator</a>, or  <a href="#PercentDecimalSeparator">NumberFormatInfo.PercentDecimalSeparator</a>), parsing ambiguous strings produces unpredictable results. If you explicitly set any of the group separator properties in NumberFormatInfo to a value that is the same as any of the decimal separators or if you explicitly set any of the decimal separators to a value that is the same as any of the group separators, ArgumentException is thrown.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#CurrencyDecimalDigits">NumberFormatInfo.CurrencyDecimalDigits</a> |  <a href="#CurrencyDecimalSeparator">NumberFormatInfo.CurrencyDecimalSeparator</a> |  <a href="#CurrencyGroupSizes">NumberFormatInfo.CurrencyGroupSizes</a> |  <a href="#CurrencySymbol">NumberFormatInfo.CurrencySymbol</a> |  <a href="#CurrencyNegativePattern">NumberFormatInfo.CurrencyNegativePattern</a> |  <a href="#CurrencyPositivePattern">NumberFormatInfo.CurrencyPositivePattern</a> |  <a href="#NumberGroupSeparator">NumberFormatInfo.NumberGroupSeparator</a> |  <a href="#PercentGroupSeparator">NumberFormatInfo.PercentGroupSeparator</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CurrencyGroupSizesTopic1"></a><a name="CurrencyGroupSizes">CurrencyGroupSizes</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the number of digits in each group to the left of the decimal in currency values.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int[]</a> CurrencyGroupSizes {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The property is being set and the array contains an entry that is less than 0 or greater than 9.<p> -or- </p>
+<p> The property is being set and the array contains an entry, other than the last entry, that is set to 0.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Every element in the one-dimensional array must be an integer from 1 through 9. The last element can be 0.<p> The first element of the array defines the number of elements in the least significant group of digits immediately to the left of the  <a href="#CurrencyDecimalSeparator">NumberFormatInfo.CurrencyDecimalSeparator</a>. Each subsequent element refers to the next significant group of digits to the left of the previous group. If the last element of the array is not 0, the remaining digits are grouped based on the last element of the array. If the last element is 0, the remaining digits are not grouped.</p>
+<p> For example, if the array contains { 3, 4, 5 }, the digits will be grouped similar to "$55,55555,55555,55555,4444,333.00". If the array contains { 3, 4, 0 }, the digits will be grouped similar to "$55555555555555555,4444,333.00".</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#CurrencyDecimalDigits">NumberFormatInfo.CurrencyDecimalDigits</a> |  <a href="#CurrencyDecimalSeparator">NumberFormatInfo.CurrencyDecimalSeparator</a> |  <a href="#CurrencyGroupSeparator">NumberFormatInfo.CurrencyGroupSeparator</a> |  <a href="#CurrencySymbol">NumberFormatInfo.CurrencySymbol</a> |  <a href="#CurrencyNegativePattern">NumberFormatInfo.CurrencyNegativePattern</a> |  <a href="#CurrencyPositivePattern">NumberFormatInfo.CurrencyPositivePattern</a> |  <a href="#NumberGroupSizes">NumberFormatInfo.NumberGroupSizes</a> |  <a href="#PercentGroupSizes">NumberFormatInfo.PercentGroupSizes</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CurrencyNegativePatternTopic1"></a><a name="CurrencyNegativePattern">CurrencyNegativePattern</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the format pattern for negative currency values.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> CurrencyNegativePattern {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The property is being set to a value that is less than 0 or greater than 15.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property can have one of the values in the following table. The symbol "$" is the  <a href="#CurrencySymbol">NumberFormatInfo.CurrencySymbol</a>, the symbol "-" is the  <a href="#NegativeSign">NumberFormatInfo.NegativeSign</a>, and <i>n</i> is a number.<br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  Value
+                </TH>
+<TH>
+                  Associated Pattern
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+                  0
+                </TD>
+<TD>
+                  ($n)
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  1
+                </TD>
+<TD>
+                  -$n
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  2
+                </TD>
+<TD>
+                  $-n
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  3
+                </TD>
+<TD>
+                  $n-
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  4
+                </TD>
+<TD>
+                  (n$)
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  5
+                </TD>
+<TD>
+                  -n$
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  6
+                </TD>
+<TD>
+                  n-$
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  7
+                </TD>
+<TD>
+                  n$-
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  8
+                </TD>
+<TD>
+                  -n $
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  9
+                </TD>
+<TD>
+                  -$ n
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  10
+                </TD>
+<TD>
+                  n $-
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  11
+                </TD>
+<TD>
+                  $ n-
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  12
+                </TD>
+<TD>
+                  $ -n
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  13
+                </TD>
+<TD>
+                  n- $
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  14
+                </TD>
+<TD>
+                  ($ n)
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  15
+                </TD>
+<TD>
+                  (n $)
+                </TD>
+</TR>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#CurrencyDecimalDigits">NumberFormatInfo.CurrencyDecimalDigits</a> |  <a href="#CurrencyDecimalSeparator">NumberFormatInfo.CurrencyDecimalSeparator</a> |  <a href="#CurrencyGroupSeparator">NumberFormatInfo.CurrencyGroupSeparator</a> |  <a href="#CurrencyGroupSizes">NumberFormatInfo.CurrencyGroupSizes</a> |  <a href="#CurrencySymbol">NumberFormatInfo.CurrencySymbol</a> |  <a href="#CurrencyPositivePattern">NumberFormatInfo.CurrencyPositivePattern</a> |  <a href="#NumberNegativePattern">NumberFormatInfo.NumberNegativePattern</a> |  <a href="#PercentNegativePattern">NumberFormatInfo.PercentNegativePattern</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CurrencyPositivePatternTopic1"></a><a name="CurrencyPositivePattern">CurrencyPositivePattern</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the format pattern for positive currency values.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> CurrencyPositivePattern {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The property is being set to a value that is less than 0 or greater than 3.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property can have one of the values in the following table. The symbol "$" is the  <a href="#CurrencySymbol">NumberFormatInfo.CurrencySymbol</a> and <i>n</i> is a number.<br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  Value
+                </TH>
+<TH>
+                  Associated Pattern
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+                  0
+                </TD>
+<TD>
+                  $n
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  1
+                </TD>
+<TD>
+                  n$
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  2
+                </TD>
+<TD>
+                  $ n
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  3
+                </TD>
+<TD>
+                  n $
+                </TD>
+</TR>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#CurrencyDecimalDigits">NumberFormatInfo.CurrencyDecimalDigits</a> |  <a href="#CurrencyDecimalSeparator">NumberFormatInfo.CurrencyDecimalSeparator</a> |  <a href="#CurrencyGroupSeparator">NumberFormatInfo.CurrencyGroupSeparator</a> |  <a href="#CurrencyGroupSizes">NumberFormatInfo.CurrencyGroupSizes</a> |  <a href="#CurrencySymbol">NumberFormatInfo.CurrencySymbol</a> |  <a href="#CurrencyNegativePattern">NumberFormatInfo.CurrencyNegativePattern</a> |  <a href="#PercentPositivePattern">NumberFormatInfo.PercentPositivePattern</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CurrencySymbolTopic1"></a><a name="CurrencySymbol">CurrencySymbol</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the string to use as the currency symbol.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> CurrencySymbol {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#CurrencyDecimalDigits">NumberFormatInfo.CurrencyDecimalDigits</a> |  <a href="#CurrencyDecimalSeparator">NumberFormatInfo.CurrencyDecimalSeparator</a> |  <a href="#CurrencyGroupSeparator">NumberFormatInfo.CurrencyGroupSeparator</a> |  <a href="#CurrencyGroupSizes">NumberFormatInfo.CurrencyGroupSizes</a> |  <a href="#CurrencyNegativePattern">NumberFormatInfo.CurrencyNegativePattern</a> |  <a href="#CurrencyPositivePattern">NumberFormatInfo.CurrencyPositivePattern</a> |  <a href="#NaNSymbol">NumberFormatInfo.NaNSymbol</a> |  <a href="#PercentSymbol">NumberFormatInfo.PercentSymbol</a> |  <a href="#PerMilleSymbol">NumberFormatInfo.PerMilleSymbol</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CurrentInfoTopic1"></a><a name="CurrentInfo">CurrentInfo</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a read-only  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> that formats values based on the current culture.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> CurrentInfo {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="InvariantInfoTopic1"></a><a name="InvariantInfo">InvariantInfo</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the default read-only  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> that is culture-independent (invariant).</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> InvariantInfo {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property does not change, regardless of the current culture.</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example displays the default property values of the  <a href="#InvariantInfo">NumberFormatInfo.InvariantInfo</a>.<pre>
+using System;
+using System.Globalization;
+using System.Text;
+
+class SamplesNumberFormatInfo  {
+
+   public static void Main()  {
+
+      // Gets the InvariantInfo.
+      NumberFormatInfo myInv = NumberFormatInfo.InvariantInfo;
+
+      // Gets a UnicodeEncoding to display the Unicode value of symbols.
+      UnicodeEncoding myUE = new UnicodeEncoding( true, false );
+      byte[] myCodes;
+
+      // Displays the default values for each of the properties.
+      Console.WriteLine( "InvariantInfo:\nNote: Symbols may not display correctly on the console,\ntherefore, Unicode values are included." );
+      Console.WriteLine( "\tCurrencyDecimalDigits\t\t{0}", myInv.CurrencyDecimalDigits );
+      Console.WriteLine( "\tCurrencyDecimalSeparator\t{0}", myInv.CurrencyDecimalSeparator );
+      Console.WriteLine( "\tCurrencyGroupSeparator\t\t{0}", myInv.CurrencyGroupSeparator );
+      Console.WriteLine( "\tCurrencyGroupSizes\t\t{0}", myInv.CurrencyGroupSizes[0] );
+      Console.WriteLine( "\tCurrencyNegativePattern\t\t{0}", myInv.CurrencyNegativePattern );
+      Console.WriteLine( "\tCurrencyPositivePattern\t\t{0}", myInv.CurrencyPositivePattern );
+      myCodes = myUE.GetBytes( myInv.CurrencySymbol );
+      Console.WriteLine( "\tCurrencySymbol\t\t\t{0}\t(U+{1:x2}{2:x2})", myInv.CurrencySymbol, myCodes[0], myCodes[1] );
+      Console.WriteLine( "\tNaNSymbol\t\t\t{0}", myInv.NaNSymbol );
+      Console.WriteLine( "\tNegativeInfinitySymbol\t\t{0}", myInv.NegativeInfinitySymbol );
+      Console.WriteLine( "\tNegativeSign\t\t\t{0}", myInv.NegativeSign );
+      Console.WriteLine( "\tNumberDecimalDigits\t\t{0}", myInv.NumberDecimalDigits );
+      Console.WriteLine( "\tNumberDecimalSeparator\t\t{0}", myInv.NumberDecimalSeparator );
+      Console.WriteLine( "\tNumberGroupSeparator\t\t{0}", myInv.NumberGroupSeparator );
+      Console.WriteLine( "\tNumberGroupSizes\t\t{0}", myInv.NumberGroupSizes[0] );
+      Console.WriteLine( "\tNumberNegativePattern\t\t{0}", myInv.NumberNegativePattern );
+      Console.WriteLine( "\tPercentDecimalDigits\t\t{0}", myInv.PercentDecimalDigits );
+      Console.WriteLine( "\tPercentDecimalSeparator\t\t{0}", myInv.PercentDecimalSeparator );
+      Console.WriteLine( "\tPercentGroupSeparator\t\t{0}", myInv.PercentGroupSeparator );
+      Console.WriteLine( "\tPercentGroupSizes\t\t{0}", myInv.PercentGroupSizes[0] );
+      Console.WriteLine( "\tPercentNegativePattern\t\t{0}", myInv.PercentNegativePattern );
+      Console.WriteLine( "\tPercentPositivePattern\t\t{0}", myInv.PercentPositivePattern );
+      myCodes = myUE.GetBytes( myInv.PercentSymbol );
+      Console.WriteLine( "\tPercentSymbol\t\t\t{0}\t(U+{1:x2}{2:x2})", myInv.PercentSymbol, myCodes[0], myCodes[1] );
+      myCodes = myUE.GetBytes( myInv.PerMilleSymbol );
+      Console.WriteLine( "\tPerMilleSymbol\t\t\t{0}\t(U+{1:x2}{2:x2})", myInv.PerMilleSymbol, myCodes[0], myCodes[1] );
+      Console.WriteLine( "\tPositiveInfinitySymbol\t\t{0}", myInv.PositiveInfinitySymbol );
+      Console.WriteLine( "\tPositiveSign\t\t\t{0}", myInv.PositiveSign );
+
+   }
+}
+
+
+/*
+
+This code produces the following output.
+
+InvariantInfo:
+Note: Symbols may not display correctly on the console,
+therefore, Unicode values are included.
+        CurrencyDecimalDigits           2
+        CurrencyDecimalSeparator        .
+        CurrencyGroupSeparator          ,
+        CurrencyGroupSizes              3
+        CurrencyNegativePattern         0
+        CurrencyPositivePattern         0
+        CurrencySymbol                         (U+00a4)
+        NaNSymbol                       NaN
+        NegativeInfinitySymbol          -Infinity
+        NegativeSign                    -
+        NumberDecimalDigits             2
+        NumberDecimalSeparator          .
+        NumberGroupSeparator            ,
+        NumberGroupSizes                3
+        NumberNegativePattern           1
+        PercentDecimalDigits            2
+        PercentDecimalSeparator         .
+        PercentGroupSeparator           ,
+        PercentGroupSizes               3
+        PercentNegativePattern          0
+        PercentPositivePattern          0
+        PercentSymbol                   %       (U+0025)
+        PerMilleSymbol                  %       (U+2030)
+        PositiveInfinitySymbol          Infinity
+        PositiveSign                    +
+
+*/
+
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsReadOnlyTopic1"></a><a name="IsReadOnly">IsReadOnly</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> IsReadOnly {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Attempting to perform an assignment to a property of a read-only  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> causes an  <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a>.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#ReadOnly(System.Globalization.NumberFormatInfo)">NumberFormatInfo.ReadOnly</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NaNSymbolTopic1"></a><a name="NaNSymbol">NaNSymbol</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the string that represents the IEEE NaN (not a number) value.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> NaNSymbol {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For more information on NaN values, see  <a href="../../System/types/Double.html">Double</a> or  <a href="../../System/types/Single.html">Single</a>.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#NumberDecimalDigits">NumberFormatInfo.NumberDecimalDigits</a> |  <a href="#NumberDecimalSeparator">NumberFormatInfo.NumberDecimalSeparator</a> |  <a href="#NumberGroupSeparator">NumberFormatInfo.NumberGroupSeparator</a> |  <a href="#NumberGroupSizes">NumberFormatInfo.NumberGroupSizes</a> |  <a href="#NumberNegativePattern">NumberFormatInfo.NumberNegativePattern</a> |  <a href="#CurrencySymbol">NumberFormatInfo.CurrencySymbol</a> |  <a href="#PercentSymbol">NumberFormatInfo.PercentSymbol</a> |  <a href="#PerMilleSymbol">NumberFormatInfo.PerMilleSymbol</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NegativeInfinitySymbolTopic1"></a><a name="NegativeInfinitySymbol">NegativeInfinitySymbol</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the string that represents negative infinity.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> NegativeInfinitySymbol {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For more information on negative infinity, see  <a href="../../System/types/Double.html">Double</a> or  <a href="../../System/types/Single.html">Single</a>.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#PositiveInfinitySymbol">NumberFormatInfo.PositiveInfinitySymbol</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NegativeSignTopic1"></a><a name="NegativeSign">NegativeSign</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the string that denotes that the associated number is negative.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> NegativeSign {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#PositiveSign">NumberFormatInfo.PositiveSign</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NumberDecimalDigitsTopic1"></a><a name="NumberDecimalDigits">NumberDecimalDigits</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the number of decimal places to use in numeric values.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> NumberDecimalDigits {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The property is being set to a value that is less than 0 or greater than 99.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#NumberDecimalSeparator">NumberFormatInfo.NumberDecimalSeparator</a> |  <a href="#NumberGroupSeparator">NumberFormatInfo.NumberGroupSeparator</a> |  <a href="#NumberGroupSizes">NumberFormatInfo.NumberGroupSizes</a> |  <a href="#NaNSymbol">NumberFormatInfo.NaNSymbol</a> |  <a href="#NumberNegativePattern">NumberFormatInfo.NumberNegativePattern</a> |  <a href="#CurrencyDecimalDigits">NumberFormatInfo.CurrencyDecimalDigits</a> |  <a href="#PercentDecimalDigits">NumberFormatInfo.PercentDecimalDigits</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NumberDecimalSeparatorTopic1"></a><a name="NumberDecimalSeparator">NumberDecimalSeparator</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the string to use as the decimal separator in numeric values.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> NumberDecimalSeparator {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The property is being set to a value that is the same as  <a href="#NumberGroupSeparator">NumberFormatInfo.NumberGroupSeparator</a>,  <a href="#CurrencyGroupSeparator">NumberFormatInfo.CurrencyGroupSeparator</a>, or  <a href="#PercentGroupSeparator">NumberFormatInfo.PercentGroupSeparator</a>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The initial value of this property is derived from the settings in Regional and Language Options (or Regional Options or Regional Settings) in Control Panel. However, if any of the group separators ( <a href="#NumberGroupSeparator">NumberFormatInfo.NumberGroupSeparator</a>,  <a href="#CurrencyGroupSeparator">NumberFormatInfo.CurrencyGroupSeparator</a>, or  <a href="#PercentGroupSeparator">NumberFormatInfo.PercentGroupSeparator</a>) is the same as any of the decimal separators ( <a href="#NumberDecimalSeparator">NumberFormatInfo.NumberDecimalSeparator</a>,  <a href="#CurrencyDecimalSeparator">NumberFormatInfo.CurrencyDecimalSeparator</a>, or  <a href="#PercentDecimalSeparator">NumberFormatInfo.PercentDecimalSeparator</a>), parsing ambiguous strings produces unpredictable results. If you explicitly set any of the group separator properties in NumberFormatInfo to a value that is the same as any of the decimal separators or if you explicitly set any of the decimal separators to a value that is the same as any of the group separators, ArgumentException is thrown.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#NumberDecimalDigits">NumberFormatInfo.NumberDecimalDigits</a> |  <a href="#NumberGroupSeparator">NumberFormatInfo.NumberGroupSeparator</a> |  <a href="#NumberGroupSizes">NumberFormatInfo.NumberGroupSizes</a> |  <a href="#NaNSymbol">NumberFormatInfo.NaNSymbol</a> |  <a href="#NumberNegativePattern">NumberFormatInfo.NumberNegativePattern</a> |  <a href="#CurrencyDecimalSeparator">NumberFormatInfo.CurrencyDecimalSeparator</a> |  <a href="#PercentDecimalSeparator">NumberFormatInfo.PercentDecimalSeparator</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NumberGroupSeparatorTopic1"></a><a name="NumberGroupSeparator">NumberGroupSeparator</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the string that separates groups of digits to the left of the decimal in numeric values.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> NumberGroupSeparator {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The property is being set to a value that is the same as  <a href="#NumberDecimalSeparator">NumberFormatInfo.NumberDecimalSeparator</a>,  <a href="#CurrencyDecimalSeparator">NumberFormatInfo.CurrencyDecimalSeparator</a>, or  <a href="#PercentDecimalSeparator">NumberFormatInfo.PercentDecimalSeparator</a>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The initial value of this property is derived from the settings in Regional and Language Options (or Regional Options or Regional Settings) in Control Panel. However, if any of the group separators ( <a href="#NumberGroupSeparator">NumberFormatInfo.NumberGroupSeparator</a>,  <a href="#CurrencyGroupSeparator">NumberFormatInfo.CurrencyGroupSeparator</a>, or  <a href="#PercentGroupSeparator">NumberFormatInfo.PercentGroupSeparator</a>) is the same as any of the decimal separators ( <a href="#NumberDecimalSeparator">NumberFormatInfo.NumberDecimalSeparator</a>,  <a href="#CurrencyDecimalSeparator">NumberFormatInfo.CurrencyDecimalSeparator</a>, or  <a href="#PercentDecimalSeparator">NumberFormatInfo.PercentDecimalSeparator</a>), parsing ambiguous strings produces unpredictable results. If you explicitly set any of the group separator properties in NumberFormatInfo to a value that is the same as any of the decimal separators or if you explicitly set any of the decimal separators to a value that is the same as any of the group separators, ArgumentException is thrown.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#NumberDecimalDigits">NumberFormatInfo.NumberDecimalDigits</a> |  <a href="#NumberDecimalSeparator">NumberFormatInfo.NumberDecimalSeparator</a> |  <a href="#NumberGroupSizes">NumberFormatInfo.NumberGroupSizes</a> |  <a href="#NaNSymbol">NumberFormatInfo.NaNSymbol</a> |  <a href="#NumberNegativePattern">NumberFormatInfo.NumberNegativePattern</a> |  <a href="#CurrencyGroupSeparator">NumberFormatInfo.CurrencyGroupSeparator</a> |  <a href="#PercentGroupSeparator">NumberFormatInfo.PercentGroupSeparator</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NumberGroupSizesTopic1"></a><a name="NumberGroupSizes">NumberGroupSizes</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the number of digits in each group to the left of the decimal in numeric values.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int[]</a> NumberGroupSizes {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The property is being set and the array contains an entry that is less than 0 or greater than 9.<p> -or- </p>
+<p> The property is being set and the array contains an entry, other than the last entry, that is set to 0.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Every element in the one-dimensional array must be an integer from 1 through 9. The last element can be 0.<p> The first element of the array defines the number of elements in the least significant group of digits immediately to the left of the  <a href="#NumberDecimalSeparator">NumberFormatInfo.NumberDecimalSeparator</a>. Each subsequent element refers to the next significant group of digits to the left of the previous group. If the last element of the array is not 0, the remaining digits are grouped based on the last element of the array. If the last element is 0, the remaining digits are not grouped.</p>
+<p> For example, if the array contains { 3, 4, 5 }, the digits will be grouped similar to "55,55555,55555,55555,4444,333.00". If the array contains { 3, 4, 0 }, the digits will be grouped similar to "55555555555555555,4444,333.00".</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example prints a value using different  <a href="#NumberGroupSizes">NumberFormatInfo.NumberGroupSizes</a> arrays.<pre>
+ using System;
+ using System.Globalization;
+ class SamplesNumberFormatInfo  {
+ 
+    public static void Main()  {
+ 
+       // Creates a new NumberFormatinfo.
+       NumberFormatInfo myNfi = new NumberFormatInfo();
+ 
+       // Takes a long value.
+       Int64 myInt = 123456789012345;
+ 
+       // Displays the value with default formatting.
+       Console.WriteLine( "Default  \t\t:\t{0}", myInt.ToString(myNfi) );
+ 
+       // Displays the value with three elements in the GroupSize array.
+       myNfi.NumberGroupSizes = new int[]  { 2, 3, 4 };
+       Console.WriteLine( "Grouping ( {0} )\t:\t{1}",
+          PrintArraySet( myNfi.NumberGroupSizes ), myInt.ToString(myNfi) );
+ 
+       // Displays the value with zero as the last element in the GroupSize array.
+       myNfi.NumberGroupSizes = new int[]  { 2, 4, 0 };
+       Console.WriteLine( "Grouping ( {0} )\t:\t{1}",
+          PrintArraySet( myNfi.NumberGroupSizes ), myInt.ToString(myNfi) );
+    }
+ 
+    public static string PrintArraySet( int[] myArr )  {
+       string myStr = null;
+       myStr = myArr[0].ToString();
+       for ( int i = 1; i &lt; myArr.Length; i++ )
+          myStr += ", " + myArr[i].ToString();
+       return( myStr );
+    }
+ }
+ /*
+ This code produces the following output. 
+ 
+ Default                 :       123,456,789,012,345.00
+ Grouping ( 2, 3, 4 )    :       12,3456,7890,123,45.00
+ Grouping ( 2, 4, 0 )    :       123456789,0123,45.00
+ */
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#NumberDecimalDigits">NumberFormatInfo.NumberDecimalDigits</a> |  <a href="#NumberDecimalSeparator">NumberFormatInfo.NumberDecimalSeparator</a> |  <a href="#NumberGroupSeparator">NumberFormatInfo.NumberGroupSeparator</a> |  <a href="#NaNSymbol">NumberFormatInfo.NaNSymbol</a> |  <a href="#NumberNegativePattern">NumberFormatInfo.NumberNegativePattern</a> |  <a href="#CurrencyGroupSizes">NumberFormatInfo.CurrencyGroupSizes</a> |  <a href="#PercentGroupSizes">NumberFormatInfo.PercentGroupSizes</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NumberNegativePatternTopic1"></a><a name="NumberNegativePattern">NumberNegativePattern</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the format pattern for negative numeric values.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> NumberNegativePattern {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The property is being set to a value that is less than 0 or greater than 4.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property can have one of the values in the following table. The symbol "-" is the  <a href="#NegativeSign">NumberFormatInfo.NegativeSign</a> and <i>n</i> is a number.<br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  Value
+                </TH>
+<TH>
+                  Associated Pattern
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+                  0
+                </TD>
+<TD>
+                  (n)
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  1
+                </TD>
+<TD>
+                  -n
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  2
+                </TD>
+<TD>
+                  - n
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  3
+                </TD>
+<TD>
+                  n-
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  4
+                </TD>
+<TD>
+                  n -
+                </TD>
+</TR>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example prints a value using different  <a href="#NumberNegativePattern">NumberFormatInfo.NumberNegativePattern</a> patterns.<pre>
+ using System;
+ using System.Globalization;
+ class SamplesNumberFormatInfo  {
+ 
+    public static void Main()  {
+ 
+       // Creates a new NumberFormatinfo.
+       NumberFormatInfo myNfi = new NumberFormatInfo();
+
+       // Takes a negative value.
+       Int64 myInt = -1234;
+
+       // Displays the value with default formatting.
+       Console.WriteLine( "Default  \t:\t{0}", myInt.ToString( "N", myNfi ) );
+
+       // Displays the value with other patterns.
+       for ( int i = 0; i &lt;= 4; i++ )  {
+          myNfi.NumberNegativePattern = i;
+          Console.WriteLine( "Pattern {0}\t:\t{1}", myNfi.NumberNegativePattern, myInt.ToString( "N", myNfi ) );
+       }
+    }
+ }
+ /*
+ This code produces the following output.
+ 
+ Default         :       (1,234.00)
+ Pattern 0       :       (1,234.00)
+ Pattern 1       :       -1,234.00
+ Pattern 2       :       - 1,234.00
+ Pattern 3       :       1,234.00-
+ Pattern 4       :       1,234.00 -
+*/
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#NumberDecimalDigits">NumberFormatInfo.NumberDecimalDigits</a> |  <a href="#NumberDecimalSeparator">NumberFormatInfo.NumberDecimalSeparator</a> |  <a href="#NumberGroupSeparator">NumberFormatInfo.NumberGroupSeparator</a> |  <a href="#NumberGroupSizes">NumberFormatInfo.NumberGroupSizes</a> |  <a href="#NaNSymbol">NumberFormatInfo.NaNSymbol</a> |  <a href="#CurrencyNegativePattern">NumberFormatInfo.CurrencyNegativePattern</a> |  <a href="#PercentNegativePattern">NumberFormatInfo.PercentNegativePattern</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="PercentDecimalDigitsTopic1"></a><a name="PercentDecimalDigits">PercentDecimalDigits</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the number of decimal places to use in percent values.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> PercentDecimalDigits {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The property is being set to a value that is less than 0 or greater than 99.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#PercentDecimalSeparator">NumberFormatInfo.PercentDecimalSeparator</a> |  <a href="#PercentGroupSeparator">NumberFormatInfo.PercentGroupSeparator</a> |  <a href="#PercentGroupSizes">NumberFormatInfo.PercentGroupSizes</a> |  <a href="#PercentSymbol">NumberFormatInfo.PercentSymbol</a> |  <a href="#PercentNegativePattern">NumberFormatInfo.PercentNegativePattern</a> |  <a href="#PercentPositivePattern">NumberFormatInfo.PercentPositivePattern</a> |  <a href="#CurrencyDecimalDigits">NumberFormatInfo.CurrencyDecimalDigits</a> |  <a href="#NumberDecimalDigits">NumberFormatInfo.NumberDecimalDigits</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="PercentDecimalSeparatorTopic1"></a><a name="PercentDecimalSeparator">PercentDecimalSeparator</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the string to use as the decimal separator in percent values.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> PercentDecimalSeparator {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The property is being set to a value that is the same as  <a href="#NumberGroupSeparator">NumberFormatInfo.NumberGroupSeparator</a>,  <a href="#CurrencyGroupSeparator">NumberFormatInfo.CurrencyGroupSeparator</a>, or  <a href="#PercentGroupSeparator">NumberFormatInfo.PercentGroupSeparator</a>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If any of the group separators ( <a href="#NumberGroupSeparator">NumberFormatInfo.NumberGroupSeparator</a>,  <a href="#CurrencyGroupSeparator">NumberFormatInfo.CurrencyGroupSeparator</a>, or  <a href="#PercentGroupSeparator">NumberFormatInfo.PercentGroupSeparator</a>) is the same as any of the decimal separators ( <a href="#NumberDecimalSeparator">NumberFormatInfo.NumberDecimalSeparator</a>,  <a href="#CurrencyDecimalSeparator">NumberFormatInfo.CurrencyDecimalSeparator</a>, or  <a href="#PercentDecimalSeparator">NumberFormatInfo.PercentDecimalSeparator</a>), parsing ambiguous strings produces unpredictable results. If you explicitly set any of the group separator properties in NumberFormatInfo to a value that is the same as any of the decimal separators or if you explicitly set any of the decimal separators to a value that is the same as any of the group separators, ArgumentException is thrown.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#PercentDecimalDigits">NumberFormatInfo.PercentDecimalDigits</a> |  <a href="#PercentGroupSeparator">NumberFormatInfo.PercentGroupSeparator</a> |  <a href="#PercentGroupSizes">NumberFormatInfo.PercentGroupSizes</a> |  <a href="#PercentSymbol">NumberFormatInfo.PercentSymbol</a> |  <a href="#PercentNegativePattern">NumberFormatInfo.PercentNegativePattern</a> |  <a href="#PercentPositivePattern">NumberFormatInfo.PercentPositivePattern</a> |  <a href="#CurrencyDecimalSeparator">NumberFormatInfo.CurrencyDecimalSeparator</a> |  <a href="#NumberDecimalSeparator">NumberFormatInfo.NumberDecimalSeparator</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="PercentGroupSeparatorTopic1"></a><a name="PercentGroupSeparator">PercentGroupSeparator</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the string that separates groups of digits to the left of the decimal in percent values.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> PercentGroupSeparator {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The property is being set to a value that is the same as  <a href="#NumberDecimalSeparator">NumberFormatInfo.NumberDecimalSeparator</a>,  <a href="#CurrencyDecimalSeparator">NumberFormatInfo.CurrencyDecimalSeparator</a>, or  <a href="#PercentDecimalSeparator">NumberFormatInfo.PercentDecimalSeparator</a>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If any of the group separators ( <a href="#NumberGroupSeparator">NumberFormatInfo.NumberGroupSeparator</a>,  <a href="#CurrencyGroupSeparator">NumberFormatInfo.CurrencyGroupSeparator</a>, or  <a href="#PercentGroupSeparator">NumberFormatInfo.PercentGroupSeparator</a>) is the same as any of the decimal separators ( <a href="#NumberDecimalSeparator">NumberFormatInfo.NumberDecimalSeparator</a>,  <a href="#CurrencyDecimalSeparator">NumberFormatInfo.CurrencyDecimalSeparator</a>, or  <a href="#PercentDecimalSeparator">NumberFormatInfo.PercentDecimalSeparator</a>), parsing ambiguous strings produces unpredictable results. If you explicitly set any of the group separator properties in NumberFormatInfo to a value that is the same as any of the decimal separators or if you explicitly set any of the decimal separators to a value that is the same as any of the group separators, ArgumentException is thrown.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#PercentDecimalDigits">NumberFormatInfo.PercentDecimalDigits</a> |  <a href="#PercentDecimalSeparator">NumberFormatInfo.PercentDecimalSeparator</a> |  <a href="#PercentGroupSizes">NumberFormatInfo.PercentGroupSizes</a> |  <a href="#PercentSymbol">NumberFormatInfo.PercentSymbol</a> |  <a href="#PercentNegativePattern">NumberFormatInfo.PercentNegativePattern</a> |  <a href="#PercentPositivePattern">NumberFormatInfo.PercentPositivePattern</a> |  <a href="#CurrencyGroupSeparator">NumberFormatInfo.CurrencyGroupSeparator</a> |  <a href="#NumberGroupSeparator">NumberFormatInfo.NumberGroupSeparator</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="PercentGroupSizesTopic1"></a><a name="PercentGroupSizes">PercentGroupSizes</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the number of digits in each group to the left of the decimal in percent values.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int[]</a> PercentGroupSizes {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The property is being set and the array contains an entry that is less than 0 or greater than 9.<p> -or- </p>
+<p> The property is being set and the array contains an entry, other than the last entry, that is set to 0.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Every element in the one-dimensional array must be an integer from 1 through 9. The last element can be 0.<p> The first element of the array defines the number of elements in the least significant group of digits immediately to the left of the  <a href="#PercentDecimalSeparator">NumberFormatInfo.PercentDecimalSeparator</a>. Each subsequent element refers to the next significant group of digits to the left of the previous group. If the last element of the array is not 0, the remaining digits are grouped based on the last element of the array. If the last element is 0, the remaining digits are not grouped.</p>
+<p> For example, if the array contains { 3, 4, 5 }, the digits will be grouped similar to "55,55555,55555,55555,4444,333.00%". If the array contains { 3, 4, 0 }, the digits will be grouped similar to "55555555555555555,4444,333.00%".</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#PercentDecimalDigits">NumberFormatInfo.PercentDecimalDigits</a> |  <a href="#PercentDecimalSeparator">NumberFormatInfo.PercentDecimalSeparator</a> |  <a href="#PercentGroupSeparator">NumberFormatInfo.PercentGroupSeparator</a> |  <a href="#PercentSymbol">NumberFormatInfo.PercentSymbol</a> |  <a href="#PercentNegativePattern">NumberFormatInfo.PercentNegativePattern</a> |  <a href="#PercentPositivePattern">NumberFormatInfo.PercentPositivePattern</a> |  <a href="#CurrencyGroupSizes">NumberFormatInfo.CurrencyGroupSizes</a> |  <a href="#NumberGroupSizes">NumberFormatInfo.NumberGroupSizes</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="PercentNegativePatternTopic1"></a><a name="PercentNegativePattern">PercentNegativePattern</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the format pattern for negative percent values.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> PercentNegativePattern {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The property is being set to a value that is less than 0 or greater than 2.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property can have one of the values in the following table. The symbol "%" is the  <a href="#PercentSymbol">NumberFormatInfo.PercentSymbol</a>, the symbol "-" is the  <a href="#NegativeSign">NumberFormatInfo.NegativeSign</a>, and <i>n</i> is a number.<br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  Value
+                </TH>
+<TH>
+                  Associated Pattern
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+                  0
+                </TD>
+<TD>
+                  -n %
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  1
+                </TD>
+<TD>
+                  -n%
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  2
+                </TD>
+<TD>
+                  -%n
+                </TD>
+</TR>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#PercentDecimalDigits">NumberFormatInfo.PercentDecimalDigits</a> |  <a href="#PercentDecimalSeparator">NumberFormatInfo.PercentDecimalSeparator</a> |  <a href="#PercentGroupSeparator">NumberFormatInfo.PercentGroupSeparator</a> |  <a href="#PercentGroupSizes">NumberFormatInfo.PercentGroupSizes</a> |  <a href="#PercentSymbol">NumberFormatInfo.PercentSymbol</a> |  <a href="#PercentPositivePattern">NumberFormatInfo.PercentPositivePattern</a> |  <a href="#CurrencyNegativePattern">NumberFormatInfo.CurrencyNegativePattern</a> |  <a href="#NumberNegativePattern">NumberFormatInfo.NumberNegativePattern</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="PercentPositivePatternTopic1"></a><a name="PercentPositivePattern">PercentPositivePattern</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the format pattern for positive percent values.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> PercentPositivePattern {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The property is being set to a value that is less than 0 or greater than 2.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property can have one of the values in the following table. The symbol "%" is the  <a href="#PercentSymbol">NumberFormatInfo.PercentSymbol</a> and <i>n</i> is a number.<br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  Value
+                </TH>
+<TH>
+                  Associated Pattern
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+                  0
+                </TD>
+<TD>
+                  n %
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  1
+                </TD>
+<TD>
+                  n%
+                </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  2
+                </TD>
+<TD>
+                  %n
+                </TD>
+</TR>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#PercentDecimalDigits">NumberFormatInfo.PercentDecimalDigits</a> |  <a href="#PercentDecimalSeparator">NumberFormatInfo.PercentDecimalSeparator</a> |  <a href="#PercentGroupSeparator">NumberFormatInfo.PercentGroupSeparator</a> |  <a href="#PercentGroupSizes">NumberFormatInfo.PercentGroupSizes</a> |  <a href="#PercentSymbol">NumberFormatInfo.PercentSymbol</a> |  <a href="#PercentNegativePattern">NumberFormatInfo.PercentNegativePattern</a> |  <a href="#CurrencyPositivePattern">NumberFormatInfo.CurrencyPositivePattern</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="PercentSymbolTopic1"></a><a name="PercentSymbol">PercentSymbol</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the string to use as the percent symbol.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> PercentSymbol {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#PercentDecimalDigits">NumberFormatInfo.PercentDecimalDigits</a> |  <a href="#PercentDecimalSeparator">NumberFormatInfo.PercentDecimalSeparator</a> |  <a href="#PercentGroupSeparator">NumberFormatInfo.PercentGroupSeparator</a> |  <a href="#PercentGroupSizes">NumberFormatInfo.PercentGroupSizes</a> |  <a href="#PercentNegativePattern">NumberFormatInfo.PercentNegativePattern</a> |  <a href="#PercentPositivePattern">NumberFormatInfo.PercentPositivePattern</a> |  <a href="#CurrencySymbol">NumberFormatInfo.CurrencySymbol</a> |  <a href="#NaNSymbol">NumberFormatInfo.NaNSymbol</a> |  <a href="#PerMilleSymbol">NumberFormatInfo.PerMilleSymbol</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="PerMilleSymbolTopic1"></a><a name="PerMilleSymbol">PerMilleSymbol</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the string to use as the per mille symbol.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> PerMilleSymbol {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#CurrencySymbol">NumberFormatInfo.CurrencySymbol</a> |  <a href="#NaNSymbol">NumberFormatInfo.NaNSymbol</a> |  <a href="#PercentSymbol">NumberFormatInfo.PercentSymbol</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="PositiveInfinitySymbolTopic1"></a><a name="PositiveInfinitySymbol">PositiveInfinitySymbol</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the string that represents positive infinity.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> PositiveInfinitySymbol {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The property is being set to <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For more information on positive infinity, see  <a href="../../System/types/Double.html">Double</a> or  <a href="../../System/types/Single.html">Single</a>.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#NegativeInfinitySymbol">NumberFormatInfo.NegativeInfinitySymbol</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="PositiveSignTopic1"></a><a name="PositiveSign">PositiveSign</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the string that denotes that the associated number is positive.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> PositiveSign {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The property is being set and the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property is used only for parsing numeric strings, not for formatting.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#NegativeSign">NumberFormatInfo.NegativeSign</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CloneTopic1"></a><a name="Clone">Clone</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates a shallow copy of the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> Clone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A new  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> copied from the original  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a>.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System/types/ICloneable.html#Clone">ICloneable.Clone</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The clone is writable even if the original  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is read-only; therefore, the properties of the clone can be modified with user-defined patterns.<p> A shallow copy of an object is a copy of the object only. If the object contains references to other objects, the shallow copy will not create copies of the referred objects. It will refer to the original objects instead. On the other hand, a deep copy of an object creates a copy of the object and a copy of everything directly or indirectly referenced by that object.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~NumberFormatInfo();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetFormatTopic1"></a><a name="GetFormat(System.Type)">GetFormat</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>formatType</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an object of the specified type that provides a number formatting service.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> GetFormat(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>formatType</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>formatType</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Type.html">Type</a> of the required formatting service.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The current  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a>, if <i>formatType</i> is the same as the type of the current  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a>; otherwise, <b>null</b>.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System/types/IFormatProvider.html#GetFormat(System.Type)">IFormatProvider.GetFormat</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The Format(String, IFormatProvider) methods supported by the base data types invoke this method when the current  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> is passed as the  <a href="../../System/types/IFormatProvider.html">IFormatProvider</a> parameter. This method implements  <a href="../../System/types/IFormatProvider.html#GetFormat(System.Type)">IFormatProvider.GetFormat</a>.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/IFormatProvider.html">IFormatProvider</a> |  <a href="../../System.Globalization/types/DateTimeFormatInfo.html#GetFormat(System.Type)">DateTimeFormatInfo.GetFormat</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetInstanceTopic1"></a><a name="GetInstance(System.IFormatProvider)">GetInstance</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/IFormatProvider.html">IFormatProvider</a> <i>formatProvider</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> associated with the specified  <a href="../../System/types/IFormatProvider.html">IFormatProvider</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> GetInstance(<br>   <font color="#008080"><a href="../../System/types/IFormatProvider.html">IFormatProvider</a> <i>formatProvider</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>formatProvider</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/IFormatProvider.html">IFormatProvider</a> used to get the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a>.<p> -or- </p>
+<p><b>null</b> to get  <a href="#CurrentInfo">NumberFormatInfo.CurrentInfo</a>.</p> The  <a href="../../System/types/IFormatProvider.html">IFormatProvider</a> used to get the  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a>.<p> -or- </p>
+<p><b>null</b> to get  <a href="#CurrentInfo">NumberFormatInfo.CurrentInfo</a>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> associated with the specified  <a href="../../System/types/IFormatProvider.html">IFormatProvider</a>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method uses the  <a href="../../System/types/IFormatProvider.html#GetFormat(System.Type)">IFormatProvider.GetFormat</a> method of <i>formatProvider</i> using  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> as the Type parameter. If <i>formatProvider</i> is <b>null</b> or if  <a href="../../System/types/IFormatProvider.html#GetFormat(System.Type)">IFormatProvider.GetFormat</a> returns <b>null</b>, this method returns  <a href="#CurrentInfo">NumberFormatInfo.CurrentInfo</a>.<p> You can get a  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> for a specific culture using one of the following methods: </p>
+<UL>
+<li> Through the  <a href="../../System.Globalization/types/CultureInfo.html#NumberFormat">CultureInfo.NumberFormat</a> property.</li>
+<li> Through the  <a href="#GetInstance(System.IFormatProvider)">NumberFormatInfo.GetInstance</a> method where <i>provider</i> is a  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a>.</li>
+</UL>
+<p> A  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> can be created only for the invariant culture or for specific cultures, not for neutral cultures. For more information about the invariant culture, specific cultures, and neutral cultures, see the  <a href="../../System.Globalization/types/CultureInfo.html">CultureInfo</a> class.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/IFormatProvider.html">IFormatProvider</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ReadOnlyTopic1"></a><a name="ReadOnly(System.Globalization.NumberFormatInfo)">ReadOnly</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> <i>nfi</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns a read-only  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> wrapper.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> ReadOnly(<br>   <font color="#008080"><a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> <i>nfi</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>nfi</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> to wrap.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A read-only  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> wrapper around <i>nfi</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>nfi</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This wrapper prevents any modifications to <i>nfi</i>.<p> Attempting to perform an assignment to a property of a read-only  <a href="../../System.Globalization/types/NumberFormatInfo.html">NumberFormatInfo</a> causes an  <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#IsReadOnly">NumberFormatInfo.IsReadOnly</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

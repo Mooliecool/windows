@@ -1,0 +1,3398 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Xml.Serialization.XmlSerializer</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Xml.Serialization.XmlSerializer Class</h2><b>Assembly: </b>System.Xml.dll<br><b>Namespace: </b>System.Xml.Serialization<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Serializes and deserializes objects into and from XML documents. The  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> enables you to control how objects are encoded into XML.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public class XmlSerializer
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> XML serialization is the process of converting an object's public properties and fields to a serial format (in this case, XML) for storage or transport. Deserialization re-creates the object in its original state from the XML output. You can thus think of serialization as a way of saving the state of an object into a stream or buffer. For example, ASP.NET uses the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> class to encode XML Web service messages.<p> The data in your objects is described using programming language constructs like classes, fields, properties, primitive types, arrays, and even embedded XML in the form of  <a href="../../System.Xml/types/XmlElement.html">XmlElement</a> or  <a href="../../System.Xml/types/XmlAttribute.html">XmlAttribute</a> objects. You have the option of creating your own classes, annotated with attributes, or using the  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconXMLSchemaDefinitionToolXsdexe.asp">MSDN: xmlschemadefinitiontoolxsdexe</a> to generate the classes based on an existing XML Schema definition (XSD) document. If you have an XML Schema, you can run the Xsd.exe to produce a set of classes that are strongly typed to the schema and annotated with attributes to adhere to the schema when serialized.</p>
+<p> To transfer data between objects and XML requires a mapping from the programming language constructs to XML Schema and vice versa. The  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>, and related tools like Xsd.exe, provide the bridge between these two technologies at both design time and run time. At design time, use the Xsd.exe to produce an XML Schema document (.xsd) from your custom classes, or to produce classes from a given schema. In either case, the classes are annotated with custom attributes to instruct the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> how to map between the XML Schema system to the common language runtime. At run time, instances of the classes can be serialized into XML documents that follow the given schema. Likewise, these XML documents can be deserialized into run time objects. (Note that the XML Schema is optional, and not needed at design time or run time.) </p>
+<p> To control the generated XML, you can apply special attributes to classes and members. For example, to specify a different XML element name, apply an  <a href="../../System.Xml.Serialization/types/XmlElementAttribute.html">XmlElementAttribute</a> to a public field or property, and set the  <a href="../../System.Xml.Serialization/types/XmlElementAttribute.html#ElementName">XmlElementAttribute.ElementName</a> property. For a list of all attributes, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAttributesThatControlSerialization.asp">MSDN: attributesthatcontrolserialization</a>.</p>
+<p> If the XML generated must conform to section 5 of the World Wide Consortium (www.w3.org) document, "Simple Object Access Protocol (SOAP) 1.1", you must construct the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> with an  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a>. To further control the encoded SOAP XML, use the attributes listed in  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAttributesThatControlSOAPEncodedSerialization.asp">MSDN: attributesthatcontrolsoapencodedserialization</a>.</p>
+<p> With the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> you can take advantage of working with strongly typed classes and still have the flexibility of XML. Using fields or properties of type  <a href="../../System.Xml/types/XmlElement.html">XmlElement</a>,  <a href="../../System.Xml/types/XmlAttribute.html">XmlAttribute</a> or  <a href="../../System.Xml/types/XmlNode.html">XmlNode</a> in your strongly typed classes, you can read parts of the XML document directly into XML objects.</p>
+<p> If you work with extensible XML schemas, you can also use the  <a href="../../System.Xml.Serialization/types/XmlAnyElementAttribute.html">XmlAnyElementAttribute</a> and  <a href="../../System.Xml.Serialization/types/XmlAnyAttributeAttribute.html">XmlAnyAttributeAttribute</a> attributes to serialize and deserialize elements or attributes that are not found in the original schema. To use the objects, apply an  <a href="../../System.Xml.Serialization/types/XmlAnyElementAttribute.html">XmlAnyElementAttribute</a> to a field that returns an array of  <a href="../../System.Xml/types/XmlElement.html">XmlElement</a> objects, or apply an  <a href="../../System.Xml.Serialization/types/XmlAnyAttributeAttribute.html">XmlAnyAttributeAttribute</a> to a field that returns an array of  <a href="../../System.Xml/types/XmlAttribute.html">XmlAttribute</a> objects.</p>
+<p> If a property or field returns a complex object (such as an array or a class instance), the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> converts it to an element nested within the main XML document. For example, the first class in the following C# code returns an instance of the second class.</p>
+<pre>
+          public class MyClass
+          {
+           public MyObject MyObjectProperty;
+          }
+          public class MyObject
+          {
+           public string ObjectName;
+          }
+        </pre>
+<p> The serialized, XML output looks like this: </p>
+<pre>
+          &lt;MyClass&gt;
+           &lt;MyObjectProperty&gt;
+           &lt;Objectname&gt;My String&lt;/ObjectName&gt;
+           &lt;/MyObjectProperty&gt;
+          &lt;/MyClass&gt;
+        </pre>
+<p> You can also override the serialization of any set of objects and their fields and properties by creating one of the appropriate attributes, and adding it to an  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a>. Overriding serialization in this way has two uses: first, you can control and augment the serialization of objects found in a DLL, even if you don't have access to the source; second, you can create one set of serializable classes, but serialize the objects in multiple ways. For more details, see the  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> class.</p>
+<p> To serialize an object, call the  <a href="#Serialize(System.IO.TextWriter,System.Object)">XmlSerializer.Serialize</a> method. To deserialize an object, call the  <a href="#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> method.</p>
+<p> To add XML namespaces to an XML document, see  <a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a>.</p><br><br><b>Note </b> The  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> gives special treatment to classes that implement  <a href="../../System.Collections/types/IEnumerable.html">IEnumerable</a> or  <a href="../../System.Collections/types/ICollection.html">ICollection</a>. A class that implements  <a href="../../System.Collections/types/IEnumerable.html">IEnumerable</a> must implement a public <b>Add</b> method that takes a single parameter. The <b>Add</b> method's parameter must be of the same type as is returned from the <b>Current</b> property on the value returned from <b>GetEnumerator</b>, or one of that type's bases. A class that implements  <a href="../../System.Collections/types/ICollection.html">ICollection</a> (such as  <a href="../../System.Collections/types/CollectionBase.html">CollectionBase</a>) in addition to  <a href="../../System.Collections/types/IEnumerable.html">IEnumerable</a> must have a public <b>Item</b> indexed property (indexer in C#) that takes an integer, and it must have a public <b>Count</b> property of type integer. The parameter to the <b>Add</b> method must be the same type as is returned from the <b>Item</b> property, or one of that type's bases. For classes implementing  <a href="../../System.Collections/types/ICollection.html">ICollection</a>, values to be serialized will be retrieved from the indexed <b>Item</b> property, not by calling <b>GetEnumerator</b>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example contains two main classes: <code>
+            PurchaseOrder
+          </code> and <code>
+            Test
+          </code>. The <code>
+            PurchaseOrder
+          </code> class contains information about a single purchase. The <code>
+            Test
+          </code> class contains the methods that create the purchase order, and that read the created purchase order.<pre>
+using System;
+using System.Xml;
+using System.Xml.Serialization;
+using System.IO;
+
+/* The XmlRootAttribute allows you to set an alternate name 
+   (PurchaseOrder) of the XML element, the element namespace; by 
+   default, the XmlSerializer uses the class name. The attribute 
+   also allows you to set the XML namespace for the element.  Lastly,
+   the attribute sets the IsNullable property, which specifies whether 
+   the xsi:null attribute appears if the class instance is set to 
+   a null reference. */
+[XmlRootAttribute("PurchaseOrder", Namespace="http://www.cpandl.com", 
+IsNullable = false)]
+public class PurchaseOrder
+{
+   public Address ShipTo;
+   public string OrderDate; 
+   /* The XmlArrayAttribute changes the XML element name
+    from the default of "OrderedItems" to "Items". */
+   [XmlArrayAttribute("Items")]
+   public OrderedItem[] OrderedItems;
+   public decimal SubTotal;
+   public decimal ShipCost;
+   public decimal TotalCost;   
+}
+ 
+public class Address
+{
+   /* The XmlAttribute instructs the XmlSerializer to serialize the Name
+      field as an XML attribute instead of an XML element (the default
+      behavior). */
+   [XmlAttribute]
+   public string Name;
+   public string Line1;
+
+   /* Setting the IsNullable property to false instructs the 
+      XmlSerializer that the XML attribute will not appear if 
+      the City field is set to a null reference. */
+   [XmlElementAttribute(IsNullable = false)]
+   public string City;
+   public string State;
+   public string Zip;
+}
+ 
+public class OrderedItem
+{
+   public string ItemName;
+   public string Description;
+   public decimal UnitPrice;
+   public int Quantity;
+   public decimal LineTotal;
+
+   /* Calculate is a custom method that calculates the price per item,
+      and stores the value in a field. */
+   public void Calculate()
+   {
+      LineTotal = UnitPrice * Quantity;
+   }
+}
+ 
+public class Test
+{
+   public static void Main()
+   {
+      // Read and write purchase orders.
+      Test t = new Test();
+      t.CreatePO("po.xml");
+      t.ReadPO("po.xml");
+   }
+
+   private void CreatePO(string filename)
+   {
+      // Create an instance of the XmlSerializer class;
+      // specify the type of object to serialize.
+      XmlSerializer serializer = 
+      new XmlSerializer(typeof(PurchaseOrder));
+      TextWriter writer = new StreamWriter(filename);
+      PurchaseOrder po=new PurchaseOrder();
+       
+      // Create an address to ship and bill to.
+      Address billAddress = new Address();
+      billAddress.Name = "Teresa Atkinson";
+      billAddress.Line1 = "1 Main St.";
+      billAddress.City = "AnyTown";
+      billAddress.State = "WA";
+      billAddress.Zip = "00000";
+      // Set ShipTo and BillTo to the same addressee.
+      po.ShipTo = billAddress;
+      po.OrderDate = System.DateTime.Now.ToLongDateString();
+ 
+      // Create an OrderedItem object.
+      OrderedItem i1 = new OrderedItem();
+      i1.ItemName = "Widget S";
+      i1.Description = "Small widget";
+      i1.UnitPrice = (decimal) 5.23;
+      i1.Quantity = 3;
+      i1.Calculate();
+ 
+      // Insert the item into the array.
+      OrderedItem [] items = {i1};
+      po.OrderedItems = items;
+      // Calculate the total cost.
+      decimal subTotal = new decimal();
+      foreach(OrderedItem oi in items)
+      {
+         subTotal += oi.LineTotal;
+      }
+      po.SubTotal = subTotal;
+      po.ShipCost = (decimal) 12.51; 
+      po.TotalCost = po.SubTotal + po.ShipCost; 
+      // Serialize the purchase order, and close the TextWriter.
+      serializer.Serialize(writer, po);
+      writer.Close();
+   }
+ 
+   protected void ReadPO(string filename)
+   {
+      // Create an instance of the XmlSerializer class;
+      // specify the type of object to be deserialized.
+      XmlSerializer serializer = new XmlSerializer(typeof(PurchaseOrder));
+      /* If the XML document has been altered with unknown 
+      nodes or attributes, handle them with the 
+      UnknownNode and UnknownAttribute events.*/
+      serializer.UnknownNode+= new 
+      XmlNodeEventHandler(serializer_UnknownNode);
+      serializer.UnknownAttribute+= new 
+      XmlAttributeEventHandler(serializer_UnknownAttribute);
+   
+      // A FileStream is needed to read the XML document.
+      FileStream fs = new FileStream(filename, FileMode.Open);
+      // Declare an object variable of the type to be deserialized.
+      PurchaseOrder po;
+      /* Use the Deserialize method to restore the object's state with
+      data from the XML document. */
+      po = (PurchaseOrder) serializer.Deserialize(fs);
+      // Read the order date.
+      Console.WriteLine ("OrderDate: " + po.OrderDate);
+  
+      // Read the shipping address.
+      Address shipTo = po.ShipTo;
+      ReadAddress(shipTo, "Ship To:");
+      // Read the list of ordered items.
+      OrderedItem [] items = po.OrderedItems;
+      Console.WriteLine("Items to be shipped:");
+      foreach(OrderedItem oi in items)
+      {
+         Console.WriteLine("\t"+
+         oi.ItemName + "\t" + 
+         oi.Description + "\t" +
+         oi.UnitPrice + "\t" +
+         oi.Quantity + "\t" +
+         oi.LineTotal);
+      }
+      // Read the subtotal, shipping cost, and total cost.
+      Console.WriteLine("\t\t\t\t\t Subtotal\t" + po.SubTotal);
+      Console.WriteLine("\t\t\t\t\t Shipping\t" + po.ShipCost); 
+      Console.WriteLine("\t\t\t\t\t Total\t\t" + po.TotalCost);
+   }
+ 
+   protected void ReadAddress(Address a, string label)
+   {
+      // Read the fields of the Address object.
+      Console.WriteLine(label);
+      Console.WriteLine("\t"+ a.Name );
+      Console.WriteLine("\t" + a.Line1);
+      Console.WriteLine("\t" + a.City);
+      Console.WriteLine("\t" + a.State);
+      Console.WriteLine("\t" + a.Zip );
+      Console.WriteLine();
+   }
+
+   protected void serializer_UnknownNode
+   (object sender, XmlNodeEventArgs e)
+   {
+      Console.WriteLine("Unknown Node:" +   e.Name + "\t" + e.Text);
+   }
+
+   protected void serializer_UnknownAttribute
+   (object sender, XmlAttributeEventArgs e)
+   {
+      System.Xml.XmlAttribute attr = e.Attr;
+      Console.WriteLine("Unknown attribute " + 
+      attr.Name + "='" + attr.Value + "'");
+   }
+}
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Xml.Serialization/System.Xml.Serialization.html">System.Xml.Serialization Namespace</a><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a> |  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> |  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a></dd>
+</dl>
+<h3>System.Xml.Serialization.XmlSerializer Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(Type type)<br><br></code> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> class that can serialize objects of the specified type into XML documents, and vice versa.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor3">ctor #3</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(XmlTypeMapping xmlTypeMapping)<br><br></code> Initializes an instance of the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> class using an object that maps one type to another.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor4">ctor #4</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(Type type, string defaultNamespace)<br><br></code> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> class that can serialize objects of the specified type into XML documents, and vice versa. Specifies the default namespace for all the XML elements.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor5">ctor #5</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(Type type, Type[] extraTypes)<br><br></code> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> class that can serialize objects of the specified type into XML documents, and vice versa. If a property or field returns an array, the <i>extraTypes</i> parameter specifies objects that can be inserted into the array.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor6">ctor #6</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(Type type, XmlAttributeOverrides overrides)<br><br></code> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> class that can serialize objects of the specified type into XML documents, and vice versa. Each object to be serialized can itself contain instances of classes, which this overload can override with other classes.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor7">ctor #7</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(Type type, XmlRootAttribute root)<br><br></code> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> class that can serialize objects of the specified type into XML documents, and vice versa. Specifies the class to use as the XML root element.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor8">ctor #8</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(Type type, XmlAttributeOverrides overrides, Type[] extraTypes, XmlRootAttribute root, string defaultNamespace)<br><br></code> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> class that can serialize objects of type  <a href="../../System/types/Object.html">Object</a> into XML document instances, and vice versa. Each object to be serialized can itself contain instances of classes, which this overload can override with other classes. This overload also specifies the default namespace for all the XML elements, and the class to use as the XML root element.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#CanDeserialize(System.Xml.XmlReader)">CanDeserialize</a></td>
+<td width="55%"> Gets a value indicating whether this  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> can deserialize a specified XML document.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Deserialize(System.IO.Stream)">Deserialize</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Deserialize(Stream stream)<br><br></code> Deserializes the XML document contained by the specified  <a href="../../System.IO/types/Stream.html">Stream</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Deserialize(System.IO.TextReader)">Deserialize</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Deserialize(TextReader textReader)<br><br></code> Deserializes the XML document contained by the specified  <a href="../../System.IO/types/TextReader.html">TextReader</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Deserialize(System.Xml.XmlReader)">Deserialize</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Deserialize(XmlReader xmlReader)<br><br></code> Deserializes the XML document contained by the specified  <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemxmlXmlReadermemberstopic.asp">XmlReader</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#FromMappings(System.Xml.Serialization.XmlMapping[])">FromMappings</a></td>
+<td width="55%"></td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#FromTypes(System.Type[])">FromTypes</a></td>
+<td width="55%"> Returns an array of  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> objects created from an array of types.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Serialize(System.IO.Stream,System.Object)">Serialize</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Serialize(Stream stream, object o)<br><br></code> Serializes the specified  <a href="../../System/types/Object.html">Object</a> and writes the XML document to a file using the specified  <a href="../../System.IO/types/Stream.html">Stream</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Serialize(System.IO.TextWriter,System.Object)">Serialize</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Serialize(TextWriter textWriter, object o)<br><br></code> Serializes the specified  <a href="../../System/types/Object.html">Object</a> and writes the XML document to a file using the specified  <a href="../../System.IO/types/TextWriter.html">TextWriter</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Serialize(System.Xml.XmlWriter,System.Object)">Serialize</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Serialize(XmlWriter xmlWriter, object o)<br><br></code> Serializes the specified  <a href="../../System/types/Object.html">Object</a> and writes the XML document to a file using the specified  <a href="../../System.Xml/types/XmlWriter.html">XmlWriter</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Serialize(System.IO.Stream,System.Object,System.Xml.Serialization.XmlSerializerNamespaces)">Serialize</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Serialize(Stream stream, object o, XmlSerializerNamespaces namespaces)<br><br></code> Serializes the specified  <a href="../../System/types/Object.html">Object</a> and writes the XML document to a file using the specified  <a href="../../System.IO/types/Stream.html">Stream</a>, referencing the specified namespaces.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Serialize(System.IO.TextWriter,System.Object,System.Xml.Serialization.XmlSerializerNamespaces)">Serialize</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Serialize(TextWriter textWriter, object o, XmlSerializerNamespaces namespaces)<br><br></code> Serializes the specified  <a href="../../System/types/Object.html">Object</a> and writes the XML document to a file using the specified  <a href="../../System.IO/types/TextWriter.html">TextWriter</a>, referencing the specified namespaces.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Serialize(System.Xml.XmlWriter,System.Object,System.Xml.Serialization.XmlSerializerNamespaces)">Serialize</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Serialize(XmlWriter xmlWriter, object o, XmlSerializerNamespaces namespaces)<br><br></code> Serializes the specified  <a href="../../System/types/Object.html">Object</a> and writes the XML document to a file using the specified  <a href="../../System.Xml/types/XmlWriter.html">XmlWriter</a>, referencing the specified namespaces.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Events</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#UnknownAttribute">UnknownAttribute</a></td>
+<td width="55%"> Occurs when the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> encounters an XML attribute of unknown type during deserialization.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#UnknownElement">UnknownElement</a></td>
+<td width="55%"> Occurs when the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> encounters an XML element of unknown type during deserialization.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#UnknownNode">UnknownNode</a></td>
+<td width="55%"> Occurs when the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> encounters an XML node of unknown type during deserialization.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#UnreferencedObject">UnreferencedObject</a></td>
+<td width="55%"> Occurs during deserialization of a SOAP-encoded XML stream, when the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> encounters a recognized type that is not used (unreferenced).</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor()<br><br></code>Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Constructs a new instance of the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> class.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#CreateReader">CreateReader</a></td>
+<td width="55%"> Returns an object used to read the XML document to be serialized.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CreateWriter">CreateWriter</a></td>
+<td width="55%"> Supports the Shared Source CLI infrastructure and is not intended to be used directly from your code </td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Deserialize(System.Xml.Serialization.XmlSerializationReader)">Deserialize</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Deserialize(XmlSerializationReader reader)<br><br></code> Supports the Shared Source CLI infrastructure and is not intended to be used directly from your code </td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Serialize(System.Object,System.Xml.Serialization.XmlSerializationWriter)">Serialize</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Serialize(object o, XmlSerializationWriter writer)<br><br></code> Supports the Shared Source CLI infrastructure and is not intended to be used directly from your code </td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Xml.Serialization.XmlSerializer</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Xml.Serialization.XmlSerializer Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Constructs a new instance of the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> class.</dd>
+</dl>
+<dl>
+<dd>
+<font color="#FF0000"><b><i>
+								This type supports the Shared Source CLI infrastructure and is not intended to be used directly from your code.
+							</i></b></font>
+</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected XmlSerializer();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> class that can serialize objects of the specified type into XML documents, and vice versa.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlSerializer(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param> The type of the object that this  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> can serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Commonly, an application defines several classes that the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> converts into a single XML-instance document. However, the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> needs to know only one type--the type of the class that represents the XML root element. The  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> automatically serializes all subordinate class instances. Similarly, only the type of the XML root element is needed for deserialization.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example constructs an  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> that serializes a simple object named Widget. The example sets various properties of the object before calling the  <a href="#Serialize(System.IO.TextWriter,System.Object)">XmlSerializer.Serialize</a> method.<pre>
+private void SerializeObject(string filename)
+{
+   XmlSerializer serializer = 
+   new XmlSerializer(typeof(OrderedItem));
+
+   // Create an instance of the class to be serialized.
+   OrderedItem i = new OrderedItem();
+
+   // Set the public property values.
+   i.ItemName = "Widget";
+   i.Description = "Regular Widget";
+   i.Quantity = 10;
+   i.UnitPrice = (decimal) 2.30;
+
+   // Writing the document requires a TextWriter.
+   TextWriter writer = new StreamWriter(filename);
+
+   // Serialize the object, and close the TextWriter.
+   serializer.Serialize(writer, i);
+   writer.Close();
+}
+
+// This is the class that will be serialized.
+public class OrderedItem
+{
+   public string ItemName;
+   public string Description;
+   public decimal UnitPrice;
+   public int Quantity;
+}
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Serialize(System.IO.TextWriter,System.Object)">XmlSerializer.Serialize</a> |  <a href="#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic3"></a><a name="ctor3">ctor #3</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes an instance of the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> class using an object that maps one type to another.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlSerializer(<br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a> <i>xmlTypeMapping</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>xmlTypeMapping</i><br><dl>
+<dd>
+<param> An  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a> that maps one type to another.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This constructor is used to create an  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> when you are serializing an object into a SOAP message. To control the SOAP messages generated, use the special attributes (beginning with the word "Soap") found in the  <a href="../../System.Xml.Serialization/System.Xml.Serialization.html">System.Xml.Serialization</a> namespace.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes a class named <code>
+                Group
+              </code>. The serialization of the <code>
+                GroupName
+              </code>, <code>
+                IgnoreThis
+              </code> fields, and the members of the <b>GroupType</b> enumeration are overridden. In the <code>
+                CreateOverrideSerializer
+              </code> method, a  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> object is created, and for each overridden member or enumeration, a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> object is created with the appropriate property set, and added to the  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> object. An  <a href="../../System.Xml.Serialization/types/XmlMapping.html">XmlMapping</a> object is created using the  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> object, and that XmlMapping object is used to create the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> that overrides the default serialization.<pre>
+using System;
+using System.IO;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
+using System.Xml.Schema;
+
+public class Group
+{
+   [SoapAttribute (Namespace = "http://www.cpandl.com")]
+   public string GroupName;
+   
+   [SoapAttribute(DataType = "base64Binary")]
+   public Byte [] GroupNumber;
+
+   [SoapAttribute(DataType = "date", AttributeName = "CreationDate")]
+   public DateTime Today;
+   [SoapElement(DataType = "nonNegativeInteger", ElementName = "PosInt")]
+   public string PostitiveInt;
+   // This is ignored when serialized unless it's overridden.
+   [SoapIgnore] 
+   public bool IgnoreThis;
+   
+   public GroupType Grouptype;
+
+   public Vehicle MyVehicle;
+
+   // The SoapInclude allows the method to return a Car.
+   [SoapInclude(typeof(Car))]
+   public Vehicle myCar(string licNumber)
+   {
+      Vehicle v;
+      if(licNumber == "")
+         {
+            v = new Car();
+   	    v.licenseNumber = "!!!!!!";
+   	 }
+      else
+   	 {
+   	   v = new Car();
+   	   v.licenseNumber = licNumber;
+   	 }
+      return v;
+   }
+}
+  
+// SoapInclude allows Vehicle to accept Car type.
+[SoapInclude(typeof(Car))]
+public abstract class Vehicle
+{
+   public string licenseNumber;
+   public DateTime makeDate;
+}
+
+public class Car: Vehicle
+{
+}
+
+public enum GroupType
+{
+   // These enums can be overridden.
+   [SoapEnum("Small")]
+   A,
+   [SoapEnum("Large")]
+   B
+}
+ 
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.SerializeOriginal("SoapOriginal.xml");
+      test.SerializeOverride("SoapOverrides.xml");
+      test.DeserializeOriginal("SoapOriginal.xml");
+      test.DeserializeOverride("SoapOverrides.xml");
+   
+   }
+   public void SerializeOriginal(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlTypeMapping myMapping = 
+      (new SoapReflectionImporter().ImportTypeMapping(
+      typeof(Group)));
+      XmlSerializer mySerializer =  
+      new XmlSerializer(myMapping);
+      Group myGroup=MakeGroup();
+      // Writing the file requires a TextWriter.
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      // Serialize the class, and close the TextWriter.
+      mySerializer.Serialize(writer, myGroup);
+      writer.WriteEndElement();
+      writer.Close();
+   }
+
+   public void SerializeOverride(string filename)
+   {
+      // Create an instance of the XmlSerializer class
+      // that overrides the serialization.
+      XmlSerializer overRideSerializer = CreateOverrideSerializer();
+      Group myGroup=MakeGroup();
+      // Writing the file requires a TextWriter.
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      // Serialize the class, and close the TextWriter.
+      overRideSerializer.Serialize(writer, myGroup);
+      writer.WriteEndElement();
+      writer.Close();
+
+   }
+
+   private Group MakeGroup(){
+      // Create an instance of the class that will be serialized.
+      Group myGroup = new Group();
+
+      // Set the object properties.
+      myGroup.GroupName = ".NET";
+
+      Byte [] hexByte = new Byte[2]{Convert.ToByte(100),
+      Convert.ToByte(50)};
+      myGroup.GroupNumber = hexByte;
+
+      DateTime myDate = new DateTime(2002,5,2);
+      myGroup.Today = myDate;
+      myGroup.PostitiveInt= "10000";
+      myGroup.IgnoreThis=true;
+      myGroup.Grouptype= GroupType.B;
+      Car thisCar =(Car)  myGroup.myCar("1234566");
+      myGroup.MyVehicle=thisCar;
+      return myGroup;
+   }   	
+
+   public void DeserializeOriginal(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlTypeMapping myMapping = 
+      (new SoapReflectionImporter().ImportTypeMapping(
+      typeof(Group)));
+      XmlSerializer mySerializer =  
+      new XmlSerializer(myMapping);
+
+
+      // Reading the file requires an  XmlTextReader.
+      XmlTextReader reader= 
+      new XmlTextReader(filename);
+      reader.ReadStartElement("wrapper");
+
+      // Deserialize and cast the object.
+      Group myGroup; 
+      myGroup = (Group) mySerializer.Deserialize(reader);
+      reader.ReadEndElement();
+      reader.Close();
+
+   }
+
+   public void DeserializeOverride(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlSerializer overRideSerializer = CreateOverrideSerializer();
+
+      // Reading the file requires an  XmlTextReader.
+      XmlTextReader reader= 
+      new XmlTextReader(filename);
+      reader.ReadStartElement("wrapper");
+
+      // Deserialize and cast the object.
+      Group myGroup; 
+      myGroup = (Group) overRideSerializer.Deserialize(reader);
+      reader.ReadEndElement();
+      reader.Close();
+      ReadGroup(myGroup);
+   }
+
+   private void ReadGroup(Group myGroup){
+      Console.WriteLine(myGroup.GroupName);
+      Console.WriteLine(myGroup.GroupNumber[0]);
+      Console.WriteLine(myGroup.GroupNumber[1]);
+      Console.WriteLine(myGroup.Today);
+      Console.WriteLine(myGroup.PostitiveInt);
+      Console.WriteLine(myGroup.IgnoreThis);
+      Console.WriteLine();
+   }
+   private XmlSerializer CreateOverrideSerializer()
+   {
+      SoapAttributeOverrides mySoapAttributeOverrides = 
+      new SoapAttributeOverrides();
+      SoapAttributes soapAtts = new SoapAttributes();
+
+      SoapElementAttribute mySoapElement = new SoapElementAttribute();
+      mySoapElement.ElementName = "xxxx";
+      soapAtts.SoapElement = mySoapElement;
+      mySoapAttributeOverrides.Add(typeof(Group), "PostitiveInt", 
+      soapAtts);
+
+      // Override the IgnoreThis property.
+      SoapIgnoreAttribute myIgnore = new SoapIgnoreAttribute();
+      soapAtts = new SoapAttributes();
+      soapAtts.SoapIgnore = false;      
+      mySoapAttributeOverrides.Add(typeof(Group), "IgnoreThis", 
+      soapAtts);
+
+      // Override the GroupType enumeration.	
+      soapAtts = new SoapAttributes();
+      SoapEnumAttribute xSoapEnum = new SoapEnumAttribute();
+      xSoapEnum.Name = "Over1000";
+      soapAtts.SoapEnum = xSoapEnum;
+
+      // Add the SoapAttributes to the 
+      // mySoapAttributeOverridesrides object.
+      mySoapAttributeOverrides.Add(typeof(GroupType), "A", 
+      soapAtts);
+
+      // Create second enumeration and add it.
+      soapAtts = new SoapAttributes();
+      xSoapEnum = new SoapEnumAttribute();
+      xSoapEnum.Name = "ZeroTo1000";
+      soapAtts.SoapEnum = xSoapEnum;
+      mySoapAttributeOverrides.Add(typeof(GroupType), "B", 
+      soapAtts);
+
+      // Override the Group type.
+      soapAtts = new SoapAttributes();
+      SoapTypeAttribute soapType = new SoapTypeAttribute();
+      soapType.TypeName = "Team";
+      soapAtts.SoapType = soapType;
+      mySoapAttributeOverrides.Add(typeof(Group),soapAtts);
+
+      // Create an XmlTypeMapping that is used to create an instance 
+      // of the XmlSerializer. Then return the XmlSerializer object.
+      XmlTypeMapping myMapping = (new SoapReflectionImporter(
+      mySoapAttributeOverrides)).ImportTypeMapping(typeof(Group));
+	
+      XmlSerializer ser = new XmlSerializer(myMapping);
+      return ser;
+   }
+}
+
+    </pre>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic4"></a><a name="ctor4">ctor #4</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> class that can serialize objects of the specified type into XML documents, and vice versa. Specifies the default namespace for all the XML elements.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlSerializer(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>defaultNamespace</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param> The type of the object that this  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> can serialize.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>defaultNamespace</i><br><dl>
+<dd>
+<param> The default namespace to use for all the XML elements.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example constructs an  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> that serializes a simple object named <b>Widget</b>. The example sets various properties of the object before calling the  <a href="#Serialize(System.IO.TextWriter,System.Object)">XmlSerializer.Serialize</a> method.<pre>
+    private void SerializeObject(string filename) {
+        XmlSerializer serializer = new XmlSerializer
+            (typeof(OrderedItem), "http://www.cpandl.com");
+         
+        // Create an instance of the class to be serialized.
+        OrderedItem i = new OrderedItem();
+         
+        // Insert code to set property values.
+         
+        // Writing the document requires a TextWriter.
+        TextWriter writer = new StreamWriter(filename);
+        // Serialize the object, and close the TextWriter
+        serializer.Serialize(writer, i);
+        writer.Close();
+    }
+ 
+    private void DeserializeObject(string filename) {
+        XmlSerializer serializer = new XmlSerializer
+            (typeof(OrderedItem), "http://www.cpandl.com");
+        // A FileStream is needed to read the XML document.
+        FileStream fs = new FileStream(filename, FileMode.Open);
+         
+        // Declare an object variable of the type to be deserialized.
+        OrderedItem i;
+         
+        // Deserialize the object.
+        i = (OrderedItem) serializer.Deserialize(fs);
+         
+        // Insert code to use the properties and methods of the object.
+    }
+
+
+    </pre>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic5"></a><a name="ctor5">ctor #5</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> class that can serialize objects of the specified type into XML documents, and vice versa. If a property or field returns an array, the <i>extraTypes</i> parameter specifies objects that can be inserted into the array.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlSerializer(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type[]</a> <i>extraTypes</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param> The type of the object that this  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> can serialize.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>extraTypes</i><br><dl>
+<dd>
+<param> A  <a href="../../System/types/Type.html">Type</a> array of additional object types to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, if a public property or field returns an object, or array of objects, the object types will be automatically serialized. However, if a class contains a field or property that returns an array of type  <a href="../../System/types/Object.html">Object</a>, any object can be inserted into that array. In that case, the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> must be instructed to expect all of the possible object types that will be inserted into the  <a href="../../System/types/Object.html">Object</a> array. To do this, use the <i>extraTypes</i> parameter to specify the extra object types to serialize or deserialize.<p> You can also use the <i>extraTypes</i> parameter to specify types derived from a base class. For example, suppose a base class named <b>Phone</b> exists, and a class named <b>InternationalPhone</b> derives from it. Use the <i>extraTypes</i> parameter to specify the derived type as well.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes an instance of a class that contains a public field that returns an array of objects. The <i>extraTypes</i> parameter of the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> constructor specifies the types of the objects that can be serialized in the array.<pre>
+using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
+
+// This defines the object that will be serialized.
+public class Teacher
+{  
+   public string Name;
+   public Teacher(){}
+   /* Note that the Info field returns an array of objects.
+      Any object can be added to the array by adding the
+      object type to the array passed to the extraTypes argument. */
+   [XmlArray (ElementName = "ExtraInfo", IsNullable = true)]
+   public object[] Info;
+   public Phone PhoneInfo;
+}
+ 
+// This defines one of the extra types to be included.
+public class Address
+{  
+   public string City;
+
+   public Address(){}
+   public Address(string city)
+   {
+      City = city;
+   }
+
+}
+
+// Another extra type to include.
+public class Phone
+{
+   public string PhoneNumber;
+   public Phone(){}
+   public Phone(string phoneNumber)
+   {
+      PhoneNumber = phoneNumber;
+   }
+}
+
+// Another type, derived from Phone
+public class InternationalPhone:Phone
+{
+   public string CountryCode;
+
+   public InternationalPhone(){}
+
+   public InternationalPhone(string countryCode)
+   {
+      CountryCode = countryCode;
+   }
+}
+    
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.SerializeObject("Teacher.xml");
+      test.DeserializeObject("Teacher.xml");
+   }
+ 
+   private void SerializeObject(string filename)
+   {
+      // Writing the file requires a TextWriter.
+      TextWriter myStreamWriter = new StreamWriter(filename);
+ 
+      // Create a Type array.
+      Type [] extraTypes= new Type[3];
+      extraTypes[0] = typeof(Address);
+      extraTypes[1] = typeof(Phone);
+      extraTypes[2] = typeof(InternationalPhone);
+
+      // Create the XmlSerializer instance.
+      XmlSerializer mySerializer = new XmlSerializer
+      (typeof(Teacher),extraTypes);
+          
+      Teacher teacher = new Teacher();
+      teacher.Name = "Mike";
+      // Add extra types to the Teacher object
+      object [] info = new object[2];
+      info[0] = new Address("Springville");
+      info[1] = new Phone("000-0000");
+         
+      teacher.Info = info;
+
+      teacher.PhoneInfo = new InternationalPhone("000"); 
+
+      mySerializer.Serialize(myStreamWriter,teacher);
+      myStreamWriter.Close();
+   }
+ 
+   private void DeserializeObject(string filename)
+   {
+      // Create a Type array.
+      Type [] extraTypes= new Type[3];
+      extraTypes[0] = typeof(Address);
+      extraTypes[1] = typeof(Phone);
+      extraTypes[2] = typeof(InternationalPhone);
+
+      // Create the XmlSerializer instance.
+      XmlSerializer mySerializer = new XmlSerializer
+      (typeof(Teacher),extraTypes);
+      
+      // Reading a file requires a FileStream.
+      FileStream fs = new FileStream(filename, FileMode.Open);
+      Teacher teacher = (Teacher) mySerializer.Deserialize(fs);
+         
+      // Read the extra information.
+      Address a = (Address)teacher.Info[0];
+      Phone p = (Phone) teacher.Info[1];
+      InternationalPhone Ip = 
+      (InternationalPhone) teacher.PhoneInfo;
+
+      Console.WriteLine(teacher.Name);
+      Console.WriteLine(a.City);
+      Console.WriteLine(p.PhoneNumber);
+      Console.WriteLine(Ip.CountryCode);
+   }
+}
+
+    </pre>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic6"></a><a name="ctor6">ctor #6</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> class that can serialize objects of the specified type into XML documents, and vice versa. Each object to be serialized can itself contain instances of classes, which this overload can override with other classes.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlSerializer(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> <i>overrides</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param> The type of the object to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>overrides</i><br><dl>
+<dd>
+<param> An  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The <i>overrides</i> parameter can be used to control how fields and properties are encoded in XML. These settings override any attributes that already exist on the objects. This can be useful when the source code cannot be modified or multiple encodings are required for the same classes.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes an instance of a class that is defined in a DLL, and, to do so, overrides the public members found in the DLL.<pre>
+// Beginning of HighSchool.dll
+namespace HighSchool
+{
+   public class Student
+   {
+      public string Name;
+      public int ID;
+   }
+    
+   public class MyClass
+   {
+      public Student[] Students;
+   }
+}
+
+namespace College
+   {
+   using System;
+   using System.IO;
+   using System.Xml;
+   using System.Xml.Serialization; 
+   using HighSchool;
+
+    public class Graduate:HighSchool.Student
+    {
+       public Graduate(){}
+       // Add a new field named University.
+       public string University;
+    }
+ 
+    
+   public class Run
+   {
+      public static void Main()
+      {
+         Run test = new Run();
+         test.WriteOverriddenAttributes("College.xml");
+         test.ReadOverriddenAttributes("College.xml");
+      }
+ 
+      private void WriteOverriddenAttributes(string filename)
+      {
+         // Writing the file requires a TextWriter.
+         TextWriter myStreamWriter = new StreamWriter(filename);
+         // Create an XMLAttributeOverrides class.
+         XmlAttributeOverrides attrOverrides = 
+         new XmlAttributeOverrides();
+         // Create the XmlAttributes class.
+         XmlAttributes attrs = new XmlAttributes();
+
+         /* Override the Student class. "Alumni" is the name
+         of the overriding element in the XML output. */
+         XmlElementAttribute attr = 
+         new XmlElementAttribute("Alumni", typeof(Graduate));
+
+         /* Add the XmlElementAttribute to the collection of
+         elements in the XmlAttributes object. */
+         attrs.XmlElements.Add(attr);
+
+         /* Add the XmlAttributes to the XmlAttributeOverrides. 
+         "Students" is the name being overridden. */
+         attrOverrides.Add(typeof(HighSchool.MyClass), 
+         "Students", attrs);
+          
+         // Create the XmlSerializer. 
+         XmlSerializer mySerializer = new XmlSerializer
+         (typeof(HighSchool.MyClass), attrOverrides);
+ 
+         MyClass myClass = new MyClass();
+
+         Graduate g1 = new Graduate();
+         g1.Name = "Jackie";
+         g1.ID = 1;
+         g1.University = "Alma Mater";
+
+         Graduate g2 = new Graduate();
+         g2.Name = "Megan";
+         g2.ID = 2;
+         g2.University = "CM";
+
+         Student[] myArray = {g1,g2};
+         myClass.Students = myArray;
+ 
+         mySerializer.Serialize(myStreamWriter, myClass);
+         myStreamWriter.Close();
+      }
+
+      private void ReadOverriddenAttributes(string filename)
+      {
+         /* The majority of the code here is the same as that in the
+         WriteOverriddenAttributes method. Because the XML being read
+         doesn't conform to the schema defined by the DLL, the
+         XMLAttributesOverrides must be used to create an 
+         XmlSerializer instance to read the XML document.*/
+          
+         XmlAttributeOverrides attrOverrides = new 
+         XmlAttributeOverrides();
+         XmlAttributes attrs = new XmlAttributes();
+         XmlElementAttribute attr = 
+         new XmlElementAttribute("Alumni", typeof(Graduate));
+         attrs.XmlElements.Add(attr);
+         attrOverrides.Add(typeof(HighSchool.MyClass), 
+         "Students", attrs);
+
+         XmlSerializer readSerializer = new XmlSerializer
+         (typeof(HighSchool.MyClass), attrOverrides);
+
+         // To read the file, a FileStream object is required. 
+         FileStream fs = new FileStream(filename, FileMode.Open);
+          
+         MyClass myClass;
+
+         myClass = (MyClass) readSerializer.Deserialize(fs);
+
+         /* Here is the difference between reading and writing an 
+         XML document: You must declare an object of the derived 
+         type (Graduate) and cast the Student instance to it.*/
+         Graduate g;
+
+         foreach(Graduate grad in myClass.Students)
+         {
+            g = (Graduate) grad;
+            Console.Write(g.Name + "\t");
+            Console.Write(g.ID + "\t");
+            Console.Write(g.University + "\n");
+         }
+      }
+   }
+}
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic7"></a><a name="ctor7">ctor #7</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> class that can serialize objects of the specified type into XML documents, and vice versa. Specifies the class to use as the XML root element.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlSerializer(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/XmlRootAttribute.html">XmlRootAttribute</a> <i>root</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param> The type of the object that this  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> can serialize.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>root</i><br><dl>
+<dd>
+<param> An  <a href="../../System.Xml.Serialization/types/XmlRootAttribute.html">XmlRootAttribute</a> that represents the XML root element.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The root element of an XML document encloses all the other elements. By default, the object specified by the <i>type</i> parameter is serialized as the root element. Properties, such as the XML element name of the root element are taken from the <i>type</i> object. However, the <i>root</i> parameter allows you to supplant the default object's information by specifying an  <a href="../../System.Xml.Serialization/types/XmlRootAttribute.html">XmlRootAttribute</a>; the object allows you to set a different namespace, element name, and so on.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example constructs an  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> that uses an  <a href="../../System.Xml.Serialization/types/XmlRootAttribute.html">XmlRootAttribute</a> containing various properties of the XML root element, such as its namespace and element name.<pre>
+    private void SerializeObject(string filename) {
+        // Create an XmlRootAttribute, and set its properties.
+        XmlRootAttribute xRoot = new XmlRootAttribute();
+        xRoot.ElementName = "CustomRoot";
+        xRoot.Namespace = "http://www.cpandl.com";
+        xRoot.IsNullable = true;
+         
+        // Construct the XmlSerializer with the XmlRootAttribute.
+        XmlSerializer serializer = new XmlSerializer
+            (typeof(OrderedItem),xRoot);
+         
+        // Create an instance of the object to serialize.
+        OrderedItem i = new OrderedItem();
+        // Insert code to set properties of the ordered item.
+         
+        // Writing the document requires a TextWriter.
+        TextWriter writer = new StreamWriter(filename);
+         
+        serializer.Serialize(writer, i);
+        writer.Close();
+    }
+
+    private void DeserializeObject(string filename) {
+        // Create an XmlRootAttribute, and set its properties.
+        XmlRootAttribute xRoot = new XmlRootAttribute();
+        xRoot.ElementName = "CustomRoot";
+        xRoot.Namespace = "http://www.cpandl.com";
+        xRoot.IsNullable = true;
+         
+        XmlSerializer serializer = new XmlSerializer
+            (typeof(OrderedItem),xRoot);
+         
+        // A FileStream is needed to read the XML document.
+        FileStream fs = new FileStream(filename, FileMode.Open);
+        // Deserialize the object.
+        OrderedItem i = (OrderedItem) serializer.Deserialize(fs);
+        // Insert code to use the object's properties and methods.
+    }
+
+
+    </pre>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic8"></a><a name="ctor8">ctor #8</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> class that can serialize objects of type  <a href="../../System/types/Object.html">Object</a> into XML document instances, and vice versa. Each object to be serialized can itself contain instances of classes, which this overload can override with other classes. This overload also specifies the default namespace for all the XML elements, and the class to use as the XML root element.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlSerializer(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i>,</font><br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> <i>overrides</i>,</font><br>   <font color="#008080"><a href="../../System/types/Type.html">Type[]</a> <i>extraTypes</i>,</font><br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/XmlRootAttribute.html">XmlRootAttribute</a> <i>root</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>defaultNamespace</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param> The type of the object that this  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> can serialize.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>overrides</i><br><dl>
+<dd>
+<param> An  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>extraTypes</i><br><dl>
+<dd>
+<param> A  <a href="../../System/types/Type.html">Type</a> array of additional object types to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>root</i><br><dl>
+<dd>
+<param> An  <a href="../../System.Xml.Serialization/types/XmlRootAttribute.html">XmlRootAttribute</a> that defines the XML root element properties.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>defaultNamespace</i><br><dl>
+<dd>
+<param> The default namespace of all XML elements in the XML document.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The <i>overrides</i> parameter allows for the creation of an  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> that serializes an overriding class. For example, given a DLL, it's possible to create a class that inherits from the DLL. To serialize the overriding class, you must use an instance of the  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> class when constructing the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>. For more details, see  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a>.<p> By default, if a public property or field returns an object, or array of objects, the object types will be automatically serialized. However, if a class contains a field or property that returns an array of type  <a href="../../System/types/Object.html">Object</a>, any object can be inserted into that array. In that case, the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> must be instructed to expect all of the possible object types that will be inserted into the  <a href="../../System/types/Object.html">Object</a> array. To do this, use the <i>extraTypes</i> parameter to specify the extra object types to serialize or deserialize.</p>
+<p> The root element of an XML document encloses all the other elements. By default, the object specified by the <i>type</i> parameter is serialized as the root element. Properties, such as the XML element name of the root element are taken from the <i>type</i> object. However, the <i>root</i> parameter allows you to supplant the default object's information by specifying an  <a href="../../System.Xml.Serialization/types/XmlRootAttribute.html">XmlRootAttribute</a>; the object allows you to set a different namespace, element name, and so on.</p>
+<p> Use the <i>defaultName</i> parameter to specify the default name of all XML elements generated by the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes an instance of a class that is defined in a DLL, and, to do so, overrides the public members found in the DLL. The example also specifies an array of extra types, the default namespace for all XML elements, and the class to use that provides the XML root element information. The example assumes that the code at the beginning has been compiled into a DLL named HighSchool.<pre>
+// Beginning of the HighSchool.dll 
+
+namespace HighSchool
+{
+   public class Student
+   {
+      public string Name;
+      public int ID;
+   }
+    
+   public class MyClass
+   {
+      public Student[] Students;
+   }
+}
+
+namespace College
+   {
+   using System;
+   using System.IO;
+   using System.Xml;
+   using System.Xml.Serialization; 
+   using HighSchool;
+
+    public class Graduate:HighSchool.Student
+    {
+       public Graduate(){}
+       // Add a new field named University.
+       public string University;
+       // Use extra types to use this field.
+       public object[]Info;
+    }
+ 
+    public class Address
+    {
+       public string City;
+    }
+ 
+    public class Phone
+    {
+       public string Number;
+    }
+    
+   public class Run
+   {
+      public static void Main()
+      {
+         Run test = new Run();
+         test.WriteOverriddenAttributes("College.xml");
+         test.ReadOverriddenAttributes("College.xml");
+      }
+ 
+      private void WriteOverriddenAttributes(string filename)
+      {
+         // Writing the file requires a TextWriter.
+         TextWriter myStreamWriter = new StreamWriter(filename);
+         // Create an XMLAttributeOverrides class.
+         XmlAttributeOverrides attrOverrides = 
+         new XmlAttributeOverrides();
+         // Create the XmlAttributes class.
+         XmlAttributes attrs = new XmlAttributes();
+         /* Override the Student class. "Alumni" is the name
+         of the overriding element in the XML output. */
+
+         XmlElementAttribute attr = 
+         new XmlElementAttribute("Alumni", typeof(Graduate));
+         /* Add the XmlElementAttribute to the collection of
+         elements in the XmlAttributes object. */
+         attrs.XmlElements.Add(attr);
+         /* Add the XmlAttributes to the XmlAttributeOverrides. 
+         "Students" is the name being overridden. */
+         attrOverrides.Add(typeof(HighSchool.MyClass), 
+         "Students", attrs);
+ 
+         // Create array of extra types.
+         Type [] extraTypes = new Type[2];
+         extraTypes[0]=typeof(Address);
+         extraTypes[1]=typeof(Phone);
+ 
+         // Create an XmlRootAttribute.
+         XmlRootAttribute root = new XmlRootAttribute("Graduates");
+          
+         /* Create the XmlSerializer with the 
+         XmlAttributeOverrides object. */
+         XmlSerializer mySerializer = new XmlSerializer
+         (typeof(HighSchool.MyClass), attrOverrides, extraTypes,
+         root, "http://www.cpandl.com");
+ 
+         MyClass myClass= new MyClass();
+
+         Graduate g1 = new Graduate();
+         g1.Name = "Jacki";
+         g1.ID = 1;
+         g1.University = "Alma";
+
+         Graduate g2 = new Graduate();
+         g2.Name = "Megan";
+         g2.ID = 2;
+         g2.University = "CM";
+
+         Student[] myArray = {g1,g2};
+
+         myClass.Students = myArray;
+ 
+         // Create extra information.
+         Address a1 = new Address();
+         a1.City = "Ionia";
+         Address a2 = new Address();
+         a2.City = "Stamford";
+         Phone p1 = new Phone();
+         p1.Number = "000-0000";
+         Phone p2 = new Phone();
+         p2.Number = "111-1111";
+ 
+         Object[]o1 = new Object[2]{a1, p1};
+         Object[]o2 = new Object[2]{a2,p2};
+ 
+         g1.Info = o1;
+         g2.Info = o2;
+         mySerializer.Serialize(myStreamWriter,myClass);
+         myStreamWriter.Close();
+      }
+
+      private void ReadOverriddenAttributes(string filename)
+      {
+         /* The majority of the code here is the same as that in the
+         WriteOverriddenAttributes method. Because the XML being read
+         doesn't conform to the schema defined by the DLL, the
+         XMLAttributesOverrides must be used to create an 
+         XmlSerializer instance to read the XML document.*/
+          
+         XmlAttributeOverrides attrOverrides = new 
+         XmlAttributeOverrides();
+         XmlAttributes attrs = new XmlAttributes();
+         XmlElementAttribute attr = 
+         new XmlElementAttribute("Alumni", typeof(Graduate));
+         attrs.XmlElements.Add(attr);
+         attrOverrides.Add(typeof(HighSchool.MyClass), 
+         "Students", attrs);
+
+         Type [] extraTypes = new Type[2];
+         extraTypes[0] = typeof(Address);
+         extraTypes[1] = typeof(Phone);
+ 
+         XmlRootAttribute root = new XmlRootAttribute("Graduates");
+          
+         XmlSerializer readSerializer = new XmlSerializer
+         (typeof(HighSchool.MyClass), attrOverrides, extraTypes,
+         root, "http://www.microsoft.com");
+
+         // A FileStream object is required to read the file. 
+         FileStream fs = new FileStream(filename, FileMode.Open);
+          
+         MyClass myClass;
+         myClass = (MyClass) readSerializer.Deserialize(fs);
+
+         /* Here is the difference between reading and writing an 
+         XML document: You must declare an object of the derived 
+         type (Graduate) and cast the Student instance to it.*/
+         Graduate g;
+         Address a;
+         Phone p;
+         foreach(Graduate grad in myClass.Students)
+         {
+            g = (Graduate) grad;
+            Console.Write(g.Name + "\t");
+            Console.Write(g.ID + "\t");
+            Console.Write(g.University + "\n");
+            a = (Address) g.Info[0];
+            Console.WriteLine(a.City);
+            p = (Phone) g.Info[1];
+            Console.WriteLine(p.Number);
+         }
+      }
+   }
+}
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> |  <a href="../../System.Xml.Serialization/types/XmlRootAttribute.html">XmlRootAttribute</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CanDeserializeTopic1"></a><a name="CanDeserialize(System.Xml.XmlReader)">CanDeserialize</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Xml/types/XmlReader.html">XmlReader</a> <i>xmlReader</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether this  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> can deserialize a specified XML document.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> CanDeserialize(<br>   <font color="#008080"><a href="../../System.Xml/types/XmlReader.html">XmlReader</a> <i>xmlReader</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>xmlReader</i><br><dl>
+<dd>
+<param> An  <a href="../../System.Xml/types/XmlReader.html">XmlReader</a> that points to the document to deserialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if an this  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> can deserialize the object which the  <a href="../../System.Xml/types/XmlReader.html">XmlReader</a> points to; otherwise, <b>false</b>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example calls the  <a href="#CanDeserialize(System.Xml.XmlReader)">XmlSerializer.CanDeserialize</a> method to check whether an XML document can be deserialized.<pre>
+private void TestDocument(string filename, Type objType)
+{
+   // Using a FileStream, create an XmlTextReader.
+   Stream fs = new FileStream(filename, FileMode.Open);
+   XmlReader reader = new XmlTextReader(fs);
+   XmlSerializer serializer = new XmlSerializer(objType);
+   if(serializer.CanDeserialize(reader))
+      {
+         Object o = serializer.Deserialize(reader);
+      }
+   fs.Close();
+}
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CreateReaderTopic1"></a><a name="CreateReader">CreateReader</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns an object used to read the XML document to be serialized.</dd>
+</dl>
+<dl>
+<dd>
+<font color="#FF0000"><b><i>
+								This type supports the Shared Source CLI infrastructure and is not intended to be used directly from your code.
+							</i></b></font>
+</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual <a href="../../System.Xml.Serialization/types/XmlSerializationReader.html">XmlSerializationReader</a> CreateReader();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An XmlSerializationReader used to read the XML document.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CreateWriterTopic1"></a><a name="CreateWriter">CreateWriter</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Supports the Shared Source CLI infrastructure and is not intended to be used directly from your code </dd>
+</dl>
+<dl>
+<dd>
+<font color="#FF0000"><b><i>
+								This type supports the Shared Source CLI infrastructure and is not intended to be used directly from your code.
+							</i></b></font>
+</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual XmlSerializationWriter CreateWriter();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="DeserializeTopic1"></a><a name="Deserialize(System.IO.Stream)">Deserialize</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.IO/types/Stream.html">Stream</a> <i>stream</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Deserializes the XML document contained by the specified  <a href="../../System.IO/types/Stream.html">Stream</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> Deserialize(<br>   <font color="#008080"><a href="../../System.IO/types/Stream.html">Stream</a> <i>stream</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>stream</i><br><dl>
+<dd>
+<param> The  <a href="../../System.IO/types/Stream.html">Stream</a> containing the XML document to deserialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The  <a href="../../System/types/Object.html">Object</a> being deserialized.</dd>
+</dl><b>Remarks</b><dl>
+<dd> Deserialization is the process of reading an XML document and constructing an object that is strongly typed to the XML Schema (XSD) of the document.<p> Before deserializing, an  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> must be constructed using the type of the object that is being deserialized.</p>
+<p> Use the <i>stream</i> parameter to specify an object that derives from the  <a href="../../System.IO/types/Stream.html">Stream</a> class, which is designed to write to streams. Classes that derive from the  <a href="../../System.IO/types/Stream.html">Stream</a> class include: </p>
+<UL>
+<li> <a href="../../System.IO/types/BufferedStream.html">BufferedStream</a></li>
+<li> <a href="../../System.IO/types/FileStream.html">FileStream</a></li>
+<li> <a href="../../System.IO/types/MemoryStream.html">MemoryStream</a></li>
+<li> <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a></li>
+<li> <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSecurityCryptographyCryptoStreammemberstopic.asp">CryptoStream</a></li>
+</UL>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example deserializes an object using a  <a href="../../System.IO/types/Stream.html">Stream</a> object.<pre>
+using System;
+using System.IO;
+using System.Xml.Serialization;
+
+// This is the class that will be deserialized.
+public class OrderedItem
+{
+   [XmlElement(Namespace = "http://www.cpandl.com")]
+   public string ItemName;
+   [XmlElement(Namespace = "http://www.cpandl.com")]
+   public string Description;
+   [XmlElement(Namespace="http://www.cohowinery.com")]
+   public decimal UnitPrice;
+   [XmlElement(Namespace = "http://www.cpandl.com")]
+   public int Quantity;
+   [XmlElement(Namespace="http://www.cohowinery.com")]
+   public decimal LineTotal;
+   // A custom method used to calculate price per item.
+   public void Calculate()
+   {
+      LineTotal = UnitPrice * Quantity;
+   }
+}
+ 
+public class Test
+{
+   public static void Main()
+   {
+      Test t = new Test();
+      // Read a purchase order.
+      t.DeserializeObject("simple.xml");
+   }
+
+   private void DeserializeObject(string filename)
+   {   
+      Console.WriteLine("Reading with Stream");
+      // Create an instance of the XmlSerializer.
+      XmlSerializer serializer = 
+      new XmlSerializer(typeof(OrderedItem));
+      // Reading the XML document requires a FileStream.
+      Stream reader= new FileStream(filename,FileMode.Open);
+          
+      // Declare an object variable of the type to be deserialized.
+      OrderedItem i;
+
+      // Call the Deserialize method to restore the object's state.
+      i = (OrderedItem) serializer.Deserialize(reader);
+
+      // Write out the properties of the object.
+      Console.Write(
+      i.ItemName + "\t" +
+      i.Description + "\t" +
+      i.UnitPrice + "\t" +
+      i.Quantity + "\t" +
+      i.LineTotal);
+   }
+}
+
+
+    </pre>
+<pre>
+&lt;?xml version="1.0"?&gt;
+ &lt;OrderedItem xmlns:inventory="http://www.cpandl.com" xmlns:money="http://www.cohowinery.com"&gt;
+   &lt;inventory:ItemName&gt;Widget&lt;/inventory:ItemName&gt;
+   &lt;inventory:Description&gt;Regular Widget&lt;/inventory:Description&gt;
+   &lt;money:UnitPrice&gt;2.3&lt;/money:UnitPrice&gt;
+   &lt;inventory:Quantity&gt;10&lt;/inventory:Quantity&gt;
+   &lt;money:LineTotal&gt;23&lt;/money:LineTotal&gt;
+ &lt;/OrderedItem&gt;
+
+
+    </pre>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a> |  <a href="#CanDeserialize(System.Xml.XmlReader)">XmlSerializer.CanDeserialize</a> |  <a href="#Serialize(System.IO.TextWriter,System.Object)">XmlSerializer.Serialize</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="DeserializeTopic2"></a><a name="Deserialize(System.IO.TextReader)">Deserialize</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.IO/types/TextReader.html">TextReader</a> <i>textReader</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Deserializes the XML document contained by the specified  <a href="../../System.IO/types/TextReader.html">TextReader</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> Deserialize(<br>   <font color="#008080"><a href="../../System.IO/types/TextReader.html">TextReader</a> <i>textReader</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>textReader</i><br><dl>
+<dd>
+<param> The  <a href="../../System.IO/types/TextReader.html">TextReader</a> containing the XML document to deserialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The  <a href="../../System/types/Object.html">Object</a> being deserialized.</dd>
+</dl><b>Remarks</b><dl>
+<dd> Deserialization is the process of reading an XML instance document and constructing an object that is strongly typed to the XML Schema (XSD) of the document.<p> Before deserializing, an  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> must be constructed using the type of the object that is being deserialized.</p>
+<p> Classes that inherit from  <a href="../../System.IO/types/TextReader.html">TextReader</a> include  <a href="../../System.IO/types/StringReader.html">StringReader</a> and  <a href="../../System.IO/types/StreamReader.html">StreamReader</a>. If you are using a  <a href="../../System.IO/types/StreamReader.html">StreamReader</a> to deserialize an object, you must construct the  <a href="../../System.IO/types/StreamReader.html">StreamReader</a> with an appropriate  <a href="../../System.Text/types/Encoding.html">Encoding</a>. The encoding specified by the XML document will be ignored.</p><br><br><b>Note </b> To use the encoding specified by the XML document, use the  <a href="#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> overload that takes an  <a href="../../System.Xml/types/XmlReader.html">XmlReader</a> instead. The  <a href="../../System.Xml/types/XmlReader.html">XmlReader</a> automatically detects and uses the encoding specified by the XML document.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example deserializes an object using a  <a href="../../System.IO/types/TextReader.html">TextReader</a> object.<pre>
+using System;
+using System.IO;
+using System.Text;
+using System.Xml.Serialization;
+
+// This is the class that will be deserialized.
+public class OrderedItem
+{
+   public string ItemName;
+   public string Description;
+   public decimal UnitPrice;
+   public int Quantity;
+   public decimal LineTotal;
+   // A custom method used to calculate price per item.
+   public void Calculate()
+   {
+      LineTotal = UnitPrice * Quantity;
+   }
+}
+ 
+public class Test
+{
+   public static void Main()
+   {
+      Test t = new Test();
+      // Read a purchase order.
+      t.DeserializeObject("simple.xml");
+   }
+   private void DeserializeObject(string filename)
+   {   
+      Console.WriteLine("Reading with TextReader");
+
+      // Create an instance of the XmlSerializer specifying type.
+      XmlSerializer serializer = 
+      new XmlSerializer(typeof(OrderedItem));
+
+      /* Create a TextReader to read the file. Specify an
+         Encoding to use. */
+      TextReader reader = new StreamReader(filename, Encoding.Unicode);
+          
+      // Declare an object variable of the type to be deserialized.
+      OrderedItem i;
+
+      // Use the Deserialize method to restore the object's state.
+      i = (OrderedItem) serializer.Deserialize(reader);
+
+      // Write out the properties of the object.
+      Console.Write(
+      i.ItemName + "\t" +
+      i.Description + "\t" +
+      i.UnitPrice + "\t" +
+      i.Quantity + "\t" +
+      i.LineTotal);
+   }
+}
+
+
+    </pre>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a> |  <a href="#CanDeserialize(System.Xml.XmlReader)">XmlSerializer.CanDeserialize</a> |  <a href="#Serialize(System.IO.TextWriter,System.Object)">XmlSerializer.Serialize</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="DeserializeTopic3"></a><a name="Deserialize(System.Xml.XmlReader)">Deserialize</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Xml/types/XmlReader.html">XmlReader</a> <i>xmlReader</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Deserializes the XML document contained by the specified  <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemxmlXmlReadermemberstopic.asp">XmlReader</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> Deserialize(<br>   <font color="#008080"><a href="../../System.Xml/types/XmlReader.html">XmlReader</a> <i>xmlReader</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>xmlReader</i><br><dl>
+<dd>
+<param> The  <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemxmlXmlReadermemberstopic.asp">XmlReader</a> containing the XML document to deserialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The  <a href="../../System/types/Object.html">Object</a> being deserialized.</dd>
+</dl><b>Remarks</b><dl>
+<dd> Deserialization is the process of reading an XML instance document and constructing an object that is strongly typed to the XML Schema (XSD) of the document. Before deserializing, an  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> must be constructed using the type of the object that is being deserialized.<p> The  <a href="../../System.Xml/types/XmlReader.html">XmlReader</a> automatically detects and uses the encoding specified by the XML document.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example deserializes an object using an  <a href="../../System.Xml/types/XmlReader.html">XmlReader</a>.<pre>
+using System;
+using System.IO;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
+
+// This is the class that will be deserialized.
+public class OrderedItem
+   {
+      public string ItemName;
+      public string Description;
+      public decimal UnitPrice;
+      public int Quantity;
+      public decimal LineTotal;
+
+      // A custom method used to calculate price per item.
+      public void Calculate()
+      {
+         LineTotal = UnitPrice * Quantity;
+      }
+   }
+ 
+public class Test
+{
+   public static void Main(string[] args)
+   {
+      Test t = new Test();
+      // Read a purchase order.
+      t.DeserializeObject("simple.xml");
+   }
+
+   private void DeserializeObject(string filename)
+   {   
+      Console.WriteLine("Reading with XmlReader");
+
+      // Create an instance of the XmlSerializer specifying type and namespace.
+      XmlSerializer serializer = new 
+      XmlSerializer(typeof(OrderedItem));
+
+      // A FileStream is needed to read the XML document.
+      FileStream fs = new FileStream(filename, FileMode.Open);
+      XmlReader reader = new XmlTextReader(fs);
+          
+      // Declare an object variable of the type to be deserialized.
+      OrderedItem i;
+
+      // Use the Deserialize method to restore the object's state.
+      i = (OrderedItem) serializer.Deserialize(reader);
+
+      // Write out the properties of the object.
+      Console.Write(
+      i.ItemName + "\t" +
+      i.Description + "\t" +
+      i.UnitPrice + "\t" +
+      i.Quantity + "\t" +
+      i.LineTotal);
+   }
+}
+
+
+    </pre>
+<pre>
+&lt;?xml version="1.0"?&gt;
+ &lt;OrderedItem xmlns:inventory="http://www.cpandl.com" xmlns:money="http://www.cohowinery.com"&gt;
+   &lt;inventory:ItemName&gt;Widget&lt;/inventory:ItemName&gt;
+   &lt;inventory:Description&gt;Regular Widget&lt;/inventory:Description&gt;
+   &lt;money:UnitPrice&gt;2.3&lt;/money:UnitPrice&gt;
+   &lt;inventory:Quantity&gt;10&lt;/inventory:Quantity&gt;
+   &lt;money:LineTotal&gt;23&lt;/money:LineTotal&gt;
+ &lt;/OrderedItem&gt;
+
+
+    </pre>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a> |  <a href="#CanDeserialize(System.Xml.XmlReader)">XmlSerializer.CanDeserialize</a> |  <a href="#Serialize(System.IO.TextWriter,System.Object)">XmlSerializer.Serialize</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="DeserializeTopic4"></a><a name="Deserialize(System.Xml.Serialization.XmlSerializationReader)">Deserialize</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/XmlSerializationReader.html">XmlSerializationReader</a> <i>reader</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Supports the Shared Source CLI infrastructure and is not intended to be used directly from your code </dd>
+</dl>
+<dl>
+<dd>
+<font color="#FF0000"><b><i>
+								This type supports the Shared Source CLI infrastructure and is not intended to be used directly from your code.
+							</i></b></font>
+</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual object Deserialize(<br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/XmlSerializationReader.html">XmlSerializationReader</a> <i>reader</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>reader</i><br><dl>
+<dd>
+<param>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~XmlSerializer();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FromMappingsTopic1"></a><a name="FromMappings(System.Xml.Serialization.XmlMapping[])">FromMappings</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/XmlMapping.html">XmlMapping[]</a> <i>mappings</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd></dd>
+</dl>
+<dl>
+<dd>
+<font color="#FF0000"><b><i>
+								This type supports the Shared Source CLI infrastructure and is not intended to be used directly from your code.
+							</i></b></font>
+</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static XmlSerializer[] FromMappings(<br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/XmlMapping.html">XmlMapping[]</a> <i>mappings</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>mappings</i><br><dl>
+<dd>
+<param>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FromTypesTopic1"></a><a name="FromTypes(System.Type[])">FromTypes</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type[]</a> <i>types</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns an array of  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> objects created from an array of types.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer[]</a> FromTypes(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type[]</a> <i>types</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>types</i><br><dl>
+<dd>
+<param> An array of  <a href="../../System/types/Type.html">Type</a> objects.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An array of  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> objects.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#FromTypes(System.Type[])">XmlSerializer.FromTypes</a> method allows you to efficiently create an array of  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> objects for processing an array of  <a href="../../System/types/Type.html">Type</a> objects.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example uses the  <a href="#FromTypes(System.Type[])">XmlSerializer.FromTypes</a> method to return an array of  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> objects. The code includes three class definitions which are each used to create an array of  <a href="../../System/types/Type.html">Type</a> objects.<pre>
+using System;
+using System.IO;
+using System.Xml.Serialization;
+
+/* Three classes are included here. Each one will
+be used to create three XmlSerializer objects. */
+
+public class Instrument
+{
+   public string InstrumentName;
+}
+
+public class Player
+{
+   public string PlayerName;
+}
+
+public class Piece
+{
+   public string PieceName;
+}
+ 
+public class Test
+{
+   public static void Main()
+   {
+      Test t = new Test();
+      t.GetSerializers();
+   }
+
+   public void GetSerializers()
+   {
+      // Create an array of types.
+      Type[]types = new Type[3];
+      types[0] = typeof(Instrument);
+      types[1] = typeof(Player);
+      types[2] = typeof(Piece);
+ 
+      // Create an array for XmlSerializer objects.
+      XmlSerializer[]serializers= new XmlSerializer[3];
+      serializers = XmlSerializer.FromTypes(types);
+      // Create one Instrument and serialize it.
+      Instrument i = new Instrument();
+      i.InstrumentName = "Piano";
+      // Create a TextWriter to write with.
+      TextWriter writer = new StreamWriter("Inst.xml");
+      serializers[0].Serialize(writer,i);
+      writer.Close();
+   }
+}
+
+
+    </pre>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="SerializeTopic1"></a><a name="Serialize(System.Object,System.Xml.Serialization.XmlSerializationWriter)">Serialize</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>o</i>,</font><br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/XmlSerializationWriter.html">XmlSerializationWriter</a> <i>writer</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Supports the Shared Source CLI infrastructure and is not intended to be used directly from your code </dd>
+</dl>
+<dl>
+<dd>
+<font color="#FF0000"><b><i>
+								This type supports the Shared Source CLI infrastructure and is not intended to be used directly from your code.
+							</i></b></font>
+</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual void Serialize(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>o</i>,</font><br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/XmlSerializationWriter.html">XmlSerializationWriter</a> <i>writer</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>o</i><br><dl>
+<dd>
+<param>
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>writer</i><br><dl>
+<dd>
+<param>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="SerializeTopic2"></a><a name="Serialize(System.IO.Stream,System.Object)">Serialize</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.IO/types/Stream.html">Stream</a> <i>stream</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>o</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Serializes the specified  <a href="../../System/types/Object.html">Object</a> and writes the XML document to a file using the specified  <a href="../../System.IO/types/Stream.html">Stream</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void Serialize(<br>   <font color="#008080"><a href="../../System.IO/types/Stream.html">Stream</a> <i>stream</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>o</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>stream</i><br><dl>
+<dd>
+<param> The  <a href="../../System.IO/types/Stream.html">Stream</a> used to write the XML document.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>o</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Object.html">Object</a> to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#Serialize(System.IO.TextWriter,System.Object)">XmlSerializer.Serialize</a> method converts the public fields and read/write properties of an object into XML. It does not convert methods, indexers, private fields, or read-only properties. To serialize all of an object's fields and properties, both public and private, use the  <a href="../../System.Runtime.Serialization.Formatters.Binary/types/BinaryFormatter.html">BinaryFormatter</a>.<p> In the <i>stream</i> parameter, specify an object that derives from the abstract  <a href="../../System.IO/types/Stream.html">Stream</a> class. Classes that derive from  <a href="../../System.IO/types/Stream.html">Stream</a> include: </p>
+<UL>
+<li> <a href="../../System.IO/types/BufferedStream.html">BufferedStream</a></li>
+<li> <a href="../../System.IO/types/FileStream.html">FileStream</a></li>
+<li> <a href="../../System.IO/types/MemoryStream.html">MemoryStream</a></li>
+<li> <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a></li>
+<li> <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSecurityCryptographyCryptoStreammemberstopic.asp">CryptoStream</a></li>
+</UL>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes an object using a  <a href="../../System.IO/types/Stream.html">Stream</a> object.<pre>
+using System;
+using System.IO;
+using System.Xml.Serialization;
+
+// This is the class that will be serialized.
+public class OrderedItem
+{
+   public string ItemName;
+   public string Description;
+   public decimal UnitPrice;
+   public int Quantity;
+   public decimal LineTotal;
+
+   // A custom method used to calculate price per item.
+   public void Calculate()
+   {
+      LineTotal = UnitPrice * Quantity;
+   }
+}
+ 
+public class Test{
+   public static void Main(string[] args)
+   {
+      Test t = new Test();
+      // Write a purchase order.
+      t.SerializeObject("simple.xml");
+   }
+ 
+   private void SerializeObject(string filename)
+   {
+      Console.WriteLine("Writing With Stream");
+ 
+      XmlSerializer serializer = 
+      new XmlSerializer(typeof(OrderedItem));
+      OrderedItem i = new OrderedItem();
+      i.ItemName = "Widget";
+      i.Description = "Regular Widget";
+      i.Quantity = 10;
+      i.UnitPrice = (decimal) 2.30;
+      i.Calculate();
+ 
+      // Create a FileStream to write with.
+      Stream writer = new FileStream(filename, FileMode.Create);
+      // Serialize the object, and close the TextWriter
+      serializer.Serialize(writer, i);
+      writer.Close();
+   }
+}
+
+
+    </pre>
+<pre>
+&lt;?xml version="1.0"?&gt;
+ &lt;OrderedItem xmlns:inventory="http://www.cpandl.com" xmlns:money="http://www.cohowinery.com"&gt;
+   &lt;inventory:ItemName&gt;Widget&lt;/inventory:ItemName&gt;
+   &lt;inventory:Description&gt;Regular Widget&lt;/inventory:Description&gt;
+   &lt;money:UnitPrice&gt;2.3&lt;/money:UnitPrice&gt;
+   &lt;inventory:Quantity&gt;10&lt;/inventory:Quantity&gt;
+   &lt;money:LineTotal&gt;23&lt;/money:LineTotal&gt;
+ &lt;/OrderedItem&gt;
+
+
+    </pre>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a> |  <a href="#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="SerializeTopic3"></a><a name="Serialize(System.IO.TextWriter,System.Object)">Serialize</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.IO/types/TextWriter.html">TextWriter</a> <i>textWriter</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>o</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Serializes the specified  <a href="../../System/types/Object.html">Object</a> and writes the XML document to a file using the specified  <a href="../../System.IO/types/TextWriter.html">TextWriter</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void Serialize(<br>   <font color="#008080"><a href="../../System.IO/types/TextWriter.html">TextWriter</a> <i>textWriter</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>o</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>textWriter</i><br><dl>
+<dd>
+<param> The  <a href="../../System.IO/types/TextWriter.html">TextWriter</a> used to write the XML document.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>o</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Object.html">Object</a> to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#Serialize(System.IO.TextWriter,System.Object)">XmlSerializer.Serialize</a> method converts the public fields and read/write properties of an object into XML. It does not convert methods, indexers, private fields, or read-only properties. To serialize all of an object's fields and properties, both public and private, use the  <a href="../../System.Runtime.Serialization.Formatters.Binary/types/BinaryFormatter.html">BinaryFormatter</a>.<p> In the <i>textWriter</i> parameter, specify an object that derives from the abstract  <a href="../../System.IO/types/TextWriter.html">TextWriter</a> class. Classes that derive from  <a href="../../System.IO/types/TextWriter.html">TextWriter</a> include: </p>
+<UL>
+<li> <a href="../../System.IO/types/StreamWriter.html">StreamWriter</a></li>
+<li> <a href="../../System.IO/types/StringWriter.html">StringWriter</a></li>
+<li> <a href="../../System.CodeDom.Compiler/types/IndentedTextWriter.html">IndentedTextWriter</a></li>
+</UL>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes an object using a  <a href="../../System.IO/types/TextWriter.html">TextWriter</a>.<pre>
+using System;
+using System.IO;
+using System.Text;
+using System.Xml.Serialization;
+
+// This is the class that will be serialized.
+public class OrderedItem
+{
+   public string ItemName;
+   public string Description;
+   public decimal UnitPrice;
+   public int Quantity;
+   public decimal LineTotal;
+   // A custom method used to calculate price per item.
+   public void Calculate()
+   {
+      LineTotal = UnitPrice * Quantity;
+   }
+}
+ 
+public class Test{
+   public static void Main(string[] args)
+   {
+      Test t = new Test();
+      // Write a purchase order.
+      t.SerializeObject("simple.xml");
+   }
+ 
+  private void SerializeObject(string filename)
+  {
+      Console.WriteLine("Writing With TextWriter");
+ 
+      XmlSerializer serializer = 
+      new XmlSerializer(typeof(OrderedItem));
+      OrderedItem i = new OrderedItem();
+      i.ItemName = "Widget";
+      i.Description = "Regular Widget";
+      i.Quantity = 10;
+      i.UnitPrice = (decimal) 2.30;
+      i.Calculate();
+ 
+      /* Create a StreamWriter to write with. First create a FileStream
+         object, and create the StreamWriter specifying an Encoding to use. */
+      FileStream fs = new FileStream(filename, FileMode.Create);
+      TextWriter writer = new StreamWriter(fs, new UTF8Encoding());
+      // Serialize using the XmlTextWriter.
+      serializer.Serialize(writer, i);
+      writer.Close();
+   }
+}
+
+
+    </pre>
+<pre>
+&lt;?xml version="1.0"?&gt;
+ &lt;OrderedItem xmlns:inventory="http://www.cpandl.com" xmlns:money="http://www.cohowinery.com"&gt;
+   &lt;inventory:ItemName&gt;Widget&lt;/inventory:ItemName&gt;
+   &lt;inventory:Description&gt;Regular Widget&lt;/inventory:Description&gt;
+   &lt;money:UnitPrice&gt;2.3&lt;/money:UnitPrice&gt;
+   &lt;inventory:Quantity&gt;10&lt;/inventory:Quantity&gt;
+   &lt;money:LineTotal&gt;23&lt;/money:LineTotal&gt;
+ &lt;/OrderedItem&gt;
+
+
+    </pre>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a> |  <a href="#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="SerializeTopic4"></a><a name="Serialize(System.Xml.XmlWriter,System.Object)">Serialize</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Xml/types/XmlWriter.html">XmlWriter</a> <i>xmlWriter</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>o</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Serializes the specified  <a href="../../System/types/Object.html">Object</a> and writes the XML document to a file using the specified  <a href="../../System.Xml/types/XmlWriter.html">XmlWriter</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void Serialize(<br>   <font color="#008080"><a href="../../System.Xml/types/XmlWriter.html">XmlWriter</a> <i>xmlWriter</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>o</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>xmlWriter</i><br><dl>
+<dd>
+<param> The  <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemxmlXmlWritermemberstopic.asp">XmlWriter</a> used to write the XML document.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>o</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Object.html">Object</a> to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#Serialize(System.IO.TextWriter,System.Object)">XmlSerializer.Serialize</a> method converts the public fields and read/write properties of an object into XML. It does not convert methods, indexers, private fields, or read-only properties. To serialize all of an object's fields and properties, both public and private, use the  <a href="../../System.Runtime.Serialization.Formatters.Binary/types/BinaryFormatter.html">BinaryFormatter</a>.<p> In the <i>xmlWriter</i> parameter, specify an object that derives from the abstract  <a href="../../System.Xml/types/XmlWriter.html">XmlWriter</a> class. The  <a href="../../System.Xml/types/XmlTextWriter.html">XmlTextWriter</a> derives from the  <a href="../../System.Xml/types/XmlWriter.html">XmlWriter</a>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes an object using an  <a href="../../System.Xml/types/XmlWriter.html">XmlWriter</a>.<pre>
+using System;
+using System.IO;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
+
+// This is the class that will be serialized.
+public class OrderedItem
+{
+   public string ItemName;
+   public string Description;
+   public decimal UnitPrice;
+   public int Quantity;
+   public decimal LineTotal;
+   // A custom method used to calculate price per item.
+   public void Calculate()
+   {
+      LineTotal = UnitPrice * Quantity;
+   }
+}
+ 
+public class Test{
+   public static void Main()
+   {
+      Test t = new Test();
+      // Write a purchase order.
+      t.SerializeObject("simple.xml");
+   }
+ 
+   private void SerializeObject(string filename)
+   {
+      Console.WriteLine("Writing With XmlTextWriter");
+ 
+      XmlSerializer serializer = 
+      new XmlSerializer(typeof(OrderedItem));
+      OrderedItem i = new OrderedItem();
+      i.ItemName = "Widget";
+      i.Description = "Regular Widget";
+      i.Quantity = 10;
+      i.UnitPrice = (decimal) 2.30;
+      i.Calculate();
+      // Create an XmlTextWriter using a FileStream.
+      Stream fs = new FileStream(filename, FileMode.Create);
+      XmlWriter writer = 
+      new XmlTextWriter(fs, Encoding.Unicode);
+      // Serialize using the XmlTextWriter.
+      serializer.Serialize(writer, i);
+      writer.Close();
+   }
+}
+   
+
+    </pre>
+<pre>
+&lt;?xml version="1.0"?&gt;
+ &lt;OrderedItem xmlns:inventory="http://www.cpandl.com" xmlns:money="http://www.cohowinery.com"&gt;
+   &lt;inventory:ItemName&gt;Widget&lt;/inventory:ItemName&gt;
+   &lt;inventory:Description&gt;Regular Widget&lt;/inventory:Description&gt;
+   &lt;money:UnitPrice&gt;2.3&lt;/money:UnitPrice&gt;
+   &lt;inventory:Quantity&gt;10&lt;/inventory:Quantity&gt;
+   &lt;money:LineTotal&gt;23&lt;/money:LineTotal&gt;
+ &lt;/OrderedItem&gt;
+
+
+    </pre>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a> |  <a href="#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="SerializeTopic5"></a><a name="Serialize(System.IO.Stream,System.Object,System.Xml.Serialization.XmlSerializerNamespaces)">Serialize</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.IO/types/Stream.html">Stream</a> <i>stream</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>o</i>,</font><br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> <i>namespaces</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Serializes the specified  <a href="../../System/types/Object.html">Object</a> and writes the XML document to a file using the specified  <a href="../../System.IO/types/Stream.html">Stream</a>, referencing the specified namespaces.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void Serialize(Stream stream, object o, XmlSerialize(<br>   <font color="#008080"><a href="../../System.IO/types/Stream.html">Stream</a> <i>stream</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>o</i>,</font><br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> <i>namespaces</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>stream</i><br><dl>
+<dd>
+<param> The  <a href="../../System.IO/types/Stream.html">Stream</a> used to write the XML document.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>o</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Object.html">Object</a> to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>namespaces</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> referenced by the object.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> When the  <a href="#Serialize(System.IO.TextWriter,System.Object)">XmlSerializer.Serialize</a> method is invoked, the public fields and read/write properties of an object are converted into XML. Methods, indexers, private fields, and read-only properties are not serialized. To serialize all fields and properties, both public and private, use the  <a href="../../System.Runtime.Serialization.Formatters.Binary/types/BinaryFormatter.html">BinaryFormatter</a>.<p> Use the <i>stream</i> parameter to specify an object that derives from the abstract  <a href="../../System.IO/types/Stream.html">Stream</a> class, which is designed to write to streams. Classes that derive from the  <a href="../../System.IO/types/Stream.html">Stream</a> class include: </p>
+<UL>
+<li> <a href="../../System.IO/types/BufferedStream.html">BufferedStream</a></li>
+<li> <a href="../../System.IO/types/FileStream.html">FileStream</a></li>
+<li> <a href="../../System.IO/types/MemoryStream.html">MemoryStream</a></li>
+<li> <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a></li>
+<li> <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSecurityCryptographyCryptoStreammemberstopic.asp">CryptoStream</a></li>
+</UL>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes an object with a  <a href="../../System.IO/types/Stream.html">Stream</a> object. The example also creates an  <a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> and adds two namespaces to the object. The class defining the serialized object is also attributed with  <a href="../../System.Xml.Serialization/types/XmlElementAttribute.html">XmlElementAttribute</a> attributes to specify the namespace for each element.<pre>
+
+using System;
+using System.IO;
+using System.Xml.Serialization;
+
+// This is the class that will be serialized.
+public class OrderedItem {
+    [XmlElement(Namespace = "http://www.cpandl.com")]
+    public string ItemName;
+    [XmlElement(Namespace = "http://www.cpandl.com")]
+    public string Description;
+    [XmlElement(Namespace="http://www.cohowinery.com")]
+    public decimal UnitPrice;
+    [XmlElement(Namespace = "http://www.cpandl.com")]
+    public int Quantity;
+    [XmlElement(Namespace="http://www.cohowinery.com")]
+    public decimal LineTotal;
+
+    // A custom method used to calculate price per item.
+    public void Calculate() {
+        LineTotal = UnitPrice * Quantity;
+    }
+}
+ 
+public class Test {
+    
+   public static void Main() {
+        Test t = new Test();
+        // Write a purchase order.
+        t.SerializeObject("simple.xml");
+        t.DeserializeObject("simple.xml");
+   }
+ 
+   private void SerializeObject(string filename) {
+        Console.WriteLine("Writing With Stream");
+ 
+        XmlSerializer serializer = 
+            new XmlSerializer(typeof(OrderedItem));
+
+        OrderedItem i = new OrderedItem();
+        i.ItemName = "Widget";
+        i.Description = "Regular Widget";
+        i.Quantity = 10;
+        i.UnitPrice = (decimal) 2.30;
+        i.Calculate();
+ 
+        // Create an XmlSerializerNamespaces object.
+        XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+
+        // Add two prefix-namespace pairs.
+        ns.Add("inventory", "http://www.cpandl.com");
+        ns.Add("money", "http://www.cohowinery.com");
+
+        // Create a FileStream to write with.
+        Stream writer = new FileStream(filename, FileMode.Create);
+
+        // Serialize the object, and close the TextWriter
+        serializer.Serialize(writer, i, ns);
+        writer.Close();
+    }
+ 
+    private void DeserializeObject(string filename) {
+        Console.WriteLine("Reading with Stream");
+        // Create an instance of the XmlSerializer.
+        XmlSerializer serializer = new XmlSerializer(typeof(OrderedItem));
+
+        // Writing the file requires a Stream.
+        Stream reader= new FileStream(filename,FileMode.Open);
+          
+        // Declare an object variable of the type to be deserialized.
+        OrderedItem i;
+
+        /* Use the Deserialize method to restore the object's state 
+           using data from the XML document. */
+        i = (OrderedItem) serializer.Deserialize(reader);
+
+        // Write out the properties of the object.
+        Console.Write(
+            i.ItemName + "\t" +
+            i.Description + "\t" +
+            i.UnitPrice + "\t" +
+            i.Quantity + "\t" +
+            i.LineTotal);
+    }
+}
+
+
+    </pre>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a> |  <a href="#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="SerializeTopic6"></a><a name="Serialize(System.IO.TextWriter,System.Object,System.Xml.Serialization.XmlSerializerNamespaces)">Serialize</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.IO/types/TextWriter.html">TextWriter</a> <i>textWriter</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>o</i>,</font><br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> <i>namespaces</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Serializes the specified  <a href="../../System/types/Object.html">Object</a> and writes the XML document to a file using the specified  <a href="../../System.IO/types/TextWriter.html">TextWriter</a>, referencing the specified namespaces.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void Serialize(TextWriter textWriter, object o, XmlSerialize(<br>   <font color="#008080"><a href="../../System.IO/types/TextWriter.html">TextWriter</a> <i>textWriter</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>o</i>,</font><br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> <i>namespaces</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>textWriter</i><br><dl>
+<dd>
+<param> The  <a href="../../System.IO/types/TextWriter.html">TextWriter</a> used to write the XML document.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>o</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Object.html">Object</a> to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>namespaces</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> containing namespaces for the generated XML document.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> When the  <a href="#Serialize(System.IO.TextWriter,System.Object)">XmlSerializer.Serialize</a> method is invoked the public fields and read/write properties of an object are converted into XML. Methods, indexers, private fields, and read-only properties are not serialized. To serialize all fields and properties, both public and private, use the  <a href="../../System.Runtime.Serialization.Formatters.Binary/types/BinaryFormatter.html">BinaryFormatter</a>.<p> Use the <i>textWriter</i> parameter to specify an object that derives from the abstract  <a href="../../System.IO/types/TextWriter.html">TextWriter</a> class. Classes that derive from  <a href="../../System.IO/types/TextWriter.html">TextWriter</a> include: </p>
+<UL>
+<li> <a href="../../System.IO/types/StreamWriter.html">StreamWriter</a></li>
+<li> <a href="../../System.IO/types/StringWriter.html">StringWriter</a></li>
+<li> <a href="../../System.CodeDom.Compiler/types/IndentedTextWriter.html">IndentedTextWriter</a></li>
+</UL>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes an object with a  <a href="../../System.IO/types/TextWriter.html">TextWriter</a>. The example also creates an  <a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> object and adds two namespaces to the object. The class defining the serialized object is also attributed with  <a href="../../System.Xml.Serialization/types/XmlElementAttribute.html">XmlElementAttribute</a> attributes to specify the namespace for each element.<pre>
+using System;
+using System.IO;
+using System.Xml.Serialization;
+
+// This is the class that will be serialized.
+public class OrderedItem
+{
+   [XmlElement(Namespace = "http://www.cpandl.com")]
+   public string ItemName;
+   [XmlElement(Namespace = "http://www.cpandl.com")]
+   public string Description;
+   [XmlElement(Namespace="http://www.cohowinery.com")]
+   public decimal UnitPrice;
+   [XmlElement(Namespace = "http://www.cpandl.com")]
+   public int Quantity;
+   [XmlElement(Namespace="http://www.cohowinery.com")]
+   public decimal LineTotal;
+   // A custom method used to calculate price per item.
+   public void Calculate()
+   {
+      LineTotal = UnitPrice * Quantity;
+   }
+}
+ 
+public class Test{
+   public static void Main(string[] args)
+   {
+      Test t = new Test();
+      // Write a purchase order.
+      t.SerializeObject("simple.xml");
+   }
+ 
+   private void SerializeObject(string filename)
+   {
+      Console.WriteLine("Writing With TextWriter");
+      // Create an XmlSerializer instance using the type.
+      XmlSerializer serializer = 
+      new XmlSerializer(typeof(OrderedItem));
+      OrderedItem i = new OrderedItem();
+      i.ItemName = "Widget";
+      i.Description = "Regular Widget";
+      i.Quantity = 10;
+      i.UnitPrice = (decimal) 2.30;
+      i.Calculate();
+ 
+      // Create an XmlSerializerNamespaces object.
+      XmlSerializerNamespaces ns = 
+      new XmlSerializerNamespaces();
+      // Add two namespaces with prefixes.
+      ns.Add("inventory", "http://www.cpandl.com");
+      ns.Add("money", "http://www.cohowinery.com");
+      // Create a StreamWriter to write with.
+      TextWriter writer = new StreamWriter(filename);
+      /* Serialize using the object using the TextWriter 
+      and namespaces. */
+      serializer.Serialize(writer, i, ns);
+      writer.Close();
+   }
+}
+
+
+    </pre>
+<pre>
+&lt;?xml version="1.0"?&gt;
+ &lt;OrderedItem xmlns:inventory="http://www.cpandl.com" xmlns:money="http://www.cohowinery.com"&gt;
+   &lt;inventory:ItemName&gt;Widget&lt;/inventory:ItemName&gt;
+   &lt;inventory:Description&gt;Regular Widget&lt;/inventory:Description&gt;
+   &lt;money:UnitPrice&gt;2.3&lt;/money:UnitPrice&gt;
+   &lt;inventory:Quantity&gt;10&lt;/inventory:Quantity&gt;
+   &lt;money:LineTotal&gt;23&lt;/money:LineTotal&gt;
+ &lt;/OrderedItem&gt;
+
+
+    </pre>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a> |  <a href="#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="SerializeTopic7"></a><a name="Serialize(System.Xml.XmlWriter,System.Object,System.Xml.Serialization.XmlSerializerNamespaces)">Serialize</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Xml/types/XmlWriter.html">XmlWriter</a> <i>xmlWriter</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>o</i>,</font><br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> <i>namespaces</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Serializes the specified  <a href="../../System/types/Object.html">Object</a> and writes the XML document to a file using the specified  <a href="../../System.Xml/types/XmlWriter.html">XmlWriter</a>, referencing the specified namespaces.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void Serialize(XmlWriter xmlWriter, object o, XmlSerialize(<br>   <font color="#008080"><a href="../../System.Xml/types/XmlWriter.html">XmlWriter</a> <i>xmlWriter</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>o</i>,</font><br>   <font color="#008080"><a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> <i>namespaces</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>xmlWriter</i><br><dl>
+<dd>
+<param> The  <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemxmlXmlWritermemberstopic.asp">XmlWriter</a> used to write the XML document.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>o</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Object.html">Object</a> to serialize.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>namespaces</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> referenced by the object.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> When the  <a href="#Serialize(System.IO.TextWriter,System.Object)">XmlSerializer.Serialize</a> method is invoked, the public fields and read/write properties of an object are converted into XML. Methods, indexers, private fields, and read-only properties are not serialized. To serialize all fields and properties, both public and private, use the  <a href="../../System.Runtime.Serialization.Formatters.Binary/types/BinaryFormatter.html">BinaryFormatter</a>.<p> Use the <i>xmlWriter</i> parameter to specify an object that derives from the abstract  <a href="../../System.Xml/types/XmlWriter.html">XmlWriter</a> class, which is designed to write XML documents. The  <a href="../../System.Xml/types/XmlTextWriter.html">XmlTextWriter</a> derives from the  <a href="../../System.Xml/types/XmlWriter.html">XmlWriter</a>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes an object with an  <a href="../../System.Xml/types/XmlWriter.html">XmlWriter</a>. The example also creates an  <a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> and adds two namespaces to the object. Several instances of the  <a href="../../System.Xml.Serialization/types/XmlElementAttribute.html">XmlElementAttribute</a> class are applied to the class members to specify the namespace for each element.<pre>
+using System;
+using System.IO;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
+
+// This is the class that will be serialized.
+public class OrderedItem
+{
+   [XmlElement(Namespace = "http://www.cpandl.com")]
+   public string ItemName;
+   [XmlElement(Namespace = "http://www.cpandl.com")]
+   public string Description;
+   [XmlElement(Namespace="http://www.cohowinery.com")]
+   public decimal UnitPrice;
+   [XmlElement(Namespace = "http://www.cpandl.com")]
+   public int Quantity;
+   [XmlElement(Namespace="http://www.cohowinery.com")]
+   public decimal LineTotal;
+   // A custom method used to calculate price per item.
+   public void Calculate()
+   {
+      LineTotal = UnitPrice * Quantity;
+   }
+}
+ 
+public class Test{
+   public static void Main()
+   {
+      Test t = new Test();
+   // Write a purchase order.
+   t.SerializeObject("simple.xml");
+   }
+ 
+   private void SerializeObject(string filename)
+   {
+      Console.WriteLine("Writing With XmlTextWriter");
+
+      XmlSerializer serializer = 
+      new XmlSerializer(typeof(OrderedItem));
+      OrderedItem i = new OrderedItem();
+      i.ItemName = "Widget";
+      i.Description = "Regular Widget";
+      i.Quantity = 10;
+      i.UnitPrice = (decimal) 2.30;
+      i.Calculate();
+ 
+      // Create an XmlSerializerNamespaces object.
+      XmlSerializerNamespaces ns = 
+      new XmlSerializerNamespaces();
+      // Add two namespaces with prefixes.
+      ns.Add("inventory", "http://www.cpandl.com");
+      ns.Add("money", "http://www.cohowinery.com");
+      // Create an XmlTextWriter using a FileStream.
+      Stream fs = new FileStream(filename, FileMode.Create);
+      XmlWriter writer = 
+      new XmlTextWriter(fs, new UTF8Encoding());
+      // Serialize using the XmlTextWriter.
+      serializer.Serialize(writer, i, ns);
+      writer.Close();
+   }
+}
+
+
+    </pre>
+<pre>
+&lt;?xml version="1.0"?&gt;
+ &lt;OrderedItem xmlns:inventory="http://www.cpandl.com" xmlns:money="http://www.cohowinery.com"&gt;
+   &lt;inventory:ItemName&gt;Widget&lt;/inventory:ItemName&gt;
+   &lt;inventory:Description&gt;Regular Widget&lt;/inventory:Description&gt;
+   &lt;money:UnitPrice&gt;2.3&lt;/money:UnitPrice&gt;
+   &lt;inventory:Quantity&gt;10&lt;/inventory:Quantity&gt;
+   &lt;money:LineTotal&gt;23&lt;/money:LineTotal&gt;
+ &lt;/OrderedItem&gt;
+
+
+    </pre>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a> |  <a href="#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Event: <i><a name="UnknownAttributeTopic1"></a><a name="UnknownAttribute">UnknownAttribute</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Occurs when the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> encounters an XML attribute of unknown type during deserialization.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public event XmlAttributeEventHandler UnknownAttribute;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, after calling the  <a href="#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> method, the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> ignores XML attributes of unknown types. However, you can use this event to handle such node types.<p> If the instance of the class being deserialized contains a field that returns an array of  <a href="../../System.Xml/types/XmlAttribute.html">XmlAttribute</a> objects, and an  <a href="../../System.Xml.Serialization/types/XmlAnyAttributeAttribute.html">XmlAnyAttributeAttribute</a> has been applied to the field, the  <a href="#UnknownAttribute">XmlSerializer.UnknownAttribute</a> event will not occur. Instead, all unknown XML attributes will be collected into the array.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example prints information about any unknown attributes encountered while deserializing an XML document.<pre>
+using System;
+using System.IO;
+using System.Xml.Serialization;
+using System.Xml;
+using System.Xml.Schema;
+
+public class Group{
+   public string GroupName;
+}
+
+public class Test{
+   static void Main(){
+      Test t = new Test();
+      // Deserialize the file containing unknown elements.
+      t.DeserializeObject("UnknownAttributes.xml");
+   }
+   private void Serializer_UnknownAttribute(object sender, XmlAttributeEventArgs e){
+      Console.WriteLine("Unknown Attribute");
+      Console.WriteLine("\t" + e.Attr.Name + " " + e.Attr.InnerXml);
+      Console.WriteLine("\t LineNumber: " + e.LineNumber);
+      Console.WriteLine("\t LinePosition: " + e.LinePosition);
+      
+      Group x  = (Group) e.ObjectBeingDeserialized;
+      Console.WriteLine (x.GroupName);
+      Console.WriteLine (sender.ToString());
+   }
+   private void DeserializeObject(string filename){
+      XmlSerializer ser = new XmlSerializer(typeof(Group));
+      // Add a delegate to handle unknown element events.
+      ser.UnknownAttribute+=new XmlAttributeEventHandler(Serializer_UnknownAttribute);
+      // A FileStream is needed to read the XML document.
+     FileStream fs = new FileStream(filename, FileMode.Open);
+     Group g = (Group) ser.Deserialize(fs);
+     fs.Close();
+   	}
+}
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml.Serialization/types/XmlAnyAttributeAttribute.html">XmlAnyAttributeAttribute</a> |  <a href="#CanDeserialize(System.Xml.XmlReader)">XmlSerializer.CanDeserialize</a> |  <a href="#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> |  <a href="#UnknownNode">XmlSerializer.UnknownNode</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Event: <i><a name="UnknownElementTopic1"></a><a name="UnknownElement">UnknownElement</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Occurs when the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> encounters an XML element of unknown type during deserialization.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public event XmlElementEventHandler UnknownElement;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, after calling the  <a href="#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> method, the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> ignores XML attributes of unknown types. However, you can use this event to handle such node types.<br><br><b>Note </b> If the  <a href="../../System.Xml.Serialization/types/XmlAnyElementAttribute.html">XmlAnyElementAttribute</a> is applied to a field that returns an array of  <a href="../../System.Xml/types/XmlElement.html">XmlElement</a> objects, all unknown elements will be collected in the array. In that case, the  <a href="#UnknownElement">XmlSerializer.UnknownElement</a> event will not occur.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example deserializes a class named <code>
+                Group
+              </code> that from a file named UnknownElements.xml. Whenever an element is found in the file that has no corresponding member in the class, the  <a href="#UnknownElement">XmlSerializer.UnknownElement</a> event occurs. To try the example, paste the XML code below into a file named UnknownElements.xml.<pre>
+              &lt;?xml version="1.0" encoding="utf-8"?&gt;
+              &lt;Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+                &lt;GroupName&gt;MyGroup&lt;/GroupName&gt;
+                &lt;GroupSize&gt;Large&lt;/GroupSize&gt;
+                &lt;GroupNumber&gt;444&lt;/GroupNumber&gt;
+                &lt;GroupBase&gt;West&lt;/GroupBase&gt;
+              &lt;/Group&gt;
+            </pre>
+<pre>
+using System;
+using System.IO;
+using System.Xml.Serialization;
+using System.Xml;
+using System.Xml.Schema;
+
+public class Group{
+   public string GroupName;
+}
+
+public class Test{
+   static void Main(){
+      Test t = new Test();
+      // Deserialize the file containing unknown elements.
+      t.DeserializeObject("UnknownElements.xml");
+   }
+   private void Serializer_UnknownElement(object sender, XmlElementEventArgs e){
+      Console.WriteLine("Unknown Element");
+      Console.WriteLine("\t" + e.Element.Name + " " + e.Element.InnerXml);
+      Console.WriteLine("\t LineNumber: " + e.LineNumber);
+      Console.WriteLine("\t LinePosition: " + e.LinePosition);
+      
+      Group x  = (Group) e.ObjectBeingDeserialized;
+      Console.WriteLine (x.GroupName);
+      Console.WriteLine (sender.ToString());
+   }
+   private void DeserializeObject(string filename){
+      XmlSerializer ser = new XmlSerializer(typeof(Group));
+      // Add a delegate to handle unknown element events.
+      ser.UnknownElement+=new XmlElementEventHandler(Serializer_UnknownElement);
+      // A FileStream is needed to read the XML document.
+     FileStream fs = new FileStream(filename, FileMode.Open);
+     Group g = (Group) ser.Deserialize(fs);
+     fs.Close();
+   	}
+}
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml.Serialization/types/XmlAnyElementAttribute.html">XmlAnyElementAttribute</a> |  <a href="#UnknownNode">XmlSerializer.UnknownNode</a> |  <a href="#UnknownAttribute">XmlSerializer.UnknownAttribute</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Event: <i><a name="UnknownNodeTopic1"></a><a name="UnknownNode">UnknownNode</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Occurs when the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> encounters an XML node of unknown type during deserialization.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public event XmlNodeEventHandler UnknownNode;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, after calling the  <a href="#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> method, the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> ignores XML nodes of unknown types. However, you can use this event to handle such node types.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example prints the type of any encountered unknown node.<pre>
+using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
+
+public class Group{
+   // Only the GroupName field will be known.
+   public string GroupName;
+}
+
+public class Test{
+   static void Main(){
+      Test t = new Test();
+      t.DeserializeObject("UnknownNodes.xml");
+   }
+
+   private void DeserializeObject(string filename){
+      XmlSerializer mySerializer = new XmlSerializer(typeof(Group));
+      FileStream fs = new FileStream(filename, FileMode.Open);
+      mySerializer.UnknownNode += new 
+      XmlNodeEventHandler(serializer_UnknownNode);
+      Group myGroup = (Group) mySerializer.Deserialize(fs);
+      fs.Close();
+   }
+   protected void serializer_UnknownNode
+   (object sender, XmlNodeEventArgs e){
+      Console.WriteLine
+      ("UnknownNode Name: {0}", e.Name);
+      Console.WriteLine
+      ("UnknownNode LocalName: {0}" ,e.LocalName);
+      Console.WriteLine
+      ("UnknownNode Namespace URI: {0}", e.NamespaceURI);
+      Console.WriteLine
+      ("UnknownNode Text: {0}", e.Text);
+
+      XmlNodeType myNodeType = e.NodeType;
+      Console.WriteLine("NodeType: {0}", myNodeType);
+ 
+      Group myGroup = (Group) e.ObjectBeingDeserialized;
+      Console.WriteLine("GroupName: {0}", myGroup.GroupName);
+      Console.WriteLine();
+   }
+}
+/* Paste this XML into a file named UnknownNodes:
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+
+xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:coho = "http://www.cohowinery.com" 
+
+xmlns:cp="http://www.cpandl.com"&gt;
+   &lt;coho:GroupName&gt;MyGroup&lt;/coho:GroupName&gt;
+   &lt;cp:GroupSize&gt;Large&lt;/cp:GroupSize&gt;
+   &lt;cp:GroupNumber&gt;444&lt;/cp:GroupNumber&gt;
+   &lt;coho:GroupBase&gt;West&lt;/coho:GroupBase&gt;
+   &lt;coho:ThingInfo&gt;
+      &lt;Number&gt;1&lt;/Number&gt;
+      &lt;Name&gt;Thing1&lt;/Name&gt;
+      &lt;Elmo&gt;
+         &lt;Glue&gt;element&lt;/Glue&gt;
+      &lt;/Elmo&gt;
+   &lt;/coho:ThingInfo&gt;
+&lt;/Group&gt;
+*/   
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml.Serialization/types/XmlAnyElementAttribute.html">XmlAnyElementAttribute</a> |  <a href="../../System.Xml.Serialization/types/XmlAnyAttributeAttribute.html">XmlAnyAttributeAttribute</a> |  <a href="#CanDeserialize(System.Xml.XmlReader)">XmlSerializer.CanDeserialize</a> |  <a href="#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> |  <a href="#UnknownAttribute">XmlSerializer.UnknownAttribute</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Event: <i><a name="UnreferencedObjectTopic1"></a><a name="UnreferencedObject">UnreferencedObject</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Occurs during deserialization of a SOAP-encoded XML stream, when the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> encounters a recognized type that is not used (unreferenced).</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public event UnreferencedObjectEventHandler UnreferencedObject;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#UnreferencedObject">XmlSerializer.UnreferencedObject</a> event can only occur when the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> is used to deserialize an XML document containing a SOAP message that conforms to section 5 of the World Wide Web Consortium (www.w3.org) document, "Simple Object Access Protocol (SOAP) 1.1".<p> Documents that conform to section 5 are in a special format. At the very least, such a document includes the main body of the SOAP message. However, rather than having all types defined inline in the document, some type definitions may be encoded as references to top-level elements in the document. Thus, for every element found in the main body that is a reference, there must be a corresponding element that contains the type definition. To correlate the referencing element and the type definition, the type definition has an <b>id</b> attribute set to a unique string ID and the referencing element has an href attribute that references the same ID.</p>
+<pre>
+              &lt;Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="id1" n1:GroupName=".NET" GroupNumber="ZDI=" CreationDate="2002-05-02" xmlns:n1="http:'www.cpandl.com"&gt;
+                  &lt;PosInt xsi:type="xsd:nonNegativeInteger"&gt;10000&lt;/PosInt&gt;
+                  &lt;GroupVehicle href="#id2" /&gt;
+                &lt;/Group&gt;
+                &lt;Vehicle id="id2" n1:type="Vehicle" xmlns:n1="http://www.w3.org/2001/XMLSchema-instance"&gt;
+                  &lt;licenseNumber xmlns:q1="http://www.w3.org/2001/XMLSchema" n1:type="q1:string"&gt;1234&lt;/licenseNumber&gt;
+                &lt;/Vehicle&gt;
+            </pre>
+<p> The  <a href="#UnreferencedObject">XmlSerializer.UnreferencedObject</a> event will thus occur when there is a type definition found in the document, but no parameter in the main body references it. When the event occurs, you can retrieve the XML type of the unreferenced object by examining the  <a href="../../System.Xml.Serialization/types/UnreferencedObjectEventArgs.html#UnreferencedObject">UnreferencedObjectEventArgs.UnreferencedObject</a> property of the  <a href="../../System.Xml.Serialization/types/UnreferencedObjectEventArgs.html">UnreferencedObjectEventArgs</a> class. The XML ID of the object is returned by the  <a href="../../System.Xml.Serialization/types/UnreferencedObjectEventArgs.html#UnreferencedId">UnreferencedObjectEventArgs.UnreferencedId</a> property.</p>
+<p> The  <a href="#UnreferencedObject">XmlSerializer.UnreferencedObject</a> event should not be confused with the  <a href="#UnknownElement">XmlSerializer.UnknownElement</a> and  <a href="#UnknownNode">XmlSerializer.UnknownNode</a> events, which occur when there is no class member corresponding to the XML node or element type.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example adds an  <a href="../../System.Xml.Serialization/types/UnreferencedObjectEventHandler.html">UnreferencedObjectEventHandler</a> to an  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>. The event is handled by the <code>
+                Serializer_UnreferencedObject
+              </code> method. To run the example, you should cut and paste the following XML into a file named "UnrefObj.xml".<pre>
+              &lt;wrapper&gt;
+                &lt;Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="id1" n1:GroupName=".NET" xmlns:n1="http://www.cpandl.com"&gt;
+                 &lt;/Group&gt;
+              &lt;Vehicle id="id2" n1:type="Vehicle" xmlns:n1="http://www.w3.org/2001/XMLSchema-instance"&gt;
+                  &lt;licenseNumber xmlns:q1="http://www.w3.org/2001/XMLSchema" n1:type="q1:string"&gt;ABCD&lt;/licenseNumber&gt;
+                &lt;/Vehicle&gt;
+              &lt;Vehicle id="id3" n1:type="Vehicle" xmlns:n1="http://www.w3.org/2001/XMLSchema-instance"&gt;
+                  &lt;licenseNumber xmlns:q1="http://www.w3.org/2001/XMLSchema" n1:type="q1:string"&gt;1234&lt;/licenseNumber&gt;
+                &lt;/Vehicle&gt;
+              &lt;/wrapper&gt;
+            </pre>
+<pre>
+using System;
+using System.IO;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
+using System.Xml.Schema;
+
+// You must use the SoapIncludeAttribute to inform the XmlSerializer
+// that the Vehicle type should be recognized when deserializing.
+[SoapInclude(typeof(Vehicle))]
+public class Group
+{
+   public string GroupName;
+   public Vehicle GroupVehicle;
+}
+ [SoapInclude(typeof(Vehicle))]
+public class Vehicle
+{
+   public string licenseNumber;
+}
+
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.DeserializeObject("UnrefObj.xml");
+   }
+   
+   public void DeserializeObject(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlTypeMapping myMapping = 
+      (new SoapReflectionImporter().ImportTypeMapping(
+      typeof(Group)));
+      XmlSerializer mySerializer =  
+      new XmlSerializer(myMapping);
+ 
+      mySerializer.UnreferencedObject += 
+      new UnreferencedObjectEventHandler
+      (Serializer_UnreferencedObject);
+
+      // Reading the file requires an  XmlTextReader.
+      XmlTextReader reader= 
+      new XmlTextReader(filename);
+      reader.ReadStartElement();
+
+      // Deserialize and cast the object.
+      Group myGroup; 
+      myGroup = (Group) mySerializer.Deserialize(reader);
+      reader.ReadEndElement();
+      reader.Close();
+   }
+
+   private void Serializer_UnreferencedObject
+   (object sender, UnreferencedObjectEventArgs e){
+      Console.WriteLine("UnreferencedObject:");
+      Console.WriteLine("ID: " + e.UnreferencedId);
+      Console.WriteLine("UnreferencedObject: " + e.UnreferencedObject);
+      Vehicle xxx = (Vehicle) e.UnreferencedObject;
+      Console.WriteLine("License: " + xxx.licenseNumber);
+   }
+}
+
+// The file named "UnrefObj.xml" should contain this XML:
+
+// &lt;wrapper&gt;
+
+//  &lt;Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+//xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="id1" 
+//n1:GroupName=".NET" xmlns:n1="http://www.cpandl.com"&gt;
+//   &lt;/Group&gt;
+
+//&lt;Vehicle id="id2" n1:type="Vehicle" 
+//xmlns:n1="http://www.w3.org/2001/XMLSchema-instance"&gt;
+//   &lt;licenseNumber xmlns:q1="http://www.w3.org/2001/XMLSchema" 
+//n1:type="q1:string"&gt;ABCD&lt;/licenseNumber&gt;
+//   &lt;/Vehicle&gt;
+
+//&lt;Vehicle id="id3" n1:type="Vehicle" 
+//xmlns:n1="http://www.w3.org/2001/XMLSchema-instance"&gt;
+//    &lt;licenseNumber xmlns:q1="http://www.w3.org/2001/XMLSchema" 
+//n1:type="q1:string"&gt;1234&lt;/licenseNumber&gt;
+//  &lt;/Vehicle&gt;
+
+//&lt;/wrapper&gt;
+
+
+    </pre>
+</dd>
+</dl><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAttributesThatControlSOAPEncodedSerialization.asp">MSDN: attributesthatcontrolsoapencodedserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconXMLSerializationUsingSOAPProtocol.asp">MSDN: xmlserializationusingsoapprotocol</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

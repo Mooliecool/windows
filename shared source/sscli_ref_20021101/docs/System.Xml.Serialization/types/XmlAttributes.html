@@ -1,0 +1,1789 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Xml.Serialization.XmlAttributes</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Xml.Serialization.XmlAttributes Class</h2><b>Assembly: </b>System.Xml.dll<br><b>Namespace: </b>System.Xml.Serialization<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Represents a collection of attribute objects that control how the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes and deserializes an object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public class XmlAttributes
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Creating the  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> is part of a process that overrides the default way the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes class instances. For example, suppose you want to serialize an object that is created from a DLL which has an inaccessible source. By using the  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a>, you can augment or otherwise control how the object is serialized.<p> The members of the  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> class correspond directly to a family of attribute classes that control serialization. For example, the  <a href="#XmlText">XmlAttributes.XmlText</a> property must be set to an  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a>, which allows you to override serialization of a field or property by instructing the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> to serialize the property value as XML text. For a complete list of attributes that control serialization, see the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>.</p>
+<p> For more details on using the  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> with the  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> class, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconOverridingSerializationOfClassesWithXmlAttributeOverridesClass.asp">MSDN: overridingserializationofclasseswithxmlattributeoverridesclass</a>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes an instance of a class named <b>Orchestra</b>, which contains a single field named <b>Instruments</b> that returns an array of <b>Instrument</b> objects. A second class named <b>Brass</b> inherits from the <b>Instrument</b> class. The example creates an  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object to override the <b>Instrument</b> field--allowing the field to accept <b>Brass</b> objects--and adds the  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object to an instance of the  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> class.<pre>
+using System;
+using System.IO;
+using System.Xml.Serialization;
+
+public class Orchestra
+{
+   public Instrument[] Instruments;
+}   
+
+public class Instrument
+{
+   public string Name;
+}
+
+public class Brass:Instrument
+{
+   public bool IsValved;
+}
+
+public class Run
+{
+    public static void Main()
+    {
+       Run test = new Run();
+       test.SerializeObject("Override.xml");
+       test.DeserializeObject("Override.xml");
+    }
+
+    public void SerializeObject(string filename)
+    {
+      /* Each overridden field, property, or type requires 
+      an XmlAttributes object. */
+      XmlAttributes attrs = new XmlAttributes();
+
+      /* Create an XmlElementAttribute to override the 
+      field that returns Instrument objects. The overridden field
+      returns Brass objects instead. */
+      XmlElementAttribute attr = new XmlElementAttribute();
+      attr.ElementName = "Brass";
+      attr.Type = typeof(Brass);
+
+      // Add the element to the collection of elements.
+      attrs.XmlElements.Add(attr);
+
+      // Create the XmlAttributeOverrides object.
+      XmlAttributeOverrides attrOverrides = new XmlAttributeOverrides();
+
+      /* Add the type of the class that contains the overridden 
+      member and the XmlAttributes to override it with to the 
+      XmlAttributeOverrides object. */
+      attrOverrides.Add(typeof(Orchestra), "Instruments", attrs);
+
+      // Create the XmlSerializer using the XmlAttributeOverrides.
+      XmlSerializer s = 
+      new XmlSerializer(typeof(Orchestra), attrOverrides);
+
+      // Writing the file requires a TextWriter.
+      TextWriter writer = new StreamWriter(filename);
+
+      // Create the object that will be serialized.
+      Orchestra band = new Orchestra();
+      
+      // Create an object of the derived type.
+      Brass i = new Brass();
+      i.Name = "Trumpet";
+      i.IsValved = true;
+      Instrument[] myInstruments = {i};
+      band.Instruments = myInstruments;
+
+      // Serialize the object.
+      s.Serialize(writer,band);
+      writer.Close();
+   }
+
+   public void DeserializeObject(string filename)
+   {
+      XmlAttributeOverrides attrOverrides = 
+         new XmlAttributeOverrides();
+      XmlAttributes attrs = new XmlAttributes();
+
+      // Create an XmlElementAttribute to override the Instrument.
+      XmlElementAttribute attr = new XmlElementAttribute();
+      attr.ElementName = "Brass";
+      attr.Type = typeof(Brass);
+
+      // Add the element to the collection of elements.
+      attrs.XmlElements.Add(attr);
+
+      attrOverrides.Add(typeof(Orchestra), "Instruments", attrs);
+
+      // Create the XmlSerializer using the XmlAttributeOverrides.
+      XmlSerializer s = 
+      new XmlSerializer(typeof(Orchestra), attrOverrides);
+
+      FileStream fs = new FileStream(filename, FileMode.Open);
+      Orchestra band = (Orchestra) s.Deserialize(fs);
+      Console.WriteLine("Brass:");
+
+      /* The difference between deserializing the overridden 
+      XML document and serializing it is this: To read the derived 
+      object values, you must declare an object of the derived type 
+      (Brass), and cast the Instrument instance to it. */
+      Brass b;
+      foreach(Instrument i in band.Instruments) 
+      {
+         b = (Brass)i;
+         Console.WriteLine(
+         b.Name + "\n" + 
+         b.IsValved);
+      }
+   }
+}
+
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Xml.Serialization/System.Xml.Serialization.html">System.Xml.Serialization Namespace</a> |  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> |  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a></dd>
+</dl>
+<h3>System.Xml.Serialization.XmlAttributes Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor()<br><br></code>Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(ICustomAttributeProvider provider)<br><br></code>  </td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#XmlAnyAttribute">XmlAnyAttribute</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the  <a href="../../System.Xml.Serialization/types/XmlAnyAttributeAttribute.html">XmlAnyAttributeAttribute</a> to override.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#XmlAnyElements">XmlAnyElements</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the collection of  <a href="../../System.Xml.Serialization/types/XmlAnyElementAttribute.html">XmlAnyElementAttribute</a> objects to override.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#XmlArray">XmlArray</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets an object that specifies how the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes a public field or read/write property that returns an array.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#XmlArrayItems">XmlArrayItems</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets or sets a collection of objects that specify how the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes items inserted into an array returned by a public field or read/write property.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#XmlAttribute">XmlAttribute</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets an object that specifies how the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes a public field or public read/write property as an XML attribute.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#XmlChoiceIdentifier">XmlChoiceIdentifier</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets or sets an object that allows you to disambiguate between a set of choices.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#XmlDefaultValue">XmlDefaultValue</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the default value of an XML element or attribute.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#XmlElements">XmlElements</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets or sets a collection of objects that specify how the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes a public field or read/write property as an XML element.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#XmlEnum">XmlEnum</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets an object that specifies how the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes an enumeration member.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#XmlIgnore">XmlIgnore</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets a value that specifies whether or not the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes a public field or public read/write property.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Xmlns">Xmlns</a></td>
+<td width="55%"><b>Read-write</b><br><br></td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#XmlRoot">XmlRoot</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets an object that specifies how the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes a class as an XML root element.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#XmlText">XmlText</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets an object that instructs the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> to serialize a public field or public read/write property as XML text.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#XmlType">XmlType</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets an object that specifies how the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes a class to which the  <a href="../../System.Xml.Serialization/types/XmlTypeAttribute.html">XmlTypeAttribute</a> has been applied.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Xml.Serialization.XmlAttributes</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Xml.Serialization.XmlAttributes Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> class.</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlAttributes();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes an instance of a class named <b>Orchestra</b>, which contains a single field named <b>Instruments</b> that returns an array of <b>Instrument</b> objects. A second class named <b>Brass</b> inherits from the <b>Instrument</b> class. The example creates an  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object to override the <b>Instrument</b> field--allowing the field to accept <b>Brass</b> objects--and adds the  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object to an instance of the  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> class.<pre>
+using System;
+using System.IO;
+using System.Xml.Serialization;
+
+public class Orchestra
+{
+   public Instrument[] Instruments;
+}   
+
+public class Instrument
+{
+   public string Name;
+}
+
+public class Brass:Instrument
+{
+   public bool IsValved;
+}
+
+public class Run
+{
+    public static void Main()
+    {
+       Run test = new Run();
+       test.SerializeObject("Override.xml");
+       test.DeserializeObject("Override.xml");
+    }
+
+    public void SerializeObject(string filename)
+    {
+      /* Each overridden field, property, or type requires 
+      an XmlAttributes object. */
+      XmlAttributes attrs = new XmlAttributes();
+
+      /* Create an XmlElementAttribute to override the 
+      field that returns Instrument objects. The overridden field
+      returns Brass objects instead. */
+      XmlElementAttribute attr = new XmlElementAttribute();
+      attr.ElementName = "Brass";
+      attr.Type = typeof(Brass);
+
+      // Add the element to the collection of elements.
+      attrs.XmlElements.Add(attr);
+
+      // Create the XmlAttributeOverrides object.
+      XmlAttributeOverrides attrOverrides = new XmlAttributeOverrides();
+
+      /* Add the type of the class that contains the overridden 
+      member and the XmlAttributes to override it with to the 
+      XmlAttributeOverrides object. */
+      attrOverrides.Add(typeof(Orchestra), "Instruments", attrs);
+
+      // Create the XmlSerializer using the XmlAttributeOverrides.
+      XmlSerializer s = 
+      new XmlSerializer(typeof(Orchestra), attrOverrides);
+
+      // Writing the file requires a TextWriter.
+      TextWriter writer = new StreamWriter(filename);
+
+      // Create the object that will be serialized.
+      Orchestra band = new Orchestra();
+      
+      // Create an object of the derived type.
+      Brass i = new Brass();
+      i.Name = "Trumpet";
+      i.IsValved = true;
+      Instrument[] myInstruments = {i};
+      band.Instruments = myInstruments;
+
+      // Serialize the object.
+      s.Serialize(writer,band);
+      writer.Close();
+   }
+
+   public void DeserializeObject(string filename)
+   {
+      XmlAttributeOverrides attrOverrides = 
+         new XmlAttributeOverrides();
+      XmlAttributes attrs = new XmlAttributes();
+
+      // Create an XmlElementAttribute to override the Instrument.
+      XmlElementAttribute attr = new XmlElementAttribute();
+      attr.ElementName = "Brass";
+      attr.Type = typeof(Brass);
+
+      // Add the element to the collection of elements.
+      attrs.XmlElements.Add(attr);
+
+      attrOverrides.Add(typeof(Orchestra), "Instruments", attrs);
+
+      // Create the XmlSerializer using the XmlAttributeOverrides.
+      XmlSerializer s = 
+      new XmlSerializer(typeof(Orchestra), attrOverrides);
+
+      FileStream fs = new FileStream(filename, FileMode.Open);
+      Orchestra band = (Orchestra) s.Deserialize(fs);
+      Console.WriteLine("Brass:");
+
+      /* The difference between deserializing the overridden 
+      XML document and serializing it is this: To read the derived 
+      object values, you must declare an object of the derived type 
+      (Brass), and cast the Instrument instance to it. */
+      Brass b;
+      foreach(Instrument i in band.Instruments) 
+      {
+         b = (Brass)i;
+         Console.WriteLine(
+         b.Name + "\n" + 
+         b.IsValved);
+      }
+   }
+}
+
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd>  </dd>
+</dl>
+<dl>
+<dd>
+<font color="#FF0000"><b><i>
+								This type supports the Shared Source CLI infrastructure and is not intended to be used directly from your code.
+							</i></b></font>
+</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlAttributes(<br>   <font color="#008080"><a href="../../System.Reflection/types/ICustomAttributeProvider.html">ICustomAttributeProvider</a> <i>provider</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>provider</i><br><dl>
+<dd>
+<param>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="XmlAnyAttributeTopic1"></a><a name="XmlAnyAttribute">XmlAnyAttribute</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the  <a href="../../System.Xml.Serialization/types/XmlAnyAttributeAttribute.html">XmlAnyAttributeAttribute</a> to override.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Serialization/types/XmlAnyAttributeAttribute.html">XmlAnyAttributeAttribute</a> XmlAnyAttribute {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Xml.Serialization/types/XmlAnyAttributeAttribute.html">XmlAnyAttributeAttribute</a> can be applied to a member that returns an array of  <a href="../../System.Xml/types/XmlAttribute.html">XmlAttribute</a> objects on deserialization. This allows the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> to deserialize any attributes that do not have a corresponding member in the object being deserialized--thus those elements are "unknown" to the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>. This is useful when the XML stream may have been altered by a Web Service, or when it is known that random data will be always be included with the XML stream.<p> The  <a href="#XmlAnyAttribute">XmlAttributes.XmlAnyAttribute</a> property allows you to override the serialization of a member to function as a member to which the  <a href="../../System.Xml.Serialization/types/XmlAnyAttributeAttribute.html">XmlAnyAttributeAttribute</a> has been applied.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="XmlAnyElementsTopic1"></a><a name="XmlAnyElements">XmlAnyElements</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the collection of  <a href="../../System.Xml.Serialization/types/XmlAnyElementAttribute.html">XmlAnyElementAttribute</a> objects to override.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Serialization/types/XmlAnyElementAttributes.html">XmlAnyElementAttributes</a> XmlAnyElements {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Xml.Serialization/types/XmlAnyElementAttribute.html">XmlAnyElementAttribute</a> can be applied to a member that returns an array of  <a href="../../System.Xml/types/XmlElement.html">XmlElement</a> objects on deserialization. This allows the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> to deserialize any elements that do not have a corresponding member in the object being deserialized--thus those elements are "unknown" to the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>. This is useful when the XML stream may have been altered by a Web Service, or when it is known that random data will be always be included with the XML stream.<p> The  <a href="#XmlAnyElements">XmlAttributes.XmlAnyElements</a> property allows you to override the serialization of a member to function as a member to which the  <a href="../../System.Xml.Serialization/types/XmlAnyElementAttribute.html">XmlAnyElementAttribute</a> has been applied.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a new  <a href="../../System.Xml.Serialization/types/XmlAnyElementAttribute.html">XmlAnyElementAttribute</a> object and adds it to the collection of objects accessed through the  <a href="#XmlAnyElements">XmlAttributes.XmlAnyElements</a> property. The  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object is then added to a  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> object which is used to create an  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> object. The XmlSerializer is used to serialize or deserialize an object. To see the effect of using the  <a href="../../System.Xml.Serialization/types/XmlAnyElementAttributes.html">XmlAnyElementAttributes</a> property, create an XML document named "UnknownElements.xml" by running the <b>SerializeObject</b> method in the <b>Main</b> method. Edit the resulting document to include other (unknown) elements. Comment out the <b>SerializeObject</b> call in the <b>Main</b> method, and uncomment the call to the <b>DeserializeObject</b> method, which will print out the name and value of any unknown XML element.<pre>
+using System;
+using System.IO;
+using System.Xml.Serialization;
+using System.Xml;
+
+public class Group{
+   public string GroupName;
+   [XmlAnyElement]
+   public object[]Things;
+
+}
+
+public class Test{
+   static void Main(){
+      Test t = new Test();
+      // 1 Run this and create the XML document.
+      // 2 Add new elements to the XML document.
+      // 3 Comment out the new line, and uncomment
+      // the DeserializeObject line to deserialize the
+      // XML document and see unknown elements.
+      t.SerializeObject("UnknownElements.xml");
+     
+      // t.DeserializeObject("UnknownElements.xml");
+   }
+
+   private void SerializeObject(string filename){
+      XmlSerializer ser = new XmlSerializer(typeof (Group));
+      TextWriter writer = new StreamWriter(filename);
+      Group g = new Group();
+      g.GroupName = "MyGroup";
+      ser.Serialize(writer, g);
+      writer.Close();
+   }
+
+   
+   private void DeserializeObject(string filename){
+
+      XmlSerializer ser = CreateOverrideSerializer();
+      // A FileStream is needed to read the XML document.
+      FileStream fs = new FileStream(filename, FileMode.Open);
+     Group g = (Group)
+     	ser.Deserialize(fs);
+     fs.Close();
+     Console.WriteLine(g.GroupName);
+     Console.WriteLine(g.Things.Length);
+     foreach(XmlElement xelement in g.Things){
+     Console.WriteLine(xelement.Name + ": " + xelement.InnerXml);
+     }
+   }
+
+   private XmlSerializer CreateOverrideSerializer(){
+      XmlAnyElementAttribute myAnyElement = 
+      new XmlAnyElementAttribute();
+      XmlAttributeOverrides xOverride = 
+      new XmlAttributeOverrides();
+      XmlAttributes xAtts = new XmlAttributes();
+      xAtts.XmlAnyElements.Add(myAnyElement);
+      xOverride.Add(typeof(Group), "Things", xAtts);
+      return new XmlSerializer(typeof(Group) , xOverride);
+   }
+}
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#XmlAnyAttribute">XmlAttributes.XmlAnyAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="XmlArrayTopic1"></a><a name="XmlArray">XmlArray</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets an object that specifies how the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes a public field or read/write property that returns an array.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html">XmlArrayAttribute</a> XmlArray {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> There are two ways in which a public field or public read/write property that returns an array is serialized by the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>: (1) the default serialization, and (2) the controlled serialization.<p> In the default serialization, no attribute is applied to the member. When serialized, the array will be serialized as a nested sequence of XML elements with the XML element name of the nested sequence taken from the member name.</p>
+<p> To control the serialization more precisely, apply an  <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html">XmlArrayAttribute</a> to the field or property. For example, you can change the generated XML element name from the default to a different name by setting the  <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html#ElementName">XmlArrayAttribute.ElementName</a> property to a new value.</p>
+<p> The  <a href="#XmlArray">XmlAttributes.XmlArray</a> property allows you to override the default serialization, as well as the serialization controlled by applying an  <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html">XmlArrayAttribute</a> to the member. For example, you can change the XML element name generated from the default (the member identifier) to a new value. In addition, if you apply an  <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html">XmlArrayAttribute</a> to a member, it will be overridden by any  <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html">XmlArrayAttribute</a> that is assigned to the  <a href="#XmlArray">XmlAttributes.XmlArray</a> property.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes a class that contains a field named Members that returns an array of objects. The  <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html">XmlArrayAttribute</a> is used to override the serialization of the field, and rename the element name to Staff.<pre>
+using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
+
+// This is the class that will be serialized.
+public class Group
+{
+   // This field will be overridden.
+   public Member [] Members;
+}
+
+public class Member
+{
+   public string MemberName;
+}
+
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.SerializeObject("OverrideArray.xml");
+      test.DeserializeObject("OverrideArray.xml");
+   }
+   // Return an XmlSerializer used for overriding. 
+   public XmlSerializer CreateOverrider()
+   {
+      // Creating XmlAttributeOverrides and XmlAttributes objects.
+      XmlAttributeOverrides xOver = new XmlAttributeOverrides();
+      XmlAttributes xAttrs = new XmlAttributes();
+
+      // Add an override for the XmlArray.    
+      XmlArrayAttribute xArray = new XmlArrayAttribute("Staff");
+      xArray.Namespace = "http://www.cpandl.com";
+      xAttrs.XmlArray = xArray;
+      xOver.Add(typeof(Group), "Members", xAttrs);
+
+      // Create the XmlSerializer and return it.
+      return new XmlSerializer(typeof(Group), xOver);
+   }
+   
+ 
+   public void SerializeObject(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlSerializer mySerializer =  CreateOverrider();
+      // Writing the file requires a TextWriter.
+      TextWriter writer = new StreamWriter(filename);
+
+      // Create an instance of the class that will be serialized.
+      Group myGroup = new Group();
+
+      // Set the object properties.
+      Member m = new Member();
+      m.MemberName = "Paul";
+      myGroup.Members = new Member[1] {m};
+      
+      // Serialize the class, and close the TextWriter.
+      mySerializer.Serialize(writer, myGroup);
+      writer.Close();
+   }
+
+   public void DeserializeObject(string filename)
+   {
+      XmlSerializer mySerializer = CreateOverrider();
+      FileStream fs = new FileStream(filename, FileMode.Open);
+      Group myGroup = (Group) 
+      mySerializer.Deserialize(fs);
+      foreach(Member m in myGroup.Members)
+      {
+         Console.WriteLine(m.MemberName);
+      }
+   }
+}
+   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="XmlArrayItemsTopic1"></a><a name="XmlArrayItems">XmlArrayItems</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets a collection of objects that specify how the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes items inserted into an array returned by a public field or read/write property.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Serialization/types/XmlArrayItemAttributes.html">XmlArrayItemAttributes</a> XmlArrayItems {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#XmlArrayItems">XmlAttributes.XmlArrayItems</a> property allows you to specify the derived types that can be inserted into an array returned by a public field or public read/write property. For each new type you want the field or property to accept, create an  <a href="../../System.Xml.Serialization/types/XmlArrayItemAttribute.html">XmlArrayItemAttribute</a> object and  <a href="../../System.Xml.Serialization/types/XmlArrayItemAttributes.html#Add(System.Xml.Serialization.XmlArrayItemAttribute)">XmlArrayItemAttributes.Add</a> it to the  <a href="../../System.Xml.Serialization/types/XmlArrayItemAttributes.html">XmlArrayItemAttributes</a>) returned by the  <a href="#XmlArrayItems">XmlAttributes.XmlArrayItems</a> property. (The new type must be derived from the type already accepted by the field or property.)  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html#Add(System.Type,System.Xml.Serialization.XmlAttributes)">XmlAttributeOverrides.Add</a> the  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object to an  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> object, specifying the type of the object containing the field or property, and the name of the field or property. Construct an  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> with the  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> object before calling  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Serialize(System.IO.TextWriter,System.Object)">XmlSerializer.Serialize</a> or  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> method.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes a class that contains a field named Members that returns an array of objects. Two  <a href="../../System.Xml.Serialization/types/XmlArrayItemAttribute.html">XmlArrayItemAttribute</a> objects are created to allow the field to accept objects that derive from the base class named Member. Each object is added to the  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> through the  <a href="#XmlArrayItems">XmlAttributes.XmlArrayItems</a> property.<pre>
+using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
+
+// This is the class that will be serialized.
+public class Group
+{
+    public Member [] Members;
+}
+
+public class Member
+{
+    public string MemberName;
+}
+
+public class NewMember:Member
+{
+    public int MemberID;
+}
+
+public class RetiredMember:NewMember
+{
+    public DateTime RetireDate;
+}
+    
+
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.SerializeObject("OverrideArrayItem.xml");
+      test.DeserializeObject("OverrideArrayItem.xml");
+   }
+
+   // Return an XmlSerializer used for overriding. 
+   public XmlSerializer CreateOverrider()
+   {
+      // Create XmlAttributeOverrides and XmlAttributes objects.
+      XmlAttributeOverrides xOver = new XmlAttributeOverrides();
+      XmlAttributes xAttrs = new XmlAttributes();
+
+      // Add an override for the XmlArrayItem.    
+      XmlArrayItemAttribute xArrayItem = 
+      new XmlArrayItemAttribute(typeof(NewMember));
+      xArrayItem.Namespace = "http://www.cpandl.com";
+      xAttrs.XmlArrayItems.Add(xArrayItem);
+
+      // Add a second override.
+      XmlArrayItemAttribute xArrayItem2 = 
+      new XmlArrayItemAttribute(typeof(RetiredMember));
+      xArrayItem2.Namespace = "http://www.cpandl.com";
+      xAttrs.XmlArrayItems.Add(xArrayItem2);
+
+      // Add all overrides to XmlAttribueOverrides object.
+      xOver.Add(typeof(Group), "Members", xAttrs);
+
+      // Create the XmlSerializer and return it.
+      return new XmlSerializer(typeof(Group), xOver);
+   }
+   
+ 
+   public void SerializeObject(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlSerializer mySerializer =  CreateOverrider();
+      // Writing the file requires a TextWriter.
+      TextWriter writer = new StreamWriter(filename);
+
+      // Create an instance of the class that will be serialized.
+      Group myGroup = new Group();
+
+      // Set the object properties.
+      NewMember m = new NewMember();
+      m.MemberName = "Paul";
+      m.MemberID = 2;
+
+      // Create a second member.
+      RetiredMember m2 = new RetiredMember();
+      m2.MemberName = "Renaldo";
+      m2.MemberID = 23;
+      m2.RetireDate = new DateTime(2000, 10,10);
+
+      myGroup.Members = new Member[2] {m, m2};
+      
+      // Serialize the class, and close the TextWriter.
+      mySerializer.Serialize(writer, myGroup);
+      writer.Close();
+   }
+
+   public void DeserializeObject(string filename)
+   {
+      XmlSerializer mySerializer = CreateOverrider();
+      FileStream fs = new FileStream(filename, FileMode.Open);
+      Group myGroup = (Group) 
+      mySerializer.Deserialize(fs);
+      foreach(Member m in myGroup.Members)
+      {
+          Console.WriteLine(m.MemberName);
+      }
+   }
+}
+   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="XmlAttributeTopic1"></a><a name="XmlAttribute">XmlAttribute</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets an object that specifies how the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes a public field or public read/write property as an XML attribute.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Serialization/types/XmlAttributeAttribute.html">XmlAttributeAttribute</a> XmlAttribute {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, if no attribute is applied to a public field or public read/write property, it will be serialized as an XML element. You can also instruct the the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> to generate an XML attribute by applying an  <a href="../../System.Xml.Serialization/types/XmlAttributeAttribute.html">XmlAttributeAttribute</a> to the field or property. The  <a href="#XmlAttribute">XmlAttributes.XmlAttribute</a> property allows you to override the default serialization, as well as the serialization controlled by applying an  <a href="../../System.Xml.Serialization/types/XmlAttributeAttribute.html">XmlAttributeAttribute</a> to the member. To do this, create an  <a href="../../System.Xml.Serialization/types/XmlAttributeAttribute.html">XmlAttributeAttribute</a> and set its properties (such as  <a href="../../System.Xml.Serialization/types/XmlAttributeAttribute.html#AttributeName">XmlAttributeAttribute.AttributeName</a>). Assign the new object to the  <a href="#XmlAttribute">XmlAttributes.XmlAttribute</a> property of an  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object. Add the  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object to an  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> object, specifying the type of the object that contains the field or propert, and the name of the field or property. Lastly, create an  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> using the  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> object and call the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Serialize(System.IO.TextWriter,System.Object)">XmlSerializer.Serialize</a> or  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> method.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes a class named Group that contains a property named GroupName; the GroupName property is serialized as an XML attribute. The example creates an  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> and an  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object to override the default serialization of the field. The example then creates an  <a href="../../System.Xml.Serialization/types/XmlAttributeAttribute.html">XmlAttributeAttribute</a> to specifically override the property, and the object is set to the  <a href="#XmlAttribute">XmlAttributes.XmlAttribute</a> property The  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object is added to the  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> object with the name of the overridden member specified. Finally, an  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> is constructed and returned using the  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> object.<pre>
+using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
+
+// This is the class that will be serialized.
+public class Group
+{
+   // This is the attribute that will be overridden.
+   [XmlAttribute]
+   public string GroupName;
+   public int GroupNumber;
+}
+ 
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.SerializeObject("OverrideAttribute.xml");
+      test.DeserializeObject("OverrideAttribute.xml");
+   }
+   // Return an XmlSerializer used for overriding. 
+   public XmlSerializer CreateOverrider()
+   {
+      // Create the XmlAttributeOverrides and XmlAttributes objects.
+      XmlAttributeOverrides xOver = new XmlAttributeOverrides();
+      XmlAttributes xAttrs = new XmlAttributes();
+
+      /* Create an overriding XmlAttributeAttribute set it to 
+      the XmlAttribute property of the XmlAttributes object.*/
+      XmlAttributeAttribute xAttribute = new XmlAttributeAttribute("SplinterName");
+      xAttrs.XmlAttribute = xAttribute;
+
+      // Add to the XmlAttributeOverrides. Specify the member name.
+      xOver.Add(typeof(Group), "GroupName", xAttrs);
+
+      // Create the XmlSerializer and return it.
+      return new XmlSerializer(typeof(Group), xOver);
+   }
+ 
+   public void SerializeObject(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlSerializer mySerializer =  CreateOverrider();
+      // Writing the file requires a TextWriter.
+      TextWriter writer = new StreamWriter(filename);
+
+      // Create an instance of the class that will be serialized.
+      Group myGroup = new Group();
+
+      /* Set the Name property, which will be generated 
+      as an XML attribute. */
+      myGroup.GroupName = ".NET";
+      myGroup.GroupNumber = 1;
+      // Serialize the class, and close the TextWriter.
+      mySerializer.Serialize(writer, myGroup);
+       writer.Close();
+   }
+
+   public void DeserializeObject(string filename)
+   {
+      XmlSerializer mySerializer = CreateOverrider();
+      FileStream fs = new FileStream(filename, FileMode.Open);
+      Group myGroup = (Group) 
+      mySerializer.Deserialize(fs);
+      
+      Console.WriteLine(myGroup.GroupName);
+      Console.WriteLine(myGroup.GroupNumber);
+   }
+}
+   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="XmlChoiceIdentifierTopic1"></a><a name="XmlChoiceIdentifier">XmlChoiceIdentifier</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets an object that allows you to disambiguate between a set of choices.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Serialization/types/XmlChoiceIdentifierAttribute.html">XmlChoiceIdentifierAttribute</a> XmlChoiceIdentifier {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="XmlDefaultValueTopic1"></a><a name="XmlDefaultValue">XmlDefaultValue</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the default value of an XML element or attribute.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> XmlDefaultValue {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> You can specify the default value of an XML element or XML attribute by applying a  <a href="../../System.ComponentModel/types/DefaultValueAttribute.html">DefaultValueAttribute</a> to a member. To examine the result of applying the value, compile the application into a DLL or executable, and pass the resulting file as an argument to the XML Schema Definition tool (XSD.exe). In the XML schema document, a default value is assigned to the <b>default</b> attribute. In the example below, the default for the Animal element is "Dogs." <pre>
+              &lt;?xml version="1.0"?&gt;
+              &lt;schema attributeFormDefault="qualified" 
+              elementFormDefault="qualified" targetNamespace="" 
+              xmlns="http://www.w3.org/2000/10/XMLSchema"&gt;
+                &lt;element name="Pets" nullable="true" type="Pets"/&gt;
+                &lt;complexType name="Pets"&gt;
+                  &lt;sequence&gt;
+                    &lt;element default="Dogs" name="Animal" nullable="true" 
+                     type="string" minOccurs="0"/&gt;
+                  &lt;/sequence&gt;
+                &lt;/complexType&gt;
+              &lt;/schema&gt;
+                 
+            </pre>
+<p> To override the default value, create an  <a href="../../System/types/Object.html">Object</a> and assign it to the  <a href="#XmlDefaultValue">XmlAttributes.XmlDefaultValue</a>.</p>
+<p> If the value assigned to a field or property is equal to the default value for that field or property, the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> will not serialize the value to the XML-instance. This is because the assigned value can be recovered from the XML schema. In other words, setting a field or property to its own default value is equivalent of not setting it at all. Likewise, if no value is set for the field or property, the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> will use the default value found in the schema. In both cases, (setting the property to its default, or not setting it at all), the XML-document instance will not contain any value for the property.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows a class named <b>Pet</b> that contains a field that has a default value set to "Dog". However, the example also creates an  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object, and sets its  <a href="#XmlDefaultValue">XmlAttributes.XmlDefaultValue</a> property to a new default value ("Cat"). This overrides the original default value. Thus, if the field value is set to "Cat", the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> will treat it as the default value, and not serialize it. If it is set to any other value, the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> will serialize the value.<pre>
+using System; 
+using System.IO; 
+using System.Xml; 
+using System.Xml.Serialization; 
+using System.ComponentModel; 
+
+// This is the class that will be serialized. 
+public class Pet 
+{
+   // The default value for the Animal field is "Dog". 
+   [DefaultValueAttribute("Dog")] 
+   public string Animal ; 
+} 
+
+public class Run 
+{ 
+   public static void Main() 
+   { 
+      Run test = new Run();
+      test.SerializeObject("OverrideDefaultValue.xml");
+      test.DeserializeObject("OverrideDefaultValue.xml"); 
+   }
+ 
+   // Return an XmlSerializer used for overriding. 
+   public XmlSerializer CreateOverrider() 
+   { 
+      // Create the XmlAttributeOverrides and XmlAttributes objects. 
+      XmlAttributeOverrides xOver = new XmlAttributeOverrides(); 
+      XmlAttributes xAttrs = new XmlAttributes(); 
+
+      // Add an override for the default value of the GroupName. 
+      Object defaultAnimal= "Cat";
+      xAttrs.XmlDefaultValue = defaultAnimal; 
+
+      // Add all the XmlAttributes to the XmlAttribueOverrides object. 
+      xOver.Add(typeof(Pet), "Animal", xAttrs); 
+
+      // Create the XmlSerializer and return it.
+      return new XmlSerializer(typeof(Pet), xOver);
+   }
+
+   public void SerializeObject(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlSerializer mySerializer = CreateOverrider(); 
+
+      // Writing the file requires a TextWriter.
+      TextWriter writer = new StreamWriter(filename); 
+
+      // Create an instance of the class that will be serialized. 
+      Pet myPet = new Pet(); 
+
+      /* Set the Animal property. If you set it to the default value,
+         which is "Cat" (the value assigned to the XmlDefaultValue
+         of the XmlAttributes object), no value will be serialized.
+         If you change the value to any other value (including "Dog"),
+         the value will be serialized.
+      */
+      // The default value "Cat" will be assigned (nothing serialized).
+      myPet.Animal= ""; 
+      // Uncommenting the next line also results in the default 
+      // value because Cat is the default value (not serialized).
+      //  myPet.Animal = "Cat"; 
+      
+      // Uncomment the next line to see the value serialized:
+      // myPet.Animal = "fish";
+      // This will also be serialized because Dog is not the 
+      // default anymore.
+      //  myPet.Animal = "Dog";
+      // Serialize the class, and close the TextWriter. 
+      mySerializer.Serialize(writer, myPet); 
+      writer.Close(); 
+   } 
+
+   public void DeserializeObject(string filename) 
+   {
+      XmlSerializer mySerializer = CreateOverrider();
+      FileStream fs = new FileStream(filename, FileMode.Open);
+      Pet myPet= (Pet)mySerializer.Deserialize(fs);
+      Console.WriteLine(myPet.Animal);
+   }
+}
+
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="XmlElementsTopic1"></a><a name="XmlElements">XmlElements</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets a collection of objects that specify how the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes a public field or read/write property as an XML element.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Serialization/types/XmlElementAttributes.html">XmlElementAttributes</a> XmlElements {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For each overridden member that is serialized as an XML element, you must add a new  <a href="../../System.Xml.Serialization/types/XmlElementAttribute.html">XmlElementAttribute</a> to an  <a href="../../System.Xml.Serialization/types/XmlElementAttributes.html">XmlElementAttributes</a> by calling the  <a href="../../System.Xml.Serialization/types/XmlElementAttributes.html#Add(System.Xml.Serialization.XmlElementAttribute)">XmlElementAttributes.Add</a> method. By default, an  <a href="../../System.Xml.Serialization/types/XmlElementAttributes.html">XmlElementAttributes</a> object is created and assigned to the  <a href="#XmlElements">XmlAttributes.XmlElements</a> property.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes the <b>Transportation</b> class, which contains a single field named <b>Vehicles</b> that returns an  <a href="../../System.Collections/types/ArrayList.html">ArrayList</a>. The example applies two  <a href="../../System.Xml.Serialization/types/XmlElementAttribute.html">XmlElementAttribute</a> attributes to the <b>Vehicles</b> field. The example creates two  <a href="../../System.Xml.Serialization/types/XmlElementAttribute.html">XmlElementAttribute</a> objects and adds them to the  <a href="../../System.Xml.Serialization/types/XmlElementAttributes.html">XmlElementAttributes</a> collection of an  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object. To allow the array to accept different object types, the  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object is added to the  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> object.<pre>
+using System;
+using System.IO;
+using System.Xml.Serialization;
+using System.Collections;
+using System.Xml;
+
+public class Transportation
+{
+   // Subsequent code overrides these two XmlElementAttributes.
+   [XmlElement(typeof(Car)),
+   XmlElement(typeof(Plane))]
+   public ArrayList Vehicles;
+}
+
+public class Car
+{
+   public string Name;
+}
+
+public class Plane
+{
+   public string Name;
+}
+public class Truck
+{
+   public string Name;
+}
+public class Train
+{
+   public string Name;
+}
+
+public class Test
+{
+   public static void Main()
+   {
+      Test t = new Test();
+      t.SerializeObject("OverrideElement.xml");
+   }
+
+   // Return an XmlSerializer used for overriding.
+   public XmlSerializer CreateOverrider()
+   {
+      // Create the XmlAttributes and XmlAttributeOverrides objects.
+      XmlAttributes attrs = new XmlAttributes();
+
+      XmlAttributeOverrides xOver = 
+      new XmlAttributeOverrides();
+      
+      
+      /* Create an XmlElementAttribute to override 
+      the Vehicles property. */
+      XmlElementAttribute xElement1 = 
+      new XmlElementAttribute(typeof(Truck));
+      // Add the XmlElementAttribute to the collection.
+      attrs.XmlElements.Add(xElement1);
+
+      /* Create a second XmlElementAttribute, and 
+      add it to the collection. */
+      XmlElementAttribute xElement2 = 
+      new XmlElementAttribute(typeof(Train));
+      attrs.XmlElements.Add(xElement2);
+
+      /* Add the XmlAttributes to the XmlAttributeOverrides,
+      specifying the member to override. */
+      xOver.Add(typeof(Transportation), "Vehicles", attrs);
+      
+      // Create the XmlSerializer, and return it.
+      XmlSerializer xSer = new XmlSerializer
+      (typeof(Transportation), xOver);
+      return xSer;
+   }
+
+   public void SerializeObject(string filename)
+   {
+      // Create an XmlSerializer instance.
+      XmlSerializer xSer = CreateOverrider();
+
+      // Create the object and serialize it.
+      Transportation myTransportation = 
+      new Transportation();
+
+      /* Create two new override objects that can be
+      inserted into the array. */
+      myTransportation.Vehicles = new ArrayList();
+      Truck myTruck = new Truck();
+      myTruck.Name = "MyTruck";
+
+      Train myTrain = new Train();
+      myTrain.Name = "MyTrain";
+
+      myTransportation.Vehicles.Add(myTruck);
+      myTransportation.Vehicles.Add(myTrain);
+
+      TextWriter writer = new StreamWriter(filename);
+      xSer.Serialize(writer, myTransportation);
+      
+   }
+}
+
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="XmlEnumTopic1"></a><a name="XmlEnum">XmlEnum</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets an object that specifies how the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes an enumeration member.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Serialization/types/XmlEnumAttribute.html">XmlEnumAttribute</a> XmlEnum {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For each identifer you want to override, you must create an  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object, and set the  <a href="#XmlEnum">XmlAttributes.XmlEnum</a> property to an  <a href="../../System.Xml.Serialization/types/XmlEnumAttribute.html">XmlEnumAttribute</a> that overrides the identifier. Add the  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object to the  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> object, specifying both the  <a href="../../System/types/Type.html">Type</a> of the class that contains the enumeration, and the overridden member name.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes two classes named <b>Food</b> and <b>FoodType</b>. The <b>FoodType</b> class contains two enumerations that are overridden and, for each enumeration, the example creates an  <a href="../../System.Xml.Serialization/types/XmlEnumAttribute.html">XmlEnumAttribute</a> object which it assigns to the  <a href="#XmlEnum">XmlAttributes.XmlEnum</a> property of an  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object. The example then adds the  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object to an  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> object, which is used to create an  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>.<pre>
+using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
+
+// This is the class that will be serialized.
+public class Food
+{
+   public FoodType Type;
+}
+
+public enum FoodType
+{
+   // Subsequent code overrides these enumerations.
+   Low,
+   High
+}
+
+
+ 
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.SerializeObject("OverrideEnum.xml");
+      test.DeserializeObject("OverrideEnum.xml");
+   }
+
+   // Return an XmlSerializer used for overriding. 
+   public XmlSerializer CreateOverrider()
+   {
+      // Create the XmlAttributeOverrides and XmlAttributes objects.
+      XmlAttributeOverrides xOver = new XmlAttributeOverrides();
+      XmlAttributes xAttrs = new XmlAttributes();
+
+      // Add an XmlEnumAttribute for the FoodType.Low enumeration.
+      XmlEnumAttribute xEnum = new XmlEnumAttribute();
+      xEnum.Name = "Cold";
+      xAttrs.XmlEnum = xEnum;
+      xOver.Add(typeof(FoodType), "Low", xAttrs);
+
+      // Add an XmlEnumAttribute for the FoodType.High enumeration.
+      xAttrs = new XmlAttributes();
+      xEnum = new XmlEnumAttribute();
+      xEnum.Name = "Hot";
+      xAttrs.XmlEnum = xEnum;
+      xOver.Add(typeof(FoodType), "High", xAttrs);
+
+      // Create the XmlSerializer, and return it.
+      return new XmlSerializer(typeof(Food), xOver);
+   }
+   
+ 
+   public void SerializeObject(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlSerializer mySerializer =  CreateOverrider();
+      // Writing the file requires a TextWriter.
+      TextWriter writer = new StreamWriter(filename);
+
+      // Create an instance of the class that will be serialized.
+      Food myFood = new Food();
+
+      // Set the object properties.
+      myFood.Type = FoodType.High;
+
+      // Serialize the class, and close the TextWriter.
+      mySerializer.Serialize(writer, myFood);
+      writer.Close();
+   }
+
+   public void DeserializeObject(string filename)
+   {
+      XmlSerializer mySerializer = CreateOverrider();
+      FileStream fs = new FileStream(filename, FileMode.Open);
+      Food myFood = (Food) 
+      mySerializer.Deserialize(fs);
+
+      Console.WriteLine(myFood.Type);
+   }
+}
+   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="XmlIgnoreTopic1"></a><a name="XmlIgnore">XmlIgnore</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets a value that specifies whether or not the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes a public field or public read/write property.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> XmlIgnore {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, all public fields and public read/write properties are serialized by the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>. That is, the value of each public field or property is persisted as an XML element or XML attribute in an XML-document instance.<p> To override the default serialization of a field or property, create an  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object, and set its  <a href="#XmlIgnore">XmlAttributes.XmlIgnore</a> property to <b>true</b>. <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html#Add(System.Type,System.Xml.Serialization.XmlAttributes)">XmlAttributeOverrides.Add</a> the object to an  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> object specifying the type of the object that contains the field or property to ignore, and the name of the field or property to ignore.</p>
+<p> If an  <a href="../../System.Xml.Serialization/types/XmlIgnoreAttribute.html">XmlIgnoreAttribute</a> is applied to a field or property, the field or property will be ignored. However you can override that behavior by creating an  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object, setting its  <a href="#XmlIgnore">XmlAttributes.XmlIgnore</a> property to <b>false</b>, and adding it to an  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> object specifying the type of the object that contains the field or property, and the name of the field or property.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes a class named <b>Group</b>,which contains a member named <b>Comment</b> to which the  <a href="../../System.Xml.Serialization/types/XmlIgnoreAttribute.html">XmlIgnoreAttribute</a> is applied. The example creates an  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object, and sets the  <a href="#XmlIgnore">XmlAttributes.XmlIgnore</a> property to <b>false</b>, thereby overriding the  <a href="../../System.Xml.Serialization/types/XmlIgnoreAttribute.html">XmlIgnoreAttribute</a>.<pre>
+using System;
+using System.IO;
+using System.Xml.Serialization;
+
+// This is the class that will be serialized. 
+public class Group
+{
+   // The GroupName value will be serialized--unless it's overridden.
+   public string GroupName;
+
+   /* This field will be ignored when serialized--
+      unless it's overridden. */
+   [XmlIgnoreAttribute]
+   public string Comment;
+}
+
+public class Test
+{
+   public static void Main()
+   {
+      Test t = new Test();
+      t.SerializeObject("IgnoreXml.xml");
+   }
+
+   // Return an XmlSerializer used for overriding.
+   public XmlSerializer CreateOverrider()
+   {
+      // Create the XmlAttributeOverrides and XmlAttributes objects.
+      XmlAttributeOverrides xOver = new XmlAttributeOverrides();
+      XmlAttributes attrs = new XmlAttributes();
+
+      /* Setting XmlIgnore to false overrides the XmlIgnoreAttribute
+         applied to the Comment field. Thus it will be serialized.*/
+      attrs.XmlIgnore = false;
+      xOver.Add(typeof(Group), "Comment", attrs);
+
+      /* Use the XmlIgnore to instruct the XmlSerializer to ignore
+         the GroupName instead. */
+      attrs = new XmlAttributes();
+      attrs.XmlIgnore = true;
+      xOver.Add(typeof(Group), "GroupName", attrs);
+      
+      XmlSerializer xSer = new XmlSerializer(typeof(Group), xOver);
+      return xSer;
+   }
+
+   public void SerializeObject(string filename)
+   {
+      // Create an XmlSerializer instance.
+      XmlSerializer xSer = CreateOverrider();
+
+      // Create the object to serialize and set its properties.
+      Group myGroup = new Group();
+      myGroup.GroupName = ".NET";
+      myGroup.Comment = "My Comment...";
+   
+      // Writing the file requires a TextWriter.
+      TextWriter writer = new StreamWriter(filename);
+
+      // Serialize the object and close the TextWriter.
+      xSer.Serialize(writer, myGroup);
+      writer.Close();
+   }
+}
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml.Serialization/types/XmlIgnoreAttribute.html">XmlIgnoreAttribute</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="XmlnsTopic1"></a><a name="Xmlns">Xmlns</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> Xmlns {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="XmlRootTopic1"></a><a name="XmlRoot">XmlRoot</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets an object that specifies how the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes a class as an XML root element.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Serialization/types/XmlRootAttribute.html">XmlRootAttribute</a> XmlRoot {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates an  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> object, an  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object, and an  <a href="../../System.Xml.Serialization/types/XmlRootAttribute.html">XmlRootAttribute</a> object. The example assigns the  <a href="../../System.Xml.Serialization/types/XmlRootAttribute.html">XmlRootAttribute</a> to the  <a href="#XmlRoot">XmlAttributes.XmlRoot</a> property of the  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object, and adds the  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object to the  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> object. Lastly, the example gets the  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object by passing the  <a href="../../System/types/Type.html">Type</a> of the serialized class to the  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> object. (In this example, the  <a href="../../System/types/Type.html">Type</a> is <b>Group</b>.) <pre>
+using System;
+using System.IO;
+using System.Xml.Serialization;
+
+// This is the class that will be serialized.
+public class Group
+{
+   public string GroupName;
+   [XmlAttribute]
+   public int GroupCode;
+}
+
+public class Test
+{
+   public static void Main()
+   {
+      Test t = new Test();
+      t.SerializeObject("OverrideRoot.xml");
+   }
+
+   // Return an XmlSerializer for overriding attributes.
+   public XmlSerializer CreateOverrider()
+   {
+      // Create the XmlAttributes and XmlAttributeOverrides objects.
+      XmlAttributes attrs = new XmlAttributes();
+      XmlAttributeOverrides xOver = new XmlAttributeOverrides();
+   
+      XmlRootAttribute xRoot = new XmlRootAttribute();
+
+      // Set a new Namespace and ElementName for the root element.
+      xRoot.Namespace = "http://www.cpandl.com";
+      xRoot.ElementName = "NewGroup";
+      attrs.XmlRoot = xRoot;
+
+      /* Add the XmlAttributes object to the XmlAttributeOverrides. 
+         No  member name is needed because the whole class is 
+         overridden. */
+      xOver.Add(typeof(Group), attrs);
+
+      // Get the XmlAttributes object, based on the type.
+      XmlAttributes tempAttrs;
+      tempAttrs = xOver[typeof(Group)];
+
+      // Print the Namespace and ElementName of the root.
+      Console.WriteLine(tempAttrs.XmlRoot.Namespace);
+      Console.WriteLine(tempAttrs.XmlRoot.ElementName);
+
+      XmlSerializer xSer = new XmlSerializer(typeof(Group), xOver);
+      return xSer;
+   }
+
+   public void SerializeObject(string filename)
+   {
+      // Create the XmlSerializer using the CreateOverrider method.
+      XmlSerializer xSer = CreateOverrider();
+
+      // Create the object to serialize.
+      Group myGroup = new Group();
+      myGroup.GroupName = ".NET";
+      myGroup.GroupCode = 123;
+
+      // To write the file, a TextWriter is required.
+      TextWriter writer = new StreamWriter(filename);
+
+      // Serialize the object and close the TextWriter.
+      xSer.Serialize(writer, myGroup);
+      writer.Close();
+   }
+}
+
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="XmlTextTopic1"></a><a name="XmlText">XmlText</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets an object that instructs the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> to serialize a public field or public read/write property as XML text.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> XmlText {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> By default, a public field or public read/write property will be serialized as an XML element by the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>. However, can force the field or property to be serialized as XML text by applying an  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> to the field or property.<br><br><b>Note </b> The  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> cannot be applied to a field or property that returns an array.<p> To override the default serialization of a field or property (that does not return an array), create an  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> and assign it to the  <a href="#XmlText">XmlAttributes.XmlText</a> property of an  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object. Add the  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object to an  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> object, specifying the type of the object containing the overridden field or property, and the name of the overridden field or property.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes the class named <b>Group</b>, which contains a field named <b>Comment</b>. To override the default way the XmlSerializer serializes the field, the example creates an  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> and an  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object. The example then creates an  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> object, which it assigns to the  <a href="#XmlText">XmlAttributes.XmlText</a> property, and adds the  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object (with the name of the field to be serialized as XML text) to the  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> object. Lastly the example creates an  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> using the  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> object.<pre>
+using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
+
+// This is the class that will be serialized.
+public class Group
+{
+   public string GroupName;
+
+   // This field will be serialized as XML text. 
+   public string Comment;
+}
+ 
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.SerializeObject("OverrideText.xml");
+      test.DeserializeObject("OverrideText.xml");
+   }
+
+   // Return an XmlSerializer to be used for overriding. 
+   public XmlSerializer CreateOverrider()
+   {
+      // Create the XmlAttributeOverrides and XmlAttributes objects.
+      XmlAttributeOverrides xOver = new XmlAttributeOverrides();
+      XmlAttributes xAttrs = new XmlAttributes();
+
+      /* Create an XmlTextAttribute and assign it to the XmlText 
+      property. This instructs the XmlSerializer to treat the 
+      Comment field as XML text. */      
+      XmlTextAttribute xText = new XmlTextAttribute();
+      xAttrs.XmlText = xText;
+      xOver.Add(typeof(Group), "Comment", xAttrs);
+
+      // Create the XmlSerializer, and return it.
+      return new XmlSerializer(typeof(Group), xOver);
+   }
+   
+ 
+   public void SerializeObject(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlSerializer mySerializer =  CreateOverrider();
+      // Writing the file requires a TextWriter.
+      TextWriter writer = new StreamWriter(filename);
+
+      // Create an instance of the class that will be serialized.
+      Group myGroup = new Group();
+
+      // Set the object properties.
+      myGroup.GroupName = ".NET";
+      myGroup.Comment = "Great Stuff!";      
+      // Serialize the class, and close the TextWriter.
+      mySerializer.Serialize(writer, myGroup);
+      writer.Close();
+   }
+
+   public void DeserializeObject(string filename)
+   {
+      XmlSerializer mySerializer = CreateOverrider();
+      FileStream fs = new FileStream(filename, FileMode.Open);
+      Group myGroup = (Group) 
+      mySerializer.Deserialize(fs);
+      Console.WriteLine(myGroup.GroupName);
+      Console.WriteLine(myGroup.Comment);
+   }
+}
+   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="XmlTypeTopic1"></a><a name="XmlType">XmlType</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets an object that specifies how the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes a class to which the  <a href="../../System.Xml.Serialization/types/XmlTypeAttribute.html">XmlTypeAttribute</a> has been applied.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Serialization/types/XmlTypeAttribute.html">XmlTypeAttribute</a> XmlType {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Xml.Serialization/types/XmlTypeAttribute.html">XmlTypeAttribute</a> can be used to control how a type is serialized by the XmlSerializer. For example, by default, when a type is serialized, the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> uses the class name as the XML element name. By creating an  <a href="../../System.Xml.Serialization/types/XmlTypeAttribute.html">XmlTypeAttribute</a>, setting the  <a href="#XmlType">XmlAttributes.XmlType</a> property to it, and creating an  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> object, you can change the XML element name.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates an  <a href="../../System.Xml.Serialization/types/XmlTypeAttribute.html">XmlTypeAttribute</a> object, and assigns it to the  <a href="#XmlType">XmlAttributes.XmlType</a> property of an  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> object.<pre>
+using System;
+using System.IO;
+using System.Xml.Serialization;
+
+public class Transportation
+{
+   public Car[] Cars;
+}
+
+public class Car
+{
+   public int ID;
+}
+
+public class Test
+{
+   public static void Main()
+   {
+      Test t = new Test();
+      t.SerializeObject("XmlType.xml");
+   }
+
+   // Return an XmlSerializer used for overriding.
+   public XmlSerializer CreateOverrider()
+   {
+      // Create the XmlAttributes and XmlAttributeOverrides objects.
+      XmlAttributes attrs = new XmlAttributes();
+      XmlAttributeOverrides xOver = new XmlAttributeOverrides();
+      
+      /* Create an XmlTypeAttribute and change the name of the 
+         XML type. */
+      XmlTypeAttribute xType = new XmlTypeAttribute();
+      xType.TypeName = "Autos";
+
+      // Set the XmlTypeAttribute to the XmlType property.
+      attrs.XmlType = xType;
+
+      /* Add the XmlAttributes to the XmlAttributeOverrides,
+         specifying the member to override. */
+      xOver.Add(typeof(Car), attrs);
+
+      // Create the XmlSerializer, and return it.
+      XmlSerializer xSer = new XmlSerializer
+      (typeof(Transportation), xOver);
+      return xSer;
+   }
+
+   public void SerializeObject(string filename)
+   {
+      // Create an XmlSerializer instance.
+      XmlSerializer xSer = CreateOverrider();
+
+      // Create object and serialize it.
+      Transportation myTransportation = 
+      new Transportation();
+
+      Car c1 = new Car();
+      c1.ID = 12;
+
+      Car c2 = new Car();
+      c2.ID = 44;
+
+      myTransportation.Cars = new Car[2]{c1,c2};
+
+      // To write the file, a TextWriter is required.
+      TextWriter writer = new StreamWriter(filename);
+      xSer.Serialize(writer, myTransportation);
+   }
+}
+
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~XmlAttributes();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

@@ -1,0 +1,1979 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Collections.BitArray</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Collections.BitArray Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Collections<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Manages a compact array of bit values, which are represented as Booleans, where <b>true</b> indicates that the bit is on (1) and <b>false</b> indicates the bit is off (0).</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public sealed class BitArray : ICollection, IEnumerable, ICloneable</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Thread Safety</b><br><dl>
+<dd> Public static (non-instance) members of this type are safe for multithreaded operations. Instance members are not guaranteed to be thread-safe.<p> This implementation does not provide a synchronized (thread-safe) wrapper for a  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</p>
+<p> Enumerating through a collection is intrinsically not a thread-safe procedure. Even when a collection is synchronized, other threads could still modify the collection, which causes the enumerator to throw an exception. To guarantee thread safety during enumeration, you can either lock the collection during the entire enumeration or catch the exceptions resulting from changes made by other threads.</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The size of a  <a href="../../System.Collections/types/BitArray.html">BitArray</a> is controlled by the client; indexing past the end of the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> throws an  <a href="../../System/types/ArgumentException.html">ArgumentException</a>.<p> Indexes in this collection are zero-based.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to create and initialize a  <a href="../../System.Collections/types/BitArray.html">BitArray</a> and how to print out its values.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesBitArray  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes several BitArrays.
+       BitArray myBA1 = new BitArray( 5 );
+ 
+       BitArray myBA2 = new BitArray( 5, false );
+ 
+       byte[] myBytes = new byte[5] { 1, 2, 3, 4, 5 };
+       BitArray myBA3 = new BitArray( myBytes );
+ 
+       bool[] myBools = new bool[5] { true, false, true, true, false };
+       BitArray myBA4 = new BitArray( myBools );
+ 
+       int[]  myInts  = new int[5] { 6, 7, 8, 9, 10 };
+       BitArray myBA5 = new BitArray( myInts );
+ 
+       // Displays the properties and values of the BitArrays.
+       Console.WriteLine( "myBA1" );
+       Console.WriteLine( "\tCount:    {0}", myBA1.Count );
+       Console.WriteLine( "\tLength:   {0}", myBA1.Length );
+       Console.WriteLine( "\tValues:" );
+       PrintValues( myBA1, 8 );
+ 
+       Console.WriteLine( "myBA2" );
+       Console.WriteLine( "\tCount:    {0}", myBA2.Count );
+       Console.WriteLine( "\tLength:   {0}", myBA2.Length );
+       Console.WriteLine( "\tValues:" );
+       PrintValues( myBA2, 8 );
+ 
+       Console.WriteLine( "myBA3" );
+       Console.WriteLine( "\tCount:    {0}", myBA3.Count );
+       Console.WriteLine( "\tLength:   {0}", myBA3.Length );
+       Console.WriteLine( "\tValues:" );
+       PrintValues( myBA3, 8 );
+ 
+       Console.WriteLine( "myBA4" );
+       Console.WriteLine( "\tCount:    {0}", myBA4.Count );
+       Console.WriteLine( "\tLength:   {0}", myBA4.Length );
+       Console.WriteLine( "\tValues:" );
+       PrintValues( myBA4, 8 );
+ 
+       Console.WriteLine( "myBA5" );
+       Console.WriteLine( "\tCount:    {0}", myBA5.Count );
+       Console.WriteLine( "\tLength:   {0}", myBA5.Length );
+       Console.WriteLine( "\tValues:" );
+       PrintValues( myBA5, 8 );
+    }
+ 
+ 
+    public static void PrintValues( IEnumerable myList, int myWidth )  {
+       System.Collections.IEnumerator myEnumerator = myList.GetEnumerator();
+       int i = myWidth;
+       while ( myEnumerator.MoveNext() )  {
+          if ( i &lt;= 0 )  {
+             i = myWidth;
+             Console.WriteLine();
+          }
+          i--;
+          Console.Write( "\t{0}", myEnumerator.Current );
+       }
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ myBA1
+     Count:    5
+     Length:   5
+     Values:
+     False    False    False    False    False
+ myBA2
+     Count:    5
+     Length:   5
+     Values:
+     False    False    False    False    False
+ myBA3
+     Count:    40
+     Length:   40
+     Values:
+     True    False    False    False    False    False    False    False
+     False    True    False    False    False    False    False    False
+     True    True    False    False    False    False    False    False
+     False    False    True    False    False    False    False    False
+     True    False    True    False    False    False    False    False
+ myBA4
+     Count:    5
+     Length:   5
+     Values:
+     True    False    True    True    False
+ myBA5
+     Count:    160
+     Length:   160
+     Values:
+     False    True    True    False    False    False    False    False
+     False    False    False    False    False    False    False    False
+     False    False    False    False    False    False    False    False
+     False    False    False    False    False    False    False    False
+     True    True    True    False    False    False    False    False
+     False    False    False    False    False    False    False    False
+     False    False    False    False    False    False    False    False
+     False    False    False    False    False    False    False    False
+     False    False    False    True    False    False    False    False
+     False    False    False    False    False    False    False    False
+     False    False    False    False    False    False    False    False
+     False    False    False    False    False    False    False    False
+     True    False    False    True    False    False    False    False
+     False    False    False    False    False    False    False    False
+     False    False    False    False    False    False    False    False
+     False    False    False    False    False    False    False    False
+     False    True    False    True    False    False    False    False
+     False    False    False    False    False    False    False    False
+     False    False    False    False    False    False    False    False
+     False    False    False    False    False    False    False    False
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Collections/System.Collections.html">System.Collections Namespace</a></dd>
+</dl>
+<h3>System.Collections.BitArray Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(BitArray bits)<br><br></code> Initializes a new instance of the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> class that contains bit values copied from the specified  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(bool[] values)<br><br></code> Initializes a new instance of the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> class that contains bit values copied from the specified array of Booleans.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor3">ctor #3</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(byte[] bytes)<br><br></code> Initializes a new instance of the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> class that contains bit values copied from the specified array of bytes.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor4">ctor #4</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(int length)<br><br></code> Initializes a new instance of the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> class that can hold the specified number of bit values, which are initially set to <b>false</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor5">ctor #5</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(int[] values)<br><br></code> Initializes a new instance of the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> class that contains bit values copied from the specified array of 32-bit integers.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor6">ctor #6</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(int length, bool defaultValue)<br><br></code> Initializes a new instance of the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> class that can hold the specified number of bit values, which are initially set to the specified value.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Count">Count</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the number of elements contained in the  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsReadOnly">IsReadOnly</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a value indicating whether the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> is read-only.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsSynchronized">IsSynchronized</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a value indicating whether access to the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> is synchronized (thread-safe).</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Item(System.Int32)">Item</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the value of the bit at a specific position in the  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Length">Length</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the number of elements in the  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SyncRoot">SyncRoot</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets an object that can be used to synchronize access to the  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#And(System.Collections.BitArray)">And</a></td>
+<td width="55%"> Performs the bitwise AND operation on the elements in the current  <a href="../../System.Collections/types/BitArray.html">BitArray</a> against the corresponding elements in the specified  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Clone">Clone</a></td>
+<td width="55%"> Creates a shallow copy of the  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CopyTo(System.Array,System.Int32)">CopyTo</a></td>
+<td width="55%"> Copies the entire  <a href="../../System.Collections/types/BitArray.html">BitArray</a> to a compatible one-dimensional  <a href="../../System/types/Array.html">Array</a>, starting at the specified index of the target array.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Get(System.Int32)">Get</a></td>
+<td width="55%"> Gets the value of the bit at a specific position in the  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetEnumerator">GetEnumerator</a></td>
+<td width="55%"> Returns an enumerator that can iterate through the  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Not">Not</a></td>
+<td width="55%"> Inverts all the bit values in the current  <a href="../../System.Collections/types/BitArray.html">BitArray</a>, so that elements set to <b>true</b> are changed to <b>false</b>, and elements set to <b>false</b> are changed to <b>true</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Or(System.Collections.BitArray)">Or</a></td>
+<td width="55%"> Performs the bitwise OR operation on the elements in the current  <a href="../../System.Collections/types/BitArray.html">BitArray</a> against the corresponding elements in the specified  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Set(System.Int32,System.Boolean)">Set</a></td>
+<td width="55%"> Sets the bit at a specific position in the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> to the specified value.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SetAll(System.Boolean)">SetAll</a></td>
+<td width="55%"> Sets all bits in the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> to the specified value.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Xor(System.Collections.BitArray)">Xor</a></td>
+<td width="55%"> Performs the bitwise eXclusive OR operation on the elements in the current  <a href="../../System.Collections/types/BitArray.html">BitArray</a> against the corresponding elements in the specified  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Collections.BitArray</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Collections.BitArray Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> class that contains bit values copied from the specified  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public BitArray(BitArray(<br>   <font color="#008080"><a href="../../System.Collections/types/BitArray.html">BitArray</a> <i>bits</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>bits</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/BitArray.html">BitArray</a> to copy.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>bits</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> class that contains bit values copied from the specified array of Booleans.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public BitArray(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool[]</a> <i>values</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>values</i><br><dl>
+<dd>
+<param> An array of Booleans to copy.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>values</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic3"></a><a name="ctor3">ctor #3</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> class that contains bit values copied from the specified array of bytes.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public BitArray(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>bytes</i><br><dl>
+<dd>
+<param> An array of bytes containing the values to copy, where each byte represents eight consecutive bits.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>bytes</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The first byte in the array represents bits 0 through 7, the second byte represents bits 8 through 15, and so on. The Least Significant Bit of each byte represents the lowest index value: " <i>bytes</i> [0] &amp; 1" represents bit 0, " <i>bytes</i> [0] &amp; 2" represents bit 1, " <i>bytes</i> [0] &amp; 4" represents bit 2, and so on.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic4"></a><a name="ctor4">ctor #4</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> class that can hold the specified number of bit values, which are initially set to <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public BitArray(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>length</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>length</i><br><dl>
+<dd>
+<param> The number of bit values in the new  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>length</i> is less than zero.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic5"></a><a name="ctor5">ctor #5</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> class that contains bit values copied from the specified array of 32-bit integers.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public BitArray(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int[]</a> <i>values</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>values</i><br><dl>
+<dd>
+<param> An array of integers containing the values to copy, where each integer represents 32 consecutive bits.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>values</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The number in the first <i>values</i> array element represents bits 0 through 31, the second number in the array represents bits 32 through 63, and so on. The Least Significant Bit of each integer represents the lowest index value: " <i>values</i> [0] &amp; 1" represents bit 0, " <i>values</i> [0] &amp; 2" represents bit 1, " <i>values</i> [0] &amp; 4" represents bit 2, and so on.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic6"></a><a name="ctor6">ctor #6</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> class that can hold the specified number of bit values, which are initially set to the specified value.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public BitArray(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>length</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>defaultValue</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>length</i><br><dl>
+<dd>
+<param> The number of bit values in the new  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>defaultValue</i><br><dl>
+<dd>
+<param> The Boolean value to assign to each bit.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>length</i> is less than zero.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CountTopic1"></a><a name="Count">Count</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the number of elements contained in the  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> Count {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/ICollection.html#Count">ICollection.Count</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#Length">BitArray.Length</a> and  <a href="#Count">BitArray.Count</a> return the same value. <a href="#Length">BitArray.Length</a> can be set to a specific value, but  <a href="#Count">BitArray.Count</a> is read-only.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsReadOnlyTopic1"></a><a name="IsReadOnly">IsReadOnly</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> is read-only.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> IsReadOnly {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="../../System.Collections/types/BitArray.html">BitArray</a> implements the  <a href="#IsReadOnly">BitArray.IsReadOnly</a> property because it is required by the  <a href="../../System.Collections/types/IList.html">IList</a> interface.<p> A collection that is read-only does not allow the addition, removal, or modification of elements after the collection is created.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsSynchronizedTopic1"></a><a name="IsSynchronized">IsSynchronized</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether access to the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> is synchronized (thread-safe).</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> IsSynchronized {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/ICollection.html#IsSynchronized">ICollection.IsSynchronized</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="../../System.Collections/types/BitArray.html">BitArray</a> implements the  <a href="#IsSynchronized">BitArray.IsSynchronized</a> property because it is required by the  <a href="../../System.Collections/types/ICollection.html">ICollection</a> interface.<p> Enumerating through a collection is intrinsically not a thread-safe procedure. Even when a collection is synchronized, other threads could still modify the collection, which causes the enumerator to throw an exception. To guarantee thread safety during enumeration, you can either lock the collection during the entire enumeration or catch the exceptions resulting from changes made by other threads.</p>
+<p> The following code example shows how to lock the collection using the  <a href="#SyncRoot">BitArray.SyncRoot</a> during the entire enumeration: </p>
+<pre>
+              BitArray myCollection = new BitArray();
+               lock( myCollection.SyncRoot ) {
+               foreach ( Object item in myCollection ) {
+               // Insert your code here.
+               }
+              }
+            </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#SyncRoot">BitArray.SyncRoot</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ItemTopic1"></a><a name="Item(System.Int32)">Item</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the value of the bit at a specific position in the  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> this[int index] {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The zero-based index of the value to get or set.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>index</i> is less than zero.<p> -or- </p>
+<p><i>index</i> is equal to or greater than  <a href="#Count">BitArray.Count</a>.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property provides the ability to access a specific element in the collection by using the following syntax: <code>
+                myCollection[index]
+              </code>.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Count">BitArray.Count</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="LengthTopic1"></a><a name="Length">Length</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the number of elements in the  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> Length {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The property is set to a value that is less than zero.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#Length">BitArray.Length</a> and  <a href="#Count">BitArray.Count</a> return the same value. <a href="#Length">BitArray.Length</a> can be set to a specific value, but  <a href="#Count">BitArray.Count</a> is read-only.<p> If  <a href="#Length">BitArray.Length</a> is set to a value that is less than  <a href="#Count">BitArray.Count</a>, the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> is truncated and the elements after the index <i>value</i> -1 are deleted.</p>
+<p> If  <a href="#Length">BitArray.Length</a> is set to a value that is greater than  <a href="#Count">BitArray.Count</a>, the new elements are set to <b>false</b>.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="SyncRootTopic1"></a><a name="SyncRoot">SyncRoot</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an object that can be used to synchronize access to the  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> SyncRoot {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/ICollection.html#SyncRoot">ICollection.SyncRoot</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> Derived classes can provide their own synchronized version of the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> using the  <a href="#SyncRoot">BitArray.SyncRoot</a> property. The synchronizing code must perform operations on the  <a href="#SyncRoot">BitArray.SyncRoot</a> of the  <a href="../../System.Collections/types/BitArray.html">BitArray</a>, not directly on the  <a href="../../System.Collections/types/BitArray.html">BitArray</a>. This ensures proper operation of collections that are derived from other objects. Specifically, it maintains proper synchronization with other threads that might be simultaneously modifying the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> object.<p> Enumerating through a collection is intrinsically not a thread-safe procedure. Even when a collection is synchronized, other threads could still modify the collection, which causes the enumerator to throw an exception. To guarantee thread safety during enumeration, you can either lock the collection during the entire enumeration or catch the exceptions resulting from changes made by other threads.</p>
+<p> The following code example shows how to lock the collection using the  <a href="#SyncRoot">BitArray.SyncRoot</a> during the entire enumeration: </p>
+<pre>
+              BitArray myCollection = new BitArray();
+               lock( myCollection.SyncRoot ) {
+               foreach ( Object item in myCollection ) {
+               // Insert your code here.
+               }
+              }
+            </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#IsSynchronized">BitArray.IsSynchronized</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="AndTopic1"></a><a name="And(System.Collections.BitArray)">And</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Collections/types/BitArray.html">BitArray</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Performs the bitwise AND operation on the elements in the current  <a href="../../System.Collections/types/BitArray.html">BitArray</a> against the corresponding elements in the specified  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Collections/types/BitArray.html">BitArray</a> And(<br>   <font color="#008080"><a href="../../System.Collections/types/BitArray.html">BitArray</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/BitArray.html">BitArray</a> with which to perform the bitwise AND operation.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System.Collections/types/BitArray.html">BitArray</a> containing the result of the bitwise AND operation on the elements in the current  <a href="../../System.Collections/types/BitArray.html">BitArray</a> against the corresponding elements in the specified  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>value</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>value</i> and the current  <a href="../../System.Collections/types/BitArray.html">BitArray</a> do not have the same number of elements.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The bitwise AND operation returns <b>true</b> if both operands are <b>true</b>, and returns <b>false</b> if one or both operands are <b>false</b>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to apply AND to two  <a href="../../System.Collections/types/BitArray.html">BitArray</a> instances.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesBitArray  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes two BitArrays of the same size.
+       BitArray myBA1 = new BitArray( 4 );
+       BitArray myBA2 = new BitArray( 4 );
+       myBA1[0] = myBA1[1] = false;
+       myBA1[2] = myBA1[3] = true;
+       myBA2[0] = myBA2[2] = false;
+       myBA2[1] = myBA2[3] = true;
+ 
+       // Performs a bitwise AND operation between BitArray instances of the same size.
+       Console.WriteLine( "Initial values" );
+       Console.Write( "myBA1:" );
+       PrintValues( myBA1, 8 );
+       Console.Write( "myBA2:" );
+       PrintValues( myBA2, 8 );
+       Console.WriteLine();
+ 
+       Console.WriteLine( "Result" );
+       Console.Write( "AND:" );
+       PrintValues( myBA1.And( myBA2 ), 8 );
+       Console.WriteLine();
+ 
+       Console.WriteLine( "After AND" );
+       Console.Write( "myBA1:" );
+       PrintValues( myBA1, 8 );
+       Console.Write( "myBA2:" );
+       PrintValues( myBA2, 8 );
+       Console.WriteLine();
+ 
+       // Performing AND between BitArray instances of different sizes returns an exception.
+       try  {
+          BitArray myBA3 = new BitArray( 8 );
+          myBA3[0] = myBA3[1] = myBA3[2] = myBA3[3] = false;
+          myBA3[4] = myBA3[5] = myBA3[6] = myBA3[7] = true;
+          myBA1.And( myBA3 );
+       } catch ( Exception myException )  {
+          Console.WriteLine("Exception: " + myException.ToString());
+       }
+    }
+ 
+ 
+    public static void PrintValues( IEnumerable myList, int myWidth )  {
+       System.Collections.IEnumerator myEnumerator = myList.GetEnumerator();
+       int i = myWidth;
+       while ( myEnumerator.MoveNext() )  {
+          if ( i &lt;= 0 )  {
+             i = myWidth;
+             Console.WriteLine();
+          }
+          i--;
+          Console.Write( "\t{0}", myEnumerator.Current );
+       }
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ Initial values
+ myBA1:    False    False    True    True
+ myBA2:    False    True    False    True
+ 
+ Result
+ AND:    False    False    False    True
+ 
+ After AND
+ myBA1:    False    False    False    True
+ myBA2:    False    True    False    True
+ 
+ Exception: System.ArgumentException: Array lengths must be the same.
+    at System.Collections.BitArray.And(BitArray value) in &lt;UnknownName&gt;:line 0
+    at SamplesBitArray.Main()
+ */ 
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CloneTopic1"></a><a name="Clone">Clone</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates a shallow copy of the  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> Clone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A shallow copy of the  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System/types/ICloneable.html#Clone">ICloneable.Clone</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> A shallow copy of a collection copies only the elements of the collection, whether they are reference types or value types, but it does not copy the objects that the references refer to. The references in the new collection point to the same objects that the references in the original collection point to.<p> In contrast, a deep copy of a collection copies the elements and everything directly or indirectly referenced by the elements.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CopyToTopic1"></a><a name="CopyTo(System.Array,System.Int32)">CopyTo</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Array.html">Array</a> <i>array</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Copies the entire  <a href="../../System.Collections/types/BitArray.html">BitArray</a> to a compatible one-dimensional  <a href="../../System/types/Array.html">Array</a>, starting at the specified index of the target array.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void CopyTo(<br>   <font color="#008080"><a href="../../System/types/Array.html">Array</a> <i>array</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>array</i><br><dl>
+<dd>
+<param> The one-dimensional  <a href="../../System/types/Array.html">Array</a> that is the destination of the elements copied from  <a href="../../System.Collections/types/BitArray.html">BitArray</a>. The  <a href="../../System/types/Array.html">Array</a> must have zero-based indexing.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The zero-based index in <i>array</i> at which copying begins.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>array</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>index</i> is less than zero.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>array</i> is multidimensional.<p> -or- </p>
+<p><i>index</i> is equal to or greater than the length of <i>array</i>.</p>
+<p> -or- </p>
+<p> The number of elements in the source  <a href="../../System.Collections/types/BitArray.html">BitArray</a> is greater than the available space from <i>index</i> to the end of the destination <i>array</i>.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td> The type of the source  <a href="../../System.Collections/types/BitArray.html">BitArray</a> cannot be cast automatically to the type of the destination <i>array</i>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/ICollection.html#CopyTo(System.Array,System.Int32)">ICollection.CopyTo</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The specified array must be of a compatible type. Only <b>bool</b>, <b>int</b> and <b>byte</b> types of arrays are supported.<p> This method uses  <a href="../../System/types/Array.html#Copy(System.Array,System.Array,System.Int32)">Array.Copy</a> to copy the elements.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to copy a  <a href="../../System.Collections/types/BitArray.html">BitArray</a> into a one-dimensional  <a href="../../System/types/Array.html">Array</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesBitArray  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes the source BitArray.
+       BitArray myBA = new BitArray( 4 );
+       myBA[0] = myBA[1] = myBA[2] = myBA[3] = true;
+ 
+       // Creates and initializes the one-dimensional target Array of type Boolean.
+       Array myBoolArray = Array.CreateInstance( typeof(bool), 8 );
+       myBoolArray.SetValue( false, 0 );
+       myBoolArray.SetValue( false, 1 );
+ 
+       // Displays the values of the target Array.
+       Console.WriteLine( "The target Boolean Array contains the following (before and after copying):" );
+       PrintValues( myBoolArray, '\t' );
+ 
+       // Copies the entire source BitArray to the target BitArray, starting at index 3.
+       myBA.CopyTo( myBoolArray, 3 );
+ 
+       // Displays the values of the target Array.
+       PrintValues( myBoolArray, '\t' );
+ 
+       // Creates and initializes the one-dimensional target Array of type integer.
+       Array myIntArray = Array.CreateInstance( typeof(int), 8 );
+       myIntArray.SetValue( 42, 0 );
+       myIntArray.SetValue( 43, 1 );
+ 
+       // Displays the values of the target Array.
+       Console.WriteLine( "The target Boolean Array contains the following (before and after copying):" );
+       PrintValues( myIntArray, '\t' );
+ 
+       // Copies the entire source BitArray to the target BitArray, starting at index 3.
+       myBA.CopyTo( myIntArray, 3 );
+ 
+       // Displays the values of the target Array.
+       PrintValues( myIntArray, '\t' );
+ 
+       // Creates and initializes the one-dimensional target Array of type integer.
+       Array myByteArray = Array.CreateInstance( typeof(byte), 8 );
+       myByteArray.SetValue( (byte) 10, 0 );
+       myByteArray.SetValue( (byte) 11, 1 );
+ 
+       // Displays the values of the target Array.
+       Console.WriteLine( "The target Boolean Array contains the following (before and after copying):" );
+       PrintValues( myByteArray, '\t' );
+ 
+       // Copies the entire source BitArray to the target BitArray, starting at index 3.
+       myBA.CopyTo( myByteArray, 3 );
+ 
+       // Displays the values of the target Array.
+       PrintValues( myByteArray, '\t' );
+ 
+       // Returns an exception if the array is not of type Boolean, integer or byte.
+       try  {
+          Array myStringArray=Array.CreateInstance( typeof(String), 8 );
+          myStringArray.SetValue( "Hello", 0 );
+          myStringArray.SetValue( "World", 1 );
+          myBA.CopyTo( myStringArray, 3 );
+       } catch ( Exception myException )  {
+          Console.WriteLine("Exception: " + myException.ToString());
+       }
+    }
+ 
+ 
+    public static void PrintValues( Array myArr, char mySeparator )  {
+       System.Collections.IEnumerator myEnumerator = myArr.GetEnumerator();
+       int i = 0;
+       int cols = myArr.GetLength( myArr.Rank - 1 );
+       while ( myEnumerator.MoveNext() )  {
+          if ( i &lt; cols )  {
+             i++;
+          } else  {
+             Console.WriteLine();
+             i = 1;
+          }
+          Console.Write( "{0}{1}", mySeparator, myEnumerator.Current );
+       }
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ The target Boolean Array contains the following (before and after copying):
+     False    False    False    False    False    False    False    False
+     False    False    False    True    True    True    True    False
+ The target Boolean Array contains the following (before and after copying):
+     42    43    0    0    0    0    0    0
+     42    43    0    15    0    0    0    0
+ The target Boolean Array contains the following (before and after copying):
+     10    11    0    0    0    0    0    0
+     10    11    0    15    0    0    0    0
+ Exception: System.ArgumentException: Only supported copyto on bit arrays are bool[], int[] and byte[].
+    at System.Collections.BitArray.CopyTo(Array array, Int32 index) in &lt;UnknownName&gt;:line 0
+    at SamplesBitArray.Main()
+ */
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/Array.html">Array</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~BitArray();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTopic1"></a><a name="Get(System.Int32)">Get</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the value of the bit at a specific position in the  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> Get(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The zero-based index of the value to get.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The value of the bit at position <i>index</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>index</i> is less than zero.<p> -or- </p>
+<p><i>index</i> is greater than or equal to the number of elements in the  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to set and get specific elements in a  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesBitArray  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a BitArray.
+       BitArray myBA = new BitArray( 5 );
+ 
+       // Displays the properties and values of the BitArray.
+       Console.WriteLine( "myBA values:" );
+       PrintIndexAndValues( myBA );
+ 
+       // Sets all the elements to true.
+       myBA.SetAll( true );
+ 
+       // Displays the properties and values of the BitArray.
+       Console.WriteLine( "After setting all elements to true," );
+       PrintIndexAndValues( myBA );
+ 
+       // Sets the last index to false.
+       myBA.Set( myBA.Count - 1, false );
+ 
+       // Displays the properties and values of the BitArray.
+       Console.WriteLine( "After setting the last element to false," );
+       PrintIndexAndValues( myBA );
+ 
+       // Gets the value of the last two elements.
+       Console.WriteLine( "The last two elements are: " );
+       Console.WriteLine( "\tat index {0} : {1}", myBA.Count - 2, myBA.Get( myBA.Count - 2 ) );
+       Console.WriteLine( "\tat index {0} : {1}", myBA.Count - 1, myBA.Get( myBA.Count - 1 ) );
+    }
+ 
+ 
+    public static void PrintIndexAndValues( IEnumerable myList )  {
+       int i = 0;
+       System.Collections.IEnumerator myEnumerator = myList.GetEnumerator();
+       while ( myEnumerator.MoveNext() )
+          Console.WriteLine( "\t[{0}]:\t{1}", i++, myEnumerator.Current );
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ myBA values:
+     [0]:    False
+     [1]:    False
+     [2]:    False
+     [3]:    False
+     [4]:    False
+ 
+ After setting all elements to true,
+     [0]:    True
+     [1]:    True
+     [2]:    True
+     [3]:    True
+     [4]:    True
+ 
+ After setting the last element to false,
+     [0]:    True
+     [1]:    True
+     [2]:    True
+     [3]:    True
+     [4]:    False
+ 
+ The last two elements are: 
+     at index 3 : True
+     at index 4 : False
+ */ 
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetEnumeratorTopic1"></a><a name="GetEnumerator">GetEnumerator</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns an enumerator that can iterate through the  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Collections/types/IEnumerator.html">IEnumerator</a> GetEnumerator();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An  <a href="../../System.Collections/types/IEnumerator.html">IEnumerator</a> for the entire  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IEnumerable.html#GetEnumerator">IEnumerable.GetEnumerator</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> Enumerators only allow reading the data in the collection. Enumerators cannot be used to modify the underlying collection.<p> Initially, the enumerator is positioned before the first element in the collection. <a href="../../System.Collections/types/IEnumerator.html#Reset">IEnumerator.Reset</a> also brings the enumerator back to this position. At this position, calling  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> throws an exception. Therefore, you must call  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> to advance the enumerator to the first element of the collection before reading the value of  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a>.</p>
+<p> <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> returns the same object until either  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> or  <a href="../../System.Collections/types/IEnumerator.html#Reset">IEnumerator.Reset</a> is called. <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> sets  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> to the next element.</p>
+<p> After the end of the collection is passed, the enumerator is positioned after the last element in the collection, and calling  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> returns <b>false</b>. If the last call to  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> returned <b>false</b>, calling  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> throws an exception. To set  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> to the first element of the collection again, you can call  <a href="../../System.Collections/types/IEnumerator.html#Reset">IEnumerator.Reset</a> followed by  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a>.</p>
+<p> An enumerator remains valid as long as the collection remains unchanged. If changes are made to the collection, such as adding, modifying or deleting elements, the enumerator is irrecoverably invalidated and the next call to  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> or  <a href="../../System.Collections/types/IEnumerator.html#Reset">IEnumerator.Reset</a> throws an  <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a>. If the collection is modified between  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> and  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a>,  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> will return the element that it is set to, even if the enumerator is already invalidated.</p>
+<p> The enumerator does not have exclusive access to the collection; therefore, enumerating through a collection is intrinsically not a thread-safe procedure. Even when a collection is synchronized, other threads could still modify the collection, which causes the enumerator to throw an exception. To guarantee thread safety during enumeration, you can either lock the collection during the entire enumeration or catch the exceptions resulting from changes made by other threads.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/IEnumerator.html">IEnumerator</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="NotTopic1"></a><a name="Not">Not</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Inverts all the bit values in the current  <a href="../../System.Collections/types/BitArray.html">BitArray</a>, so that elements set to <b>true</b> are changed to <b>false</b>, and elements set to <b>false</b> are changed to <b>true</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Collections/types/BitArray.html">BitArray</a> Not();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The current instance with inverted bit values.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to apply NOT to a  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesBitArray  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes two BitArrays of the same size.
+       BitArray myBA1 = new BitArray( 4 );
+       BitArray myBA2 = new BitArray( 4 );
+       myBA1[0] = myBA1[1] = false;
+       myBA1[2] = myBA1[3] = true;
+       myBA2[0] = myBA2[2] = false;
+       myBA2[1] = myBA2[3] = true;
+ 
+       // Performs a bitwise NOT operation between BitArray instances of the same size.
+       Console.WriteLine( "Initial values" );
+       Console.Write( "myBA1:" );
+       PrintValues( myBA1, 8 );
+       Console.Write( "myBA2:" );
+       PrintValues( myBA2, 8 );
+       Console.WriteLine();
+ 
+       myBA1.Not();
+       myBA2.Not();
+ 
+       Console.WriteLine( "After NOT" );
+       Console.Write( "myBA1:" );
+       PrintValues( myBA1, 8 );
+       Console.Write( "myBA2:" );
+       PrintValues( myBA2, 8 );
+       Console.WriteLine();
+    }
+ 
+ 
+    public static void PrintValues( IEnumerable myList, int myWidth )  {
+       System.Collections.IEnumerator myEnumerator = myList.GetEnumerator();
+       int i = myWidth;
+       while ( myEnumerator.MoveNext() )  {
+          if ( i &lt;= 0 )  {
+             i = myWidth;
+             Console.WriteLine();
+          }
+          i--;
+          Console.Write( "\t{0}", myEnumerator.Current );
+       }
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ Initial values
+ myBA1:    False    False    True    True
+ myBA2:    False    True    False    True
+ 
+ After NOT
+ myBA1:    True    True    False    False
+ myBA2:    True    False    True    False
+ */ 
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="OrTopic1"></a><a name="Or(System.Collections.BitArray)">Or</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Collections/types/BitArray.html">BitArray</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Performs the bitwise OR operation on the elements in the current  <a href="../../System.Collections/types/BitArray.html">BitArray</a> against the corresponding elements in the specified  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Collections/types/BitArray.html">BitArray</a> Or(<br>   <font color="#008080"><a href="../../System.Collections/types/BitArray.html">BitArray</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/BitArray.html">BitArray</a> with which to perform the bitwise OR operation.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System.Collections/types/BitArray.html">BitArray</a> containing the result of the bitwise OR operation on the elements in the current  <a href="../../System.Collections/types/BitArray.html">BitArray</a> against the corresponding elements in the specified  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>value</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>value</i> and the current  <a href="../../System.Collections/types/BitArray.html">BitArray</a> do not have the same number of elements.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The bitwise OR operation returns <b>true</b> if one or both operands are <b>true</b>, and returns <b>false</b> if both operands are <b>false</b>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to apply OR to two  <a href="../../System.Collections/types/BitArray.html">BitArray</a> instances.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesBitArray  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes two BitArrays of the same size.
+       BitArray myBA1 = new BitArray( 4 );
+       BitArray myBA2 = new BitArray( 4 );
+       myBA1[0] = myBA1[1] = false;
+       myBA1[2] = myBA1[3] = true;
+       myBA2[0] = myBA2[2] = false;
+       myBA2[1] = myBA2[3] = true;
+ 
+       // Performs a bitwise OR operation between BitArray instances of the same size.
+       Console.WriteLine( "Initial values" );
+       Console.Write( "myBA1:" );
+       PrintValues( myBA1, 8 );
+       Console.Write( "myBA2:" );
+       PrintValues( myBA2, 8 );
+       Console.WriteLine();
+ 
+       Console.WriteLine( "Result" );
+       Console.Write( "OR:" );
+       PrintValues( myBA1.Or( myBA2 ), 8 );
+       Console.WriteLine();
+ 
+       Console.WriteLine( "After OR" );
+       Console.Write( "myBA1:" );
+       PrintValues( myBA1, 8 );
+       Console.Write( "myBA2:" );
+       PrintValues( myBA2, 8 );
+       Console.WriteLine();
+ 
+       // Performing OR between BitArray instances of different sizes returns an exception.
+       try  {
+          BitArray myBA3 = new BitArray( 8 );
+          myBA3[0] = myBA3[1] = myBA3[2] = myBA3[3] = false;
+          myBA3[4] = myBA3[5] = myBA3[6] = myBA3[7] = true;
+          myBA1.Or( myBA3 );
+       } catch ( Exception myException )  {
+          Console.WriteLine("Exception: " + myException.ToString());
+       }
+    }
+ 
+ 
+    public static void PrintValues( IEnumerable myList, int myWidth )  {
+       System.Collections.IEnumerator myEnumerator = myList.GetEnumerator();
+       int i = myWidth;
+       while ( myEnumerator.MoveNext() )  {
+          if ( i &lt;= 0 )  {
+             i = myWidth;
+             Console.WriteLine();
+          }
+          i--;
+          Console.Write( "\t{0}", myEnumerator.Current );
+       }
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ Initial values
+ myBA1:    False    False    True    True
+ myBA2:    False    True    False    True
+ 
+ Result
+ OR:    False    True    True    True
+ 
+ After OR
+ myBA1:    False    True    True    True
+ myBA2:    False    True    False    True
+ 
+ Exception: System.ArgumentException: Array lengths must be the same.
+    at System.Collections.BitArray.Or(BitArray value) in &lt;UnknownName&gt;:line 0
+    at SamplesBitArray.Main()
+ */ 
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="SetTopic1"></a><a name="Set(System.Int32,System.Boolean)">Set</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Sets the bit at a specific position in the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> to the specified value.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void Set(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The zero-based index of the bit to set.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The Boolean value to assign to the bit.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>index</i> is less than zero.<p> -or- </p>
+<p><i>index</i> is greater than or equal to the number of elements in the  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to set and get specific elements in a  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesBitArray  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a BitArray.
+       BitArray myBA = new BitArray( 5 );
+ 
+       // Displays the properties and values of the BitArray.
+       Console.WriteLine( "myBA values:" );
+       PrintIndexAndValues( myBA );
+ 
+       // Sets all the elements to true.
+       myBA.SetAll( true );
+ 
+       // Displays the properties and values of the BitArray.
+       Console.WriteLine( "After setting all elements to true," );
+       PrintIndexAndValues( myBA );
+ 
+       // Sets the last index to false.
+       myBA.Set( myBA.Count - 1, false );
+ 
+       // Displays the properties and values of the BitArray.
+       Console.WriteLine( "After setting the last element to false," );
+       PrintIndexAndValues( myBA );
+ 
+       // Gets the value of the last two elements.
+       Console.WriteLine( "The last two elements are: " );
+       Console.WriteLine( "\tat index {0} : {1}", myBA.Count - 2, myBA.Get( myBA.Count - 2 ) );
+       Console.WriteLine( "\tat index {0} : {1}", myBA.Count - 1, myBA.Get( myBA.Count - 1 ) );
+    }
+ 
+ 
+    public static void PrintIndexAndValues( IEnumerable myList )  {
+       int i = 0;
+       System.Collections.IEnumerator myEnumerator = myList.GetEnumerator();
+       while ( myEnumerator.MoveNext() )
+          Console.WriteLine( "\t[{0}]:\t{1}", i++, myEnumerator.Current );
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ myBA values:
+     [0]:    False
+     [1]:    False
+     [2]:    False
+     [3]:    False
+     [4]:    False
+ 
+ After setting all elements to true,
+     [0]:    True
+     [1]:    True
+     [2]:    True
+     [3]:    True
+     [4]:    True
+ 
+ After setting the last element to false,
+     [0]:    True
+     [1]:    True
+     [2]:    True
+     [3]:    True
+     [4]:    False
+ 
+ The last two elements are: 
+     at index 3 : True
+     at index 4 : False
+ */ 
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="SetAllTopic1"></a><a name="SetAll(System.Boolean)">SetAll</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Sets all bits in the  <a href="../../System.Collections/types/BitArray.html">BitArray</a> to the specified value.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void SetAll(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The Boolean value to assign to all bits.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to set and get specific elements in a  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesBitArray  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a BitArray.
+       BitArray myBA = new BitArray( 5 );
+ 
+       // Displays the properties and values of the BitArray.
+       Console.WriteLine( "myBA values:" );
+       PrintIndexAndValues( myBA );
+ 
+       // Sets all the elements to true.
+       myBA.SetAll( true );
+ 
+       // Displays the properties and values of the BitArray.
+       Console.WriteLine( "After setting all elements to true," );
+       PrintIndexAndValues( myBA );
+ 
+       // Sets the last index to false.
+       myBA.Set( myBA.Count - 1, false );
+ 
+       // Displays the properties and values of the BitArray.
+       Console.WriteLine( "After setting the last element to false," );
+       PrintIndexAndValues( myBA );
+ 
+       // Gets the value of the last two elements.
+       Console.WriteLine( "The last two elements are: " );
+       Console.WriteLine( "\tat index {0} : {1}", myBA.Count - 2, myBA.Get( myBA.Count - 2 ) );
+       Console.WriteLine( "\tat index {0} : {1}", myBA.Count - 1, myBA.Get( myBA.Count - 1 ) );
+    }
+ 
+ 
+    public static void PrintIndexAndValues( IEnumerable myList )  {
+       int i = 0;
+       System.Collections.IEnumerator myEnumerator = myList.GetEnumerator();
+       while ( myEnumerator.MoveNext() )
+          Console.WriteLine( "\t[{0}]:\t{1}", i++, myEnumerator.Current );
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ myBA values:
+     [0]:    False
+     [1]:    False
+     [2]:    False
+     [3]:    False
+     [4]:    False
+ 
+ After setting all elements to true,
+     [0]:    True
+     [1]:    True
+     [2]:    True
+     [3]:    True
+     [4]:    True
+ 
+ After setting the last element to false,
+     [0]:    True
+     [1]:    True
+     [2]:    True
+     [3]:    True
+     [4]:    False
+ 
+ The last two elements are: 
+     at index 3 : True
+     at index 4 : False
+ */ 
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="XorTopic1"></a><a name="Xor(System.Collections.BitArray)">Xor</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Collections/types/BitArray.html">BitArray</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Performs the bitwise eXclusive OR operation on the elements in the current  <a href="../../System.Collections/types/BitArray.html">BitArray</a> against the corresponding elements in the specified  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Collections/types/BitArray.html">BitArray</a> Xor(<br>   <font color="#008080"><a href="../../System.Collections/types/BitArray.html">BitArray</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/BitArray.html">BitArray</a> with which to perform the bitwise eXclusive OR operation.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System.Collections/types/BitArray.html">BitArray</a> containing the result of the bitwise eXclusive OR operation on the elements in the current  <a href="../../System.Collections/types/BitArray.html">BitArray</a> against the corresponding elements in the specified  <a href="../../System.Collections/types/BitArray.html">BitArray</a>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>value</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>value</i> and the current  <a href="../../System.Collections/types/BitArray.html">BitArray</a> do not have the same number of elements.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The bitwise exclusive OR operation returns <b>true</b> if exactly one operand is <b>true</b>, and returns <b>false</b> if both operands have the same Boolean value.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to apply XOR to two  <a href="../../System.Collections/types/BitArray.html">BitArray</a> instances.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesBitArray  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes two BitArrays of the same size.
+       BitArray myBA1 = new BitArray( 4 );
+       BitArray myBA2 = new BitArray( 4 );
+       myBA1[0] = myBA1[1] = false;
+       myBA1[2] = myBA1[3] = true;
+       myBA2[0] = myBA2[2] = false;
+       myBA2[1] = myBA2[3] = true;
+ 
+       // Performs a bitwise XOR operation between BitArray instances of the same size.
+       Console.WriteLine( "Initial values" );
+       Console.Write( "myBA1:" );
+       PrintValues( myBA1, 8 );
+       Console.Write( "myBA2:" );
+       PrintValues( myBA2, 8 );
+       Console.WriteLine();
+ 
+       Console.WriteLine( "Result" );
+       Console.Write( "XOR:" );
+       PrintValues( myBA1.Xor( myBA2 ), 8 );
+       Console.WriteLine();
+ 
+       Console.WriteLine( "After XOR" );
+       Console.Write( "myBA1:" );
+       PrintValues( myBA1, 8 );
+       Console.Write( "myBA2:" );
+       PrintValues( myBA2, 8 );
+       Console.WriteLine();
+ 
+       // Performing XOR between BitArray instances of different sizes returns an exception.
+       try  {
+          BitArray myBA3 = new BitArray( 8 );
+          myBA3[0] = myBA3[1] = myBA3[2] = myBA3[3] = false;
+          myBA3[4] = myBA3[5] = myBA3[6] = myBA3[7] = true;
+          myBA1.Xor( myBA3 );
+       } catch ( Exception myException )  {
+          Console.WriteLine("Exception: " + myException.ToString());
+       }
+    }
+ 
+ 
+    public static void PrintValues( IEnumerable myList, int myWidth )  {
+       System.Collections.IEnumerator myEnumerator = myList.GetEnumerator();
+       int i = myWidth;
+       while ( myEnumerator.MoveNext() )  {
+          if ( i &lt;= 0 )  {
+             i = myWidth;
+             Console.WriteLine();
+          }
+          i--;
+          Console.Write( "\t{0}", myEnumerator.Current );
+       }
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ Initial values
+ myBA1:    False    False    True    True
+ myBA2:    False    True    False    True
+ 
+ Result
+ XOR:    False    True    True    False
+ 
+ After XOR
+ myBA1:    False    True    True    False
+ myBA2:    False    True    False    True
+ 
+ Exception: System.ArgumentException: Array lengths must be the same.
+    at System.Collections.BitArray.Xor(BitArray value) in &lt;UnknownName&gt;:line 0
+    at SamplesBitArray.Main()
+ */ 
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

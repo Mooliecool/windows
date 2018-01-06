@@ -1,0 +1,671 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Net.SocketPermissionAttribute</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Net.SocketPermissionAttribute Class</h2><b>Assembly: </b>System.dll<br><b>Namespace: </b>System.Net<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Specifies security actions to control  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> connections. This class cannot be inherited.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Constructor | AttributeTargets.Method)]<br>[Serializable]<br><b>public sealed class SocketPermissionAttribute : CodeAccessSecurityAttribute</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> To use this attribute, your  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> connection must conform to the properties specified in your  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a>. For example, to secure a  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> connection on port 80, set the  <a href="#Port">SocketPermissionAttribute.Port</a> property of the  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a> to "80." The security information specified in  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a> is stored in the metadata of the attribute target, which is the class to which the  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a> is applied. The system then accesses the information at run time. The  <a href="../../System.Security.Permissions/types/SecurityAction.html">SecurityAction</a> passed to the constructor determines the allowable  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a> targets.<br><br><b>Note </b> The properties of a  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a> must have values that are not <b>null</b>. Also, once set, the values of the properties cannot be changed.<br><br><b>Note </b> <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a> is used for  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpcondeclarativesecurity.asp">MSDN: declarativesecurity</a> only. For  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconimperativesecurity.asp">MSDN: imperativesecurity</a>, use the corresponding  <a href="../../System.Net/types/SocketPermission.html">SocketPermission</a>.<br><br><b>Note </b> For more information about using attributes, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconExtendingMetadataUsingAttributes.asp">MSDN: extendingmetadatausingattributes</a>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example demonstrates how to apply  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a> to a custom class.<pre>
+	[SocketPermission(SecurityAction.Assert, Access = "Connect", 
+					Host = "192.168.144.238", Port = "All", Transport = "All")]
+	[SocketPermission(SecurityAction.Deny, Access = "Connect", 
+					Host = "192.168.144.239", Port = "All", Transport = "All")]
+	public String GetDate() {
+
+		// Gets the current date from the remote date server.
+		try {
+			int bytesReceived;		
+			byte[] getByte = new byte[100];
+			Socket mysocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+			try {
+                           mysocket.Connect(new IPEndPoint(IPAddress.Parse("192.168.144.239"), 13));		
+                    }
+             catch (SecurityException e){
+			    Console.WriteLine("SecurityException (expected)" + e.Message);
+                     }
+
+			mysocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                     mysocket.Connect(new IPEndPoint(IPAddress.Parse("192.168.144.238"), 13));		
+			bytesReceived = mySocket.Receive( getByte, getByte.Length, 0 );
+			return asciiEncoding.GetString( getByte, 0, bytesReceived );
+		}
+		catch(Exception e)
+		{
+			Console.WriteLine(e.Message);
+			return "";
+		}
+	}
+
+
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Net/System.Net.html">System.Net Namespace</a><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpcondeclarativesecurity.asp">MSDN: declarativesecurity</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconimperativesecurity.asp">MSDN: imperativesecurity</a> |  <a href="../../System.Net/types/SocketPermission.html">SocketPermission</a></dd>
+</dl>
+<h3>System.Net.SocketPermissionAttribute Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"> Initializes a new instance of the  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a> class with the specified  <a href="../../System.Security.Permissions/types/SecurityAction.html">SecurityAction</a> value.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Access">Access</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the network access method allowed by this  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Action">Action</a><br>(inherited from <b>System.Security.Permissions.SecurityAttribute)</b></td>
+<td width="55%"><b>Read-write</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Security.Permissions/types/SecurityAttribute.html#Action">System.Security.Permissions.SecurityAttribute.Action</a></font></b><br><br><br> Gets or sets a security action.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Host">Host</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the DNS host name or IP address specified by this  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Port">Port</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the port number associated with this  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Transport">Transport</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the  <a href="../../System.Net/types/TransportType.html">TransportType</a> specified by this  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#TypeId">TypeId</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#TypeId">System.Attribute.TypeId</a></font></b><br><br><br> When implemented in a derived class, gets a unique identifier for this <b>Attribute</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Unrestricted">Unrestricted</a><br>(inherited from <b>System.Security.Permissions.SecurityAttribute)</b></td>
+<td width="55%"><b>Read-write</b><br><br><b><font color="#800080">See base class member description: <a href="../../System.Security.Permissions/types/SecurityAttribute.html#Unrestricted">System.Security.Permissions.SecurityAttribute.Unrestricted</a></font></b><br><br><br> Gets or sets a value indicating whether full (unrestricted) permission to the resource protected by the attribute is declared.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#CreatePermission">CreatePermission</a></td>
+<td width="55%"><b>Overridden: </b><br> Creates and returns a new instance of the  <a href="../../System.Net/types/SocketPermission.html">SocketPermission</a> class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#GetHashCode">System.Attribute.GetHashCode</a></font></b><br><br><br> Returns the hash code for this instance.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsDefaultAttribute">IsDefaultAttribute</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#IsDefaultAttribute">System.Attribute.IsDefaultAttribute</a></font></b><br><br><br> When overridden in a derived class, returns an indication whether the value of this instance is the default value for the derived class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Match(System.Object)">Match</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#Match(System.Object)">System.Attribute.Match</a></font></b><br><br><br> When overridden in a derived class, returns a value indicating whether this instance equals a specified object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/Attribute.html">System.Attribute</a></li>
+<ul class="none">
+<li><a href="../../System.Security.Permissions/types/SecurityAttribute.html">System.Security.Permissions.SecurityAttribute</a></li>
+<ul class="none">
+<li><a href="../../System.Security.Permissions/types/CodeAccessSecurityAttribute.html">System.Security.Permissions.CodeAccessSecurityAttribute</a></li>
+<ul class="none">
+<li><b>System.Net.SocketPermissionAttribute</b></li>
+</ul>
+</ul>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Net.SocketPermissionAttribute Member Details</h3><b><i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a> class with the specified  <a href="../../System.Security.Permissions/types/SecurityAction.html">SecurityAction</a> value.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public SocketPermissionAttribute(<br>   <font color="#008080"><a href="../../System.Security.Permissions/types/SecurityAction.html">SecurityAction</a> <i>action</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>action</i><br><dl>
+<dd>
+<param> One of the  <a href="../../System.Security.Permissions/types/SecurityAction.html">SecurityAction</a> values.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Security.Permissions/types/SecurityAction.html">SecurityAction</a> value passed to this constructor specifies the allowable  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a> targets.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example demonstrates how to apply  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a> to a custom class.<pre>
+	[SocketPermission(SecurityAction.Assert, Access = "Connect", 
+					Host = "192.168.144.238", Port = "All", Transport = "All")]
+	[SocketPermission(SecurityAction.Deny, Access = "Connect", 
+					Host = "192.168.144.239", Port = "All", Transport = "All")]
+	public String GetDate() {
+
+		// Gets the current date from the remote date server.
+		try {
+			int bytesReceived;		
+			byte[] getByte = new byte[100];
+			Socket mysocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+			try {
+                           mysocket.Connect(new IPEndPoint(IPAddress.Parse("192.168.144.239"), 13));		
+                    }
+             catch (SecurityException e){
+			    Console.WriteLine("SecurityException (expected)" + e.Message);
+                     }
+
+			mysocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                     mysocket.Connect(new IPEndPoint(IPAddress.Parse("192.168.144.238"), 13));		
+			bytesReceived = mySocket.Receive( getByte, getByte.Length, 0 );
+			return asciiEncoding.GetString( getByte, 0, bytesReceived );
+		}
+		catch(Exception e)
+		{
+			Console.WriteLine(e.Message);
+			return "";
+		}
+	}
+
+
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="AccessTopic1"></a><a name="Access">Access</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the network access method allowed by this  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> Access {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The  <a href="#Access">SocketPermissionAttribute.Access</a> property is not <b>null</b> when you attempt to set the value. If you wish to specify more than one Access method, use an additional attribute declaration statement.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property is write-once. Valid values for this property correspond to  <a href="../../System.Net/types/NetworkAccess.html">NetworkAccess</a> enumeration values.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ActionTopic1"></a><a name="Action">Action</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Security.Permissions/types/SecurityAttribute.html#Action">System.Security.Permissions.SecurityAttribute.Action</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets a security action.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Security.Permissions/types/SecurityAction.html">SecurityAction</a> Action {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property is inherited by all classes implementing custom attributes for declarative security.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="HostTopic1"></a><a name="Host">Host</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the DNS host name or IP address specified by this  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> Host {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> <a href="#Host">SocketPermissionAttribute.Host</a> is not <b>null</b> when you attempt to set the value. If you wish to specify more than one host, use an additional attribute declaration statement.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property is write-once and specifies the Domain Name Services (DNS) host name to which this permission applies.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="PortTopic1"></a><a name="Port">Port</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the port number associated with this  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> Port {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The  <a href="#Port">SocketPermissionAttribute.Port</a> property is <b>null</b> when attempt to set the value. If you wish to specify more than one port, use an additional attribute declaration statement.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property is write-once and specifies the port number to which this permission applies. The valid values are a string-encoded integer, or the string "All".</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="TransportTopic1"></a><a name="Transport">Transport</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the  <a href="../../System.Net/types/TransportType.html">TransportType</a> specified by this  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> Transport {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> <a href="#Transport">SocketPermissionAttribute.Transport</a> is not <b>null</b> when you attempt to set the value. If you wish to specify more than one transport type, use an additional attribute declaration statement.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Possible string values of this property are  <a href="../../System.Net/types/TransportType.html#All">TransportType.All</a>,  <a href="../../System.Net/types/TransportType.html#Connectionless">TransportType.Connectionless</a>,  <a href="../../System.Net/types/TransportType.html#ConnectionOriented">TransportType.ConnectionOriented</a>,  <a href="../../System.Net/types/TransportType.html#Tcp">TransportType.Tcp</a>,  <a href="../../System.Net/types/TransportType.html#Udp">TransportType.Udp</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="TypeIdTopic1"></a><a name="TypeId">TypeId</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#TypeId">System.Attribute.TypeId</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When implemented in a derived class, gets a unique identifier for this <b>Attribute</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> TypeId {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> As implemented, this identifier is merely the  <a href="../../System/types/Type.html">Type</a> of the attribute. However, it is intended that the unique identifier be used to identify two attributes of the same type.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="UnrestrictedTopic1"></a><a name="Unrestricted">Unrestricted</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.Security.Permissions/types/SecurityAttribute.html#Unrestricted">System.Security.Permissions.SecurityAttribute.Unrestricted</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets a value indicating whether full (unrestricted) permission to the resource protected by the attribute is declared.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> Unrestricted {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property is inherited by all classes implementing custom attributes for declarative security.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="CreatePermissionTopic1"></a><a name="CreatePermission">CreatePermission</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates and returns a new instance of the  <a href="../../System.Net/types/SocketPermission.html">SocketPermission</a> class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System.Security/types/IPermission.html">IPermission</a> CreatePermission();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An instance of the  <a href="../../System.Net/types/SocketPermission.html">SocketPermission</a> class corresponding to the security declaration.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#CreatePermission">SocketPermissionAttribute.CreatePermission</a> method is called by the security system, not by application code. The security information described by  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a> is stored in the metadata of the attribute target, which is the class to which the  <a href="../../System.Net/types/SocketPermissionAttribute.html">SocketPermissionAttribute</a> is applied. The system then accesses the information at runtime and calls  <a href="#CreatePermission">SocketPermissionAttribute.CreatePermission</a>. The system uses the returned  <a href="../../System.Security/types/IPermission.html">IPermission</a> to enforce the specified security requirements.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Net/types/SocketPermission.html">SocketPermission</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~SocketPermissionAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#GetHashCode">System.Attribute.GetHashCode</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the hash code for this instance.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A 32-bit signed integer hash code.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IsDefaultAttributeTopic1"></a><a name="IsDefaultAttribute">IsDefaultAttribute</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#IsDefaultAttribute">System.Attribute.IsDefaultAttribute</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, returns an indication whether the value of this instance is the default value for the derived class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsDefaultAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if this instance is the default attribute for the class; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The default implementation of this class returns <b>false</b>, and must be implemented in the derived class to be useful to that class.<p> The implementation of this method in a derived class compares the value of this instance to a standard, default value obtained by some means, then returns a Boolean value that indicates whether the value of this instance is equal to the standard. The standard value is typically coded as a constant in the implementation, or stored programmatically in a field used by the implementation.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MatchTopic1"></a><a name="Match(System.Object)">Match</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#Match(System.Object)">System.Attribute.Match</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, returns a value indicating whether this instance equals a specified object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Match(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> An  <a href="../../System/types/Object.html">Object</a> to compare with this instance of <b>Attribute</b>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if this instance equals <i>obj</i>; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method determines if one <b>Attribute</b> equals another. Its default implementation is the same as  <a href="#Equals(System.Object)">Attribute.Equals</a>, which performs a value and reference comparison. Override this method to implement support for attribute values, such as flags or bitfields, that consist of components that are meaningful in themselves. For example, consider an attribute whose value is a binary field divided into a bitfield of flags. Two instances of this attribute have one flag in set in common while all the other flags differ. The <b>Equal</b> method cannot determine that the two instances have the same flag set, but the <b>Match</b> method can.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

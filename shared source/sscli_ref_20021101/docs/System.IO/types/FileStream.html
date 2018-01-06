@@ -1,0 +1,2578 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.IO.FileStream</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.IO.FileStream Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.IO<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Exposes a  <a href="../../System.IO/types/Stream.html">Stream</a> around a file, supporting both synchronous and asynchronous read and write operations.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public class FileStream : Stream
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd><b>FileStream</b> is useful for reading and writing files on a file system, as well as other file-related operating system handles (including pipes, standard input, standard output, and so on).<b>FileStream</b> buffers input and output for better performance.<p> The <b>FileStream</b> class can open a file in one of two modes, either synchronously or asynchronously, with significant performance consequences for the synchronous methods ( <a href="#Read(System.Byte[],System.Int32,System.Int32)">FileStream.Read</a> and  <a href="#Write(System.Byte[],System.Int32,System.Int32)">FileStream.Write</a>) and the asynchronous methods ( <a href="#BeginRead(System.Byte[],System.Int32,System.Int32,System.AsyncCallback,System.Object)">FileStream.BeginRead</a> and  <a href="#BeginWrite(System.Byte[],System.Int32,System.Int32,System.AsyncCallback,System.Object)">FileStream.BeginWrite</a>). Both sets of methods will work in either mode; however, the mode will affect the performance of these methods.<b>FileStream</b> defaults to opening files synchronously, but provides a constructor to open files asynchronously.</p>
+<p> For file and directory operations, see the  <a href="../../System.IO/types/File.html">File</a>,  <a href="../../System.IO/types/Directory.html">Directory</a>, and  <a href="../../System.IO/types/Path.html">Path</a> classes. The  <a href="../../System.IO/types/File.html">File</a> class is a utility class with static methods primarily for the creation of <b>FileStream</b> objects based on file paths and the standard input, standard output, and standard error devices. The  <a href="../../System.IO/types/MemoryStream.html">MemoryStream</a> class creates a stream from a byte array and functions similarly to a <b>FileStream</b>.</p>
+<p> If a process terminates with part of a file locked or closes a file that has outstanding locks, the behavior is undefined.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd><b>FileStream</b> objects support random access to files using the  <a href="#Seek(System.Int64,System.IO.SeekOrigin)">FileStream.Seek</a> method. The <b>Seek</b> method allows the read/write position to be moved to any position within the file. This is done with byte offset reference point parameters. The byte offset is relative to the seek reference point, which can be the beginning, the current position, or the end of the underlying file, as represented by the three properties of the  <a href="../../System.IO/types/SeekOrigin.html">SeekOrigin</a> class.<br><br><b>Note </b> Disk files always support random access. At the time of construction, the  <a href="#CanSeek">FileStream.CanSeek</a> property is set to <b>true</b> or <b>false</b> depending on the underlying file type. Specifically, if the underlying file type is FILE_TYPE_DISK, as defined in winbase.h, the <b>CanSeek</b> property is <b>true</b>. Otherwise, the <b>CanSeek</b> property is <b>false</b>.<p> In the following example, a file is opened, or created if it does not already exist, and information is appended to the end of the file. The contents of the file are then written to standard output for display.</p>
+<p></p>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.IO/System.IO.html">System.IO Namespace</a> |  <a href="../../System.IO/types/File.html">File</a> |  <a href="../../System.IO/types/FileAccess.html">FileAccess</a> |  <a href="../../System.IO/types/FileMode.html">FileMode</a> |  <a href="../../System.IO/types/FileShare.html">FileShare</a></dd>
+</dl>
+<h3>System.IO.FileStream Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(IntPtr handle, FileAccess access)<br><br></code> Initializes a new instance of the  <a href="../../System.IO/types/FileStream.html">FileStream</a> class for the specified file handle, with the specified read/write permission.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(string path, FileMode mode)<br><br></code> Initializes a new instance of the  <a href="../../System.IO/types/FileStream.html">FileStream</a> class with the specified path and creation mode.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor3">ctor #3</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(IntPtr handle, FileAccess access, bool ownsHandle)<br><br></code> Initializes a new instance of the  <a href="../../System.IO/types/FileStream.html">FileStream</a> class for the specified file handle, with the specified read/write permission and <b>FileStream</b> instance ownership.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor4">ctor #4</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(string path, FileMode mode, FileAccess access)<br><br></code> Initializes a new instance of the  <a href="../../System.IO/types/FileStream.html">FileStream</a> class with the specified path, creation mode, and read/write permission.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor5">ctor #5</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(IntPtr handle, FileAccess access, bool ownsHandle, int bufferSize)<br><br></code> Initializes a new instance of the  <a href="../../System.IO/types/FileStream.html">FileStream</a> class for the specified file handle, with the specified read/write permission, <b>FileStream</b> instance ownership, and buffer size.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor6">ctor #6</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(string path, FileMode mode, FileAccess access, FileShare share)<br><br></code> Initializes a new instance of the  <a href="../../System.IO/types/FileStream.html">FileStream</a> class with the specified path, creation mode, read/write permission, and sharing permission.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor7">ctor #7</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(IntPtr handle, FileAccess access, bool ownsHandle, int bufferSize, bool isAsync)<br><br></code> Initializes a new instance of the  <a href="../../System.IO/types/FileStream.html">FileStream</a> class for the specified file handle, with the specified read/write permission, <b>FileStream</b> instance ownership, buffer size, and synchronous or asynchronous state.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor8">ctor #8</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(string path, FileMode mode, FileAccess access, FileShare share, int bufferSize)<br><br></code> Initializes a new instance of the  <a href="../../System.IO/types/FileStream.html">FileStream</a> class with the specified path, creation mode, read/write and sharing permission, and buffer size.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor9">ctor #9</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(string path, FileMode mode, FileAccess access, FileShare share, int bufferSize, bool useAsync)<br><br></code> Initializes a new instance of the  <a href="../../System.IO/types/FileStream.html">FileStream</a> class with the specified path, creation mode, read/write and sharing permission, buffer size, and synchronous or asynchronous state.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#CanRead">CanRead</a></td>
+<td width="55%"><b>Read-only</b><br><br><b>Overridden: </b><br> Gets a value indicating whether the current stream supports reading.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CanSeek">CanSeek</a></td>
+<td width="55%"><b>Read-only</b><br><br><b>Overridden: </b><br> Gets a value indicating whether the current stream supports seeking.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CanWrite">CanWrite</a></td>
+<td width="55%"><b>Read-only</b><br><br><b>Overridden: </b><br> Gets a value indicating whether the current stream supports writing.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Handle">Handle</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the operating system file handle for the file that the current <b>FileStream</b> object encapsulates.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsAsync">IsAsync</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a value indicating whether the <b>FileStream</b> was opened asynchronously or synchronously.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Length">Length</a></td>
+<td width="55%"><b>Read-only</b><br><br><b>Overridden: </b><br> Gets the length in bytes of the stream.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Name">Name</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the name of the <b>FileStream</b> that was passed to the constructor.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Position">Position</a></td>
+<td width="55%"><b>Read-write</b><br><br><b>Overridden: </b><br> Gets or sets the current position of this stream.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#BeginRead(System.Byte[],System.Int32,System.Int32,System.AsyncCallback,System.Object)">BeginRead</a></td>
+<td width="55%"><b>Overridden: </b><br> Begins an asynchronous read.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#BeginWrite(System.Byte[],System.Int32,System.Int32,System.AsyncCallback,System.Object)">BeginWrite</a></td>
+<td width="55%"><b>Overridden: </b><br> Begins an asynchronous write.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Close">Close</a></td>
+<td width="55%"><b>Overridden: </b><br> Closes the file and releases any resources associated with the current file stream.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CreateObjRef(System.Type)">CreateObjRef</a><br>(inherited from <b>System.MarshalByRefObject)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/MarshalByRefObject.html#CreateObjRef(System.Type)">System.MarshalByRefObject.CreateObjRef</a></font></b><br><br><br> Creates an object that contains all the relevant information required to generate a proxy used to communicate with a remote object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#EndRead(System.IAsyncResult)">EndRead</a></td>
+<td width="55%"><b>Overridden: </b><br> Waits for the pending asynchronous read to complete.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#EndWrite(System.IAsyncResult)">EndWrite</a></td>
+<td width="55%"><b>Overridden: </b><br> Ends an asynchronous write, blocking until the I/O operation has completed.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Flush">Flush</a></td>
+<td width="55%"><b>Overridden: </b><br> Clears all buffers for this stream and causes any buffered data to be written to the underlying device.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetLifetimeService">GetLifetimeService</a><br>(inherited from <b>System.MarshalByRefObject)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/MarshalByRefObject.html#GetLifetimeService">System.MarshalByRefObject.GetLifetimeService</a></font></b><br><br><br> Retrieves the current lifetime service object that controls the lifetime policy for this instance.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#InitializeLifetimeService">InitializeLifetimeService</a><br>(inherited from <b>System.MarshalByRefObject)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/MarshalByRefObject.html#InitializeLifetimeService">System.MarshalByRefObject.InitializeLifetimeService</a></font></b><br><br><br> Obtains a lifetime service object to control the lifetime policy for this instance.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Lock(System.Int64,System.Int64)">Lock</a></td>
+<td width="55%"> Prevents access by other processes to all or part of a file.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Read(System.Byte[],System.Int32,System.Int32)">Read</a></td>
+<td width="55%"><b>Overridden: </b><br> Reads a block of bytes from the stream and writes the data in a given buffer.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ReadByte">ReadByte</a></td>
+<td width="55%"><b>Overridden: </b><br> Reads a byte from the file and advances the read position one byte.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Seek(System.Int64,System.IO.SeekOrigin)">Seek</a></td>
+<td width="55%"><b>Overridden: </b><br> Sets the current position of this stream to the given value.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SetLength(System.Int64)">SetLength</a></td>
+<td width="55%"><b>Overridden: </b><br> Sets the length of this stream to the given value.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Unlock(System.Int64,System.Int64)">Unlock</a></td>
+<td width="55%"> Allows access by other processes to all or part of a file that was previously locked.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Write(System.Byte[],System.Int32,System.Int32)">Write</a></td>
+<td width="55%"><b>Overridden: </b><br> Writes a block of bytes to this stream using data from a buffer.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#WriteByte(System.Byte)">WriteByte</a></td>
+<td width="55%"><b>Overridden: </b><br> Writes a byte to the current position in the file stream.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#CreateWaitHandle">CreateWaitHandle</a><br>(inherited from <b>System.IO.Stream)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System.IO/types/Stream.html#CreateWaitHandle">System.IO.Stream.CreateWaitHandle</a></font></b><br><br><br> Allocates a  <a href="../../System.Threading/types/WaitHandle.html">WaitHandle</a> object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Dispose(System.Boolean)">Dispose</a></td>
+<td width="55%"> Releases the unmanaged resources used by the  <a href="../../System.IO/types/FileStream.html">FileStream</a> and optionally releases the managed resources.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a></td>
+<td width="55%"><b>Overridden: </b><br> Ensures that resources are freed and other cleanup operations are performed when the garbage collector reclaims the <b>FileStream</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/MarshalByRefObject.html">System.MarshalByRefObject</a></li>
+<ul class="none">
+<li><a href="../../System.IO/types/Stream.html">System.IO.Stream</a></li>
+<ul class="none">
+<li><b>System.IO.FileStream</b><ul class="none">
+<li><a href="../../System.IO.IsolatedStorage/types/IsolatedStorageFileStream.html">System.IO.IsolatedStorage.IsolatedStorageFileStream</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.IO.FileStream Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.IO/types/FileStream.html">FileStream</a> class for the specified file handle, with the specified read/write permission.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public FileStream(<br>   <font color="#008080"><a href="../../System/types/IntPtr.html">IntPtr</a> <i>handle</i>,</font><br>   <font color="#008080"><a href="../../System.IO/types/FileAccess.html">FileAccess</a> <i>access</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>handle</i><br><dl>
+<dd>
+<param> A file handle for the file that the current <b>FileStream</b> object will encapsulate.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>access</i><br><dl>
+<dd>
+<param> A  <a href="../../System.IO/types/FileAccess.html">FileAccess</a> constant that gets the  <a href="#CanRead">FileStream.CanRead</a> and  <a href="#CanWrite">FileStream.CanWrite</a> properties of the <b>FileStream</b> object.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>access</i> is not a field of  <a href="../../System.IO/types/FileAccess.html">FileAccess</a>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td> The caller does not have the required permission.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> An I/O error occurs, such as a disk error.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/UnauthorizedAccessException.html">UnauthorizedAccessException</a></td>
+<td> The <i>access</i> requested is not permitted by the operating system for the specified file handle, such as when <i>access</i> is <b>Write</b> or <b>ReadWrite</b> and the file handle is set for read-only access.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> When  <a href="#Close">FileStream.Close</a> is called, the handle is also closed and the file's handle count is decremented.<b>FileStream</b> assumes that it has exclusive control over the handle. Reading, writing, or seeking while a <b>FileStream</b> is also holding a handle could result in data corruption. For data safety, call  <a href="#Flush">FileStream.Flush</a> before using the handle, and avoid calling any methods other than <b>Close</b> after you are done using the handle. When you compile a set of characters with a particular cultural setting and retrieve those same characters with a different cultural setting, the characters may not be interpretable, and could cause an exception to be thrown.<p><b>FileShare.Read</b> is the default for those  <a href="../../System.IO/types/FileStream.html">FileStream</a> constructors without a <b>FileShare</b> parameter.</p>
+</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/FileIOPermission.html">FileIOPermission</a> for reading, writing, and appending to files. Associated enumerations:  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Read">FileIOPermissionAccess.Read</a>,  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Write">FileIOPermissionAccess.Write</a>, and  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Append">FileIOPermissionAccess.Append</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.IO/types/FileStream.html">FileStream</a> class with the specified path and creation mode.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public FileStream(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i>,</font><br>   <font color="#008080"><a href="../../System.IO/types/FileMode.html">FileMode</a> <i>mode</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>path</i><br><dl>
+<dd>
+<param> A relative or absolute path for the file that the current <b>FileStream</b> object will encapsulate.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>mode</i><br><dl>
+<dd>
+<param> A  <a href="../../System.IO/types/FileMode.html">FileMode</a> constant that determines how to open or create the file.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>path</i> is an empty string ("").</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>path</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td> The caller does not have the required permission.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/FileNotFoundException.html">FileNotFoundException</a></td>
+<td> The file cannot be found, such as when <i>mode</i> is <b>FileMode.Truncate</b> or <b>FileMode.Open</b>, and the file specified by <i>path</i> does not exist. The file must already exist in these modes.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> An I/O error occurs, such as specifying <b>FileMode.CreateNew</b> and the file specified by <i>path</i> already exists.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/DirectoryNotFoundException.html">DirectoryNotFoundException</a></td>
+<td> The directory path leading to the file specified by <i>path</i> does not exist.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/PathTooLongException.html">PathTooLongException</a></td>
+<td> The specified path, file name, or both are too long. After full qualification, each must be less than 256 characters.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>mode</i> contains an invalid value.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The <i>path</i> parameter can be a file name, including a file on a Universal Naming Convention (UNC) share.<p> If <i>path</i> contains invalid characters or lacks necessary characters, the code will not compile. For example, in C#, C++, or JScript code, you cannot specify "c:\\Dir\myfile.txt" as the <i>path</i> string, because it is missing an escape character in front of the backslash between Dir and myfile.txt.</p>
+<p> The constructor is given read/write access to the file, and it is opened sharing Read access (that is, requests to open the file for writing by this or another process will fail until the FileStream object has been closed, but read attempts will succeed). The buffer size is set to the default size of 8192 bytes (8 KB).</p><br><br><b>Note </b><i>path</i> is not required to be a file stored on disk; it can be any part of a system that supports access via streams. For example, depending on the system, this class may be able to access a physical device.<p> <a href="../../System.IO/types/Stream.html#CanSeek">Stream.CanSeek</a> is <b>true</b> for all  <a href="../../System.IO/types/FileStream.html">FileStream</a> objects that encapsulate files. If <i>path</i> indicates a device that does not support seeking, the  <a href="#CanSeek">FileStream.CanSeek</a> property on the resulting  <a href="../../System.IO/types/FileStream.html">FileStream</a> is <b>false</b>. For additional information, see  <a href="../../System.IO/types/Stream.html#CanSeek">Stream.CanSeek</a>.</p>
+<p><b>FileShare.Read</b> is the default for those  <a href="../../System.IO/types/FileStream.html">FileStream</a> constructors without a <b>FileShare</b> parameter.</p> When you compile a set of characters with a particular cultural setting and retrieve those same characters with a different cultural setting, the characters might not be interpretable, and could cause an exception to be thrown.</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/FileIOPermission.html">FileIOPermission</a> for reading, writing, and appending to files. Associated enumerations:  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Read">FileIOPermissionAccess.Read</a>,  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Write">FileIOPermissionAccess.Write</a>, and  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Append">FileIOPermissionAccess.Append</a>.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.IO/types/Path.html#InvalidPathChars">Path.InvalidPathChars</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic3"></a><a name="ctor3">ctor #3</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.IO/types/FileStream.html">FileStream</a> class for the specified file handle, with the specified read/write permission and <b>FileStream</b> instance ownership.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public FileStream(<br>   <font color="#008080"><a href="../../System/types/IntPtr.html">IntPtr</a> <i>handle</i>,</font><br>   <font color="#008080"><a href="../../System.IO/types/FileAccess.html">FileAccess</a> <i>access</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>ownsHandle</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>handle</i><br><dl>
+<dd>
+<param> A file handle for the file that the current <b>FileStream</b> object will encapsulate.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>access</i><br><dl>
+<dd>
+<param> A  <a href="../../System.IO/types/FileAccess.html">FileAccess</a> constant that gets the  <a href="#CanRead">FileStream.CanRead</a> and  <a href="#CanWrite">FileStream.CanWrite</a> properties of the <b>FileStream</b> object.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>ownsHandle</i><br><dl>
+<dd>
+<param><b>true</b> if the file handle will be owned by this <b>FileStream</b> instance; otherwise, <b>false</b>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>access</i> is not a field of  <a href="../../System.IO/types/FileAccess.html">FileAccess</a>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td> The caller does not have the required permission.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> An I/O error occurs, such as a disk error.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/UnauthorizedAccessException.html">UnauthorizedAccessException</a></td>
+<td> The <i>access</i> requested is not permitted by the operating system for the specified file handle, such as when <i>access</i> is <b>Write</b> or <b>ReadWrite</b> and the file handle is set for read-only access.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The <b>FileStream</b> object is given the specified access to the file. The ownership of the handle will be as specified. If this process owns the handle, a call to the  <a href="#Close">FileStream.Close</a> method will also close the handle and the file's handle count is decremented. The <b>FileStream</b> object is given the default buffer size of 8192 bytes.<p><b>FileStream</b> assumes that it has exclusive control over the handle. Reading, writing, or seeking while a <b>FileStream</b> is also holding a handle could result in data corruption. For data safety, call  <a href="#Flush">FileStream.Flush</a> before using the handle, and avoid calling methods other than <b>Close</b> after you are done using the handle.</p>
+<p><b>FileShare.Read</b> is the default for those  <a href="../../System.IO/types/FileStream.html">FileStream</a> constructors without a <b>FileShare</b> parameter.</p> When you compile a set of characters with a particular cultural setting and retrieve those same characters with a different cultural setting, the characters may not be interpretable, and could cause an exception to be thrown.</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/FileIOPermission.html">FileIOPermission</a> for reading, writing, and appending to files. Associated enumerations:  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Read">FileIOPermissionAccess.Read</a>,  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Write">FileIOPermissionAccess.Write</a>, and  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Append">FileIOPermissionAccess.Append</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic4"></a><a name="ctor4">ctor #4</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.IO/types/FileStream.html">FileStream</a> class with the specified path, creation mode, and read/write permission.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public FileStream(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i>,</font><br>   <font color="#008080"><a href="../../System.IO/types/FileMode.html">FileMode</a> <i>mode</i>,</font><br>   <font color="#008080"><a href="../../System.IO/types/FileAccess.html">FileAccess</a> <i>access</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>path</i><br><dl>
+<dd>
+<param> A relative or absolute path for the file that the current <b>FileStream</b> object will encapsulate.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>mode</i><br><dl>
+<dd>
+<param> A  <a href="../../System.IO/types/FileMode.html">FileMode</a> constant that determines how to open or create the file.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>access</i><br><dl>
+<dd>
+<param> A  <a href="../../System.IO/types/FileAccess.html">FileAccess</a> constant that determines how the file may be accessed by the <b>FileStream</b> object. This gets the  <a href="#CanRead">FileStream.CanRead</a> and  <a href="#CanWrite">FileStream.CanWrite</a> properties of the <b>FileStream</b> object. <a href="#CanSeek">FileStream.CanSeek</a> is <b>true</b> if <i>path</i> specifies a disk file.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>path</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>path</i> is an empty string ("").</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/FileNotFoundException.html">FileNotFoundException</a></td>
+<td> The file cannot be found, such as when <i>mode</i> is <b>FileMode.Truncate</b> or <b>FileMode.Open</b>, and the file specified by <i>path</i> does not exist. The file must already exist in these modes.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> An I/O error occurs, such as specifying <b>FileMode.CreateNew</b> and the file specified by <i>path</i> already exists.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td> The caller does not have the required permission.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/DirectoryNotFoundException.html">DirectoryNotFoundException</a></td>
+<td> The directory path leading to the file specified by <i>path</i> does not exist.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/UnauthorizedAccessException.html">UnauthorizedAccessException</a></td>
+<td> The <i>access</i> requested is not permitted by the operating system for the specified <i>path</i>, such as when <i>access</i> is <b>Write</b> or <b>ReadWrite</b> and the file or directory is set for read-only access.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/PathTooLongException.html">PathTooLongException</a></td>
+<td> The specified path, file name, or both are too long. After full qualification, each must be less than 256 characters.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>mode</i> contains an invalid value.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The <i>path</i> parameter can be a file name, including a file on a Universal Naming Convention (UNC) share.<p> If <i>path</i> contains invalid characters or lacks necessary characters, the code will not compile. For example, you cannot specify "c:\\Dir\myfile.txt" as the <i>path</i> string, because it is missing an escape character in front of the backslash between Dir and myfile.txt.</p>
+<p> The constructor is given read/write access to the file, and it is opened sharing Read access (that is, requests to open the file for writing by this or another process will fail until the <b>FileStream</b> object has been closed, but read attempts will succeed). The buffer size is set to the default size of 8192 bytes (8 KB).</p><br><br><b>Note </b><i>path</i> is not required to be a file stored on disk; it can be any part of a system that supports access via streams. For example, depending on the system, this class may be able to access a physical device.<p> <a href="../../System.IO/types/Stream.html#CanSeek">Stream.CanSeek</a> is <b>true</b> for all  <a href="../../System.IO/types/FileStream.html">FileStream</a> objects that encapsulate files. If <i>path</i> indicates a device that does not support seeking, the  <a href="#CanSeek">FileStream.CanSeek</a> property on the resulting  <a href="../../System.IO/types/FileStream.html">FileStream</a> is <b>false</b>. For additional information, see  <a href="../../System.IO/types/Stream.html#CanSeek">Stream.CanSeek</a>.</p>
+<p><b>FileShare.Read</b> is the default for those  <a href="../../System.IO/types/FileStream.html">FileStream</a> constructors without a <b>FileShare</b> parameter.</p> When you compile a set of characters with a particular cultural setting and retrieve those same characters with a different cultural setting, the characters may not be interpretable, and could cause an exception to be thrown.</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/FileIOPermission.html">FileIOPermission</a> for reading, writing, and appending to files. Associated enumerations:  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Read">FileIOPermissionAccess.Read</a>,  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Write">FileIOPermissionAccess.Write</a>, and  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Append">FileIOPermissionAccess.Append</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic5"></a><a name="ctor5">ctor #5</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.IO/types/FileStream.html">FileStream</a> class for the specified file handle, with the specified read/write permission, <b>FileStream</b> instance ownership, and buffer size.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public FileStream(<br>   <font color="#008080"><a href="../../System/types/IntPtr.html">IntPtr</a> <i>handle</i>,</font><br>   <font color="#008080"><a href="../../System.IO/types/FileAccess.html">FileAccess</a> <i>access</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>ownsHandle</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>bufferSize</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>handle</i><br><dl>
+<dd>
+<param> A file handle for the file that this <b>FileStream</b> object will encapsulate.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>access</i><br><dl>
+<dd>
+<param> A  <a href="../../System.IO/types/FileAccess.html">FileAccess</a> constant that gets the  <a href="#CanRead">FileStream.CanRead</a> and  <a href="#CanWrite">FileStream.CanWrite</a> properties of the <b>FileStream</b> object.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>ownsHandle</i><br><dl>
+<dd>
+<param><b>true</b> if the file handle will be owned by this <b>FileStream</b> instance; otherwise, <b>false</b>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>bufferSize</i><br><dl>
+<dd>
+<param> The size of the buffer in bytes.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>bufferSize</i> is negative.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> An I/O error occurs, such as a disk error.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td> The caller does not have the required permission.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/UnauthorizedAccessException.html">UnauthorizedAccessException</a></td>
+<td> The <i>access</i> requested is not permitted by the operating system for the specified file handle, such as when <i>access</i> is <b>Write</b> or <b>ReadWrite</b> and the file handle is set for read-only access.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The <b>FileStream</b> object is given the specified access to the file. The ownership of the handle will be as specified. If this <b>FileStream</b> owns the handle, a call to the  <a href="#Close">FileStream.Close</a> method will also close the handle. In particular, the file's handle count is decremented. The <b>FileStream</b> object is given the specified buffer size.<p><b>FileStream</b> assumes that it has exclusive control over the handle. Reading, writing, or seeking while a <b>FileStream</b> is also holding a handle could result in data corruption. For data safety, call  <a href="#Flush">FileStream.Flush</a> before using the handle, and avoid calling any methods other than <b>Close</b> after you are done using the handle. Alternately, read and write to the handle before calling this <b>FileStream</b> constructor.</p>
+<p><b>FileShare.Read</b> is the default for those  <a href="../../System.IO/types/FileStream.html">FileStream</a> constructors without a <b>FileShare</b> parameter.</p> When you compile a set of characters with a particular cultural setting and retrieve those same characters with a different cultural setting, the characters may not be interpretable, and could cause an exception to be thrown.</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/FileIOPermission.html">FileIOPermission</a> for reading, writing, and appending to files. Associated enumerations:  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Read">FileIOPermissionAccess.Read</a>,  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Write">FileIOPermissionAccess.Write</a>, and  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Append">FileIOPermissionAccess.Append</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic6"></a><a name="ctor6">ctor #6</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.IO/types/FileStream.html">FileStream</a> class with the specified path, creation mode, read/write permission, and sharing permission.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public FileStream(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i>,</font><br>   <font color="#008080"><a href="../../System.IO/types/FileMode.html">FileMode</a> <i>mode</i>,</font><br>   <font color="#008080"><a href="../../System.IO/types/FileAccess.html">FileAccess</a> <i>access</i>,</font><br>   <font color="#008080"><a href="../../System.IO/types/FileShare.html">FileShare</a> <i>share</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>path</i><br><dl>
+<dd>
+<param> A relative or absolute path for the file that the current <b>FileStream</b> object will encapsulate.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>mode</i><br><dl>
+<dd>
+<param> A  <a href="../../System.IO/types/FileMode.html">FileMode</a> constant that determines how to open or create the file.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>access</i><br><dl>
+<dd>
+<param> A  <a href="../../System.IO/types/FileAccess.html">FileAccess</a> constant that determines how the file may be accessed by the <b>FileStream</b> object. This gets the  <a href="#CanRead">FileStream.CanRead</a> and  <a href="#CanWrite">FileStream.CanWrite</a> properties of the <b>FileStream</b> object. <a href="#CanSeek">FileStream.CanSeek</a> is <b>true</b> if <i>path</i> specifies a disk file.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>share</i><br><dl>
+<dd>
+<param> A  <a href="../../System.IO/types/FileShare.html">FileShare</a> constant that determines how the file will be shared by processes.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>path</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>path</i> is an empty string ("").</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/FileNotFoundException.html">FileNotFoundException</a></td>
+<td> The file cannot be found, such as when <i>mode</i> is <b>FileMode.Truncate</b> or <b>FileMode.Open</b>, and the file specified by <i>path</i> does not exist. The file must already exist in these modes.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> An I/O error occurs, such as specifying <b>FileMode.CreateNew</b> and the file specified by <i>path</i> already exists.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td> The caller does not have the required permission.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/DirectoryNotFoundException.html">DirectoryNotFoundException</a></td>
+<td> The directory path leading to the file specified by <i>path</i> does not exist.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/UnauthorizedAccessException.html">UnauthorizedAccessException</a></td>
+<td> The <i>access</i> requested is not permitted by the operating system for the specified <i>path</i>, such as when <i>access</i> is <b>Write</b> or <b>ReadWrite</b> and the file or directory is set for read-only access.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/PathTooLongException.html">PathTooLongException</a></td>
+<td> The specified path, file name, or both are too long. After full qualification, each must be less than 256 characters.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>mode</i> contains an invalid value.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The <i>path</i> parameter can be a file name, including a file on a Universal Naming Convention (UNC) share.<p> If <i>path</i> contains invalid characters or lacks necessary characters, the code will not compile. For example, you cannot specify "c:\\Dir\myfile.txt" as the <i>path</i> string, because it is missing an escape character in front of the backslash between Dir and myfile.txt.</p>
+<p> The constructor is given read/write access to the file, and it is opened sharing Read access (that is, requests to open the file for writing by this or another process will fail until the <b>FileStream</b> object has been closed, but read attempts will succeed). The buffer size is set to the default size of 8192 bytes (8 KB).</p><br><br><b>Note </b><i>path</i> is not required to be a file stored on disk; it can be any part of a system that supports access via streams. For example, depending on the system, this class may be able to access a physical device.<p> <a href="../../System.IO/types/Stream.html#CanSeek">Stream.CanSeek</a> is <b>true</b> for all  <a href="../../System.IO/types/FileStream.html">FileStream</a> objects that encapsulate files. If <i>path</i> indicates a device that does not support seeking, the  <a href="#CanSeek">FileStream.CanSeek</a> property on the resulting  <a href="../../System.IO/types/FileStream.html">FileStream</a> is <b>false</b>. For additional information, see  <a href="../../System.IO/types/Stream.html#CanSeek">Stream.CanSeek</a>.</p> When you compile a set of characters with a particular cultural setting and retrieve those same characters with a different cultural setting, the characters may not be interpretable, and could cause an exception to be thrown.</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/FileIOPermission.html">FileIOPermission</a> for reading, writing, and appending to files. Associated enumerations:  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Read">FileIOPermissionAccess.Read</a>,  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Write">FileIOPermissionAccess.Write</a>, and  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Append">FileIOPermissionAccess.Append</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic7"></a><a name="ctor7">ctor #7</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.IO/types/FileStream.html">FileStream</a> class for the specified file handle, with the specified read/write permission, <b>FileStream</b> instance ownership, buffer size, and synchronous or asynchronous state.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public FileStream(<br>   <font color="#008080"><a href="../../System/types/IntPtr.html">IntPtr</a> <i>handle</i>,</font><br>   <font color="#008080"><a href="../../System.IO/types/FileAccess.html">FileAccess</a> <i>access</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>ownsHandle</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>bufferSize</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>isAsync</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>handle</i><br><dl>
+<dd>
+<param> A file handle for the file that this <b>FileStream</b> object will encapsulate.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>access</i><br><dl>
+<dd>
+<param> A  <a href="../../System.IO/types/FileAccess.html">FileAccess</a> constant that gets the  <a href="#CanRead">FileStream.CanRead</a> and  <a href="#CanWrite">FileStream.CanWrite</a> properties of the <b>FileStream</b> object.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>ownsHandle</i><br><dl>
+<dd>
+<param><b>true</b> if the file handle will be owned by this <b>FileStream</b> instance; otherwise, <b>false</b>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>bufferSize</i><br><dl>
+<dd>
+<param> The size of the buffer in bytes.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>isAsync</i><br><dl>
+<dd>
+<param><b>true</b> if the handle was opened asynchronously (that is, in overlapped I/O mode); otherwise, <b>false</b>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>access</i> is less than <b>FileAccess.Read</b> or greater than <b>FileAccess.ReadWrite</b> or <i>bufferSize</i> is less than or equal to 0.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The handle is invalid.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> An I/O error occurs, such as a disk error.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td> The caller does not have the required permission.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/UnauthorizedAccessException.html">UnauthorizedAccessException</a></td>
+<td> The <i>access</i> requested is not permitted by the operating system for the specified file handle, such as when <i>access</i> is <b>Write</b> or <b>ReadWrite</b> and the file handle is set for read-only access.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The <b>FileStream</b> object is given the specified access to the file. The ownership of the handle will be as specified. If this <b>FileStream</b> owns the handle, a call to the  <a href="#Close">FileStream.Close</a> method will also close the handle. In particular, the file's handle count is decremented. The <b>FileStream</b> object is given the specified buffer size.<p><b>FileStream</b> assumes that it has exclusive control over the handle. Reading, writing, or seeking while a <b>FileStream</b> is also holding a handle could result in data corruption. For data safety, call  <a href="#Flush">FileStream.Flush</a> before using the handle, and avoid calling any methods other than <b>Close</b> after you are done using the handle. Alternately, read and write to the handle before calling this <b>FileStream</b> constructor.</p>
+<p><b>FileShare.Read</b> is the default for those  <a href="../../System.IO/types/FileStream.html">FileStream</a> constructors without a <b>FileShare</b> parameter.</p> When you compile a set of characters with a particular cultural setting and retrieve those same characters with a different cultural setting, the characters may not be interpretable, and could cause an exception to be thrown.</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/SecurityPermission.html">SecurityPermission</a> for access to unmanaged code. Associated enumeration:  <a href="../../System.Security.Permissions/types/SecurityPermissionFlag.html#UnmanagedCode">SecurityPermissionFlag.UnmanagedCode</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic8"></a><a name="ctor8">ctor #8</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.IO/types/FileStream.html">FileStream</a> class with the specified path, creation mode, read/write and sharing permission, and buffer size.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public FileStream(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i>,</font><br>   <font color="#008080"><a href="../../System.IO/types/FileMode.html">FileMode</a> <i>mode</i>,</font><br>   <font color="#008080"><a href="../../System.IO/types/FileAccess.html">FileAccess</a> <i>access</i>,</font><br>   <font color="#008080"><a href="../../System.IO/types/FileShare.html">FileShare</a> <i>share</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>bufferSize</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>path</i><br><dl>
+<dd>
+<param> A relative or absolute path for the file that the current <b>FileStream</b> object will encapsulate.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>mode</i><br><dl>
+<dd>
+<param> A  <a href="../../System.IO/types/FileMode.html">FileMode</a> constant that determines how to open or create the file.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>access</i><br><dl>
+<dd>
+<param> A  <a href="../../System.IO/types/FileAccess.html">FileAccess</a> constant that determines how the file may be accessed by the <b>FileStream</b> object. This gets the  <a href="#CanRead">FileStream.CanRead</a> and  <a href="#CanWrite">FileStream.CanWrite</a> properties of the <b>FileStream</b> object. <a href="#CanSeek">FileStream.CanSeek</a> is <b>true</b> if <i>path</i> specifies a disk file.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>share</i><br><dl>
+<dd>
+<param> A  <a href="../../System.IO/types/FileShare.html">FileShare</a> constant that determines how the file will be shared by processes.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>bufferSize</i><br><dl>
+<dd>
+<param> The desired buffer size in bytes. For <i>bufferSize</i> values between zero and eight, the actual buffer size is set to eight bytes.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>path</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>path</i> is an empty string ("").</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>bufferSize</i> is negative.<p> -or- </p>
+<p><i>mode</i>, <i>access</i>, or <i>share</i> contain an invalid value.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/FileNotFoundException.html">FileNotFoundException</a></td>
+<td> The file cannot be found, such as when <i>mode</i> is <b>FileMode.Truncate</b> or <b>FileMode.Open</b>, and the file specified by <i>path</i> does not exist. The file must already exist in these modes.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> An I/O error occurs, such as specifying <b>FileMode.CreateNew</b> and the file specified by <i>path</i> already exists.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td> The caller does not have the required permission.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/DirectoryNotFoundException.html">DirectoryNotFoundException</a></td>
+<td> The directory path leading to the file specified by <i>path</i> does not exist.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/UnauthorizedAccessException.html">UnauthorizedAccessException</a></td>
+<td> The <i>access</i> requested is not permitted by the operating system for the specified <i>path</i>, such as when <i>access</i> is <b>Write</b> or <b>ReadWrite</b> and the file or directory is set for read-only access.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/PathTooLongException.html">PathTooLongException</a></td>
+<td> The specified path, file name, or both are too long. After full qualification, each must be less than 256 characters.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The <i>path</i> parameter can be a file name, including a file on a Universal Naming Convention (UNC) share.<p> If <i>path</i> contains invalid characters or lacks necessary characters, the code will not compile. For example, you cannot specify "c:\\Dir\myfile.txt" as the <i>path</i> string, because it is missing an escape character in front of the backslash between Dir and myfile.txt.</p><br><br><b>Note </b><i>path</i> is not required to be a file stored on disk; it can be any part of a system that supports access via streams. For example, depending on the system, this class may be able to access a physical device.<p> <a href="../../System.IO/types/Stream.html#CanSeek">Stream.CanSeek</a> is <b>true</b> for all  <a href="../../System.IO/types/FileStream.html">FileStream</a> objects that encapsulate files. If <i>path</i> indicates a device that does not support seeking, the  <a href="#CanSeek">FileStream.CanSeek</a> property on the resulting  <a href="../../System.IO/types/FileStream.html">FileStream</a> is <b>false</b>. For additional information, see  <a href="../../System.IO/types/Stream.html#CanSeek">Stream.CanSeek</a>.</p> When you compile a set of characters with a particular cultural setting and retrieve those same characters with a different cultural setting, the characters may not be interpretable, and could cause an exception to be thrown.</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/FileIOPermission.html">FileIOPermission</a> for reading, writing, and appending to files. Associated enumerations:  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Read">FileIOPermissionAccess.Read</a>,  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Write">FileIOPermissionAccess.Write</a>, and  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Append">FileIOPermissionAccess.Append</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic9"></a><a name="ctor9">ctor #9</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.IO/types/FileStream.html">FileStream</a> class with the specified path, creation mode, read/write and sharing permission, buffer size, and synchronous or asynchronous state.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public FileStream(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>path</i>,</font><br>   <font color="#008080"><a href="../../System.IO/types/FileMode.html">FileMode</a> <i>mode</i>,</font><br>   <font color="#008080"><a href="../../System.IO/types/FileAccess.html">FileAccess</a> <i>access</i>,</font><br>   <font color="#008080"><a href="../../System.IO/types/FileShare.html">FileShare</a> <i>share</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>bufferSize</i>,</font><br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>useAsync</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>path</i><br><dl>
+<dd>
+<param> A relative or absolute path for the file that the current <b>FileStream</b> object will encapsulate.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>mode</i><br><dl>
+<dd>
+<param> A  <a href="../../System.IO/types/FileMode.html">FileMode</a> constant that determines how to open or create the file.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>access</i><br><dl>
+<dd>
+<param> A  <a href="../../System.IO/types/FileAccess.html">FileAccess</a> constant that determines how the file may be accessed by the <b>FileStream</b> object. This gets the  <a href="#CanRead">FileStream.CanRead</a> and  <a href="#CanWrite">FileStream.CanWrite</a> properties of the <b>FileStream</b> object. <a href="#CanSeek">FileStream.CanSeek</a> is <b>true</b> if <i>path</i> specifies a disk file.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>share</i><br><dl>
+<dd>
+<param> A  <a href="../../System.IO/types/FileShare.html">FileShare</a> constant that determines how the file will be shared by processes.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>bufferSize</i><br><dl>
+<dd>
+<param> The desired buffer size in bytes. For <i>bufferSize</i> values between zero and eight, the actual buffer size is set to eight bytes.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>useAsync</i><br><dl>
+<dd>
+<param> Specifies whether to use asynchronous I/O or synchronous I/O. However, note that the underlying operating system might not support asynchronous I/O, so when specifying <b>true</b>, the handle might be opened synchronously depending on the platform. When opened asynchronously, the  <a href="#BeginRead(System.Byte[],System.Int32,System.Int32,System.AsyncCallback,System.Object)">FileStream.BeginRead</a> and  <a href="#BeginWrite(System.Byte[],System.Int32,System.Int32,System.AsyncCallback,System.Object)">FileStream.BeginWrite</a> methods perform better on large reads or writes, but they might be much slower for small reads or writes. If the application is designed to take advantage of asynchronous I/O, set the <i>useAsync</i> parameter to <b>true</b>. Using asynchronous I/O correctly can speed up applications by as much as a factor of 10, but using it without redesigning the application for asynchronous I/O can decrease performance by as much as a factor of 10.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>path</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>path</i> is an empty string ("").</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>bufferSize</i> is negative.<p> -or- </p>
+<p><i>mode</i>, <i>access</i>, or <i>share</i> contain an invalid value.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/FileNotFoundException.html">FileNotFoundException</a></td>
+<td> The file cannot be found, such as when <i>mode</i> is <b>FileMode.Truncate</b> or <b>FileMode.Open</b>, and the file specified by <i>path</i> does not exist. The file must already exist in these modes.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> An I/O error occurs, such as specifying <b>FileMode.CreateNew</b> and the file specified by <i>path</i> already exists.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td> The caller does not have the required permission.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/DirectoryNotFoundException.html">DirectoryNotFoundException</a></td>
+<td> The directory path leading to the file specified by <i>path</i> does not exist.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/UnauthorizedAccessException.html">UnauthorizedAccessException</a></td>
+<td> The <i>access</i> requested is not permitted by the operating system for the specified <i>path</i>, such as when <i>access</i> is <b>Write</b> or <b>ReadWrite</b> and the file or directory is set for read-only access.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/PathTooLongException.html">PathTooLongException</a></td>
+<td> The specified path, file name, or both are too long. After full qualification, each must be less than 256 characters.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The <i>path</i> parameter can be a file name, including a file on a Universal Naming Convention (UNC) share.<p> If <i>path</i> contains invalid characters or lacks necessary characters, the code will not compile. For example, you cannot specify "c:\\Dir\myfile.txt" as the <i>path</i> string, because it is missing an escape character in front of the backslash between Dir and myfile.txt.</p><br><br><b>Note </b><i>path</i> is not required to be a file stored on disk; it can be any part of a system that supports access via streams. For example, depending on the system, this class may be able to access a physical device.<p> <a href="../../System.IO/types/Stream.html#CanSeek">Stream.CanSeek</a> is <b>true</b> for all  <a href="../../System.IO/types/FileStream.html">FileStream</a> objects that encapsulate files. If <i>path</i> indicates a device that does not support seeking, the  <a href="#CanSeek">FileStream.CanSeek</a> property on the resulting  <a href="../../System.IO/types/FileStream.html">FileStream</a> is <b>false</b>. For additional information, see  <a href="../../System.IO/types/Stream.html#CanSeek">Stream.CanSeek</a>.</p> When you compile a set of characters with a particular cultural setting and retrieve those same characters with a different cultural setting, the characters may not be interpretable, and could cause an exception to be thrown.</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/FileIOPermission.html">FileIOPermission</a> for reading, writing, and appending to files. Associated enumerations:  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Read">FileIOPermissionAccess.Read</a>,  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Write">FileIOPermissionAccess.Write</a>, and  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#Append">FileIOPermissionAccess.Append</a>.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.IO/types/File.html">File</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Property: <i><a name="CanReadTopic1"></a><a name="CanRead">CanRead</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether the current stream supports reading.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Boolean.html">bool</a> CanRead {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If a class derived from  <a href="../../System.IO/types/Stream.html">Stream</a> does not support reading, calls to the  <a href="#Read(System.Byte[],System.Int32,System.Int32)">FileStream.Read</a>,  <a href="#ReadByte">FileStream.ReadByte</a>,  <a href="#BeginRead(System.Byte[],System.Int32,System.Int32,System.AsyncCallback,System.Object)">FileStream.BeginRead</a>, and  <a href="#EndRead(System.IAsyncResult)">FileStream.EndRead</a> methods throw a  <a href="../../System/types/NotSupportedException.html">NotSupportedException</a>.<p> If the stream is closed, this property returns <b>false</b>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following is an example of using the <b>CanRead</b> property.<pre>
+ using System;
+ using System.IO;
+ 
+class TestRW 
+{
+   public static void Main(String[] args)
+   {
+ 
+      FileStream fs = new FileStream("MyFile.txt", FileMode.OpenOrCreate, FileAccess.Read);
+         if (fs.CanRead &amp;&amp; fs.CanWrite)
+         {
+            Console.WriteLine("MyFile.txt can be both written to and read from.");
+         }
+         else if (fs.CanRead)
+         {
+            Console.WriteLine("MyFile.txt is not writable.");
+      }
+   }
+}
+ //This code outputs "MyFile.txt is not writable."
+ //To get the output message "MyFile.txt can be both written to and read from.",
+ //change the FileAccess parameter to ReadWrite in the FileStream constructor.
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Property: <i><a name="CanSeekTopic1"></a><a name="CanSeek">CanSeek</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether the current stream supports seeking.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Boolean.html">bool</a> CanSeek {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If a class derived from  <a href="../../System.IO/types/Stream.html">Stream</a> does not support seeking, calls to  <a href="#Length">FileStream.Length</a>,  <a href="#SetLength(System.Int64)">FileStream.SetLength</a>,  <a href="#Position">FileStream.Position</a>, and  <a href="#Seek(System.Int64,System.IO.SeekOrigin)">FileStream.Seek</a> throw a  <a href="../../System/types/NotSupportedException.html">NotSupportedException</a>.<p> If the stream is closed, this property returns <b>false</b>.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Property: <i><a name="CanWriteTopic1"></a><a name="CanWrite">CanWrite</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether the current stream supports writing.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Boolean.html">bool</a> CanWrite {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If a class derived from  <a href="../../System.IO/types/Stream.html">Stream</a> does not support writing, a call to  <a href="#SetLength(System.Int64)">FileStream.SetLength</a>,  <a href="#Write(System.Byte[],System.Int32,System.Int32)">FileStream.Write</a>,  <a href="#BeginWrite(System.Byte[],System.Int32,System.Int32,System.AsyncCallback,System.Object)">FileStream.BeginWrite</a>,  <a href="#EndWrite(System.IAsyncResult)">FileStream.EndWrite</a>, or  <a href="#WriteByte(System.Byte)">FileStream.WriteByte</a> throws a  <a href="../../System/types/NotSupportedException.html">NotSupportedException</a>.<p> If the stream is closed, this property returns <b>false</b>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following is an example using the <b>CanWrite</b> property.<pre>
+ using System;
+ using System.IO;
+ 
+ class TestRW 
+ {
+ public static void Main(String[] args)
+   {
+ 
+ FileStream fs = new FileStream("MyFile.txt", FileMode.OpenOrCreate, FileAccess.Write);
+     if (fs.CanRead &amp;&amp; fs.CanWrite)
+     {
+     Console.WriteLine("MyFile.txt can be both written to and read from.");
+     }
+     else if (fs.CanWrite)
+     {
+     Console.WriteLine("MyFile.txt is writable.");
+     }
+   }
+ }
+ //This code outputs "MyFile.txt is writable."
+ //To get the output message "MyFile.txt can be both written to and read from.",
+ //change the FileAccess parameter to ReadWrite in the FileStream constructor.
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="HandleTopic1"></a><a name="Handle">Handle</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the operating system file handle for the file that the current <b>FileStream</b> object encapsulates.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/IntPtr.html">IntPtr</a> Handle {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Security/types/SecurityException.html">SecurityException</a></td>
+<td> The caller does not have the required permission.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property is an operating system handle for use with operating-system-provided system calls (such as <b>ReadFile</b> on Windows). It will not work with C library functions that expect a file descriptor, such as <b>fread</b>.<p> The operating system handle might have been opened synchronously or asynchronously, depending on which <b>FileStream</b> constructor was called. Use the  <a href="#IsAsync">FileStream.IsAsync</a> property to discover whether this handle was opened asynchronously. In Win32, this means the handle was opened for overlapped IO, and it requires different parameters to <b>ReadFile</b> and <b>WriteFile</b>.</p> Data corruption might occur if a <b>FileStream</b> is created, its handle is passed, some operation moves the handle's file pointer, and then the <b>FileStream</b> is used again. Multiple threads cannot safely write to the same file simultaneously, and <b>FileStream</b> buffering code assumes that it exclusively controls the handle.<b>FileStream</b> might throw an  <a href="../../System.IO/types/IOException.html">IOException</a> if <b>FileStream</b> detects that some other process has moved the file pointer. To avoid this, do not write any data into a portion of the file that <b>FileStream</b> might have buffered, and restore the file pointer to the location it had when methods were last called on <b>FileStream</b>.</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/SecurityPermission.html">SecurityPermission</a> for calling unmanaged code, such as calling native code with PInvoke or COM integration. Associated enumeration:  <a href="../../System.Security.Permissions/types/SecurityPermissionFlag.html#UnmanagedCode">SecurityPermissionFlag.UnmanagedCode</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsAsyncTopic1"></a><a name="IsAsync">IsAsync</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether the <b>FileStream</b> was opened asynchronously or synchronously.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsAsync {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The <b>IsAsync</b> property detects whether the <b>FileStream</b> handle was opened asynchronously, enabling your code to use the  <a href="#Handle">FileStream.Handle</a> property correctly. In Win32, <b>IsAsync</b> being true means the handle was opened for overlapped I/O, and thus requires different parameters to <b>ReadFile</b> and <b>WriteFile</b>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Property: <i><a name="LengthTopic1"></a><a name="Length">Length</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the length in bytes of the stream.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Int64.html">long</a> Length {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> <a href="#CanSeek">FileStream.CanSeek</a> for this stream is <b>false</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> An I/O error occurs, such as the file being closed.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following is an example of using the <b>Length</b> and <b>Position</b> properties to check for an end-of-file condition.<pre>
+ if( s.Length==s.Position )
+ {
+    Console.WriteLine("End of file has been reached.");
+ }
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NameTopic1"></a><a name="Name">Name</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the name of the <b>FileStream</b> that was passed to the constructor.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> Name {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>.NET Framework Security:</b><dl>
+<dd> <a href="../../System.Security.Permissions/types/FileIOPermission.html">FileIOPermission</a> for access to the path. Associated enumeration:  <a href="../../System.Security.Permissions/types/FileIOPermissionAccess.html#PathDiscovery">FileIOPermissionAccess.PathDiscovery</a></dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Property: <i><a name="PositionTopic1"></a><a name="Position">Position</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the current position of this stream.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Int64.html">long</a> Position {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The stream does not support seeking.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> An I/O error occurs.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> Attempted to set the position to a negative value.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/EndOfStreamException.html">EndOfStreamException</a></td>
+<td> Attempted seeking past the end of a stream that does not support this.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Seeking to any location beyond the length of the stream is supported.<p> In order to open a new file and write to it, set the position to one byte beyond the end of the stream. This allows you to append to the file. The position cannot be set to more than one byte beyond the end of the stream.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following is an example of using the <b>Length</b> and <b>Position</b> properties to check for an end-of-file condition.<pre>
+ if( s.Length==s.Position )
+ {
+    Console.WriteLine("End of file has been reached.");
+ }
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="BeginReadTopic1"></a><a name="BeginRead(System.Byte[],System.Int32,System.Int32,System.AsyncCallback,System.Object)">BeginRead</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>array</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>offset</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>numBytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/AsyncCallback.html">AsyncCallback</a> <i>userCallback</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>stateObject</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Begins an asynchronous read.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/IAsyncResult.html">IAsyncResult</a> BeginRead(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>array</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>offset</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>numBytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/AsyncCallback.html">AsyncCallback</a> <i>userCallback</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>stateObject</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>array</i><br><dl>
+<dd>
+<param> The buffer to read data into.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>offset</i><br><dl>
+<dd>
+<param> The byte offset in <i>array</i> at which to begin reading.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>numBytes</i><br><dl>
+<dd>
+<param> The maximum number of bytes to read.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>userCallback</i><br><dl>
+<dd>
+<param> The method to be called when the asynchronous read operation is completed.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>stateObject</i><br><dl>
+<dd>
+<param> A user-provided object that distinguishes this particular asynchronous read request from other requests.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An  <a href="../../System/types/IAsyncResult.html">IAsyncResult</a> that references the asynchronous read.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> The array length minus <i>offset</i> is less than <i>numBytes</i>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>array</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>offset</i> or <i>numBytes</i> is negative.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> An asynchronous read was attempted past the end of the file.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd><b>FileStream</b> provides two different modes of operation: synchronous I/O and asynchronous I/O. While either can be used, the underlying operating system resources might allow access in only one of these modes. By default, <b>FileStream</b> opens the operating system handle synchronously. In Windows, this slows down asynchronous methods. If asynchronous methods are used, call the <b>FileStream</b> constructor that has the <i>isAsync</i> parameter.<br><br><b>Note </b> Use the  <a href="#CanRead">FileStream.CanRead</a> property to determine whether the current instance supports reading. For additional information, see  <a href="../../System.IO/types/Stream.html#CanRead">Stream.CanRead</a>.<p> If a stream is closed or you pass an invalid argument, exceptions are thrown immediately from <b>BeginRead</b>. Errors that occur during an asynchronous read request, such as a disk failure during the IO request, occur on the threadpool thread and become visible upon a call to  <a href="#EndRead(System.IAsyncResult)">FileStream.EndRead</a>.</p><br><br><b>Note </b> On Windows, all I/O operations smaller than 64 KB will complete synchronously for better performance. Asynchronous I/O might hinder performance for buffer sizes smaller than 64 KB.<p> <a href="../../System.IO/types/Stream.html#EndRead(System.IAsyncResult)">Stream.EndRead</a> must be called with this  <a href="../../System/types/IAsyncResult.html">IAsyncResult</a> to find out how many bytes were read.</p>
+<p> Multiple simultaneous asynchronous requests render the request completion order uncertain.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="BeginWriteTopic1"></a><a name="BeginWrite(System.Byte[],System.Int32,System.Int32,System.AsyncCallback,System.Object)">BeginWrite</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>array</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>offset</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>numBytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/AsyncCallback.html">AsyncCallback</a> <i>userCallback</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>stateObject</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Begins an asynchronous write.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/IAsyncResult.html">IAsyncResult</a> BeginWrite(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>array</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>offset</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>numBytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/AsyncCallback.html">AsyncCallback</a> <i>userCallback</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>stateObject</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>array</i><br><dl>
+<dd>
+<param> The buffer to write data to.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>offset</i><br><dl>
+<dd>
+<param> The zero based byte offset in <i>array</i> at which to begin writing.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>numBytes</i><br><dl>
+<dd>
+<param> The maximum number of bytes to write.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>userCallback</i><br><dl>
+<dd>
+<param> The method to be called when the asynchronous write operation is completed.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>stateObject</i><br><dl>
+<dd>
+<param> A user-provided object that distinguishes this particular asynchronous write request from other requests.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An  <a href="../../System/types/IAsyncResult.html">IAsyncResult</a> that references the asynchronous write.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>array</i> length minus <i>offset</i> is less than <i>numBytes</i>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>array</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>offset</i> or <i>numBytes</i> is negative.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> The stream does not support writing, or an I/O error occurs.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method overrides  <a href="../../System.IO/types/Stream.html#BeginWrite(System.Byte[],System.Int32,System.Int32,System.AsyncCallback,System.Object)">Stream.BeginWrite</a>.<p><b>FileStream</b> provides two different modes of operation: synchronous I/O and asynchronous I/O. While either can be used, the underlying operating system resources might allow access in only one of these modes. By default, <b>FileStream</b> opens the operating system handle synchronously. In Windows, this slows down asynchronous methods. If asynchronous methods are used, call the <b>FileStream</b> constructor that has the <i>isAsync</i> parameter.</p>
+<p> If a stream is closed or you pass an invalid argument, exceptions are thrown immediately from <b>BeginWrite</b>. Errors that occur during an asynchronous write request, such as a disk failure during the IO request, occur on the threadpool thread and become visible upon a call to  <a href="#EndWrite(System.IAsyncResult)">FileStream.EndWrite</a>.</p><br><br><b>Note </b> On Windows, all I/O operations smaller than 64 KB will complete synchronously for better performance. Asynchronous I/O might hinder performance for buffer sizes smaller than 64 KB.<p> <a href="../../System.IO/types/Stream.html#EndWrite(System.IAsyncResult)">Stream.EndWrite</a> must be called with this  <a href="../../System/types/IAsyncResult.html">IAsyncResult</a> to find out how many bytes were read.</p>
+<p> Multiple simultaneous asynchronous requests render the request completion order uncertain.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="CloseTopic1"></a><a name="Close">Close</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Closes the file and releases any resources associated with the current file stream.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void Close();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> An error occurred while trying to close the stream.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method overrides  <a href="../../System.IO/types/Stream.html#Close">Stream.Close</a>.<p> This implementation of <b>Close</b> calls the  <a href="#Dispose(System.Boolean)">FileStream.Dispose</a> method passing a <b>true</b> value.</p>
+<p> Any data previously written to the buffer is copied to the file before the file stream is closed, so it is not necessary to call  <a href="#Flush">FileStream.Flush</a> before invoking <b>Close</b>. Following a call to <b>Close</b>, any operations on the file stream might raise exceptions. After <b>Close</b> has been called once, it does nothing if called again.</p>
+<p> Flushing the stream will not flush its underlying encoder unless you explicitly call  <a href="#Flush">FileStream.Flush</a> or <b>Close</b>. Setting  <a href="../../System.IO/types/StreamWriter.html#AutoFlush">StreamWriter.AutoFlush</a> to <b>true</b> means that data will be flushed from the buffer to the stream, but the encoder state will not be flushed. This allows the encoder to keep its state (partial characters) so that it can encode the next block of characters correctly. This scenario affects UTF8 and UTF7 where certain characters can only be encoded after the encoder receives the adjacent character or characters.</p>
+<p> The  <a href="#Finalize">FileStream.Finalize</a> method invokes <b>Close</b> so that the file stream is closed before the garbage collector finalizes the object. However, objects writing to the <b>FileStream</b>, such as a  <a href="../../System.IO/types/StreamWriter.html">StreamWriter</a>, might not have flushed the data from their internal buffers to the <b>FileStream</b> when the call to <b>Finalize</b> closes the stream. To prevent data loss, always call <b>Close</b> on the highest-level object.</p>
+<p> If a process terminates with part of a file locked or closes a file that has outstanding locks, the behavior is undefined.</p><br><br><b>Note </b> This version of <b>Close</b> is equivalent to <a href="../../System.IO/types/FileStream.html#disposetopic">Dispose</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CreateObjRefTopic1"></a><a name="CreateObjRef(System.Type)">CreateObjRef</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>requestedType</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/MarshalByRefObject.html#CreateObjRef(System.Type)">System.MarshalByRefObject.CreateObjRef</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates an object that contains all the relevant information required to generate a proxy used to communicate with a remote object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System.Runtime.Remoting/types/ObjRef.html">ObjRef</a> CreateObjRef(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>requestedType</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>requestedType</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Type.html">Type</a> of the object that the new  <a href="../../System.Runtime.Remoting/types/ObjRef.html">ObjRef</a> will reference.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> Information required to generate a proxy.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Remoting/types/RemotingException.html">RemotingException</a></td>
+<td> This instance is not a valid remoting object.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CreateWaitHandleTopic1"></a><a name="CreateWaitHandle">CreateWaitHandle</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System.IO/types/Stream.html#CreateWaitHandle">System.IO.Stream.CreateWaitHandle</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Allocates a  <a href="../../System.Threading/types/WaitHandle.html">WaitHandle</a> object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual <a href="../../System.Threading/types/WaitHandle.html">WaitHandle</a> CreateWaitHandle();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A reference to the allocated <b>WaitHandle</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> When called for the first time, the current method creates a <b>WaitHandle</b> object and returns it. On subsequent calls, the <b>CreateWaitHandle</b> returns a reference to the same wait handle.<p> Use this method if you implement the asynchronous methods and require a way of blocking in  <a href="#EndRead(System.IAsyncResult)">Stream.EndRead</a> or  <a href="#EndWrite(System.IAsyncResult)">Stream.EndWrite</a> until the asynchronous operation is complete.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="DisposeTopic1"></a><a name="Dispose(System.Boolean)">Dispose</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>disposing</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Releases the unmanaged resources used by the  <a href="../../System.IO/types/FileStream.html">FileStream</a> and optionally releases the managed resources.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual void Dispose(<br>   <font color="#008080"><a href="../../System/types/Boolean.html">bool</a> <i>disposing</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>disposing</i><br><dl>
+<dd>
+<param><b>true</b> to release both managed and unmanaged resources; <b>false</b> to release only unmanaged resources.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> When the <i>disposing</i> parameter is <b>true</b>, this method releases all resources held by any managed objects that this  <a href="../../System.IO/types/FileStream.html">FileStream</a> references. This method invokes the <b>Dispose()</b> method of each referenced object.<br><br><b>Notes to inheritors: </b> <a href="#Dispose(System.Boolean)">FileStream.Dispose</a> may be called multiple times by other objects. When overriding  <a href="#Dispose(System.Boolean)">FileStream.Dispose</a>, be careful not to reference objects that have been previously disposed in an earlier call to  <a href="#Dispose(System.Boolean)">FileStream.Dispose</a>. This method calls the dispose method of the base class,  <a href="../../System/types/IDisposable.html#Dispose">IDisposable.Dispose</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="EndReadTopic1"></a><a name="EndRead(System.IAsyncResult)">EndRead</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/IAsyncResult.html">IAsyncResult</a> <i>asyncResult</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Waits for the pending asynchronous read to complete.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Int32.html">int</a> EndRead(<br>   <font color="#008080"><a href="../../System/types/IAsyncResult.html">IAsyncResult</a> <i>asyncResult</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>asyncResult</i><br><dl>
+<dd>
+<param> The reference to the pending asynchronous request to wait for.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The number of bytes read from the stream, between 0 and the number of bytes you requested. Streams only return 0 at the end of the stream, otherwise, they should block until at least 1 byte is available.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>asyncResult</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> This  <a href="../../System/types/IAsyncResult.html">IAsyncResult</a> object was not created by calling  <a href="#BeginRead(System.Byte[],System.Int32,System.Int32,System.AsyncCallback,System.Object)">FileStream.BeginRead</a> on this class.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td><b>EndRead</b> is called multiple times.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method overrides  <a href="../../System.IO/types/Stream.html#EndRead(System.IAsyncResult)">Stream.EndRead</a>.<p><b>EndRead</b> can be called on every  <a href="../../System/types/IAsyncResult.html">IAsyncResult</a> from  <a href="#BeginRead(System.Byte[],System.Int32,System.Int32,System.AsyncCallback,System.Object)">FileStream.BeginRead</a>. Calling <b>EndRead</b> tells you how many bytes were read from the stream.<b>EndRead</b> will block until the I/O operation has completed.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="EndWriteTopic1"></a><a name="EndWrite(System.IAsyncResult)">EndWrite</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/IAsyncResult.html">IAsyncResult</a> <i>asyncResult</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Ends an asynchronous write, blocking until the I/O operation has completed.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void EndWrite(<br>   <font color="#008080"><a href="../../System/types/IAsyncResult.html">IAsyncResult</a> <i>asyncResult</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>asyncResult</i><br><dl>
+<dd>
+<param> The pending asynchronous I/O request.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>asyncResult</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> This  <a href="../../System/types/IAsyncResult.html">IAsyncResult</a> object was not created by calling  <a href="../../System.IO/types/Stream.html#BeginWrite(System.Byte[],System.Int32,System.Int32,System.AsyncCallback,System.Object)">Stream.BeginWrite</a> on this class.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td><b>EndWrite</b> is called multiple times.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method overrides  <a href="../../System.IO/types/Stream.html#EndWrite(System.IAsyncResult)">Stream.EndWrite</a>.<p><b>EndWrite</b> must be called exactly once on every  <a href="../../System/types/IAsyncResult.html">IAsyncResult</a> from  <a href="#BeginWrite(System.Byte[],System.Int32,System.Int32,System.AsyncCallback,System.Object)">FileStream.BeginWrite</a>.<b>EndWrite</b> will block until the I/O operation has completed.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Ensures that resources are freed and other cleanup operations are performed when the garbage collector reclaims the <b>FileStream</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~FileStream();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> The handle for the file is invalid.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The garbage collector calls <b>Finalize</b> when the current object is ready to be finalized.<b>Finalize</b> closes the <b>FileStream</b>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="FlushTopic1"></a><a name="Flush">Flush</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Clears all buffers for this stream and causes any buffered data to be written to the underlying device.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void Flush();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> An I/O error occurs.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ObjectDisposedException.html">ObjectDisposedException</a></td>
+<td> The stream is closed.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method overrides  <a href="../../System.IO/types/Stream.html#Flush">Stream.Flush</a>.<p> Flushing the stream will not flush its underlying encoder unless you explicitly call <b>Flush</b> or  <a href="#Close">FileStream.Close</a>. Setting  <a href="../../System.IO/types/StreamWriter.html#AutoFlush">StreamWriter.AutoFlush</a> to <b>true</b> means that data will be flushed from the buffer to the stream, but the encoder state will not be flushed. This allows the encoder to keep its state (partial characters) so that it can encode the next block of characters correctly. This scenario affects UTF8 and UTF7 where certain characters can only be encoded after the encoder receives the adjacent character or characters.</p>
+<p> Because a buffer can be used for either reading or writing, <b>Flush</b> performs the following two functions: </p>
+<OL>
+<li> Any data previously written to the buffer is copied to the file and the buffer is cleared except for its encoder state.</li>
+<li> If  <a href="../../System.IO/types/BufferedStream.html#CanSeek">BufferedStream.CanSeek</a> is <b>true</b> and data was previously copied from the file to the buffer for reading, the current position within the file is decremented by the number of unread bytes in the buffer. The buffer is then cleared.</li>
+</OL>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetLifetimeServiceTopic1"></a><a name="GetLifetimeService">GetLifetimeService</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/MarshalByRefObject.html#GetLifetimeService">System.MarshalByRefObject.GetLifetimeService</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves the current lifetime service object that controls the lifetime policy for this instance.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> GetLifetimeService();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An object of type  <a href="../../System.Runtime.Remoting.Lifetime/types/ILease.html">ILease</a> used to control the lifetime policy for this instance.</dd>
+</dl><b>Remarks</b><dl>
+<dd> For more information about lifetime services, see the  <a href="../../System.Runtime.Remoting.Lifetime/types/LifetimeServices.html">LifetimeServices</a> class.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="InitializeLifetimeServiceTopic1"></a><a name="InitializeLifetimeService">InitializeLifetimeService</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/MarshalByRefObject.html#InitializeLifetimeService">System.MarshalByRefObject.InitializeLifetimeService</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Obtains a lifetime service object to control the lifetime policy for this instance.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> InitializeLifetimeService();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An object of type  <a href="../../System.Runtime.Remoting.Lifetime/types/ILease.html">ILease</a> used to control the lifetime policy for this instance. This is the current lifetime service object for this instance if one exists; otherwise, a new lifetime service object initialized to the value of the  <a href="../../System.Runtime.Remoting.Lifetime/types/LifetimeServices.html#LeaseManagerPollTime">LifetimeServices.LeaseManagerPollTime</a> property.</dd>
+</dl><b>Remarks</b><dl>
+<dd> For more information about lifetime services, see the  <a href="../../System.Runtime.Remoting.Lifetime/types/LifetimeServices.html">LifetimeServices</a> class.</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example demonstrates creating a lease.<pre>
+ public class MyClass : MarshalByRefObject
+ {
+   public override Object InitializeLifetimeService()
+   {
+     ILease lease = (ILease)base.InitializeLifetimeService();
+     if (lease.CurrentState == LeaseState.Initial)
+     {
+          lease.InitialLeaseTime = TimeSpan.FromMinutes(1);
+          lease.SponsorshipTimeout = TimeSpan.FromMinutes(2);
+           lease.RenewOnCallTime = TimeSpan.FromSeconds(2);
+     }
+       return lease;
+   }
+ }
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="LockTopic1"></a><a name="Lock(System.Int64,System.Int64)">Lock</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>position</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>length</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Prevents access by other processes to all or part of a file.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void Lock(<br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>position</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>length</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>position</i><br><dl>
+<dd>
+<param> The beginning of the range to lock.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>length</i><br><dl>
+<dd>
+<param> The range to be locked.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>position</i> or <i>length</i> is negative.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> An I/O error occurs, such as the file being closed or its handle being invalid.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="ReadTopic1"></a><a name="Read(System.Byte[],System.Int32,System.Int32)">Read</a></i></b><b><i>(<br>   <font color="#008080"><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">in</a> <i>byte[] array</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>offset</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Reads a block of bytes from the stream and writes the data in a given buffer.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Int32.html">int</a> Read(<br>   <font color="#008080"><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfmemberstopic.asp">in</a> <i>byte[] array</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>offset</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>array</i><br><dl>
+<dd>
+<param> When this method returns, contains the specified byte array with the values between <i>offset </i> and (<i>offset + count - 1) </i> replaced by the bytes read from the current source.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>offset</i><br><dl>
+<dd>
+<param> The byte offset in <i>array</i> at which to begin writing.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>count</i><br><dl>
+<dd>
+<param> The maximum number of bytes to read.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The total number of bytes read into the buffer. This might be less than the number of bytes requested if that number of bytes are not currently available, or zero if the end of the stream is reached.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>array</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>offset</i> or <i>count</i> is negative.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The stream does not support reading.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> An I/O error occurs.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>offset</i> and <i>count</i> describe an invalid range in <i>array</i>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ObjectDisposedException.html">ObjectDisposedException</a></td>
+<td> Methods were called after the stream was closed.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method overrides  <a href="../../System.IO/types/Stream.html#Read(System.Byte[],System.Int32,System.Int32)">Stream.Read</a>.<p> The <i>offset</i> parameter gives the offset of the byte in <i>array</i> (the buffer index) at which to begin writing, and the <i>count</i> parameter gives the maximum number of bytes to be read from this stream. The returned value is the actual number of bytes read, or zero if the end of the stream is reached. If the read operation is successful, the current position of the stream is advanced by the number of bytes read. If an exception occurs, the current position of the stream is unchanged.</p>
+<p> The <b>Read</b> method returns zero only after reaching the end of the stream. Otherwise, <b>Read</b> always reads at least one byte from the stream before returning. If no data is available from the stream upon a call to <b>Read</b>, the method will block until at least one byte of data can be returned. An implementation is free to return fewer bytes than requested even if the end of the stream has not been reached.</p>
+<p> Use  <a href="../../System.IO/types/BinaryReader.html">BinaryReader</a> for reading primitive data types.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following is an example of using the <b>Length</b> and <b>Position</b> properties to check for an end-of-file condition.<pre>
+ if( s.Length==s.Position )
+ {
+    Console.WriteLine("End of file has been reached.");
+ }
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="ReadByteTopic1"></a><a name="ReadByte">ReadByte</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Reads a byte from the file and advances the read position one byte.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Int32.html">int</a> ReadByte();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The byte cast to an <b>int</b>, or -1 if reading from the end of the stream.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The current stream does not support reading.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ObjectDisposedException.html">ObjectDisposedException</a></td>
+<td> The current stream is closed.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method overrides  <a href="../../System.IO/types/Stream.html#ReadByte">Stream.ReadByte</a>.<br><br><b>Note </b> Use the  <a href="#CanRead">FileStream.CanRead</a> property to determine whether the current instance supports reading. For additional information, see  <a href="../../System.IO/types/Stream.html#CanRead">Stream.CanRead</a>.<br><br><b>Notes to implementors: </b> The default implementation on <b>Stream</b> creates a new single-byte array and then calls  <a href="../../System.IO/types/Stream.html#Read(System.Byte[],System.Int32,System.Int32)">Stream.Read</a>. While this is formally correct, it is inefficient. Any stream with an internal buffer should override this method and provide a much more efficient version that reads the buffer directly, avoiding the extra array allocation on every call.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="SeekTopic1"></a><a name="Seek(System.Int64,System.IO.SeekOrigin)">Seek</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>offset</i>,</font><br>   <font color="#008080"><a href="../../System.IO/types/SeekOrigin.html">SeekOrigin</a> <i>origin</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Sets the current position of this stream to the given value.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override long Seek(long <a href="../../System/types/Int64.html">offset,</a> Seek(<br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>offset</i>,</font><br>   <font color="#008080"><a href="../../System.IO/types/SeekOrigin.html">SeekOrigin</a> <i>origin</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>offset</i><br><dl>
+<dd>
+<param> The point relative to <i>origin</i> from which to begin seeking.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>origin</i><br><dl>
+<dd>
+<param> Specifies the beginning, the end, or the current position as a reference point for <i>origin</i>, using a value of type  <a href="../../System.IO/types/SeekOrigin.html">SeekOrigin</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The new position in the stream.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> An I/O error occurs.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The stream does not support seeking, such as if the <b>FileStream</b> is constructed from a pipe or console output.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> Attempted seeking before the beginning of the stream or more than one byte past the end of the stream.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ObjectDisposedException.html">ObjectDisposedException</a></td>
+<td> Methods were called after the stream was closed.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method overrides  <a href="../../System.IO/types/Stream.html#Seek(System.Int64,System.IO.SeekOrigin)">Stream.Seek</a>.<br><br><b>Note </b> Use the  <a href="#CanSeek">FileStream.CanSeek</a> property to determine whether the current instance supports seeking. For additional information, see  <a href="../../System.IO/types/Stream.html#CanSeek">Stream.CanSeek</a>.<p> Seeking to any location beyond the length of the stream is supported.</p>
+<p> In order to open a new file and write to it, set the position to one byte beyond the end of the stream. This allows you to append to the file. The position cannot be set to more than one byte beyond the end of the stream.</p>
+<p> On some platforms, seeking past the end of a file and then doing a write operation results in undefined behavior.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="SetLengthTopic1"></a><a name="SetLength(System.Int64)">SetLength</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Sets the length of this stream to the given value.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void SetLength(<br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The new length of the stream.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> An I/O error has occurred.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The stream does not support both writing and seeking.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> Attempted to set the <i>value</i> parameter to less than 0.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method overrides  <a href="../../System.IO/types/Stream.html#SetLength(System.Int64)">Stream.SetLength</a>.<p> If the given value is less than the current length of the stream, the stream is truncated. If the given value is larger than the current length of the stream, the stream is expanded. If the stream is expanded, the contents of the stream between the old and the new length are undefined.</p>
+<p> A stream must support both writing and seeking for <b>SetLength</b> to work.</p><br><br><b>Note </b> Use the  <a href="#CanWrite">FileStream.CanWrite</a> property to determine whether the current instance supports writing, and the  <a href="#CanSeek">FileStream.CanSeek</a> property to determine whether seeking is supported. For additional information, see  <a href="../../System.IO/types/Stream.html#CanWrite">Stream.CanWrite</a> and  <a href="../../System.IO/types/Stream.html#CanSeek">Stream.CanSeek</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="UnlockTopic1"></a><a name="Unlock(System.Int64,System.Int64)">Unlock</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>position</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>length</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Allows access by other processes to all or part of a file that was previously locked.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void Unlock(<br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>position</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int64.html">long</a> <i>length</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>position</i><br><dl>
+<dd>
+<param> The beginning of the range to unlock.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>length</i><br><dl>
+<dd>
+<param> The range to be unlocked.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>position</i> or <i>length</i> is negative.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteTopic1"></a><a name="Write(System.Byte[],System.Int32,System.Int32)">Write</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>array</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>offset</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes a block of bytes to this stream using data from a buffer.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void Write(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>array</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>offset</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>array</i><br><dl>
+<dd>
+<param> The array to read.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>offset</i><br><dl>
+<dd>
+<param> The byte offset in <i>array</i> at which to begin reading.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>count</i><br><dl>
+<dd>
+<param> The maximum number of bytes to write.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>array</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>offset</i> and <i>count</i> describe an invalid range in <i>array</i>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>offset</i> or <i>count</i> is negative.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> An I/O error occurs.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The current stream instance does not support writing.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method overrides  <a href="../../System.IO/types/Stream.html#Write(System.Byte[],System.Int32,System.Int32)">Stream.Write</a>.<p> The <i>offset</i> parameter gives the offset of the byte in <i>array</i> (the buffer index) at which to begin reading, and the <i>count</i> parameter gives the maximum number of bytes that will be written to this stream. If the write operation is successful, the current position of the stream is advanced by the number of bytes written. If an exception occurs, the current position of the stream is unchanged.</p><br><br><b>Note </b> Use the  <a href="#CanWrite">FileStream.CanWrite</a> property to determine whether the current instance supports writing. For additional information, see  <a href="../../System.IO/types/Stream.html#CanWrite">Stream.CanWrite</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="WriteByteTopic1"></a><a name="WriteByte(System.Byte)">WriteByte</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Writes a byte to the current position in the file stream.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override void WriteByte(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> A byte to write to the stream.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.IO/types/IOException.html">IOException</a></td>
+<td> The stream is closed.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The stream does not support writing, or the stream is already closed.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method overrides  <a href="../../System.IO/types/Stream.html#WriteByte(System.Byte)">Stream.WriteByte</a>.<p> Use <b>WriteByte</b> to write a byte to a <b>FileStream</b> efficiently. If the stream is closed or not writable, an exception will be thrown.</p><br><br><b>Note </b> Use the  <a href="#CanWrite">FileStream.CanWrite</a> property to determine whether the current instance supports writing. For additional information, see  <a href="../../System.IO/types/Stream.html#CanWrite">Stream.CanWrite</a>.<br><br><b>Notes to implementors: </b> The default implementation on <b>Stream</b> creates a new single-byte array and then calls  <a href="../../System.IO/types/Stream.html#Write(System.Byte[],System.Int32,System.Int32)">Stream.Write</a>. While this is formally correct, it is inefficient. Any stream with an internal buffer should override this method and provide a much more efficient version that reads the buffer directly, avoiding the extra array allocation on every call.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

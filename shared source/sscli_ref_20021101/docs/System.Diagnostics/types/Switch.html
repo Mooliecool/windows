@@ -1,0 +1,484 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Diagnostics.Switch</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Diagnostics.Switch Class</h2><b>Assembly: </b>System.dll<br><b>Namespace: </b>System.Diagnostics<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides an <b>abstract</b> base class to create new debugging and tracing switches.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public abstract class Switch
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> A switch provides an efficient mechanism for controlling tracing and debugging output at run time using external settings. The  <a href="../../System.Diagnostics/types/Switch.html">Switch</a> class implements default behavior for switches, allowing you to change the switch level at run time.<p> This class is the base class for the  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> and the  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> classes. These switches meet most debugging and tracing needs. If you create switches, they must be <b>static</b>.</p>
+<p> You must enable tracing or debugging to use a switch. The following syntax is compiler specific. If you use compilers other than C# or Visual Basic, refer to the documentation for your compiler.</p>
+<UL>
+<li> To enable debugging in C#, add the <b>/d:DEBUG</b> flag to the compiler command line when you compile your code, or you can add <b>#define DEBUG</b> to the top of your file. In Visual Basic, add the <b>/d:DEBUG=True</b> flag to the compiler command line.</li>
+<li> To enable tracing using in C#, add the <b>/d:TRACE</b> flag to the compiler command line when you compile your code, or add <b>#define TRACE</b> to the top of your file. In Visual Basic, add the <b>/d:TRACE=True</b> flag to the compiler command line.</li>
+</UL>
+<p> To set the level of your switch, edit the configuration file that corresponds to the name of your application. Within this file, you can add a switch and set its value, remove a switch, or clear all the switches previously set by the application. The configuration file should be formatted like the following example: </p>
+<pre>
+          &lt;configuration&gt;
+           &lt;system.diagnostics&gt;
+           &lt;switches&gt;
+           &lt;add name="mySwitch" value="10" /&gt;
+           &lt;add name="myNewSwitch" value="20" /&gt;
+           &lt;remove name="mySwitch" /&gt;
+           &lt;clear/&gt;
+           &lt;/switches&gt;
+           &lt;/system.diagnostics&gt;
+           &lt;/configuration&gt;
+        </pre><br><br><b>Note </b> To improve performance, you can make  <a href="../../System.Diagnostics/types/Switch.html">Switch</a> members <b>static</b> in your class.<br><br><b>Notes to inheritors: </b> If you need trace levels, or mechanisms for setting switch levels different from those provided by  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> and  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a>, you can inherit from  <a href="../../System.Diagnostics/types/Switch.html">Switch</a>. When inheriting from this class, you must implement the  <a href="#SwitchSetting">Switch.SwitchSetting</a> method.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to define a new  <a href="../../System.Diagnostics/types/Switch.html">Switch</a> class with four levels of tracing that can be used to trace a call stack. You can use the switch to instrument your application to log each time the method is entered or exited.<p> The first example creates the enumeration used to set the level of the switch.</p>
+<pre>
+// The following are possible values for the new switch.
+ public enum MethodTracingSwitchLevel {
+    Off = 0,
+    EnteringMethod = 1,
+    ExitingMethod = 2,
+    Both = 3,
+ }
+
+    </pre>
+<p> The following example creates the new switch. The code implements a <code>
+            Level
+          </code> property to set the value of the new switch.<code>
+            Level
+          </code> calls the protected property  <a href="#SwitchSetting">Switch.SwitchSetting</a> that assigns the value to the new switch. This example also implements two assessor properties to get the assigned value of the switch.</p> The following example creates a new switch in <pre>
+public class MyMethodTracingSwitch:Switch {
+     protected bool outExit;
+     protected bool outEnter;
+     protected MethodTracingSwitchLevel level;
+ 
+     public MyMethodTracingSwitch(string displayName, string description):base(displayName, description){
+     }
+ 
+     public MethodTracingSwitchLevel Level {
+         get{
+             return level;
+         }
+         set{
+             SetSwitchSetting((int)value);
+         }
+     }
+     
+     protected void SetSwitchSetting(int value){
+         if(value&lt;0){
+             value = 0;
+         }
+         if(value&gt;3){
+             value = 3;
+         }
+ 
+         level = (MethodTracingSwitchLevel)value;
+ 
+         outEnter = false;
+         if((value == (int)MethodTracingSwitchLevel.EnteringMethod) || (value == (int)MethodTracingSwitchLevel.Both)){
+             outEnter = true;
+         }
+ 
+         outExit = false;
+         if((value == (int)MethodTracingSwitchLevel.ExitingMethod) || (value == (int)MethodTracingSwitchLevel.Both)){
+             outExit = true;
+         }
+     }
+ 
+     public bool OutputExit{
+         get{
+             return outExit;
+         }
+     }
+ 
+     public bool OutputEnter{
+         get{
+             return outEnter;
+         }
+     }
+ }
+
+    </pre><code>
+          Main
+        </code>. It creates a new switch and assigns it a value. Then, depending on the switch settings, it outputs debugging messages for entering and leaving the method.<pre>
+public class MyClass {
+    /* Create an instance of MyMethodTracingSwitch. This switch is set
+     * by using values stored in the registry or in environmental variables. */
+    static MyMethodTracingSwitch mySwitch = 
+       new MyMethodTracingSwitch("Methods", "Trace entering and exiting method");
+ 
+    public static int Main(string[] args) {
+       // Write a diagnostic message if the switch is set to entering.
+       Debug.WriteLineIf(mySwitch.OutputEnter, "Entering Main");
+ 
+       // Insert code to handle processing.
+ 
+       // Write another diagnostic message if the switch is set to exiting.
+       Debug.WriteLineIf(mySwitch.OutputExit, "Exiting Main");
+       return 0;
+    }
+ }
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Diagnostics/System.Diagnostics.html">System.Diagnostics Namespace</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a></dd>
+</dl>
+<h3>System.Diagnostics.Switch Member List: </h3>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Description">Description</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a description of the switch.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#DisplayName">DisplayName</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a name used to identify the switch.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"> Initializes a new instance of the  <a href="../../System.Diagnostics/types/Switch.html">Switch</a> class.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#SwitchSetting">SwitchSetting</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the current setting for this switch.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#OnSwitchSettingChanged">OnSwitchSettingChanged</a></td>
+<td width="55%"> Raises the <b>SwitchSettingChanged</b> event.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Diagnostics.Switch</b><ul class="none">
+<li><a href="../../System.Diagnostics/types/BooleanSwitch.html">System.Diagnostics.BooleanSwitch</a></li>
+<li><a href="../../System.Diagnostics/types/TraceSwitch.html">System.Diagnostics.TraceSwitch</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Diagnostics.Switch Member Details</h3><b><i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Diagnostics/types/Switch.html">Switch</a> class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected Switch(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>displayName</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>description</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>displayName</i><br><dl>
+<dd>
+<param> The name of the switch.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>description</i><br><dl>
+<dd>
+<param> The description for the switch.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> When you create a new  <a href="../../System.Diagnostics/types/Switch.html">Switch</a> object, the value of the <i>displayName</i> parameter is used to find initial switch settings. The default value is an empty string ("").<p> To set the level of your switch, edit the configuration file that corresponds to the name of your application. Within this file, you can add a switch and set its value, remove a switch, or clear all the switches previously set by the application. The configuration file should be formatted like the following example: </p>
+<pre>
+              &lt;configuration&gt;
+                  &lt;system.diagnostics&gt;
+                     &lt;switches&gt;
+                        &lt;add name="mySwitch" value="10" /&gt;
+                        &lt;add name="myNewSwitch" value="20" /&gt;
+                        &lt;remove name="mySwitch" /&gt;
+                        &lt;clear/&gt;
+                     &lt;/switches&gt;
+                  &lt;/system.diagnostics&gt;
+               &lt;/configuration&gt;
+            </pre><br><br><b>Note </b> To improve performance, you can make  <a href="../../System.Diagnostics/types/Switch.html">Switch</a> members <b>static</b> in your class.<br><br><b>Notes to inheritors: </b> To set the value of the switch, use the  <a href="#SwitchSetting">Switch.SwitchSetting</a> method during initialization by the constructor.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Switch.html">Switch</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="DescriptionTopic1"></a><a name="Description">Description</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a description of the switch.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> Description {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This property should indicate the function of the switch. For example, "Enables tracing for a directory watcher component." </dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Switch.html">Switch</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="DisplayNameTopic1"></a><a name="DisplayName">DisplayName</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a name used to identify the switch.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> DisplayName {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> When you create a new  <a href="../../System.Diagnostics/types/Switch.html">Switch</a> object, the  <a href="#DisplayName">Switch.DisplayName</a> finds initial switch settings. For more information, see the  <a href="#ctor1">Switch.#ctor</a> constructor and the TraceSwitch Configuration topic in the Visual Studio documentation.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Switch.html">Switch</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="SwitchSettingTopic1"></a><a name="SwitchSetting">SwitchSetting</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the current setting for this switch.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Int32.html">int</a> SwitchSetting {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Diagnostics/types/Switch.html">Switch</a> |  <a href="../../System.Diagnostics/types/BooleanSwitch.html">BooleanSwitch</a> |  <a href="../../System.Diagnostics/types/TraceSwitch.html">TraceSwitch</a> |  <a href="../../System.Diagnostics/types/Debug.html">Debug</a> |  <a href="../../System.Diagnostics/types/Trace.html">Trace</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~Switch();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="OnSwitchSettingChangedTopic1"></a><a name="OnSwitchSettingChanged">OnSwitchSettingChanged</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Raises the <b>SwitchSettingChanged</b> event.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected virtual void OnSwitchSettingChanged();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The <b>SwitchSettingChanged</b> event is raised any time the  <a href="#SwitchSetting">Switch.SwitchSetting</a> property is changed. It is invoked the first time a switch reads its value from the configuration file and is invoked again each time the switch's value is changed.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

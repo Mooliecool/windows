@@ -1,0 +1,1081 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Xml.Schema.XmlSchemaCollection</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Xml.Schema.XmlSchemaCollection Class</h2><b>Assembly: </b>System.Xml.dll<br><b>Namespace: </b>System.Xml.Schema<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Contains a cache of XML Schema definition language (XSD) and XML-Data Reduced (XDR) schemas. This class cannot be inherited.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public sealed class XmlSchemaCollection : ICollection, IEnumerable
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Schemas are loaded using the  <a href="#Add(System.String,System.String)">XmlSchemaCollection.Add</a> method, at which time the schema is associated with a namespace URI. For XML Schemas, this will typically be the <b>targetNamespace</b> property of the schema.<p> Although this class stores both XML Schemas and XDR schemas, any method and property that takes or returns an  <a href="../../System.Xml.Schema/types/XmlSchema.html">XmlSchema</a> applies to XML Schemas only.</p>
+<p> This version of the product supports the World Wide Web Consortium (W3C) XML Schema recommendation located at http://www.w3.org/TR/xmlschema-1 and http://www.w3.org/TR/xmlschema-2 . An XML Schema must reference the W3C Schema namespace, <b>http://www.w3.org/2001/XMLSchema</b> in its schema element. See the  <a href="#Add(System.String,System.String)">XmlSchemaCollection.Add</a> method for an example.</p>
+<p><b>XmlSchemaCollection</b> can be used by  <a href="../../System.Xml/types/XmlValidatingReader.html">XmlValidatingReader</a> for efficient data validation.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example validates an XML document using the <b>XmlSchemaCollection</b>.<pre>
+using System;
+using System.Xml;
+using System.Xml.Schema;
+using System.IO;
+
+public class ValidXSD {
+
+  public static void Main() {
+    XmlSchemaCollection sc = new XmlSchemaCollection();
+    sc.ValidationEventHandler += new ValidationEventHandler(ValidationCallBack);
+    sc.Add(null, "books.xsd");
+
+    if(sc.Count &gt; 0)
+    {
+      XmlTextReader tr = new XmlTextReader("notValidXSD.xml");
+      XmlValidatingReader rdr = new XmlValidatingReader(tr);
+
+      rdr.ValidationType = ValidationType.Schema;
+      rdr.Schemas.Add(sc);
+      rdr.ValidationEventHandler += new ValidationEventHandler(ValidationCallBack);
+      while (rdr.Read());
+    }
+    
+  }
+
+  public static void ValidationCallBack(object sender, ValidationEventArgs e) {
+    Console.WriteLine("Validation Error: {0}", e.Message);
+  }
+}
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Xml.Schema/System.Xml.Schema.html">System.Xml.Schema Namespace</a></dd>
+</dl>
+<h3>System.Xml.Schema.XmlSchemaCollection Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor()<br><br></code>Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Initializes a new instance of the <b>XmlSchemaCollection</b> class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(XmlNameTable nametable)<br><br></code> Initializes a new instance of the <b>XmlSchemaCollection</b> class with the specified  <a href="../../System.Xml/types/XmlNameTable.html">XmlNameTable</a>. The <b>XmlNameTable</b> is used when loading schemas.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Count">Count</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the number of namespaces defined in this collection.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Item(System.String)">Item</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the  <a href="../../System.Xml.Schema/types/XmlSchema.html">XmlSchema</a> associated with the given namespace URI.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#NameTable">NameTable</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the default <b>XmlNameTable</b> used by the <b>XmlSchemaCollection</b> when loading new schemas.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Add(System.Xml.Schema.XmlSchema)">Add</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Add(XmlSchema schema)<br><br></code> Adds the  <a href="../../System.Xml.Schema/types/XmlSchema.html">XmlSchema</a> to the collection.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Add(System.Xml.Schema.XmlSchemaCollection)">Add</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Add(XmlSchemaCollection schema)<br><br></code> Adds all the namespaces defined in the given collection (including their associated schemas) to this collection.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Add(System.String,System.String)">Add</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Add(string ns, string uri)<br><br></code> Adds the schema located by the given URL into the schema collection.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Add(System.String,System.Xml.XmlReader)">Add</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Add(string ns, XmlReader reader)<br><br></code> Adds the given schema into the schema collection.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Contains(System.String)">Contains</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Contains(string ns)<br><br></code> Gets a value indicating whether a schema with the specified namespace is in the collection.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Contains(System.Xml.Schema.XmlSchema)">Contains</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>Contains(XmlSchema schema)<br><br></code> Gets a value indicating whether the <b>targetNamespace</b> of the specified  <a href="../../System.Xml.Schema/types/XmlSchema.html">XmlSchema</a> is in the collection.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CopyTo(System.Xml.Schema.XmlSchema[],System.Int32)">CopyTo</a></td>
+<td width="55%"> Copies all the <b>XmlSchema</b> objects from this collection into the given array starting at the given index.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetEnumerator">GetEnumerator</a></td>
+<td width="55%"> Provides support for the "for each" style iteration over the collection of schemas.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Events</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ValidationEventHandler">ValidationEventHandler</a></td>
+<td width="55%"> Sets an event handler for receiving information about the XML-Data Reduced (XDR) and XML Schema definition language (XSD) schema validation errors.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Xml.Schema.XmlSchemaCollection</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Xml.Schema.XmlSchemaCollection Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the <b>XmlSchemaCollection</b> class.</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlSchemaCollection();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the <b>XmlSchemaCollection</b> class with the specified  <a href="../../System.Xml/types/XmlNameTable.html">XmlNameTable</a>. The <b>XmlNameTable</b> is used when loading schemas.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlSchemaCollection(<br>   <font color="#008080"><a href="../../System.Xml/types/XmlNameTable.html">XmlNameTable</a> <i>nametable</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>nametable</i><br><dl>
+<dd>
+<param> The <b>XmlNameTable</b> to use.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CountTopic1"></a><a name="Count">Count</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the number of namespaces defined in this collection.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Int32.html">int</a> Count {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ItemTopic1"></a><a name="Item(System.String)">Item</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the  <a href="../../System.Xml.Schema/types/XmlSchema.html">XmlSchema</a> associated with the given namespace URI.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchema.html">XmlSchema</a> this[string ns] {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>ns</i><br><dl>
+<dd>
+<param> The namespace URI associated with the schema you want to return. This will typically be the <b>targetNamespace</b> of the schema.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example checks to see if a schema is in the collection. If it is, it displays the schema.<pre>
+if (xsc.Contains("urn:bookstore-schema"))
+{
+  XmlSchema schema = xsc["urn:bookstore-schema"];
+  StringWriter sw = new StringWriter();
+  XmlTextWriter xmlWriter = new XmlTextWriter(sw);
+  xmlWriter.Formatting = Formatting.Indented;
+  xmlWriter.Indentation = 2;
+  schema.Write(xmlWriter);
+  Console.WriteLine(sw.ToString());
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NameTableTopic1"></a><a name="NameTable">NameTable</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the default <b>XmlNameTable</b> used by the <b>XmlSchemaCollection</b> when loading new schemas.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml/types/XmlNameTable.html">XmlNameTable</a> NameTable {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml/types/XmlNameTable.html">XmlNameTable</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddTopic1"></a><a name="Add(System.Xml.Schema.XmlSchema)">Add</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Xml.Schema/types/XmlSchema.html">XmlSchema</a> <i>schema</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds the  <a href="../../System.Xml.Schema/types/XmlSchema.html">XmlSchema</a> to the collection.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchema.html">XmlSchema</a> Add(<br>   <font color="#008080"><a href="../../System.Xml.Schema/types/XmlSchema.html">XmlSchema</a> <i>schema</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>schema</i><br><dl>
+<dd>
+<param> The <b>XmlSchema</b> to add to the collection.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The <b>XmlSchema</b> object.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The <b>targetNamespace</b> attribute is used to identify this schema.<p> If the schema contains <b>include</b> and <b>import</b> elements that reference other namespaces, the schemas for these other namespaces are loaded for validation purposes only. Unlike the original schema, these other schemas are not explicitly added to the schema collection. As a result, they are not accessible using any of the collection methods or properties.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml.Schema/types/XmlSchema.html">XmlSchema</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddTopic2"></a><a name="Add(System.Xml.Schema.XmlSchemaCollection)">Add</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Xml.Schema/types/XmlSchemaCollection.html">XmlSchemaCollection</a> <i>schema</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds all the namespaces defined in the given collection (including their associated schemas) to this collection.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void Add(<br>   <font color="#008080"><a href="../../System.Xml.Schema/types/XmlSchemaCollection.html">XmlSchemaCollection</a> <i>schema</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>schema</i><br><dl>
+<dd>
+<param> The <b>XmlSchemaCollection</b> you want to add to this collection.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddTopic3"></a><a name="Add(System.String,System.String)">Add</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>uri</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds the schema located by the given URL into the schema collection.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchema.html">XmlSchema</a> Add(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i>,</font><br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>uri</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>ns</i><br><dl>
+<dd>
+<param> The namespace URI associated with the schema. For XML Schema Definition language (XSD) schemas, this will typically be the <b>targetNamespace</b>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>uri</i><br><dl>
+<dd>
+<param> The URL that specifies the schema to load.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The  <a href="../../System.Xml.Schema/types/XmlSchema.html">XmlSchema</a> added to the schema collection; <b>null</b> if the the schema being added is an XDR schema or if there are compilation errors in the schema.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Xml/types/XmlException.html">XmlException</a></td>
+<td> The schema is not a valid schema.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If <i>ns</i> has already been associated with another schema in the collection, the schema being added replaces the original schema in the collection. For example, in the following C# code, authors.xsd is removed from the collection and names.xsd is added.<pre>
+              schemaColl.Add("urn:author", "authors.xsd");
+              schemaColl.Add("urn:author", "names.xsd");
+            </pre> If <i>ns</i> is <b>null</b> and the schema being added is an XML Schema, the <b>Add</b> method uses the <b>targetNamespace</b> defined in the XML Schema to identify the schema in the collection.<p> If you are adding an XML Schema and the schema contains <b>include</b> and <b>import</b> elements that reference other namespaces, the schemas for these other namespaces are loaded for validation purposes only. Unlike the original schema, these other schemas are not explicitly added to the schema collection. As a result, they are not accessible using any of the collection methods or properties.</p>
+<p> If you are adding an XDR schema and the schema references other schemas using the <b>x-schema</b> attribute, these schemas are not loaded for validation purposes and are not added to the schema collection.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example validates three XML files using schemas stored in the <b>XmlSchemaCollection</b>.<pre>
+
+ 
+ 
+ using System;
+ using System.IO;
+ using System.Xml;
+ using System.Xml.Schema;
+ 
+ public class SchemaCollectionSample
+ {
+   private const String doc1 = "booksSchema.xml";
+   private const String doc2 = "booksSchemaFail.xml";
+   private const String doc3 = "newbooks.xml";
+   private const String schema = "books.xsd";
+   private const String schema1 = "schema1.xdr";
+   
+   private XmlTextReader reader=null;
+   private XmlValidatingReader vreader = null;
+   private Boolean m_success = true;
+ 
+   public SchemaCollectionSample ()
+   {
+     //Load the schema collection.
+     XmlSchemaCollection xsc = new XmlSchemaCollection();
+     xsc.Add("urn:bookstore-schema", schema);  //XSD schema
+     xsc.Add("urn:newbooks-schema", schema1);  //XDR schema
+ 
+     //Validate the files using schemas stored in the collection.
+     Validate(doc1, xsc); //Should pass.
+     Validate(doc2, xsc); //Should fail.   
+     Validate(doc3, xsc); //Should fail. 
+ 
+   }    
+ 
+   public static void Main ()
+   {
+       SchemaCollectionSample validation = new SchemaCollectionSample();
+   }
+ 
+   private void Validate(String filename, XmlSchemaCollection xsc)
+   {
+    
+      m_success = true;
+      Console.WriteLine();
+      Console.WriteLine("Validating XML file {0}...", filename.ToString());
+      reader = new XmlTextReader (filename);
+         
+      //Create a validating reader.
+     vreader = new XmlValidatingReader (reader);
+
+      //Validate using the schemas stored in the schema collection.
+      vreader.Schemas.Add(xsc);
+  
+      //Set the validation event handler
+      vreader.ValidationEventHandler += new ValidationEventHandler (ValidationCallBack);
+      //Read and validate the XML data.
+      while (vreader.Read()){}
+      Console.WriteLine ("Validation finished. Validation {0}", (m_success==true ? "successful" : "failed"));
+      Console.WriteLine();
+
+      //Close the reader.
+      vreader.Close();
+ 
+   } 
+ 
+ 
+   public void ValidationCallBack (object sender, ValidationEventArgs args)
+   {
+      m_success = false;
+ 
+      Console.Write("\r\n\tValidation error: " + args.Message);
+
+   }  
+ }
+
+    </pre>
+<p> The sample uses the following five input files: </p>
+<p><b>booksSchema.xml</b></p>
+<pre>
+
+&lt;?xml version='1.0'?&gt;
+ &lt;bookstore xmlns="urn:bookstore-schema"&gt;
+   &lt;book genre="autobiography"&gt;
+     &lt;title&gt;The Autobiography of Benjamin Franklin&lt;/title&gt;
+     &lt;author&gt;
+       &lt;first-name&gt;Benjamin&lt;/first-name&gt;
+       &lt;last-name&gt;Franklin&lt;/last-name&gt;
+     &lt;/author&gt;
+     &lt;price&gt;8.99&lt;/price&gt;
+   &lt;/book&gt;
+   &lt;book genre="novel"&gt;
+     &lt;title&gt;The Confidence Man&lt;/title&gt;
+     &lt;author&gt;
+       &lt;first-name&gt;Herman&lt;/first-name&gt;
+       &lt;last-name&gt;Melville&lt;/last-name&gt;
+     &lt;/author&gt;
+     &lt;price&gt;11.99&lt;/price&gt;
+   &lt;/book&gt;
+ &lt;/bookstore&gt;
+
+    </pre>
+<p><b>booksSchemaFail.xml</b></p>
+<pre>
+
+&lt;?xml version='1.0'?&gt;
+ &lt;bookstore xmlns="urn:bookstore-schema"&gt;
+   &lt;book&gt;
+     &lt;author&gt;
+       &lt;first-name&gt;Benjamin&lt;/first-name&gt;
+       &lt;last-name&gt;Franklin&lt;/last-name&gt;
+     &lt;/author&gt;
+   &lt;/book&gt;
+   &lt;book genre="novel"&gt;
+     &lt;title&gt;The Confidence Man&lt;/title&gt;
+     &lt;author&gt;
+       &lt;first-name&gt;Herman&lt;/first-name&gt;
+       &lt;last-name&gt;Melville&lt;/last-name&gt;
+     &lt;/author&gt;
+     &lt;price&gt;11.99&lt;/price&gt;
+   &lt;/book&gt;
+   &lt;book genre="philosophy"&gt;
+     &lt;title&gt;The Gorgias&lt;/title&gt;
+     &lt;author&gt;
+       &lt;name&gt;Plato&lt;/name&gt;
+     &lt;/author&gt;
+     &lt;price&gt;9.99&lt;/price&gt;
+   &lt;/book&gt;
+ &lt;/bookstore&gt;
+
+    </pre>
+<p><b>newbooks.xml</b></p>
+<pre>
+
+&lt;?xml version='1.0'?&gt;
+&lt;bookstore xmlns="urn:newbooks-schema"&gt;
+  &lt;book genre="novel" style="hardcover"&gt;
+    &lt;title&gt;The Handmaid's Tale&lt;/title&gt;
+    &lt;author&gt;
+      &lt;first-name&gt;Margaret&lt;/first-name&gt;
+      &lt;last-name&gt;Atwood&lt;/last-name&gt;
+    &lt;/author&gt;
+    &lt;price&gt;19.95&lt;/price&gt;
+  &lt;/book&gt;
+  &lt;book genre="novel" style="other"&gt;
+    &lt;title&gt;The Poisonwood Bible&lt;/title&gt;
+    &lt;author&gt;
+      &lt;first-name&gt;Barbara&lt;/first-name&gt;
+      &lt;last-name&gt;Kingsolver&lt;/last-name&gt;
+    &lt;/author&gt;
+    &lt;price&gt;11.99&lt;/price&gt;
+  &lt;/book&gt;
+&lt;/bookstore&gt;
+
+    </pre>
+<p><b>books.xsd</b></p>
+<pre>
+
+&lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+     xmlns="urn:bookstore-schema"
+     elementFormDefault="qualified"
+     targetNamespace="urn:bookstore-schema"&gt;
+ 
+  &lt;xsd:element name="bookstore" type="bookstoreType"/&gt;
+ 
+  &lt;xsd:complexType name="bookstoreType"&gt;
+   &lt;xsd:sequence maxOccurs="unbounded"&gt;
+    &lt;xsd:element name="book"  type="bookType"/&gt;
+   &lt;/xsd:sequence&gt;
+  &lt;/xsd:complexType&gt;
+ 
+  &lt;xsd:complexType name="bookType"&gt;
+   &lt;xsd:sequence&gt;
+    &lt;xsd:element name="title" type="xsd:string"/&gt;
+    &lt;xsd:element name="author" type="authorName"/&gt;
+    &lt;xsd:element name="price"  type="xsd:decimal"/&gt;
+   &lt;/xsd:sequence&gt;
+   &lt;xsd:attribute name="genre" type="xsd:string"/&gt;
+  &lt;/xsd:complexType&gt;
+ 
+  &lt;xsd:complexType name="authorName"&gt;
+   &lt;xsd:sequence&gt;
+    &lt;xsd:element name="first-name"  type="xsd:string"/&gt;
+    &lt;xsd:element name="last-name" type="xsd:string"/&gt;
+   &lt;/xsd:sequence&gt;
+  &lt;/xsd:complexType&gt;
+ 
+ &lt;/xsd:schema&gt;
+
+    </pre>
+<p><b>schema1.xdr</b></p>
+<pre>
+
+&lt;?xml version="1.0"?&gt;
+&lt;Schema xmlns="urn:schemas-microsoft-com:xml-data"
+        xmlns:dt="urn:schemas-microsoft-com:datatypes"&gt;
+  &lt;ElementType name="first-name" content="textOnly"/&gt;
+  &lt;ElementType name="last-name" content="textOnly"/&gt;
+  &lt;ElementType name="name" content="textOnly"/&gt;
+  &lt;ElementType name="price" content="textOnly" dt:type="fixed.14.4"/&gt;
+  &lt;ElementType name="author" content="eltOnly" order="one"&gt;
+    &lt;group order="seq"&gt;
+      &lt;element type="name"/&gt;
+    &lt;/group&gt;
+    &lt;group order="seq"&gt;
+      &lt;element type="first-name"/&gt;
+      &lt;element type="last-name"/&gt;
+    &lt;/group&gt;
+  &lt;/ElementType&gt;
+  &lt;ElementType name="title" content="textOnly"/&gt;
+  &lt;AttributeType name="genre" dt:type="string"/&gt;
+  &lt;AttributeType name="style" dt:type="enumeration"
+        dt:values="paperback hardcover"/&gt;
+  &lt;ElementType name="book" content="eltOnly"&gt;
+    &lt;attribute type="genre" required="yes"/&gt;
+    &lt;attribute type="style" required="yes"/&gt;
+    &lt;element type="title"/&gt;
+    &lt;element type="author"/&gt;
+    &lt;element type="price"/&gt;
+  &lt;/ElementType&gt;
+  &lt;ElementType name="bookstore" content="eltOnly"&gt;
+    &lt;element type="book"/&gt;
+  &lt;/ElementType&gt;
+&lt;/Schema&gt;
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="AddTopic4"></a><a name="Add(System.String,System.Xml.XmlReader)">Add</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i>,</font><br>   <font color="#008080"><a href="../../System.Xml/types/XmlReader.html">XmlReader</a> <i>reader</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds the given schema into the schema collection.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchema.html">XmlSchema</a> Add(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i>,</font><br>   <font color="#008080"><a href="../../System.Xml/types/XmlReader.html">XmlReader</a> <i>reader</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>ns</i><br><dl>
+<dd>
+<param> The namespace URI associated with the schema. For XML Schema definition language (XSD) schemas, this will typically be the <b>targetNamespace</b>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>reader</i><br><dl>
+<dd>
+<param> <a href="../../System.Xml/types/XmlReader.html">XmlReader</a> containing the schema to add.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The  <a href="../../System.Xml.Schema/types/XmlSchema.html">XmlSchema</a> added to the schema collection; <b>null</b> if the schema being added is an XML-Data Reduced (XDR) schema or if there are compilation errors in the schema.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Xml/types/XmlException.html">XmlException</a></td>
+<td> The schema is not a valid schema.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If <i>ns</i> has already been associated with another schema in the collection, the schema being added replaces the original schema in the collection.<p> If <i>ns</i> is <b>null</b> and the schema being added is an XML Schema, the <b>Add</b> method uses the targetNamespace defined in the XML Schema to identify the schema in the collection.</p>
+<p> If you are adding an XML Schema and the schema contains <b>include</b> and <b>import</b> elements that reference other namespaces, the schemas for these other namespaces are loaded for validation purposes only. Unlike the original schema, these other schemas are not explicitly added to the schema collection. As a result, they are not accessible using any of the collection methods or properties.</p>
+<p> If you are adding an XDR schema and the schema references other schemas using the <b>x-schema</b> attribute, these schemas are not loaded for validation purposes and are not added to the schema collection.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="ContainsTopic1"></a><a name="Contains(System.String)">Contains</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether a schema with the specified namespace is in the collection.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> Contains(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>ns</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>ns</i><br><dl>
+<dd>
+<param> The namespace URI associated with the schema. For XML Schema Definition language (XSD) schemas, this will typically be the target namespace.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if a schema with the specified namespace is in the collection; otherwise, <b>false</b>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example checks to see if a schema is in the collection. If it is, it displays the schema.<pre>
+if (xsc.Contains("urn:bookstore-schema"))
+{
+  XmlSchema schema = xsc["urn:bookstore-schema"];
+  StringWriter sw = new StringWriter();
+  XmlTextWriter xmlWriter = new XmlTextWriter(sw);
+  xmlWriter.Formatting = Formatting.Indented;
+  xmlWriter.Indentation = 2;
+  schema.Write(xmlWriter);
+  Console.WriteLine(sw.ToString());
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded Method: <i><a name="ContainsTopic2"></a><a name="Contains(System.Xml.Schema.XmlSchema)">Contains</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Xml.Schema/types/XmlSchema.html">XmlSchema</a> <i>schema</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether the <b>targetNamespace</b> of the specified  <a href="../../System.Xml.Schema/types/XmlSchema.html">XmlSchema</a> is in the collection.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> Contains(<br>   <font color="#008080"><a href="../../System.Xml.Schema/types/XmlSchema.html">XmlSchema</a> <i>schema</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>schema</i><br><dl>
+<dd>
+<param> The <b>XmlSchema</b> object.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if there is a schema in the collection with the same <b>targetNamespace</b>; otherwise, <b>false</b>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CopyToTopic1"></a><a name="CopyTo(System.Xml.Schema.XmlSchema[],System.Int32)">CopyTo</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Xml.Schema/types/XmlSchema.html">XmlSchema[]</a> <i>array</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Copies all the <b>XmlSchema</b> objects from this collection into the given array starting at the given index.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void CopyTo(<br>   <font color="#008080"><a href="../../System.Xml.Schema/types/XmlSchema.html">XmlSchema[]</a> <i>array</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>array</i><br><dl>
+<dd>
+<param> The array to copy the objects to.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The index in <i>array</i> where copying will begin.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~XmlSchemaCollection();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetEnumeratorTopic1"></a><a name="GetEnumerator">GetEnumerator</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Provides support for the "for each" style iteration over the collection of schemas.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchemaCollectionEnumerator.html">XmlSchemaCollectionEnumerator</a> GetEnumerator();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An enumerator for iterating over all schemas in the current collection.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example displays each of the XML Schema definition language (XSD) schemas in the schema collection.<pre>
+    public void DisplaySchemas(XmlSchemaCollection xsc)
+    {
+      XmlSchemaCollectionEnumerator ienum = xsc.GetEnumerator();
+      while (ienum.MoveNext())
+      {
+        XmlSchema schema = ienum.Current;
+        StringWriter sw = new StringWriter();
+        XmlTextWriter writer = new XmlTextWriter(sw);
+        writer.Formatting = Formatting.Indented;
+        writer.Indentation = 2;
+        schema.Write(writer);
+        Console.WriteLine(sw.ToString());  
+
+      }
+    }
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml.Schema/types/XmlSchemaCollectionEnumerator.html">XmlSchemaCollectionEnumerator</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Event: <i><a name="ValidationEventHandlerTopic1"></a><a name="ValidationEventHandler">ValidationEventHandler</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Sets an event handler for receiving information about the XML-Data Reduced (XDR) and XML Schema definition language (XSD) schema validation errors.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public event ValidationEventHandler ValidationEventHandler;
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> These events occur when the schemas are added to the collection. If an event handler is not provided, an  <a href="../../System.Xml.Schema/types/XmlSchemaException.html">XmlSchemaException</a> is thrown on any validation errors where the  <a href="../../System.Xml.Schema/types/ValidationEventArgs.html#Severity">ValidationEventArgs.Severity</a> is <b>XmlSeverityType.Error</b>. To specify an event handler, define a callback function and add it to the <b>ValidationEventHandler</b>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to set an event handler to handle invalid XML Schemas.<pre>
+using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Schema;
+
+public class Sample
+{
+
+  public static void Main (){
+
+    //Create the schema collection.
+    XmlSchemaCollection xsc = new XmlSchemaCollection();
+
+    //Set an event handler to manage invalid schemas.
+    xsc.ValidationEventHandler += new ValidationEventHandler (ValidationCallBack);
+
+    //Add the schema to the collection.  
+    xsc.Add(null, "invalid.xsd");
+
+  }    
+
+  //Display the schema error information.
+  public static void ValidationCallBack (object sender, ValidationEventArgs args){
+     Console.WriteLine("Invalid XSD schema: " + args.Exception.Message);
+  }  
+}
+
+    </pre> The preceding example uses the file, <b>invalid.xsd</b>, as input.<pre>
+&lt;xsd:schema xmlns:xsd='http://www.w3.org/2001/XMLSchema' &gt;
+ &lt;xsd:complexType name="personName"&gt;
+        &lt;xsd:sequence&gt;
+            &lt;xsd:element name="title" minOccurs="0" maxOccurs="1"/&gt;
+            &lt;xsd:element name="forename" minOccurs="0" maxOccurs="unbounded"/&gt;
+            &lt;xsd:element name="surname"/&gt;
+        &lt;/xsd:sequence&gt;
+    &lt;/xsd:complexType&gt;
+
+   &lt;xsd:complexType name="simpleName"&gt;
+        &lt;xsd:complexContent&gt;
+            &lt;xsd:restriction base="personName"&gt;
+                &lt;xsd:sequence&gt;
+                    &lt;xsd:element name="title" minOccurs="0" maxOccurs="0"/&gt;
+                    &lt;xsd:element name="firstname" minOccurs="1" maxOccurs="1"/&gt;
+                    &lt;xsd:element name="surname"/&gt;
+                &lt;/xsd:sequence&gt;
+            &lt;/xsd:restriction&gt;
+        &lt;/xsd:complexContent&gt;
+    &lt;/xsd:complexType&gt;
+
+&lt;/xsd:schema&gt;
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

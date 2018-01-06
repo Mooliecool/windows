@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.IDisposable</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.IDisposable Interface</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Defines a method to release allocated unmanaged resources.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public interface IDisposable
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The garbage collector automatically releases the memory allocated to a managed object when that object is no longer used, however, it is unpredictable when garbage collection will occur. Furthermore, the garbage collector has no knowledge of unmanaged resources such as window handles, and open files and streams.<p> Use the  <a href="#Dispose">IDisposable.Dispose</a> method of this interface to explicitly release unmanaged resources in conjunction with the garbage collector. The consumer of an object can call this method when the object is no longer needed.</p>
+<p> It is a version breaking change to add the  <a href="../../System/types/IDisposable.html">IDisposable</a> interface to an existing class, as it changes the semantics of the class.</p>
+<p> For a detailed discussion about how this interface and the  <a href="../../System/types/Object.html#Finalize">Object.Finalize</a> method are used, see the  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconprogrammingessentialsforgarbagecollection.asp">MSDN: programmingessentialsforgarbagecollection</a> and  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconimplementingdisposemethod.asp">MSDN: implementingdisposemethod</a> topics.</p>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System/System.html">System Namespace</a></dd>
+</dl>
+<h3>System.IDisposable Member List: </h3>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Dispose">Dispose</a></td>
+<td width="55%"> Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<hr>
+<h3>System.IDisposable Member Details</h3><b>Method: <i><a name="DisposeTopic1"></a><a name="Dispose">Dispose</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            void Dispose();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Use this method to close or release unmanaged resources such as files, streams, and handles held by an instance of the class that implements this interface. This method is, by convention, used for all tasks associated with freeing resources held by an object, or preparing an object for reuse.<p> When implementing this method, objects must seek to ensure that all held resources are freed by propagating the call through the containment hierarchy. For example, if an object A allocates an object B, and object B allocates an object C, then A's  <a href="#Dispose">IDisposable.Dispose</a> implementation must call  <a href="#Dispose">IDisposable.Dispose</a> on B, which must in turn call  <a href="#Dispose">IDisposable.Dispose</a> on C. Objects must also call the  <a href="#Dispose">IDisposable.Dispose</a> method of their base class if the base class implements  <a href="../../System/types/IDisposable.html">IDisposable</a>.</p>
+<p> If an object's  <a href="#Dispose">IDisposable.Dispose</a> method is called more than once, the object must ignore all calls after the first one. The object must not throw an exception if its  <a href="#Dispose">IDisposable.Dispose</a> method is called multiple times. <a href="#Dispose">IDisposable.Dispose</a> can throw an exception if an error occurs because a resource has already been freed and  <a href="#Dispose">IDisposable.Dispose</a> had not been called previously.</p>
+<p> A resource type might use a particular convention to denote an allocated state versus a freed state. An example of this is stream classes, which are traditionally thought of as open or closed. Classes that have such conventions might choose to implement a public method with a customized name, such as Close, which calls the  <a href="#Dispose">IDisposable.Dispose</a> method.</p>
+<p> Because the  <a href="#Dispose">IDisposable.Dispose</a> method must be called explicitly, objects that implement  <a href="../../System/types/IDisposable.html">IDisposable</a> must also implement a finalizer to handle freeing resources when  <a href="#Dispose">IDisposable.Dispose</a> is not called. By default, the garbage collector will automatically call an object's finalizer prior to reclaiming its memory. However, once the  <a href="#Dispose">IDisposable.Dispose</a> method has been called, it is typically unnecessary for the garbage collector to call the disposed object's finalizer. To prevent automatic finalization,  <a href="#Dispose">IDisposable.Dispose</a> implementations can call the  <a href="../../System/types/GC.html#SuppressFinalize(System.Object)">GC.SuppressFinalize</a> method.</p>
+<p> For more information on implementing finalizers, see the  <a href="../../System/types/GC.html">GC</a> class and the  <a href="../../System/types/Object.html#Finalize">Object.Finalize</a> method.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

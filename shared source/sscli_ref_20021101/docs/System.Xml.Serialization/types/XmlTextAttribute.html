@@ -1,0 +1,1117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Xml.Serialization.XmlTextAttribute</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Xml.Serialization.XmlTextAttribute Class</h2><b>Assembly: </b>System.Xml.dll<br><b>Namespace: </b>System.Xml.Serialization<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Indicates to the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> that the member should be treated as XML text when the containing class is serialized or deserialized.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.ReturnValue)]<br><b>public class XmlTextAttribute : Attribute</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> belongs to a family of attributes that controls how the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes and deserializes an object (through its  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Serialize(System.IO.TextWriter,System.Object)">XmlSerializer.Serialize</a> and  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Deserialize(System.IO.Stream)">XmlSerializer.Deserialize</a> methods). See  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAttributesThatControlSerialization.asp">MSDN: attributesthatcontrolserialization</a> for a complete list of similar attributes.<p> Only one instance of the  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> class can be applied in a class.</p>
+<p> You can apply the  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> to public fields and public read/write properties that return primitive and enumeration types.</p>
+<p> You can apply the  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> to a field or property that returns an array of strings. You can also apply the attribute to an array of type  <a href="../../System/types/Object.html">Object</a> but you must set the  <a href="#Type">XmlTextAttribute.Type</a> property to string. In that case, any strings inserted into the array will be serialized as XML text.</p>
+<p> The  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> can also be applied to a field that returns an  <a href="../../System.Xml/types/XmlNode.html">XmlNode</a> or an array of  <a href="../../System.Xml/types/XmlNode.html">XmlNode</a> objects.</p>
+<p> By default, the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes a class member as an XML element. However, if you apply the  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> to a member, the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> translates its value into XML text. This means that the value will be encoded into the content of an XML element.</p>
+<p> The  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconXMLSchemaDefinitionToolXsdexe.asp">MSDN: xmlschemadefinitiontoolxsdexe</a> occasionally generates the  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> when creating classes from an XML Schema definition (XSD) file. This occurs when the schema contains a <code>
+            complexType
+          </code> with mixed content; in that case, the corresponding class will contain a member that returns a string array to which the  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> is applied. For example, when the <b>Xml Schema Definition</b> tool processes this schema: </p>
+<pre>
+          &lt;xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="" 
+          xmlns:xs="http://www.w3.org/2001/XMLSchema"&gt;
+            &lt;xs:element name="LinkList" type="LinkList" /&gt;
+            &lt;xs:complexType name="LinkList" mixed="true"&gt;
+              &lt;xs:sequence&gt;
+                &lt;xs:element minOccurs="1" maxOccurs="1" name="id" type="xs:int" /&gt;
+                &lt;xs:element minOccurs="0" maxOccurs="1" name="name" type="xs:string" /&gt;
+                &lt;xs:element minOccurs="0" maxOccurs="1" name="next" type="LinkList" /&gt;
+              &lt;/xs:sequence&gt;
+            &lt;/xs:complexType&gt;
+          &lt;/xs:schema&gt;
+        </pre>
+<p> the following class will be generated: </p>
+<pre>
+          ' Visual Basic code
+          Public Class LinkList 
+             Public id As Integer
+             Public string name
+             Public LinkList next
+             &lt;System.Xml.Serialization.XmlTextAttribute()&gt; _
+             Public Text() As string
+          End Class
+          // C# code
+          public class LinkList {
+             public int id;
+             public string name;
+             public LinkList next;
+             [System.Xml.Serialization.XmlTextAttribute()]
+             public string[] Text;
+          }
+        </pre>
+<p> For more information about using attributes, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconExtendingMetadataUsingAttributes.asp">MSDN: extendingmetadatausingattributes</a>.</p><br><br><b>Note </b> In your code, you can use the word <b>XmlText</b> instead of the longer  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a>.</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+using System;
+using System.Xml.Serialization;
+using System.IO;
+
+
+public class Group1{
+   // The XmlTextAttribute with type set to string informs the 
+   // XmlSerializer that strings should be serialized as XML text.
+   [XmlText(typeof(string))]
+   [XmlElement(typeof(int))]  
+   [XmlElement(typeof(double))]
+   public object [] All= new object []{321, "One", 2, 3.0, "Two" };
+}
+
+public class Group2{
+   [XmlText(Type = typeof(GroupType))]
+   public GroupType Type;
+}
+public enum GroupType{
+   Small,
+   Medium,
+   Large
+}
+
+public class Group3{
+   [XmlText(Type=typeof(DateTime))]
+   public DateTime CreationTime = DateTime.Now;
+}
+
+public class Test{
+   static void Main(){
+      Test t = new Test();
+      t.SerializeArray("XmlText1.xml");
+      t.SerializeEnum("XmlText2.xml");
+      t.SerializeDateTime("XmlText3.xml");
+   }
+
+   private void SerializeArray(string filename){
+      XmlSerializer ser = new XmlSerializer(typeof(Group1));
+      Group1 myGroup1 = new Group1();
+
+      TextWriter writer = new StreamWriter(filename);
+
+      ser.Serialize(writer, myGroup1);
+      writer.Close();
+   }
+
+   private void SerializeEnum(string filename){
+      XmlSerializer ser = new XmlSerializer(typeof(Group2));
+      Group2 myGroup = new Group2();
+      myGroup.Type = GroupType.Medium;
+      TextWriter writer = new StreamWriter(filename);
+
+      ser.Serialize(writer, myGroup);
+      writer.Close();
+   }
+
+   private void SerializeDateTime(string filename){
+      XmlSerializer ser = new XmlSerializer(typeof(Group3));
+      Group3 myGroup = new Group3();
+      TextWriter writer = new StreamWriter(filename);
+
+      ser.Serialize(writer, myGroup);
+      writer.Close();
+   }   
+}
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Xml.Serialization/System.Xml.Serialization.html">System.Xml.Serialization Namespace</a> |  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> |  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> |  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> |  <a href="../../System.Xml.Serialization/types/XmlAttributes.html#XmlText">XmlAttributes.XmlText</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconOverridingSerializationOfClassesWithXmlAttributeOverridesClass.asp">MSDN: overridingserializationofclasseswithxmlattributeoverridesclass</a> |  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a></dd>
+</dl>
+<h3>System.Xml.Serialization.XmlTextAttribute Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor()<br><br></code>Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(Type type)<br><br></code> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> class.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#DataType">DataType</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the XML Schema definition language (XSD) data type of the text generated by the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Type">Type</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the type of the member.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#TypeId">TypeId</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#TypeId">System.Attribute.TypeId</a></font></b><br><br><br> When implemented in a derived class, gets a unique identifier for this <b>Attribute</b>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#GetHashCode">System.Attribute.GetHashCode</a></font></b><br><br><br> Returns the hash code for this instance.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsDefaultAttribute">IsDefaultAttribute</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#IsDefaultAttribute">System.Attribute.IsDefaultAttribute</a></font></b><br><br><br> When overridden in a derived class, returns an indication whether the value of this instance is the default value for the derived class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Match(System.Object)">Match</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#Match(System.Object)">System.Attribute.Match</a></font></b><br><br><br> When overridden in a derived class, returns a value indicating whether this instance equals a specified object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/Attribute.html">System.Attribute</a></li>
+<ul class="none">
+<li><b>System.Xml.Serialization.XmlTextAttribute</b></li>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Xml.Serialization.XmlTextAttribute Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> class.</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlTextAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> You can override the way that the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes a public field or public read/write property by creating an  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a>, and setting its  <a href="../../System.Xml.Serialization/types/XmlAttributes.html#XmlText">XmlAttributes.XmlText</a> property to an  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a>. For more details, see the  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> class.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes a class that contains a public field, named <code>
+                Comment
+              </code>. The example applies an  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> to the field, thereby overriding its serialization as an XML element, and instead serializing it as XML text.<pre>
+using System;
+using System.IO;
+using System.Xml.Serialization;
+using System.Xml.Schema;
+using System.Xml;
+
+
+public class Group {
+    public string GroupName;
+    public string Comment;
+}
+
+public class Test {
+    public static void Main() {
+        Test t = new Test();
+        t.SerializerOrder("TextOverride.xml");
+    }
+    /* Create an instance of the XmlSerializer class that overrides 
+       the default way it serializes an object. */
+    public XmlSerializer CreateOverrider() {
+        /* Create instances of the XmlAttributes and 
+        XmlAttributeOverrides classes. */
+   
+        XmlAttributes attrs = new XmlAttributes();
+
+        XmlAttributeOverrides xOver = new XmlAttributeOverrides();
+              
+        /* Create an XmlTextAttribute to override the default 
+        serialization process. */
+        XmlTextAttribute xText = new XmlTextAttribute();
+        attrs.XmlText = xText;
+
+        // Add the XmlAttributes to the XmlAttributeOverrides.
+        xOver.Add(typeof(Group), "Comment", attrs);
+
+        // Create the XmlSerializer, and return it.
+        XmlSerializer xSer = new XmlSerializer(typeof(Group), xOver);
+        return xSer;
+    }
+
+    public void SerializerOrder(string filename) {
+        // Create an XmlSerializer instance.
+        XmlSerializer xSer = CreateOverrider();
+
+        // Create the object and serialize it.
+        Group myGroup = new Group();
+        myGroup.Comment = "This is a great product.";
+      
+        TextWriter writer = new StreamWriter(filename);
+        xSer.Serialize(writer, myGroup);
+    }
+}
+   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlTextAttribute(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>type</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>type</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Type.html">Type</a> of the member to be serialized.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> You can override the way that the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes a public field or public read/write property by creating an  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a>, and setting its  <a href="../../System.Xml.Serialization/types/XmlAttributes.html#XmlText">XmlAttributes.XmlText</a> property to an  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a>. For more details, see the  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> class.</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+using System;
+using System.Xml.Serialization;
+using System.IO;
+
+
+public class Group1{
+   // The XmlTextAttribute with type set to string informs the 
+   // XmlSerializer that strings should be serialized as XML text.
+   [XmlText(typeof(string))]
+   [XmlElement(typeof(int))]  
+   [XmlElement(typeof(double))]
+   public object [] All= new object []{321, "One", 2, 3.0, "Two" };
+}
+
+public class Group2{
+   [XmlText(Type = typeof(GroupType))]
+   public GroupType Type;
+}
+public enum GroupType{
+   Small,
+   Medium,
+   Large
+}
+
+public class Group3{
+   [XmlText(Type=typeof(DateTime))]
+   public DateTime CreationTime = DateTime.Now;
+}
+
+public class Test{
+   static void Main(){
+      Test t = new Test();
+      t.SerializeArray("XmlText1.xml");
+      t.SerializeEnum("XmlText2.xml");
+      t.SerializeDateTime("XmlText3.xml");
+   }
+
+   private void SerializeArray(string filename){
+      XmlSerializer ser = new XmlSerializer(typeof(Group1));
+      Group1 myGroup1 = new Group1();
+
+      TextWriter writer = new StreamWriter(filename);
+
+      ser.Serialize(writer, myGroup1);
+      writer.Close();
+   }
+
+   private void SerializeEnum(string filename){
+      XmlSerializer ser = new XmlSerializer(typeof(Group2));
+      Group2 myGroup = new Group2();
+      myGroup.Type = GroupType.Medium;
+      TextWriter writer = new StreamWriter(filename);
+
+      ser.Serialize(writer, myGroup);
+      writer.Close();
+   }
+
+   private void SerializeDateTime(string filename){
+      XmlSerializer ser = new XmlSerializer(typeof(Group3));
+      Group3 myGroup = new Group3();
+      TextWriter writer = new StreamWriter(filename);
+
+      ser.Serialize(writer, myGroup);
+      writer.Close();
+   }   
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="DataTypeTopic1"></a><a name="DataType">DataType</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the XML Schema definition language (XSD) data type of the text generated by the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> DataType {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/Exception.html">Exception</a></td>
+<td> The XML Schema data type you've specified cannot be mapped to the .NET data type.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The XML Schema data type you've specified is invalid for the property and cannot be converted to the member type.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Setting the  <a href="#DataType">XmlTextAttribute.DataType</a> property to an XML Schema simple data type affects the format of the generated XML. For example, setting the property to "date" causes the generated text to be formatted in the general date style, for example: 2001-08-31. By contrast, setting the property to "dateTime" results in a specific instant as defined by the International Organization for Standardization document 8601, "Representations of Dates and Times", for example: 2001-08-15T06:59:11.0508456-07:00.<p> The effect of setting the  <a href="#DataType">XmlTextAttribute.DataType</a> property can also be seen when using the  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconXMLSchemaDefinitionToolXsdexe.asp">MSDN: xmlschemadefinitiontoolxsdexe</a> to generate the XML Schema for a compiled file. For more information on using the tool, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconUsingXMLSchemaDefinitionTool.asp">MSDN: usingxmlschemadefinitiontool</a>.</p>
+<p> The following table lists the XML Schema simple data types with their .NET equivalents.</p>
+<p> For the XML Schema <b>base64Binary</b> and <b>hexBinary</b> data types, use an array of  <a href="../../System/types/Byte.html">Byte</a> structures, and apply a  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> with the  <a href="#DataType">XmlTextAttribute.DataType</a> set to "base64Binary" or "hexBinary", as appropriate. For the XML Schema <b>time</b> and <b>date</b> data types, use the  <a href="../../System/types/DateTime.html">DateTime</a> type and apply the  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> with the  <a href="#DataType">XmlTextAttribute.DataType</a> set to "date" or "time".</p>
+<p> For every XML Schema data type that is mapped to a string, apply the  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> with its  <a href="#DataType">XmlTextAttribute.DataType</a> property set to the XML Schema data type. Note that this will not change the serialization format, only the schema for the member.</p><br><br><b>Note </b> The property is case-sensitive, so you must set it exactly to one of the XML Schema data types.<br><br><b>Note </b> Passing binary data as an XML element is more efficient then passing it as an XML attribute.<p> For more information about XML Schema data types, see the World Wide Web Consortium (www.w3.org ) document named "XML Schema Part 2: Datatypes".</p><br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  XML Schema data type
+                </TH>
+<TH>
+                  .NET data type
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+                  anyURI
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  base64Binary
+                </TD>
+<TD> Array of  <a href="../../System/types/Byte.html">Byte</a> objects </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  boolean
+                </TD>
+<TD> <a href="../../System/types/Boolean.html">Boolean</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  byte
+                </TD>
+<TD> <a href="../../System/types/SByte.html">SByte</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  date
+                </TD>
+<TD> <a href="../../System/types/DateTime.html">DateTime</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  dateTime
+                </TD>
+<TD> <a href="../../System/types/DateTime.html">DateTime</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  decimal
+                </TD>
+<TD> <a href="../../System/types/Decimal.html">Decimal</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  double
+                </TD>
+<TD> <a href="../../System/types/Double.html">Double</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  ENTITY
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  ENTITIES
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  float
+                </TD>
+<TD> <a href="../../System/types/Single.html">Single</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  gDay
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  gMonth
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  gMonthDay
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  gYear
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  gYearMonth
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  hexBinary
+                </TD>
+<TD> Array of  <a href="../../System/types/Byte.html">Byte</a> objects </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  ID
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  IDREF
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  IDREFS
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  int
+                </TD>
+<TD> <a href="../../System/types/Int32.html">Int32</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  integer
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  language
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  long
+                </TD>
+<TD> <a href="../../System/types/Int64.html">Int64</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Name
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  NCName
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  negativeInteger
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  NMTOKEN
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  NMTOKENS
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  normalizedString
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  nonNegativeInteger
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  nonPositiveInteger
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  NOTATION
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  positiveInteger
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  QName
+                </TD>
+<TD> <a href="../../System.Xml/types/XmlQualifiedName.html">XmlQualifiedName</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  recurringDate
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  duration
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  string
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  short
+                </TD>
+<TD> <a href="../../System/types/Int16.html">Int16</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  time
+                </TD>
+<TD> <a href="../../System/types/DateTime.html">DateTime</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  token
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  unsignedByte
+                </TD>
+<TD> <a href="../../System/types/Byte.html">Byte</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  unsignedInt
+                </TD>
+<TD> <a href="../../System/types/UInt32.html">UInt32</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  unsignedLong
+                </TD>
+<TD> <a href="../../System/types/UInt64.html">UInt64</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  unsignedShort
+                </TD>
+<TD> <a href="../../System/types/UInt16.html">UInt16</a></TD>
+</TR>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+using System;
+using System.Xml.Serialization;
+using System.IO;
+
+
+public class Group1{
+   // The XmlTextAttribute with type set to string informs the 
+   // XmlSerializer that strings should be serialized as XML text.
+   [XmlText(typeof(string))]
+   [XmlElement(typeof(int))]  
+   [XmlElement(typeof(double))]
+   public object [] All= new object []{321, "One", 2, 3.0, "Two" };
+}
+
+public class Group2{
+   [XmlText(Type = typeof(GroupType))]
+   public GroupType Type;
+}
+public enum GroupType{
+   Small,
+   Medium,
+   Large
+}
+
+public class Group3{
+   [XmlText(Type=typeof(DateTime))]
+   public DateTime CreationTime = DateTime.Now;
+}
+
+public class Test{
+   static void Main(){
+      Test t = new Test();
+      t.SerializeArray("XmlText1.xml");
+      t.SerializeEnum("XmlText2.xml");
+      t.SerializeDateTime("XmlText3.xml");
+   }
+
+   private void SerializeArray(string filename){
+      XmlSerializer ser = new XmlSerializer(typeof(Group1));
+      Group1 myGroup1 = new Group1();
+
+      TextWriter writer = new StreamWriter(filename);
+
+      ser.Serialize(writer, myGroup1);
+      writer.Close();
+   }
+
+   private void SerializeEnum(string filename){
+      XmlSerializer ser = new XmlSerializer(typeof(Group2));
+      Group2 myGroup = new Group2();
+      myGroup.Type = GroupType.Medium;
+      TextWriter writer = new StreamWriter(filename);
+
+      ser.Serialize(writer, myGroup);
+      writer.Close();
+   }
+
+   private void SerializeDateTime(string filename){
+      XmlSerializer ser = new XmlSerializer(typeof(Group3));
+      Group3 myGroup = new Group3();
+      TextWriter writer = new StreamWriter(filename);
+
+      ser.Serialize(writer, myGroup);
+      writer.Close();
+   }   
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="TypeTopic1"></a><a name="Type">Type</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the type of the member.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> Type {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System/types/Type.html">Type</a> property can only be set to primitive types and enumerations.<p> The  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> can also be applied to a field that returns an  <a href="../../System.Xml/types/XmlNode.html">XmlNode</a> or an array of  <a href="../../System.Xml/types/XmlNode.html">XmlNode</a> objects.</p>
+<p> You can apply the  <a href="../../System.Xml.Serialization/types/XmlTextAttribute.html">XmlTextAttribute</a> to a field or property that returns an array of strings. You can also apply the attribute to an array of type  <a href="../../System/types/Object.html">Object</a> but you must set the  <a href="#Type">XmlTextAttribute.Type</a> property to string. In that case, any strings inserted into the array will be serialized as XML text.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+using System;
+using System.Xml.Serialization;
+using System.IO;
+
+
+public class Group1{
+   // The XmlTextAttribute with type set to string informs the 
+   // XmlSerializer that strings should be serialized as XML text.
+   [XmlText(typeof(string))]
+   [XmlElement(typeof(int))]  
+   [XmlElement(typeof(double))]
+   public object [] All= new object []{321, "One", 2, 3.0, "Two" };
+}
+
+public class Group2{
+   [XmlText(Type = typeof(GroupType))]
+   public GroupType Type;
+}
+public enum GroupType{
+   Small,
+   Medium,
+   Large
+}
+
+public class Group3{
+   [XmlText(Type=typeof(DateTime))]
+   public DateTime CreationTime = DateTime.Now;
+}
+
+public class Test{
+   static void Main(){
+      Test t = new Test();
+      t.SerializeArray("XmlText1.xml");
+      t.SerializeEnum("XmlText2.xml");
+      t.SerializeDateTime("XmlText3.xml");
+   }
+
+   private void SerializeArray(string filename){
+      XmlSerializer ser = new XmlSerializer(typeof(Group1));
+      Group1 myGroup1 = new Group1();
+
+      TextWriter writer = new StreamWriter(filename);
+
+      ser.Serialize(writer, myGroup1);
+      writer.Close();
+   }
+
+   private void SerializeEnum(string filename){
+      XmlSerializer ser = new XmlSerializer(typeof(Group2));
+      Group2 myGroup = new Group2();
+      myGroup.Type = GroupType.Medium;
+      TextWriter writer = new StreamWriter(filename);
+
+      ser.Serialize(writer, myGroup);
+      writer.Close();
+   }
+
+   private void SerializeDateTime(string filename){
+      XmlSerializer ser = new XmlSerializer(typeof(Group3));
+      Group3 myGroup = new Group3();
+      TextWriter writer = new StreamWriter(filename);
+
+      ser.Serialize(writer, myGroup);
+      writer.Close();
+   }   
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="TypeIdTopic1"></a><a name="TypeId">TypeId</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#TypeId">System.Attribute.TypeId</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When implemented in a derived class, gets a unique identifier for this <b>Attribute</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> TypeId {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> As implemented, this identifier is merely the  <a href="../../System/types/Type.html">Type</a> of the attribute. However, it is intended that the unique identifier be used to identify two attributes of the same type.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~XmlTextAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#GetHashCode">System.Attribute.GetHashCode</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the hash code for this instance.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A 32-bit signed integer hash code.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IsDefaultAttributeTopic1"></a><a name="IsDefaultAttribute">IsDefaultAttribute</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#IsDefaultAttribute">System.Attribute.IsDefaultAttribute</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, returns an indication whether the value of this instance is the default value for the derived class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsDefaultAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if this instance is the default attribute for the class; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The default implementation of this class returns <b>false</b>, and must be implemented in the derived class to be useful to that class.<p> The implementation of this method in a derived class compares the value of this instance to a standard, default value obtained by some means, then returns a Boolean value that indicates whether the value of this instance is equal to the standard. The standard value is typically coded as a constant in the implementation, or stored programmatically in a field used by the implementation.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MatchTopic1"></a><a name="Match(System.Object)">Match</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#Match(System.Object)">System.Attribute.Match</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, returns a value indicating whether this instance equals a specified object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Match(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> An  <a href="../../System/types/Object.html">Object</a> to compare with this instance of <b>Attribute</b>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if this instance equals <i>obj</i>; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method determines if one <b>Attribute</b> equals another. Its default implementation is the same as  <a href="#Equals(System.Object)">Attribute.Equals</a>, which performs a value and reference comparison. Override this method to implement support for attribute values, such as flags or bitfields, that consist of components that are meaningful in themselves. For example, consider an attribute whose value is a binary field divided into a bitfield of flags. Two instances of this attribute have one flag in set in common while all the other flags differ. The <b>Equal</b> method cannot determine that the two instances have the same flag set, but the <b>Match</b> method can.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

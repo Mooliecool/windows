@@ -1,0 +1,3045 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Collections.SortedList</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Collections.SortedList Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Collections<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Represents a collection of key-and-value pairs that are sorted by the keys and are accessible by key and by index.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public class SortedList : IDictionary, ICollection, IEnumerable, ICloneable</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Thread Safety</b><br><dl>
+<dd> Public static (non-instance) members of this type are safe for multithreaded operations. Instance members are not guaranteed to be thread-safe.<p> A  <a href="../../System.Collections/types/SortedList.html">SortedList</a> can safely support multiple readers concurrently, as long as the collection is not modified. To guarantee the thread safety of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>, all operations must be done through the wrapper returned by the  <a href="#Synchronized(System.Collections.SortedList)">SortedList.Synchronized</a> method.</p>
+<p> Enumerating through a collection is intrinsically not a thread-safe procedure. Even when a collection is synchronized, other threads could still modify the collection, which causes the enumerator to throw an exception. To guarantee thread safety during enumeration, you can either lock the collection during the entire enumeration or catch the exceptions resulting from changes made by other threads.</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> A  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is a hybrid between a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> and an  <a href="../../System/types/Array.html">Array</a>. When an element is accessed by its key using the  <a href="#Item(System.Object)">SortedList.Item</a> indexer property, it behaves like a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>. When an element is accessed by its index using  <a href="#GetByIndex(System.Int32)">SortedList.GetByIndex</a> or  <a href="#SetByIndex(System.Int32,System.Object)">SortedList.SetByIndex</a>, it behaves like an  <a href="../../System/types/Array.html">Array</a>.<p> A  <a href="../../System.Collections/types/SortedList.html">SortedList</a> internally maintains two arrays to store the elements of the list; that is, one array for the keys and another array for the associated values. Each element is a key-and-value pair that can be accessed as a  <a href="../../System.Collections/types/DictionaryEntry.html">DictionaryEntry</a> object.</p>
+<p> The capacity of a  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is the number of elements that the list can hold. As elements are added to a  <a href="../../System.Collections/types/SortedList.html">SortedList</a>, the capacity is automatically increased as required through reallocation. The capacity can be decreased by calling  <a href="#TrimToSize">SortedList.TrimToSize</a> or by setting the  <a href="#Capacity">SortedList.Capacity</a> property explicitly.</p>
+<p> The elements of a  <a href="../../System.Collections/types/SortedList.html">SortedList</a> are sorted by the keys either according to a specific  <a href="../../System.Collections/types/IComparer.html">IComparer</a> implementation specified when the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is created or according to the  <a href="../../System/types/IComparable.html">IComparable</a> implementation provided by the keys themselves. In either case, a  <a href="../../System.Collections/types/SortedList.html">SortedList</a> does not allow duplicate keys.</p>
+<p> The index sequence is based on the sort sequence. When an element is added, it is inserted into  <a href="../../System.Collections/types/SortedList.html">SortedList</a> in the correct sort order, and the indexing adjusts accordingly. When an element removed, the indexing also adjusts accordingly. Therefore, the index of a specific key-and-value pair might change as elements are added or removed from the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</p>
+<p> Operations on a  <a href="../../System.Collections/types/SortedList.html">SortedList</a> tend to be slower than operations on a  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> because of the sorting. However, the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> offers more flexibility by allowing access to the values either through the associated keys or through the indexes.</p>
+<p> A key cannot be <b>null</b>, but a value can be <b>null</b>.</p>
+<p> Indexes in this collection are zero-based.</p>
+<p> The <b>foreach</b> statement of the C# language requires the type of each element in the collection. Since each element of the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> is a key-and-value pair, the element type is not the type of the key or the type of the value. Instead, the element type is  <a href="../../System.Collections/types/DictionaryEntry.html">DictionaryEntry</a>. For example: <code>
+            foreach (DictionaryEntry myEntry in myHashtable) {...}
+          </code></p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to create and initialize a  <a href="../../System.Collections/types/SortedList.html">SortedList</a> and how to print out its keys and values.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesSortedList  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new SortedList.
+       SortedList mySL = new SortedList();
+       mySL.Add("First", "Hello");
+       mySL.Add("Second", "World");
+       mySL.Add("Third", "!");
+ 
+       // Displays the properties and values of the SortedList.
+       Console.WriteLine( "mySL" );
+       Console.WriteLine( "  Count:    {0}", mySL.Count );
+       Console.WriteLine( "  Capacity: {0}", mySL.Capacity );
+       Console.WriteLine( "  Keys and Values:" );
+       PrintKeysAndValues( mySL );
+    }
+ 
+ 
+    public static void PrintKeysAndValues( SortedList myList )  {
+       Console.WriteLine( "\t-KEY-\t-VALUE-" );
+       for ( int i = 0; i &lt; myList.Count; i++ )  {
+          Console.WriteLine( "\t{0}:\t{1}", myList.GetKey(i), myList.GetByIndex(i) );
+       }
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ mySL
+   Count:    3
+   Capacity: 16
+   Keys and Values:
+     -KEY-    -VALUE-
+     First:    Hello
+     Second:    World
+     Third:    !
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Collections/System.Collections.html">System.Collections Namespace</a> |  <a href="../../System/types/IComparable.html">IComparable</a> |  <a href="../../System.Collections/types/IComparer.html">IComparer</a> |  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> |  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a></dd>
+</dl>
+<h3>System.Collections.SortedList Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor()<br><br></code>Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Initializes a new instance of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> class that is empty, has the default initial capacity and is sorted according to the  <a href="../../System/types/IComparable.html">IComparable</a> interface implemented by each key added to the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(IComparer comparer)<br><br></code> Initializes a new instance of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> class that is empty, has the default initial capacity and is sorted according to the specified  <a href="../../System.Collections/types/IComparer.html">IComparer</a> interface.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor3">ctor #3</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(IDictionary d)<br><br></code> Initializes a new instance of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> class that contains elements copied from the specified dictionary, has the same initial capacity as the number of elements copied and is sorted according to the  <a href="../../System/types/IComparable.html">IComparable</a> interface implemented by each key.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor4">ctor #4</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(int initialCapacity)<br><br></code> Initializes a new instance of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> class that is empty, has the specified initial capacity and is sorted according to the  <a href="../../System/types/IComparable.html">IComparable</a> interface implemented by each key added to the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor5">ctor #5</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(IComparer comparer, int capacity)<br><br></code> Initializes a new instance of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> class that is empty, has the specified initial capacity and is sorted according to the specified  <a href="../../System.Collections/types/IComparer.html">IComparer</a> interface.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor6">ctor #6</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(IDictionary d, IComparer comparer)<br><br></code> Initializes a new instance of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> class that contains elements copied from the specified dictionary, has the same initial capacity as the number of elements copied and is sorted according to the specified  <a href="../../System.Collections/types/IComparer.html">IComparer</a> interface.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Capacity">Capacity</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the capacity of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Count">Count</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the number of elements contained in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsFixedSize">IsFixedSize</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a value indicating whether the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> has a fixed size.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsReadOnly">IsReadOnly</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a value indicating whether the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is read-only.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsSynchronized">IsSynchronized</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a value indicating whether access to the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is synchronized (thread-safe).</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Item(System.Object)">Item</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets and sets the value associated with a specific key in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Keys">Keys</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the keys in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SyncRoot">SyncRoot</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets an object that can be used to synchronize access to the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Values">Values</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the values in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Add(System.Object,System.Object)">Add</a></td>
+<td width="55%"> Adds an element with the specified key and value to the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Clear">Clear</a></td>
+<td width="55%"> Removes all elements from the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Clone">Clone</a></td>
+<td width="55%"> Creates a shallow copy of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Contains(System.Object)">Contains</a></td>
+<td width="55%"> Determines whether the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> contains a specific key.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ContainsKey(System.Object)">ContainsKey</a></td>
+<td width="55%"> Determines whether the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> contains a specific key.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ContainsValue(System.Object)">ContainsValue</a></td>
+<td width="55%"> Determines whether the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> contains a specific value.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#CopyTo(System.Array,System.Int32)">CopyTo</a></td>
+<td width="55%"> Copies the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> elements to a one-dimensional  <a href="../../System/types/Array.html">Array</a> instance at the specified index.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetByIndex(System.Int32)">GetByIndex</a></td>
+<td width="55%"> Gets the value at the specified index of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetEnumerator">GetEnumerator</a></td>
+<td width="55%"> Returns an  <a href="../../System.Collections/types/IDictionaryEnumerator.html">IDictionaryEnumerator</a> that can iterate through the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetKey(System.Int32)">GetKey</a></td>
+<td width="55%"> Gets the key at the specified index of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetKeyList">GetKeyList</a></td>
+<td width="55%"> Gets the keys in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetValueList">GetValueList</a></td>
+<td width="55%"> Gets the values in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IndexOfKey(System.Object)">IndexOfKey</a></td>
+<td width="55%"> Returns the zero-based index of the specified key in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IndexOfValue(System.Object)">IndexOfValue</a></td>
+<td width="55%"> Returns the zero-based index of the first occurrence of the specified value in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Remove(System.Object)">Remove</a></td>
+<td width="55%"> Removes the element with the specified key from  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#RemoveAt(System.Int32)">RemoveAt</a></td>
+<td width="55%"> Removes the element at the specified index of  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#SetByIndex(System.Int32,System.Object)">SetByIndex</a></td>
+<td width="55%"> Replaces the value at a specific index in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Synchronized(System.Collections.SortedList)">Synchronized</a></td>
+<td width="55%"> Returns a synchronized (thread-safe) wrapper for the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#TrimToSize">TrimToSize</a></td>
+<td width="55%"> Sets the capacity to the actual number of elements in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Explicit Interface Implementations </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#IEnumerable.GetEnumerator">IEnumerable.GetEnumerator</a></td>
+<td width="55%"> Returns an  <a href="../../System.Collections/types/IEnumerator.html">IEnumerator</a> that can iterate through the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Collections.SortedList</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Collections.SortedList Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> class that is empty, has the default initial capacity and is sorted according to the  <a href="../../System/types/IComparable.html">IComparable</a> interface implemented by each key added to the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public SortedList();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The initial capacity is the starting capacity of the new  <a href="../../System.Collections/types/SortedList.html">SortedList</a>. The default initial capacity for a  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is 16.<p> If the number of elements added to the list reaches the current capacity, the capacity is automatically doubled.</p>
+<p> Each key must implement the  <a href="../../System/types/IComparable.html">IComparable</a> interface to be capable of comparisons with every other key in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>. The elements are sorted according to the  <a href="../../System/types/IComparable.html">IComparable</a> implementation of each key added to the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/IComparable.html">IComparable</a> |  <a href="#Capacity">SortedList.Capacity</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> class that is empty, has the default initial capacity and is sorted according to the specified  <a href="../../System.Collections/types/IComparer.html">IComparer</a> interface.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public SortedList(<br>   <font color="#008080"><a href="../../System.Collections/types/IComparer.html">IComparer</a> <i>comparer</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>comparer</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/IComparer.html">IComparer</a> implementation to use when comparing keys.<p> -or- </p>
+<p><b>null</b> to use the  <a href="../../System/types/IComparable.html">IComparable</a> implementation of each key.</p> The  <a href="../../System.Collections/types/IComparer.html">IComparer</a> implementation to use when comparing keys.<p> -or- </p>
+<p><b>null</b> to use the  <a href="../../System/types/IComparable.html">IComparable</a> implementation of each key.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The initial capacity is the starting capacity of the new  <a href="../../System.Collections/types/SortedList.html">SortedList</a>. The default initial capacity for a  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is 16.<p> If the number of elements added to the list reaches the current capacity, the capacity is automatically doubled.</p>
+<p> The elements are sorted according to the specified  <a href="../../System.Collections/types/IComparer.html">IComparer</a> implementation. If <i>comparer</i> is <b>null</b>, the  <a href="../../System/types/IComparable.html">IComparable</a> implementation of each key is used; therefore, each key must implement the  <a href="../../System/types/IComparable.html">IComparable</a> interface to be capable of comparisons with every other key in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/IComparer.html">IComparer</a> |  <a href="../../System/types/IComparable.html">IComparable</a> |  <a href="#Capacity">SortedList.Capacity</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic3"></a><a name="ctor3">ctor #3</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> class that contains elements copied from the specified dictionary, has the same initial capacity as the number of elements copied and is sorted according to the  <a href="../../System/types/IComparable.html">IComparable</a> interface implemented by each key.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public SortedList(<br>   <font color="#008080"><a href="../../System.Collections/types/IDictionary.html">IDictionary</a> <i>d</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>d</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> to copy to a new  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>d</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td> One or more elements in <i>d</i> do not implement the  <a href="../../System/types/IComparable.html">IComparable</a> interface.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The initial capacity is the starting capacity of the new  <a href="../../System.Collections/types/SortedList.html">SortedList</a>. When adding elements to the list, if the number of elements exceeds the current capacity, the capacity is automatically doubled.<p> Each key must implement the  <a href="../../System/types/IComparable.html">IComparable</a> interface to be capable of comparisons with every other key in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>. The elements are sorted according to the  <a href="../../System/types/IComparable.html">IComparable</a> implementation of each key added to the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</p>
+<p> A  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> is an example of an  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> implementation that can be passed to this constructor. The new  <a href="../../System.Collections/types/SortedList.html">SortedList</a> contains a copy of the keys and values stored in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> |  <a href="../../System/types/IComparable.html">IComparable</a> |  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> |  <a href="#Capacity">SortedList.Capacity</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic4"></a><a name="ctor4">ctor #4</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> class that is empty, has the specified initial capacity and is sorted according to the  <a href="../../System/types/IComparable.html">IComparable</a> interface implemented by each key added to the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public SortedList(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>initialCapacity</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>initialCapacity</i><br><dl>
+<dd>
+<param> The initial number of elements that the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> can contain.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>initialCapacity</i> is less than zero.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The initial capacity is the starting capacity of the new  <a href="../../System.Collections/types/SortedList.html">SortedList</a>. The default initial capacity for a  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is 16.<p> If the number of elements added to the list reaches the current capacity, the capacity is automatically doubled. Therefore, if the size of the collection can be estimated, specifying the initial capacity eliminates the need to perform a number of resizing operations while adding elements to the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</p>
+<p> Each key must implement the  <a href="../../System/types/IComparable.html">IComparable</a> interface to be capable of comparisons with every other key in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>. The elements are sorted according to the  <a href="../../System/types/IComparable.html">IComparable</a> implementation of each key added to the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/IComparable.html">IComparable</a> |  <a href="#Capacity">SortedList.Capacity</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic5"></a><a name="ctor5">ctor #5</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> class that is empty, has the specified initial capacity and is sorted according to the specified  <a href="../../System.Collections/types/IComparer.html">IComparer</a> interface.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public SortedList(<br>   <font color="#008080"><a href="../../System.Collections/types/IComparer.html">IComparer</a> <i>comparer</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>capacity</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>comparer</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/IComparer.html">IComparer</a> implementation to use when comparing keys.<p> -or- </p>
+<p><b>null</b> to use the  <a href="../../System/types/IComparable.html">IComparable</a> implementation of each key.</p> The  <a href="../../System.Collections/types/IComparer.html">IComparer</a> implementation to use when comparing keys.<p> -or- </p>
+<p><b>null</b> to use the  <a href="../../System/types/IComparable.html">IComparable</a> implementation of each key.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>capacity</i><br><dl>
+<dd>
+<param> The initial number of elements that the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> can contain.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>initialCapacity</i> is less than zero.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The initial capacity is the starting capacity of the new  <a href="../../System.Collections/types/SortedList.html">SortedList</a>. The default initial capacity for a  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is 16.<p> If the number of elements added to the list reaches the current capacity, the capacity is automatically doubled. Therefore, if the size of the collection can be estimated, specifying the initial capacity eliminates the need to perform a number of resizing operations while adding elements to the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</p>
+<p> The elements are sorted according to the specified  <a href="../../System.Collections/types/IComparer.html">IComparer</a> implementation. If <i>comparer</i> is <b>null</b>, the  <a href="../../System/types/IComparable.html">IComparable</a> implementation of each key is used; therefore, each key must implement the  <a href="../../System/types/IComparable.html">IComparable</a> interface to be capable of comparisons with every other key in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/IComparer.html">IComparer</a> |  <a href="../../System/types/IComparable.html">IComparable</a> |  <a href="#Capacity">SortedList.Capacity</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic6"></a><a name="ctor6">ctor #6</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> class that contains elements copied from the specified dictionary, has the same initial capacity as the number of elements copied and is sorted according to the specified  <a href="../../System.Collections/types/IComparer.html">IComparer</a> interface.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public SortedList(<br>   <font color="#008080"><a href="../../System.Collections/types/IDictionary.html">IDictionary</a> <i>d</i>,</font><br>   <font color="#008080"><a href="../../System.Collections/types/IComparer.html">IComparer</a> <i>comparer</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>d</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> to copy to a new  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>comparer</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/IComparer.html">IComparer</a> implementation to use when comparing keys.<p> -or- </p>
+<p><b>null</b> to use the  <a href="../../System/types/IComparable.html">IComparable</a> implementation of each key.</p> The  <a href="../../System.Collections/types/IComparer.html">IComparer</a> implementation to use when comparing keys.<p> -or- </p>
+<p><b>null</b> to use the  <a href="../../System/types/IComparable.html">IComparable</a> implementation of each key.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>d</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td><i>comparer</i> is <b>null</b>, and one or more elements in <i>d</i> do not implement the  <a href="../../System/types/IComparable.html">IComparable</a> interface.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The initial capacity is the starting capacity of the new  <a href="../../System.Collections/types/SortedList.html">SortedList</a>. When adding elements to the list, if the number of elements exceeds the current capacity, the capacity is automatically doubled.<p> The elements are sorted according to the specified  <a href="../../System.Collections/types/IComparer.html">IComparer</a> implementation. If <i>comparer</i> is <b>null</b>, the  <a href="../../System/types/IComparable.html">IComparable</a> implementation of each key is used; therefore, each key must implement the  <a href="../../System/types/IComparable.html">IComparable</a> interface to be capable of comparisons with every other key in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</p>
+<p> A  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> is an example of an  <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> implementation that can be passed to this constructor. The new  <a href="../../System.Collections/types/SortedList.html">SortedList</a> contains a copy of the keys and values stored in the  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/IDictionary.html">IDictionary</a> |  <a href="../../System.Collections/types/IComparer.html">IComparer</a> |  <a href="../../System/types/IComparable.html">IComparable</a> |  <a href="../../System.Collections/types/Hashtable.html">Hashtable</a> |  <a href="#Capacity">SortedList.Capacity</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CapacityTopic1"></a><a name="Capacity">Capacity</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the capacity of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> Capacity {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The value assigned is less than the current number of elements in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> If the number of elements added to the list reaches the current capacity, the capacity is automatically doubled.<p> When  <a href="#Capacity">SortedList.Capacity</a> is set, the internal arrays are reallocated to accommodate the new capacity.</p>
+<p> <a href="#TrimToSize">SortedList.TrimToSize</a> can also be used to reduce the capacity of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#TrimToSize">SortedList.TrimToSize</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="CountTopic1"></a><a name="Count">Count</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the number of elements contained in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> Count {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/ICollection.html#Count">ICollection.Count</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> Each element is a key-and-value pair that can be accessed as a  <a href="../../System.Collections/types/DictionaryEntry.html">DictionaryEntry</a> object.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Capacity">SortedList.Capacity</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsFixedSizeTopic1"></a><a name="IsFixedSize">IsFixedSize</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> has a fixed size.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsFixedSize {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#IsFixedSize">IDictionary.IsFixedSize</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> A collection with a fixed size does not allow the addition or removal of elements after the collection is created, but it allows the modification of existing elements.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsReadOnlyTopic1"></a><a name="IsReadOnly">IsReadOnly</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is read-only.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsReadOnly {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#IsReadOnly">IDictionary.IsReadOnly</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> A collection that is read-only does not allow the addition, removal, or modification of elements after the collection is created.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsSynchronizedTopic1"></a><a name="IsSynchronized">IsSynchronized</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value indicating whether access to the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is synchronized (thread-safe).</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsSynchronized {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/ICollection.html#IsSynchronized">ICollection.IsSynchronized</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> To guarantee the thread safety of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>, all operations must be done through the wrapper returned by the  <a href="#Synchronized(System.Collections.SortedList)">SortedList.Synchronized</a> method.<p> Enumerating through a collection is intrinsically not a thread-safe procedure. Even when a collection is synchronized, other threads could still modify the collection, which causes the enumerator to throw an exception. To guarantee thread safety during enumeration, you can either lock the collection during the entire enumeration or catch the exceptions resulting from changes made by other threads.</p>
+<p> The following code example shows how to lock the collection using the  <a href="#SyncRoot">SortedList.SyncRoot</a> during the entire enumeration: </p>
+<pre>
+              SortedList myCollection = new SortedList();
+               lock( myCollection.SyncRoot ) {
+               foreach ( Object item in myCollection ) {
+               // Insert your code here.
+               }
+              }
+            </pre>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to synchronize a  <a href="../../System.Collections/types/SortedList.html">SortedList</a>, determine if a  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is synchronized and use a synchronized  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesSortedList  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new SortedList.
+       SortedList mySL = new SortedList();
+       mySL.Add( 0, "zero" );
+       mySL.Add( 1, "one" );
+       mySL.Add( 2, "two" );
+       mySL.Add( 3, "three" );
+       mySL.Add( 4, "four" );
+ 
+       // Creates a synchronized wrapper around the SortedList.
+       SortedList mySyncdSL = SortedList.Synchronized( mySL );
+ 
+       // Displays the sychronization status of both SortedLists.
+       Console.WriteLine( "mySL is {0}.", mySL.IsSynchronized ? "synchronized" : "not synchronized" );
+       Console.WriteLine( "mySyncdSL is {0}.", mySyncdSL.IsSynchronized ? "synchronized" : "not synchronized" );
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ mySL is not synchronized.
+ mySyncdSL is synchronized.
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#SyncRoot">SortedList.SyncRoot</a> |  <a href="#Synchronized(System.Collections.SortedList)">SortedList.Synchronized</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ItemTopic1"></a><a name="Item(System.Object)">Item</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets and sets the value associated with a specific key in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> this[object key] {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>key</i><br><dl>
+<dd>
+<param> The key associated with the value to get or set.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>key</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The property is set and the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is read-only.<p> -or- </p>
+<p> The property is set, <i>key</i> does not exist in the collection, and the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> has a fixed size.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The comparer throws an exception.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Item">IDictionary.Item</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> If setting the value of <i>key</i> and <i>key</i> does not exist in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>, a new element is created with the specified key and the specified value.<p> A value in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> can be <b>null</b>. To distinguish between a null that is returned because the specified key is not found and a null that is returned because the value of the specified key is <b>null</b>, use the  <a href="#Contains(System.Object)">SortedList.Contains</a> method or the  <a href="#ContainsKey(System.Object)">SortedList.ContainsKey</a> method to determine if the key exists in the list.</p>
+<p> This property provides the ability to access a specific element in the collection by using the following syntax: <code>
+                myCollection[key]
+              </code>.</p>
+<p> When setting this property, if the specified key already exists in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>, the value is replaced; otherwise, a new element is created. In contrast, the  <a href="#Add(System.Object,System.Object)">SortedList.Add</a> method does not modify existing elements.</p>
+<p> The elements of a  <a href="../../System.Collections/types/SortedList.html">SortedList</a> are sorted by the keys either according to a specific  <a href="../../System.Collections/types/IComparer.html">IComparer</a> implementation specified when the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is created or according to the  <a href="../../System/types/IComparable.html">IComparable</a> implementation provided by the keys themselves.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Add(System.Object,System.Object)">SortedList.Add</a> |  <a href="#Contains(System.Object)">SortedList.Contains</a> |  <a href="#ContainsKey(System.Object)">SortedList.ContainsKey</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="KeysTopic1"></a><a name="Keys">Keys</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the keys in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System.Collections/types/ICollection.html">ICollection</a> Keys {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Keys">IDictionary.Keys</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Collections/types/ICollection.html">ICollection</a> is a read-only view of the keys of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>. Modifications made to the underlying  <a href="../../System.Collections/types/SortedList.html">SortedList</a> are immediately reflected in the  <a href="../../System.Collections/types/ICollection.html">ICollection</a>.<p> The elements of the  <a href="../../System.Collections/types/ICollection.html">ICollection</a> are sorted in the same order as the keys of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</p>
+<p> Similar to  <a href="#GetKeyList">SortedList.GetKeyList</a>, but returns an  <a href="../../System.Collections/types/ICollection.html">ICollection</a> instead of an  <a href="../../System.Collections/types/IList.html">IList</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/ICollection.html">ICollection</a> |  <a href="#Values">SortedList.Values</a> |  <a href="#GetKeyList">SortedList.GetKeyList</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="SyncRootTopic1"></a><a name="SyncRoot">SyncRoot</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets an object that can be used to synchronize access to the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> SyncRoot {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/ICollection.html#SyncRoot">ICollection.SyncRoot</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> To create a synchronized version of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>, use the  <a href="#Synchronized(System.Collections.SortedList)">SortedList.Synchronized</a> method. However, derived classes can provide their own synchronized version of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> using the  <a href="#SyncRoot">SortedList.SyncRoot</a> property. The synchronizing code must perform operations on the  <a href="#SyncRoot">SortedList.SyncRoot</a> of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>, not directly on the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>. This ensures proper operation of collections that are derived from other objects. Specifically, it maintains proper synchronization with other threads that might be simultaneously modifying the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> object.<p> Enumerating through a collection is intrinsically not a thread-safe procedure. Even when a collection is synchronized, other threads could still modify the collection, which causes the enumerator to throw an exception. To guarantee thread safety during enumeration, you can either lock the collection during the entire enumeration or catch the exceptions resulting from changes made by other threads.</p>
+<p> The following code example shows how to lock the collection using the  <a href="#SyncRoot">SortedList.SyncRoot</a> during the entire enumeration: </p>
+<pre>
+              SortedList myCollection = new SortedList();
+               lock( myCollection.SyncRoot ) {
+               foreach ( Object item in myCollection ) {
+               // Insert your code here.
+               }
+              }
+            </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#IsSynchronized">SortedList.IsSynchronized</a> |  <a href="#Synchronized(System.Collections.SortedList)">SortedList.Synchronized</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ValuesTopic1"></a><a name="Values">Values</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the values in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System.Collections/types/ICollection.html">ICollection</a> Values {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Values">IDictionary.Values</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Collections/types/ICollection.html">ICollection</a> is a read-only view of the values of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>. Modifications made to the underlying  <a href="../../System.Collections/types/SortedList.html">SortedList</a> are immediately reflected in the  <a href="../../System.Collections/types/ICollection.html">ICollection</a>.<p> The elements of the  <a href="../../System.Collections/types/ICollection.html">ICollection</a> are sorted in the same order as the values of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</p>
+<p> Similar to  <a href="#GetValueList">SortedList.GetValueList</a>, but returns an  <a href="../../System.Collections/types/ICollection.html">ICollection</a> instead of an  <a href="../../System.Collections/types/IList.html">IList</a>.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/ICollection.html">ICollection</a> |  <a href="#Keys">SortedList.Keys</a> |  <a href="#GetValueList">SortedList.GetValueList</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="AddTopic1"></a><a name="Add(System.Object,System.Object)">Add</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Adds an element with the specified key and value to the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void Add(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>key</i><br><dl>
+<dd>
+<param> The key of the element to add.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The value of the element to add.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>key</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td> An element with the specified <i>key</i> already exists in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.<p> -or- </p>
+<p> The  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is set to use the  <a href="../../System/types/IComparable.html">IComparable</a> interface, and <i>key</i> does not implement the  <a href="../../System/types/IComparable.html">IComparable</a> interface.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is read-only.<p> -or- </p>
+<p> The  <a href="../../System.Collections/types/SortedList.html">SortedList</a> has a fixed size.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The comparer throws an exception.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Add(System.Object,System.Object)">IDictionary.Add</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> If the number of elements added to the list reaches the current capacity, the capacity is automatically doubled. The insertion point is determined based on the comparer selected, either explicitly or by default when the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> was created.<p> The  <a href="#Item(System.Object)">SortedList.Item</a> property can also be used to add new elements by setting the value of a key that does not exist in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>. For example: <code>
+                myCollection["myNonexistentKey"] = myValue
+              </code>. However, if the specified key already exists in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>, setting the  <a href="#Item(System.Object)">SortedList.Item</a> property overwrites the old value. In contrast, the  <a href="#Add(System.Object,System.Object)">SortedList.Add</a> method does not modify existing elements.</p>
+<p> The elements of a  <a href="../../System.Collections/types/SortedList.html">SortedList</a> are sorted by the keys either according to a specific  <a href="../../System.Collections/types/IComparer.html">IComparer</a> implementation specified when the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is created or according to the  <a href="../../System/types/IComparable.html">IComparable</a> implementation provided by the keys themselves.</p>
+<p> A key cannot be <b>null</b>, but a value can.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to add elements to the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesSortedList  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new SortedList.
+       SortedList mySL = new SortedList();
+       mySL.Add( "one", "The" );
+       mySL.Add( "two", "quick" );
+       mySL.Add( "three", "brown" );
+       mySL.Add( "four", "fox" );
+ 
+       // Displays the SortedList.
+       Console.WriteLine( "The SortedList contains the following:" );
+       PrintKeysAndValues( mySL );
+    }
+ 
+ 
+    public static void PrintKeysAndValues( SortedList myList )  {
+       Console.WriteLine( "\t-KEY-\t-VALUE-" );
+       for ( int i = 0; i &lt; myList.Count; i++ )  {
+          Console.WriteLine( "\t{0}:\t{1}", myList.GetKey(i), myList.GetByIndex(i) );
+       }
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ The SortedList contains the following:
+     -KEY-    -VALUE-
+     four:    fox
+     one:    The
+     three:    brown
+     two:    quick
+ */
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Item(System.Object)">SortedList.Item</a> |  <a href="../../System.Collections/types/IComparer.html">IComparer</a> |  <a href="../../System/types/IComparable.html">IComparable</a> |  <a href="#Capacity">SortedList.Capacity</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ClearTopic1"></a><a name="Clear">Clear</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Removes all elements from the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void Clear();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is read-only.<p> -or- </p>
+<p> The  <a href="../../System.Collections/types/SortedList.html">SortedList</a> has a fixed size.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Clear">IDictionary.Clear</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#Count">SortedList.Count</a> is set to zero. <a href="#Capacity">SortedList.Capacity</a> remains unchanged. To reset the capacity of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>, call  <a href="#TrimToSize">SortedList.TrimToSize</a> or set the  <a href="#Capacity">SortedList.Capacity</a> property directly. Trimming an empty  <a href="../../System.Collections/types/SortedList.html">SortedList</a> sets the capacity of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> to the default capacity, not zero.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to trim the unused portions of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> and how to clear the values of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesSortedList  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new SortedList.
+       SortedList mySL = new SortedList();
+       mySL.Add( "one", "The" );
+       mySL.Add( "two", "quick" );
+       mySL.Add( "three", "brown" );
+       mySL.Add( "four", "fox" );
+       mySL.Add( "five", "jumped" );
+ 
+       // Displays the count, capacity and values of the SortedList.
+       Console.WriteLine( "Initially," );
+       Console.WriteLine( "   Count    : {0}", mySL.Count );
+       Console.WriteLine( "   Capacity : {0}", mySL.Capacity );
+       Console.WriteLine( "   Values:" );
+       PrintKeysAndValues( mySL );
+ 
+       // Trims the SortedList.
+       mySL.TrimToSize();
+ 
+       // Displays the count, capacity and values of the SortedList.
+       Console.WriteLine( "After TrimToSize," );
+       Console.WriteLine( "   Count    : {0}", mySL.Count );
+       Console.WriteLine( "   Capacity : {0}", mySL.Capacity );
+       Console.WriteLine( "   Values:" );
+       PrintKeysAndValues( mySL );
+ 
+       // Clears the SortedList.
+       mySL.Clear();
+ 
+       // Displays the count, capacity and values of the SortedList.
+       Console.WriteLine( "After Clear," );
+       Console.WriteLine( "   Count    : {0}", mySL.Count );
+       Console.WriteLine( "   Capacity : {0}", mySL.Capacity );
+       Console.WriteLine( "   Values:" );
+       PrintKeysAndValues( mySL );
+ 
+       // Trims the SortedList again.
+       mySL.TrimToSize();
+ 
+       // Displays the count, capacity and values of the SortedList.
+       Console.WriteLine( "After the second TrimToSize," );
+       Console.WriteLine( "   Count    : {0}", mySL.Count );
+       Console.WriteLine( "   Capacity : {0}", mySL.Capacity );
+       Console.WriteLine( "   Values:" );
+       PrintKeysAndValues( mySL );
+    }
+ 
+ 
+    public static void PrintKeysAndValues( SortedList myList )  {
+       Console.WriteLine( "\t-KEY-\t-VALUE-" );
+       for ( int i = 0; i &lt; myList.Count; i++ )  {
+          Console.WriteLine( "\t{0}:\t{1}", myList.GetKey(i), myList.GetByIndex(i) );
+       }
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ Initially,
+    Count    : 5
+    Capacity : 16
+    Values:
+     -KEY-    -VALUE-
+     five:    jumped
+     four:    fox
+     one:    The
+     three:    brown
+     two:    quick
+ 
+ After TrimToSize,
+    Count    : 5
+    Capacity : 5
+    Values:
+     -KEY-    -VALUE-
+     five:    jumped
+     four:    fox
+     one:    The
+     three:    brown
+     two:    quick
+ 
+ After Clear,
+    Count    : 0
+    Capacity : 16
+    Values:
+     -KEY-    -VALUE-
+ 
+ After the second TrimToSize,
+    Count    : 0
+    Capacity : 16
+    Values:
+     -KEY-    -VALUE-
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#TrimToSize">SortedList.TrimToSize</a> |  <a href="#Capacity">SortedList.Capacity</a> |  <a href="#Count">SortedList.Count</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CloneTopic1"></a><a name="Clone">Clone</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates a shallow copy of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> Clone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A shallow copy of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System/types/ICloneable.html#Clone">ICloneable.Clone</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> A shallow copy of a collection copies only the elements of the collection, whether they are reference types or value types, but it does not copy the objects that the references refer to. The references in the new collection point to the same objects that the references in the original collection point to.<p> In contrast, a deep copy of a collection copies the elements and everything directly or indirectly referenced by the elements.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#CopyTo(System.Array,System.Int32)">SortedList.CopyTo</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ContainsTopic1"></a><a name="Contains(System.Object)">Contains</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines whether the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> contains a specific key.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Contains(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>key</i><br><dl>
+<dd>
+<param> The key to locate in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> contains an element with the specified <i>key</i>; otherwise, <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>key</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The comparer throws an exception.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Contains(System.Object)">IDictionary.Contains</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The elements of a  <a href="../../System.Collections/types/SortedList.html">SortedList</a> are sorted by the keys either according to a specific  <a href="../../System.Collections/types/IComparer.html">IComparer</a> implementation specified when the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is created or according to the  <a href="../../System/types/IComparable.html">IComparable</a> implementation provided by the keys themselves.<p> This method uses a binary search algorithm; therefore, the average execution time is proportional to <i>Log2</i> (<i>n</i>), where <i>n</i> is  <a href="#Count">SortedList.Count</a>.</p>
+<p> <a href="#Contains(System.Object)">SortedList.Contains</a> implements  <a href="../../System.Collections/types/IDictionary.html#Contains(System.Object)">IDictionary.Contains</a>. It behaves exactly as  <a href="#ContainsKey(System.Object)">SortedList.ContainsKey</a>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to determine whether the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> contains a specific element.<pre>
+ using System;
+ using System.Collections;
+ 
+ public class SamplesSortedList  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new SortedList.
+       SortedList mySL = new SortedList();
+       mySL.Add( 0, "zero" );
+       mySL.Add( 1, "one" );
+       mySL.Add( 2, "two" );
+       mySL.Add( 3, "three" );
+       mySL.Add( 4, "four" );
+ 
+       // Displays the values of the SortedList.
+       Console.WriteLine( "The SortedList contains the following values:" );
+       PrintIndexAndKeysAndValues( mySL );
+ 
+       // Searches for a specific key.
+       int myKey = 2;
+       Console.WriteLine( "The key \"{0}\" is {1}.", myKey, mySL.ContainsKey( myKey ) ? "in the SortedList" : "NOT in the SortedList" );
+       myKey = 6;
+       Console.WriteLine( "The key \"{0}\" is {1}.", myKey, mySL.ContainsKey( myKey ) ? "in the SortedList" : "NOT in the SortedList" );
+ 
+       // Searches for a specific value.
+       String myValue = "three";
+       Console.WriteLine( "The value \"{0}\" is {1}.", myValue, mySL.ContainsValue( myValue ) ? "in the SortedList" : "NOT in the SortedList" );
+       myValue = "nine";
+       Console.WriteLine( "The value \"{0}\" is {1}.", myValue, mySL.ContainsValue( myValue ) ? "in the SortedList" : "NOT in the SortedList" );
+    }
+ 
+ 
+    public static void PrintIndexAndKeysAndValues( SortedList myList )  {
+       Console.WriteLine( "\t-INDEX-\t-KEY-\t-VALUE-" );
+       for ( int i = 0; i &lt; myList.Count; i++ )  {
+          Console.WriteLine( "\t[{0}]:\t{1}\t{2}", i, myList.GetKey(i), myList.GetByIndex(i) );
+       }
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ The SortedList contains the following values:
+     -INDEX-    -KEY-    -VALUE-
+     [0]:    0    zero
+     [1]:    1    one
+     [2]:    2    two
+     [3]:    3    three
+     [4]:    4    four
+ 
+ The key "2" is in the SortedList.
+ The key "6" is NOT in the SortedList.
+ The value "three" is in the SortedList.
+ The value "nine" is NOT in the SortedList.
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#ContainsKey(System.Object)">SortedList.ContainsKey</a> |  <a href="#IndexOfKey(System.Object)">SortedList.IndexOfKey</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ContainsKeyTopic1"></a><a name="ContainsKey(System.Object)">ContainsKey</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines whether the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> contains a specific key.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> ContainsKey(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>key</i><br><dl>
+<dd>
+<param> The key to locate in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> contains an element with the specified <i>key</i>; otherwise, <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>key</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The comparer throws an exception.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The elements of a  <a href="../../System.Collections/types/SortedList.html">SortedList</a> are sorted by the keys either according to a specific  <a href="../../System.Collections/types/IComparer.html">IComparer</a> implementation specified when the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is created or according to the  <a href="../../System/types/IComparable.html">IComparable</a> implementation provided by the keys themselves.<p> This method uses a binary search algorithm; therefore, the average execution time is proportional to <i>Log2</i> (<i>n</i>), where <i>n</i> is  <a href="#Count">SortedList.Count</a>.</p>
+<p> This method behaves exactly as  <a href="#Contains(System.Object)">SortedList.Contains</a>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to determine whether the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> contains a specific element.<pre>
+ using System;
+ using System.Collections;
+ 
+ public class SamplesSortedList  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new SortedList.
+       SortedList mySL = new SortedList();
+       mySL.Add( 0, "zero" );
+       mySL.Add( 1, "one" );
+       mySL.Add( 2, "two" );
+       mySL.Add( 3, "three" );
+       mySL.Add( 4, "four" );
+ 
+       // Displays the values of the SortedList.
+       Console.WriteLine( "The SortedList contains the following values:" );
+       PrintIndexAndKeysAndValues( mySL );
+ 
+       // Searches for a specific key.
+       int myKey = 2;
+       Console.WriteLine( "The key \"{0}\" is {1}.", myKey, mySL.ContainsKey( myKey ) ? "in the SortedList" : "NOT in the SortedList" );
+       myKey = 6;
+       Console.WriteLine( "The key \"{0}\" is {1}.", myKey, mySL.ContainsKey( myKey ) ? "in the SortedList" : "NOT in the SortedList" );
+ 
+       // Searches for a specific value.
+       String myValue = "three";
+       Console.WriteLine( "The value \"{0}\" is {1}.", myValue, mySL.ContainsValue( myValue ) ? "in the SortedList" : "NOT in the SortedList" );
+       myValue = "nine";
+       Console.WriteLine( "The value \"{0}\" is {1}.", myValue, mySL.ContainsValue( myValue ) ? "in the SortedList" : "NOT in the SortedList" );
+    }
+ 
+ 
+    public static void PrintIndexAndKeysAndValues( SortedList myList )  {
+       Console.WriteLine( "\t-INDEX-\t-KEY-\t-VALUE-" );
+       for ( int i = 0; i &lt; myList.Count; i++ )  {
+          Console.WriteLine( "\t[{0}]:\t{1}\t{2}", i, myList.GetKey(i), myList.GetByIndex(i) );
+       }
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ The SortedList contains the following values:
+     -INDEX-    -KEY-    -VALUE-
+     [0]:    0    zero
+     [1]:    1    one
+     [2]:    2    two
+     [3]:    3    three
+     [4]:    4    four
+ 
+ The key "2" is in the SortedList.
+ The key "6" is NOT in the SortedList.
+ The value "three" is in the SortedList.
+ The value "nine" is NOT in the SortedList.
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Contains(System.Object)">SortedList.Contains</a> |  <a href="#ContainsValue(System.Object)">SortedList.ContainsValue</a> |  <a href="#IndexOfKey(System.Object)">SortedList.IndexOfKey</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ContainsValueTopic1"></a><a name="ContainsValue(System.Object)">ContainsValue</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines whether the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> contains a specific value.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> ContainsValue(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The value to locate in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> contains an element with the specified <i>value</i>; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method performs a linear search; therefore, the average execution time is proportional to  <a href="#Count">SortedList.Count</a>. That is, this method is an O(<i>n</i>) operation, where <i>n</i> is  <a href="#Count">SortedList.Count</a>.<p> The values of the elements of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> are compared to the specified value using the  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a> method.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to determine whether the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> contains a specific element.<pre>
+ using System;
+ using System.Collections;
+ 
+ public class SamplesSortedList  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new SortedList.
+       SortedList mySL = new SortedList();
+       mySL.Add( 0, "zero" );
+       mySL.Add( 1, "one" );
+       mySL.Add( 2, "two" );
+       mySL.Add( 3, "three" );
+       mySL.Add( 4, "four" );
+ 
+       // Displays the values of the SortedList.
+       Console.WriteLine( "The SortedList contains the following values:" );
+       PrintIndexAndKeysAndValues( mySL );
+ 
+       // Searches for a specific key.
+       int myKey = 2;
+       Console.WriteLine( "The key \"{0}\" is {1}.", myKey, mySL.ContainsKey( myKey ) ? "in the SortedList" : "NOT in the SortedList" );
+       myKey = 6;
+       Console.WriteLine( "The key \"{0}\" is {1}.", myKey, mySL.ContainsKey( myKey ) ? "in the SortedList" : "NOT in the SortedList" );
+ 
+       // Searches for a specific value.
+       String myValue = "three";
+       Console.WriteLine( "The value \"{0}\" is {1}.", myValue, mySL.ContainsValue( myValue ) ? "in the SortedList" : "NOT in the SortedList" );
+       myValue = "nine";
+       Console.WriteLine( "The value \"{0}\" is {1}.", myValue, mySL.ContainsValue( myValue ) ? "in the SortedList" : "NOT in the SortedList" );
+    }
+ 
+ 
+    public static void PrintIndexAndKeysAndValues( SortedList myList )  {
+       Console.WriteLine( "\t-INDEX-\t-KEY-\t-VALUE-" );
+       for ( int i = 0; i &lt; myList.Count; i++ )  {
+          Console.WriteLine( "\t[{0}]:\t{1}\t{2}", i, myList.GetKey(i), myList.GetByIndex(i) );
+       }
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ The SortedList contains the following values:
+     -INDEX-    -KEY-    -VALUE-
+     [0]:    0    zero
+     [1]:    1    one
+     [2]:    2    two
+     [3]:    3    three
+     [4]:    4    four
+ 
+ The key "2" is in the SortedList.
+ The key "6" is NOT in the SortedList.
+ The value "three" is in the SortedList.
+ The value "nine" is NOT in the SortedList.
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#ContainsKey(System.Object)">SortedList.ContainsKey</a> |  <a href="#IndexOfValue(System.Object)">SortedList.IndexOfValue</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CopyToTopic1"></a><a name="CopyTo(System.Array,System.Int32)">CopyTo</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Array.html">Array</a> <i>array</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>arrayIndex</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Copies the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> elements to a one-dimensional  <a href="../../System/types/Array.html">Array</a> instance at the specified index.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void CopyTo(<br>   <font color="#008080"><a href="../../System/types/Array.html">Array</a> <i>array</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>arrayIndex</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>array</i><br><dl>
+<dd>
+<param> The one-dimensional  <a href="../../System/types/Array.html">Array</a> that is the destination of the  <a href="../../System.Collections/types/DictionaryEntry.html">DictionaryEntry</a> objects copied from  <a href="../../System.Collections/types/SortedList.html">SortedList</a>. The  <a href="../../System/types/Array.html">Array</a> must have zero-based indexing.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>arrayIndex</i><br><dl>
+<dd>
+<param> The zero-based index in <i>array</i> at which copying begins.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>array</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>arrayIndex</i> is less than zero.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentException.html">ArgumentException</a></td>
+<td><i>array</i> is multidimensional.<p> -or- </p>
+<p><i>arrayIndex</i> is equal to or greater than the length of <i>array</i>.</p>
+<p> -or- </p>
+<p> The number of elements in the source  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is greater than the available space from <i>arrayIndex</i> to the end of the destination <i>array</i>.</p>
+</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidCastException.html">InvalidCastException</a></td>
+<td> The type of the source  <a href="../../System.Collections/types/SortedList.html">SortedList</a> cannot be cast automatically to the type of the destination <i>array</i>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/ICollection.html#CopyTo(System.Array,System.Int32)">ICollection.CopyTo</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> The key-and-value pairs are copied to the  <a href="../../System/types/Array.html">Array</a> in the same order in which the enumerator iterates through the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.<p> To copy only the keys in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>, use <code>
+                SortedList.Keys.CopyTo
+              </code>.</p>
+<p> To copy only the values in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>, use <code>
+                SortedList.Values.CopyTo
+              </code>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to copy the values in a  <a href="../../System.Collections/types/SortedList.html">SortedList</a> into a one-dimensional  <a href="../../System/types/Array.html">Array</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesSortedList  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes the source SortedList.
+       SortedList mySourceList = new SortedList();
+       mySourceList.Add( 0, "three" );
+       mySourceList.Add( 1, "napping" );
+       mySourceList.Add( 2, "cats" );
+       mySourceList.Add( 3, "in" );
+       mySourceList.Add( 4, "the" );
+       mySourceList.Add( 5, "barn" );
+ 
+       // Creates and initializes the one-dimensional target Array.
+       Array myTargetArray=Array.CreateInstance( typeof(String), 15 );
+       myTargetArray.SetValue( "The", 0 );
+       myTargetArray.SetValue( "quick", 1 );
+       myTargetArray.SetValue( "brown", 2 );
+       myTargetArray.SetValue( "fox", 3 );
+       myTargetArray.SetValue( "jumped", 4 );
+       myTargetArray.SetValue( "over", 5 );
+       myTargetArray.SetValue( "the", 6 );
+       myTargetArray.SetValue( "lazy", 7 );
+       myTargetArray.SetValue( "dog", 8 );
+ 
+       // Displays the values of the target Array.
+       Console.WriteLine( "The target Array contains the following (before and after copying):" );
+       PrintValues( myTargetArray, ' ' );
+ 
+       // Copies the entire source SortedList to the target SortedList, starting at index 6.
+       mySourceList.CopyTo( myTargetArray, 6 );
+ 
+       // Displays the values of the target Array.
+       PrintValues( myTargetArray, ' ' );
+    }
+ 
+ 
+    public static void PrintValues( Array myArr, char mySeparator )  {
+       System.Collections.IEnumerator myEnumerator = myArr.GetEnumerator();
+       int i = 0;
+       int cols = myArr.GetLength( myArr.Rank - 1 );
+       while ( myEnumerator.MoveNext() )  {
+          if ( i &lt; cols )  {
+             i++;
+          } else  {
+             Console.WriteLine();
+             i = 1;
+          }
+          Console.Write( "{0}{1}", mySeparator, myEnumerator.Current );
+       }
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ The target Array contains the following (before and after copying):
+  The quick brown fox jumped over the lazy dog      
+  The quick brown fox jumped over three napping cats in the barn
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System/types/Array.html">Array</a> |  <a href="../../System.Collections/types/DictionaryEntry.html">DictionaryEntry</a> |  <a href="#GetEnumerator">SortedList.GetEnumerator</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~SortedList();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetByIndexTopic1"></a><a name="GetByIndex(System.Int32)">GetByIndex</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the value at the specified index of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> GetByIndex(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The zero-based index of the value to get.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The value at the specified index of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>index</i> is outside the range of valid indexes for the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The index sequence is based on the sort sequence. When an element is added, it is inserted into  <a href="../../System.Collections/types/SortedList.html">SortedList</a> in the correct sort order, and the indexing adjusts accordingly. When an element removed, the indexing also adjusts accordingly. Therefore, the index of a specific key-and-value pair might change as elements are added or removed from the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to get one or all the keys or values in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesSortedList  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new SortedList.
+       SortedList mySL = new SortedList();
+       mySL.Add( 1.0, "The" );
+       mySL.Add( 1.1, "quick" );
+       mySL.Add( 1.2, "brown" );
+       mySL.Add( 1.3, "fox" );
+       mySL.Add( 1.4, "jumped" );
+       mySL.Add( 1.5, "over" );
+       mySL.Add( 1.6, "the" );
+       mySL.Add( 1.7, "lazy" );
+       mySL.Add( 1.8, "dog" );
+ 
+       // Gets the key and the value based on the index.
+       int myIndex=3;
+       Console.WriteLine( "The key   at index {0} is {1}.", myIndex, mySL.GetKey( myIndex ) );
+       Console.WriteLine( "The value at index {0} is {1}.", myIndex, mySL.GetByIndex( myIndex ) );
+ 
+       // Gets the list of keys and the list of values.
+       IList myKeyList = mySL.GetKeyList();
+       IList myValueList = mySL.GetValueList();
+ 
+       // Prints the keys in the first column and the values in the second column.
+       Console.WriteLine( "\t-KEY-\t-VALUE-" );
+       for ( int i = 0; i &lt; mySL.Count; i++ )
+          Console.WriteLine( "\t{0}\t{1}", myKeyList[i], myValueList[i] );
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ The key   at index 3 is 1.3.
+ The value at index 3 is fox.
+     -KEY-    -VALUE-
+     1    The
+     1.1    quick
+     1.2    brown
+     1.3    fox
+     1.4    jumped
+     1.5    over
+     1.6    the
+     1.7    lazy
+     1.8    dog
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#IndexOfKey(System.Object)">SortedList.IndexOfKey</a> |  <a href="#IndexOfValue(System.Object)">SortedList.IndexOfValue</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetEnumeratorTopic1"></a><a name="GetEnumerator">GetEnumerator</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns an  <a href="../../System.Collections/types/IDictionaryEnumerator.html">IDictionaryEnumerator</a> that can iterate through the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System.Collections/types/IDictionaryEnumerator.html">IDictionaryEnumerator</a> GetEnumerator();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An  <a href="../../System.Collections/types/IDictionaryEnumerator.html">IDictionaryEnumerator</a> for the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#GetEnumerator">IDictionary.GetEnumerator</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> Enumerators only allow reading the data in the collection. Enumerators cannot be used to modify the underlying collection.<p> Initially, the enumerator is positioned before the first element in the collection. <a href="../../System.Collections/types/IEnumerator.html#Reset">IEnumerator.Reset</a> also brings the enumerator back to this position. At this position, calling  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> throws an exception. Therefore, you must call  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> to advance the enumerator to the first element of the collection before reading the value of  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a>.</p>
+<p> <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> returns the same object until either  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> or  <a href="../../System.Collections/types/IEnumerator.html#Reset">IEnumerator.Reset</a> is called. <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> sets  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> to the next element.</p>
+<p> After the end of the collection is passed, the enumerator is positioned after the last element in the collection, and calling  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> returns <b>false</b>. If the last call to  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> returned <b>false</b>, calling  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> throws an exception. To set  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> to the first element of the collection again, you can call  <a href="../../System.Collections/types/IEnumerator.html#Reset">IEnumerator.Reset</a> followed by  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a>.</p>
+<p> An enumerator remains valid as long as the collection remains unchanged. If changes are made to the collection, such as adding, modifying or deleting elements, the enumerator is irrecoverably invalidated and the next call to  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> or  <a href="../../System.Collections/types/IEnumerator.html#Reset">IEnumerator.Reset</a> throws an  <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a>. If the collection is modified between  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> and  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a>,  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> will return the element that it is set to, even if the enumerator is already invalidated.</p>
+<p> The enumerator does not have exclusive access to the collection; therefore, enumerating through a collection is intrinsically not a thread-safe procedure. Even when a collection is synchronized, other threads could still modify the collection, which causes the enumerator to throw an exception. To guarantee thread safety during enumeration, you can either lock the collection during the entire enumeration or catch the exceptions resulting from changes made by other threads.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/IDictionaryEnumerator.html">IDictionaryEnumerator</a> |  <a href="../../System.Collections/types/IEnumerator.html">IEnumerator</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetKeyTopic1"></a><a name="GetKey(System.Int32)">GetKey</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the key at the specified index of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> GetKey(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The zero-based index of the key to get.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The key at the specified index of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>index</i> is outside the range of valid indexes for the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The index sequence is based on the sort sequence. When an element is added, it is inserted into  <a href="../../System.Collections/types/SortedList.html">SortedList</a> in the correct sort order, and the indexing adjusts accordingly. When an element removed, the indexing also adjusts accordingly. Therefore, the index of a specific key-and-value pair might change as elements are added or removed from the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to get one or all the keys or values in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesSortedList  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new SortedList.
+       SortedList mySL = new SortedList();
+       mySL.Add( 1.0, "The" );
+       mySL.Add( 1.1, "quick" );
+       mySL.Add( 1.2, "brown" );
+       mySL.Add( 1.3, "fox" );
+       mySL.Add( 1.4, "jumped" );
+       mySL.Add( 1.5, "over" );
+       mySL.Add( 1.6, "the" );
+       mySL.Add( 1.7, "lazy" );
+       mySL.Add( 1.8, "dog" );
+ 
+       // Gets the key and the value based on the index.
+       int myIndex=3;
+       Console.WriteLine( "The key   at index {0} is {1}.", myIndex, mySL.GetKey( myIndex ) );
+       Console.WriteLine( "The value at index {0} is {1}.", myIndex, mySL.GetByIndex( myIndex ) );
+ 
+       // Gets the list of keys and the list of values.
+       IList myKeyList = mySL.GetKeyList();
+       IList myValueList = mySL.GetValueList();
+ 
+       // Prints the keys in the first column and the values in the second column.
+       Console.WriteLine( "\t-KEY-\t-VALUE-" );
+       for ( int i = 0; i &lt; mySL.Count; i++ )
+          Console.WriteLine( "\t{0}\t{1}", myKeyList[i], myValueList[i] );
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ The key   at index 3 is 1.3.
+ The value at index 3 is fox.
+     -KEY-    -VALUE-
+     1    The
+     1.1    quick
+     1.2    brown
+     1.3    fox
+     1.4    jumped
+     1.5    over
+     1.6    the
+     1.7    lazy
+     1.8    dog
+ */ 
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetKeyListTopic1"></a><a name="GetKeyList">GetKeyList</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the keys in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System.Collections/types/IList.html">IList</a> GetKeyList();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An  <a href="../../System.Collections/types/IList.html">IList</a> containing the keys in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The returned  <a href="../../System.Collections/types/IList.html">IList</a> is a read-only view of the keys of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>. Modifications made to the underlying  <a href="../../System.Collections/types/SortedList.html">SortedList</a> are immediately reflected in the  <a href="../../System.Collections/types/IList.html">IList</a>.<p> The elements of the returned  <a href="../../System.Collections/types/IList.html">IList</a> are sorted in the same order as the keys of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</p>
+<p> Similar to  <a href="#Keys">SortedList.Keys</a>, but returns an  <a href="../../System.Collections/types/IList.html">IList</a> instead of an  <a href="../../System.Collections/types/ICollection.html">ICollection</a>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to get one or all the keys or values in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesSortedList  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new SortedList.
+       SortedList mySL = new SortedList();
+       mySL.Add( 1.0, "The" );
+       mySL.Add( 1.1, "quick" );
+       mySL.Add( 1.2, "brown" );
+       mySL.Add( 1.3, "fox" );
+       mySL.Add( 1.4, "jumped" );
+       mySL.Add( 1.5, "over" );
+       mySL.Add( 1.6, "the" );
+       mySL.Add( 1.7, "lazy" );
+       mySL.Add( 1.8, "dog" );
+ 
+       // Gets the key and the value based on the index.
+       int myIndex=3;
+       Console.WriteLine( "The key   at index {0} is {1}.", myIndex, mySL.GetKey( myIndex ) );
+       Console.WriteLine( "The value at index {0} is {1}.", myIndex, mySL.GetByIndex( myIndex ) );
+ 
+       // Gets the list of keys and the list of values.
+       IList myKeyList = mySL.GetKeyList();
+       IList myValueList = mySL.GetValueList();
+ 
+       // Prints the keys in the first column and the values in the second column.
+       Console.WriteLine( "\t-KEY-\t-VALUE-" );
+       for ( int i = 0; i &lt; mySL.Count; i++ )
+          Console.WriteLine( "\t{0}\t{1}", myKeyList[i], myValueList[i] );
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ The key   at index 3 is 1.3.
+ The value at index 3 is fox.
+     -KEY-    -VALUE-
+     1    The
+     1.1    quick
+     1.2    brown
+     1.3    fox
+     1.4    jumped
+     1.5    over
+     1.6    the
+     1.7    lazy
+     1.8    dog
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/IList.html">IList</a> |  <a href="#GetValueList">SortedList.GetValueList</a> |  <a href="#Keys">SortedList.Keys</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetValueListTopic1"></a><a name="GetValueList">GetValueList</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the values in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System.Collections/types/IList.html">IList</a> GetValueList();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An  <a href="../../System.Collections/types/IList.html">IList</a> containing the values in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The returned  <a href="../../System.Collections/types/IList.html">IList</a> is a read-only view of the values of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>. Modifications made to the underlying  <a href="../../System.Collections/types/SortedList.html">SortedList</a> are immediately reflected in the  <a href="../../System.Collections/types/IList.html">IList</a>.<p> The elements of the returned  <a href="../../System.Collections/types/IList.html">IList</a> are sorted in the same order as the values of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</p>
+<p> Similar to  <a href="#Values">SortedList.Values</a>, but returns an  <a href="../../System.Collections/types/IList.html">IList</a> instead of an  <a href="../../System.Collections/types/ICollection.html">ICollection</a>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to get one or all the keys or values in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesSortedList  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new SortedList.
+       SortedList mySL = new SortedList();
+       mySL.Add( 1.0, "The" );
+       mySL.Add( 1.1, "quick" );
+       mySL.Add( 1.2, "brown" );
+       mySL.Add( 1.3, "fox" );
+       mySL.Add( 1.4, "jumped" );
+       mySL.Add( 1.5, "over" );
+       mySL.Add( 1.6, "the" );
+       mySL.Add( 1.7, "lazy" );
+       mySL.Add( 1.8, "dog" );
+ 
+       // Gets the key and the value based on the index.
+       int myIndex=3;
+       Console.WriteLine( "The key   at index {0} is {1}.", myIndex, mySL.GetKey( myIndex ) );
+       Console.WriteLine( "The value at index {0} is {1}.", myIndex, mySL.GetByIndex( myIndex ) );
+ 
+       // Gets the list of keys and the list of values.
+       IList myKeyList = mySL.GetKeyList();
+       IList myValueList = mySL.GetValueList();
+ 
+       // Prints the keys in the first column and the values in the second column.
+       Console.WriteLine( "\t-KEY-\t-VALUE-" );
+       for ( int i = 0; i &lt; mySL.Count; i++ )
+          Console.WriteLine( "\t{0}\t{1}", myKeyList[i], myValueList[i] );
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ The key   at index 3 is 1.3.
+ The value at index 3 is fox.
+     -KEY-    -VALUE-
+     1    The
+     1.1    quick
+     1.2    brown
+     1.3    fox
+     1.4    jumped
+     1.5    over
+     1.6    the
+     1.7    lazy
+     1.8    dog
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/IList.html">IList</a> |  <a href="#GetKeyList">SortedList.GetKeyList</a> |  <a href="#Values">SortedList.Values</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IndexOfKeyTopic1"></a><a name="IndexOfKey(System.Object)">IndexOfKey</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the zero-based index of the specified key in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> IndexOfKey(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>key</i><br><dl>
+<dd>
+<param> The key to locate in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The zero-based index of <i>key</i>, if <i>key</i> is found in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>; otherwise, -1.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>key</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The comparer throws an exception.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The elements of a  <a href="../../System.Collections/types/SortedList.html">SortedList</a> are sorted by the keys either according to a specific  <a href="../../System.Collections/types/IComparer.html">IComparer</a> implementation specified when the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is created or according to the  <a href="../../System/types/IComparable.html">IComparable</a> implementation provided by the keys themselves.<p> The index sequence is based on the sort sequence. When an element is added, it is inserted into  <a href="../../System.Collections/types/SortedList.html">SortedList</a> in the correct sort order, and the indexing adjusts accordingly. When an element removed, the indexing also adjusts accordingly. Therefore, the index of a specific key-and-value pair might change as elements are added or removed from the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</p>
+<p> This method uses a binary search algorithm; therefore, the average execution time is proportional to <i>Log2</i> (<i>n</i>), where <i>n</i> is  <a href="#Count">SortedList.Count</a>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to determine the index of a key or a value in a  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesSortedList  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new SortedList.
+       SortedList mySL = new SortedList();
+       mySL.Add( 0, "zero" );
+       mySL.Add( 1, "one" );
+       mySL.Add( 2, "two" );
+       mySL.Add( 3, "three" );
+       mySL.Add( 4, "four" );
+ 
+       // Displays the values of the SortedList.
+       Console.WriteLine( "The SortedList contains the following values:" );
+       PrintIndexAndKeysAndValues( mySL );
+ 
+       // Searches for a specific key.
+       int myKey = 2;
+       Console.WriteLine( "The key \"{0}\" is at index {1}.", myKey, mySL.IndexOfKey( myKey ) );
+ 
+       // Searches for a specific value.
+       String myValue = "three";
+       Console.WriteLine( "The value \"{0}\" is at index {1}.", myValue, mySL.IndexOfValue( myValue ) );
+    }
+ 
+ 
+    public static void PrintIndexAndKeysAndValues( SortedList myList )  {
+       Console.WriteLine( "\t-INDEX-\t-KEY-\t-VALUE-" );
+       for ( int i = 0; i &lt; myList.Count; i++ )  {
+          Console.WriteLine( "\t[{0}]:\t{1}\t{2}", i, myList.GetKey(i), myList.GetByIndex(i) );
+       }
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ The SortedList contains the following values:
+     -INDEX-    -KEY-    -VALUE-
+     [0]:    0    zero
+     [1]:    1    one
+     [2]:    2    two
+     [3]:    3    three
+     [4]:    4    four
+ 
+ The key "2" is at index 2.
+ The value "three" is at index 3.
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#ContainsKey(System.Object)">SortedList.ContainsKey</a> |  <a href="#IndexOfValue(System.Object)">SortedList.IndexOfValue</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IndexOfValueTopic1"></a><a name="IndexOfValue(System.Object)">IndexOfValue</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the zero-based index of the first occurrence of the specified value in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> IndexOfValue(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The value to locate in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The zero-based index of the first occurrence of <i>value</i>, if <i>value</i> is found in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>; otherwise, -1.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The index sequence is based on the sort sequence. When an element is added, it is inserted into  <a href="../../System.Collections/types/SortedList.html">SortedList</a> in the correct sort order, and the indexing adjusts accordingly. When an element removed, the indexing also adjusts accordingly. Therefore, the index of a specific key-and-value pair might change as elements are added or removed from the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.<p> The values of the elements of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> are compared to the specified value using the  <a href="../../System/types/Object.html#Equals(System.Object)">Object.Equals</a> method.</p>
+<p> This method uses a linear search; therefore, the average execution time is proportional to  <a href="#Count">SortedList.Count</a>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to determine the index of a key or a value in a  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesSortedList  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new SortedList.
+       SortedList mySL = new SortedList();
+       mySL.Add( 0, "zero" );
+       mySL.Add( 1, "one" );
+       mySL.Add( 2, "two" );
+       mySL.Add( 3, "three" );
+       mySL.Add( 4, "four" );
+ 
+       // Displays the values of the SortedList.
+       Console.WriteLine( "The SortedList contains the following values:" );
+       PrintIndexAndKeysAndValues( mySL );
+ 
+       // Searches for a specific key.
+       int myKey = 2;
+       Console.WriteLine( "The key \"{0}\" is at index {1}.", myKey, mySL.IndexOfKey( myKey ) );
+ 
+       // Searches for a specific value.
+       String myValue = "three";
+       Console.WriteLine( "The value \"{0}\" is at index {1}.", myValue, mySL.IndexOfValue( myValue ) );
+    }
+ 
+ 
+    public static void PrintIndexAndKeysAndValues( SortedList myList )  {
+       Console.WriteLine( "\t-INDEX-\t-KEY-\t-VALUE-" );
+       for ( int i = 0; i &lt; myList.Count; i++ )  {
+          Console.WriteLine( "\t[{0}]:\t{1}\t{2}", i, myList.GetKey(i), myList.GetByIndex(i) );
+       }
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ The SortedList contains the following values:
+     -INDEX-    -KEY-    -VALUE-
+     [0]:    0    zero
+     [1]:    1    one
+     [2]:    2    two
+     [3]:    3    three
+     [4]:    4    four
+ 
+ The key "2" is at index 2.
+ The value "three" is at index 3.
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#ContainsValue(System.Object)">SortedList.ContainsValue</a> |  <a href="#IndexOfKey(System.Object)">SortedList.IndexOfKey</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="RemoveTopic1"></a><a name="Remove(System.Object)">Remove</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Removes the element with the specified key from  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void Remove(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>key</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>key</i><br><dl>
+<dd>
+<param> The key of the element to remove.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>key</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is read-only.<p> -or- </p>
+<p> The  <a href="../../System.Collections/types/SortedList.html">SortedList</a> has a fixed size.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IDictionary.html#Remove(System.Object)">IDictionary.Remove</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> If the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> does not contain an element with the specified key, the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> remains unchanged. No exception is thrown.<p> In collections of contiguous elements, such as lists, the elements that follow the removed element move up to occupy the vacated spot. If the collection is indexed, the indexes of the elements that are moved are also updated. This behavior does not apply to collections where elements are conceptually grouped into buckets, such as a hashtable.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to remove elements from the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesSortedList  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new SortedList.
+       SortedList mySL = new SortedList();
+       mySL.Add( "1a", "The" );
+       mySL.Add( "1b", "quick" );
+       mySL.Add( "1c", "brown" );
+       mySL.Add( "2a", "fox" );
+       mySL.Add( "2b", "jumped" );
+       mySL.Add( "2c", "over" );
+       mySL.Add( "3a", "the" );
+       mySL.Add( "3b", "lazy" );
+       mySL.Add( "3c", "dog" );
+ 
+       // Displays the SortedList.
+       Console.WriteLine( "The SortedList initially contains the following:" );
+       PrintKeysAndValues( mySL );
+ 
+       // Removes the element with the key "3b".
+       mySL.Remove( "3b" );
+ 
+       // Displays the current state of the SortedList.
+       Console.WriteLine( "After removing \"lazy\":" );
+       PrintKeysAndValues( mySL );
+ 
+       // Removes the element at index 5.
+       mySL.RemoveAt( 5 );
+ 
+       // Displays the current state of the SortedList.
+       Console.WriteLine( "After removing the element at index 5:" );
+       PrintKeysAndValues( mySL );
+    }
+ 
+ 
+    public static void PrintKeysAndValues( SortedList myList )  {
+       Console.WriteLine( "\t-KEY-\t-VALUE-" );
+       for ( int i = 0; i &lt; myList.Count; i++ )  {
+          Console.WriteLine( "\t{0}:\t{1}", myList.GetKey(i), myList.GetByIndex(i) );
+       }
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ The SortedList initially contains the following:
+     -KEY-    -VALUE-
+     1a:    The
+     1b:    quick
+     1c:    brown
+     2a:    fox
+     2b:    jumped
+     2c:    over
+     3a:    the
+     3b:    lazy
+     3c:    dog
+ 
+ After removing "lazy":
+     -KEY-    -VALUE-
+     1a:    The
+     1b:    quick
+     1c:    brown
+     2a:    fox
+     2b:    jumped
+     2c:    over
+     3a:    the
+     3c:    dog
+ 
+ After removing the element at index 5:
+     -KEY-    -VALUE-
+     1a:    The
+     1b:    quick
+     1c:    brown
+     2a:    fox
+     2b:    jumped
+     3a:    the
+     3c:    dog
+ */
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#RemoveAt(System.Int32)">SortedList.RemoveAt</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="RemoveAtTopic1"></a><a name="RemoveAt(System.Int32)">RemoveAt</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Removes the element at the specified index of  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void RemoveAt(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The zero-based index of the element to remove.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>index</i> is outside the range of valid indexes for the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is read-only.<p> -or- </p>
+<p> The  <a href="../../System.Collections/types/SortedList.html">SortedList</a> has a fixed size.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The index sequence is based on the sort sequence. When an element is added, it is inserted into  <a href="../../System.Collections/types/SortedList.html">SortedList</a> in the correct sort order, and the indexing adjusts accordingly. When an element removed, the indexing also adjusts accordingly. Therefore, the index of a specific key-and-value pair might change as elements are added or removed from the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.<p> In collections of contiguous elements, such as lists, the elements that follow the removed element move up to occupy the vacated spot. If the collection is indexed, the indexes of the elements that are moved are also updated. This behavior does not apply to collections where elements are conceptually grouped into buckets, such as a hashtable.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to remove elements from the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesSortedList  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new SortedList.
+       SortedList mySL = new SortedList();
+       mySL.Add( "1a", "The" );
+       mySL.Add( "1b", "quick" );
+       mySL.Add( "1c", "brown" );
+       mySL.Add( "2a", "fox" );
+       mySL.Add( "2b", "jumped" );
+       mySL.Add( "2c", "over" );
+       mySL.Add( "3a", "the" );
+       mySL.Add( "3b", "lazy" );
+       mySL.Add( "3c", "dog" );
+ 
+       // Displays the SortedList.
+       Console.WriteLine( "The SortedList initially contains the following:" );
+       PrintKeysAndValues( mySL );
+ 
+       // Removes the element with the key "3b".
+       mySL.Remove( "3b" );
+ 
+       // Displays the current state of the SortedList.
+       Console.WriteLine( "After removing \"lazy\":" );
+       PrintKeysAndValues( mySL );
+ 
+       // Removes the element at index 5.
+       mySL.RemoveAt( 5 );
+ 
+       // Displays the current state of the SortedList.
+       Console.WriteLine( "After removing the element at index 5:" );
+       PrintKeysAndValues( mySL );
+    }
+ 
+ 
+    public static void PrintKeysAndValues( SortedList myList )  {
+       Console.WriteLine( "\t-KEY-\t-VALUE-" );
+       for ( int i = 0; i &lt; myList.Count; i++ )  {
+          Console.WriteLine( "\t{0}:\t{1}", myList.GetKey(i), myList.GetByIndex(i) );
+       }
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ The SortedList initially contains the following:
+     -KEY-    -VALUE-
+     1a:    The
+     1b:    quick
+     1c:    brown
+     2a:    fox
+     2b:    jumped
+     2c:    over
+     3a:    the
+     3b:    lazy
+     3c:    dog
+ 
+ After removing "lazy":
+     -KEY-    -VALUE-
+     1a:    The
+     1b:    quick
+     1c:    brown
+     2a:    fox
+     2b:    jumped
+     2c:    over
+     3a:    the
+     3c:    dog
+ 
+ After removing the element at index 5:
+     -KEY-    -VALUE-
+     1a:    The
+     1b:    quick
+     1c:    brown
+     2a:    fox
+     2b:    jumped
+     3a:    the
+     3c:    dog
+ */
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Remove(System.Object)">SortedList.Remove</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="SetByIndexTopic1"></a><a name="SetByIndex(System.Int32,System.Object)">SetByIndex</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Replaces the value at a specific index in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void SetByIndex(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>value</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The zero-based index at which to save <i>value</i>.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>value</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Object.html">Object</a> to save into the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>index</i> is outside the range of valid indexes for the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The index sequence is based on the sort sequence. When an element is added, it is inserted into  <a href="../../System.Collections/types/SortedList.html">SortedList</a> in the correct sort order, and the indexing adjusts accordingly. When an element removed, the indexing also adjusts accordingly. Therefore, the index of a specific key-and-value pair might change as elements are added or removed from the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to replace the value of an existing element in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesSortedList  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new SortedList.
+       SortedList mySL = new SortedList();
+       mySL.Add( 0, "zero" );
+       mySL.Add( 1, "one" );
+       mySL.Add( 2, "two" );
+       mySL.Add( 3, "three" );
+       mySL.Add( 4, "four" );
+ 
+       // Displays the values of the SortedList.
+       Console.WriteLine( "The SortedList contains the following values:" );
+       PrintIndexAndKeysAndValues( mySL );
+ 
+       // Replaces the values at index 3 and index 4.
+       mySL.SetByIndex( 3, "III" );
+       mySL.SetByIndex( 4, "IV" );
+ 
+       // Displays the updated values of the SortedList.
+       Console.WriteLine( "After replacing the value at index 3 and index 4," );
+       PrintIndexAndKeysAndValues( mySL );
+    }
+ 
+ 
+    public static void PrintIndexAndKeysAndValues( SortedList myList )  {
+       Console.WriteLine( "\t-INDEX-\t-KEY-\t-VALUE-" );
+       for ( int i = 0; i &lt; myList.Count; i++ )  {
+          Console.WriteLine( "\t[{0}]:\t{1}\t{2}", i, myList.GetKey(i), myList.GetByIndex(i) );
+       }
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ The SortedList contains the following values:
+     -INDEX-    -KEY-    -VALUE-
+     [0]:    0    zero
+     [1]:    1    one
+     [2]:    2    two
+     [3]:    3    three
+     [4]:    4    four
+ 
+ After replacing the value at index 3 and index 4,
+     -INDEX-    -KEY-    -VALUE-
+     [0]:    0    zero
+     [1]:    1    one
+     [2]:    2    two
+     [3]:    3    III
+     [4]:    4    IV
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#IndexOfKey(System.Object)">SortedList.IndexOfKey</a> |  <a href="#IndexOfValue(System.Object)">SortedList.IndexOfValue</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="SynchronizedTopic1"></a><a name="Synchronized(System.Collections.SortedList)">Synchronized</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System.Collections/types/SortedList.html">SortedList</a> <i>list</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns a synchronized (thread-safe) wrapper for the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public static <a href="../../System.Collections/types/SortedList.html">SortedList</a> Synchronized(<br>   <font color="#008080"><a href="../../System.Collections/types/SortedList.html">SortedList</a> <i>list</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>list</i><br><dl>
+<dd>
+<param> The  <a href="../../System.Collections/types/SortedList.html">SortedList</a> to synchronize.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A synchronized (thread-safe) wrapper for the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>list</i> is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> To guarantee the thread safety of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>, all operations must be done through this wrapper only.<p> Enumerating through a collection is intrinsically not a thread-safe procedure. Even when a collection is synchronized, other threads could still modify the collection, which causes the enumerator to throw an exception. To guarantee thread safety during enumeration, you can either lock the collection during the entire enumeration or catch the exceptions resulting from changes made by other threads.</p>
+<p> The following code example shows how to lock the collection using the  <a href="#SyncRoot">SortedList.SyncRoot</a> during the entire enumeration: </p>
+<pre>
+              SortedList myCollection = new SortedList();
+               lock( myCollection.SyncRoot ) {
+               foreach ( Object item in myCollection ) {
+               // Insert your code here.
+               }
+              }
+            </pre>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to synchronize a  <a href="../../System.Collections/types/SortedList.html">SortedList</a>, determine if a  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is synchronized and use a synchronized  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesSortedList  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new SortedList.
+       SortedList mySL = new SortedList();
+       mySL.Add( 0, "zero" );
+       mySL.Add( 1, "one" );
+       mySL.Add( 2, "two" );
+       mySL.Add( 3, "three" );
+       mySL.Add( 4, "four" );
+ 
+       // Creates a synchronized wrapper around the SortedList.
+       SortedList mySyncdSL = SortedList.Synchronized( mySL );
+ 
+       // Displays the sychronization status of both SortedLists.
+       Console.WriteLine( "mySL is {0}.", mySL.IsSynchronized ? "synchronized" : "not synchronized" );
+       Console.WriteLine( "mySyncdSL is {0}.", mySyncdSL.IsSynchronized ? "synchronized" : "not synchronized" );
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ mySL is not synchronized.
+ mySyncdSL is synchronized.
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#IsSynchronized">SortedList.IsSynchronized</a> |  <a href="#SyncRoot">SortedList.SyncRoot</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IEnumerable.GetEnumeratorTopic1"></a><a name="IEnumerable.GetEnumerator">IEnumerable.GetEnumerator</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns an  <a href="../../System.Collections/types/IEnumerator.html">IEnumerator</a> that can iterate through the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            <a href="../../System.Collections/types/IEnumerator.html">IEnumerator</a> IEnumerable.GetEnumerator();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An  <a href="../../System.Collections/types/IEnumerator.html">IEnumerator</a> for the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Collections/types/IEnumerable.html#GetEnumerator">IEnumerable.GetEnumerator</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> Enumerators only allow reading the data in the collection. Enumerators cannot be used to modify the underlying collection.<p> Initially, the enumerator is positioned before the first element in the collection. <a href="../../System.Collections/types/IEnumerator.html#Reset">IEnumerator.Reset</a> also brings the enumerator back to this position. At this position, calling  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> throws an exception. Therefore, you must call  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> to advance the enumerator to the first element of the collection before reading the value of  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a>.</p>
+<p> <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> returns the same object until either  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> or  <a href="../../System.Collections/types/IEnumerator.html#Reset">IEnumerator.Reset</a> is called. <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> sets  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> to the next element.</p>
+<p> After the end of the collection is passed, the enumerator is positioned after the last element in the collection, and calling  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> returns <b>false</b>. If the last call to  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> returned <b>false</b>, calling  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> throws an exception. To set  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> to the first element of the collection again, you can call  <a href="../../System.Collections/types/IEnumerator.html#Reset">IEnumerator.Reset</a> followed by  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a>.</p>
+<p> An enumerator remains valid as long as the collection remains unchanged. If changes are made to the collection, such as adding, modifying or deleting elements, the enumerator is irrecoverably invalidated and the next call to  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> or  <a href="../../System.Collections/types/IEnumerator.html#Reset">IEnumerator.Reset</a> throws an  <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a>. If the collection is modified between  <a href="../../System.Collections/types/IEnumerator.html#MoveNext">IEnumerator.MoveNext</a> and  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a>,  <a href="../../System.Collections/types/IEnumerator.html#Current">IEnumerator.Current</a> will return the element that it is set to, even if the enumerator is already invalidated.</p>
+<p> The enumerator does not have exclusive access to the collection; therefore, enumerating through a collection is intrinsically not a thread-safe procedure. Even when a collection is synchronized, other threads could still modify the collection, which causes the enumerator to throw an exception. To guarantee thread safety during enumeration, you can either lock the collection during the entire enumeration or catch the exceptions resulting from changes made by other threads.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Collections/types/IDictionaryEnumerator.html">IDictionaryEnumerator</a> |  <a href="../../System.Collections/types/IEnumerator.html">IEnumerator</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="TrimToSizeTopic1"></a><a name="TrimToSize">TrimToSize</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Sets the capacity to the actual number of elements in the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual void TrimToSize();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/NotSupportedException.html">NotSupportedException</a></td>
+<td> The  <a href="../../System.Collections/types/SortedList.html">SortedList</a> is read-only.<p> -or- </p>
+<p> The  <a href="../../System.Collections/types/SortedList.html">SortedList</a> has a fixed size.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method can be used to minimize a list's memory overhead if no new elements will be added to the list.<p> To completely clear all elements in a list, call the  <a href="#Clear">SortedList.Clear</a> method before calling  <a href="#TrimToSize">SortedList.TrimToSize</a>. Trimming an empty  <a href="../../System.Collections/types/SortedList.html">SortedList</a> sets the capacity of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> to the default capacity, not zero.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example shows how to trim the unused portions of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a> and how to clear the values of the  <a href="../../System.Collections/types/SortedList.html">SortedList</a>.<pre>
+ using System;
+ using System.Collections;
+ public class SamplesSortedList  {
+ 
+    public static void Main()  {
+ 
+       // Creates and initializes a new SortedList.
+       SortedList mySL = new SortedList();
+       mySL.Add( "one", "The" );
+       mySL.Add( "two", "quick" );
+       mySL.Add( "three", "brown" );
+       mySL.Add( "four", "fox" );
+       mySL.Add( "five", "jumped" );
+ 
+       // Displays the count, capacity and values of the SortedList.
+       Console.WriteLine( "Initially," );
+       Console.WriteLine( "   Count    : {0}", mySL.Count );
+       Console.WriteLine( "   Capacity : {0}", mySL.Capacity );
+       Console.WriteLine( "   Values:" );
+       PrintKeysAndValues( mySL );
+ 
+       // Trims the SortedList.
+       mySL.TrimToSize();
+ 
+       // Displays the count, capacity and values of the SortedList.
+       Console.WriteLine( "After TrimToSize," );
+       Console.WriteLine( "   Count    : {0}", mySL.Count );
+       Console.WriteLine( "   Capacity : {0}", mySL.Capacity );
+       Console.WriteLine( "   Values:" );
+       PrintKeysAndValues( mySL );
+ 
+       // Clears the SortedList.
+       mySL.Clear();
+ 
+       // Displays the count, capacity and values of the SortedList.
+       Console.WriteLine( "After Clear," );
+       Console.WriteLine( "   Count    : {0}", mySL.Count );
+       Console.WriteLine( "   Capacity : {0}", mySL.Capacity );
+       Console.WriteLine( "   Values:" );
+       PrintKeysAndValues( mySL );
+ 
+       // Trims the SortedList again.
+       mySL.TrimToSize();
+ 
+       // Displays the count, capacity and values of the SortedList.
+       Console.WriteLine( "After the second TrimToSize," );
+       Console.WriteLine( "   Count    : {0}", mySL.Count );
+       Console.WriteLine( "   Capacity : {0}", mySL.Capacity );
+       Console.WriteLine( "   Values:" );
+       PrintKeysAndValues( mySL );
+    }
+ 
+ 
+    public static void PrintKeysAndValues( SortedList myList )  {
+       Console.WriteLine( "\t-KEY-\t-VALUE-" );
+       for ( int i = 0; i &lt; myList.Count; i++ )  {
+          Console.WriteLine( "\t{0}:\t{1}", myList.GetKey(i), myList.GetByIndex(i) );
+       }
+       Console.WriteLine();
+    }
+ }
+ /* 
+ This code produces the following output.
+ 
+ Initially,
+    Count    : 5
+    Capacity : 16
+    Values:
+     -KEY-    -VALUE-
+     five:    jumped
+     four:    fox
+     one:    The
+     three:    brown
+     two:    quick
+ 
+ After TrimToSize,
+    Count    : 5
+    Capacity : 5
+    Values:
+     -KEY-    -VALUE-
+     five:    jumped
+     four:    fox
+     one:    The
+     three:    brown
+     two:    quick
+ 
+ After Clear,
+    Count    : 0
+    Capacity : 16
+    Values:
+     -KEY-    -VALUE-
+ 
+ After the second TrimToSize,
+    Count    : 0
+    Capacity : 16
+    Values:
+     -KEY-    -VALUE-
+ */ 
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Clear">SortedList.Clear</a> |  <a href="#Capacity">SortedList.Capacity</a> |  <a href="#Count">SortedList.Count</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

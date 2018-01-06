@@ -1,0 +1,429 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Text.Decoder</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Text.Decoder Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Text<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Converts encoded blocks of bytes into blocks of Unicode characters.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public abstract class Decoder</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> This is an abstract class. You must implement and override all its methods in a derived class.<p> An implementation of this class converts blocks of encoded bytes into blocks of Unicode characters through successive calls of the  <a href="#GetChars(System.Byte[],System.Int32,System.Int32,System.Char[],System.Int32)">Decoder.GetChars</a> method. This class maintains state information between successive calls of  <a href="#GetChars(System.Byte[],System.Int32,System.Int32,System.Char[],System.Int32)">Decoder.GetChars</a>, enabling it to decode a sequence of bytes that span adjacent blocks. For example, use  <a href="#GetChars(System.Byte[],System.Int32,System.Int32,System.Char[],System.Int32)">Decoder.GetChars</a> to decode a sequence of bytes that does not have a specific end, such as a stream.</p>
+<p> The  <a href="#GetCharCount(System.Byte[],System.Int32,System.Int32)">Decoder.GetCharCount</a> method calculates the number of characters yielded by decoding a specified block of bytes.</p>
+<p> Use the <b>GetDecoder</b> method of classes derived from the  <a href="../../System.Text/types/Encoding.html">Encoding</a> class to obtain an instance of the  <a href="../../System.Text/types/Decoder.html">Decoder</a> class.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example demonstrates using a  <a href="../../System.Text/types/Decoder.html">Decoder</a> to convert two different byte arrays into a character array. One of the character's bytes spans the arrays. This is similar to what a  <a href="../../System.IO/types/StreamReader.html">StreamReader</a> does internally when reading a stream.<pre>
+ using System;
+ using System.Text;
+ public class dec
+ {
+     public static void Main()
+     {
+         // These bytes in UTF-8 correspond to 3 different Unicode
+         // characters: space (U+0020), # (U+0023), and the biohazard
+         // symbol (U+2623).  Note the biohazard symbol requires 3 bytes
+         // in UTF-8 (hexadecimal e2, 98, e3).  Decoders store state across
+         // multiple calls to GetChars, handling the case when one char
+         // is in multiple byte arrays.
+         byte[] bytes1 = { 0x20, 0x23, 0xe2 };
+         byte[] bytes2 = { 0x98, 0xe3 };
+         char[] chars = new char[3];
+
+         Decoder d = Encoding.UTF8.GetDecoder();
+         int charLen = d.GetChars(bytes1, 0, bytes1.Length, chars, 0);
+         // The value of charLen should be 2 now.
+         charLen += d.GetChars(bytes2, 0, bytes2.Length, chars, charLen);
+         foreach(char c in chars)
+             Console.Write("U+" + ((ushort)c).ToString() + "  ");
+     }
+ }
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Text/System.Text.html">System.Text Namespace</a></dd>
+</dl>
+<h3>System.Text.Decoder Member List: </h3>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetCharCount(System.Byte[],System.Int32,System.Int32)">GetCharCount</a></td>
+<td width="55%"> When overridden in a derived class, calculates the number of characters  <a href="#GetChars(System.Byte[],System.Int32,System.Int32,System.Char[],System.Int32)">Decoder.GetChars</a> would produce from decoding the specified range of bytes.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetChars(System.Byte[],System.Int32,System.Int32,System.Char[],System.Int32)">GetChars</a></td>
+<td width="55%"> When overridden in a derived class, decodes a specified range of elements from a byte array and stores them in a specified range of a Unicode character array.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%">Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Initializes a new instance of the  <a href="../../System.Text/types/Decoder.html">Decoder</a> class.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Text.Decoder</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Text.Decoder Member Details</h3><b><i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Text/types/Decoder.html">Decoder</a> class.</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected Decoder();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~Decoder();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetCharCountTopic1"></a><a name="GetCharCount(System.Byte[],System.Int32,System.Int32)">GetCharCount</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, calculates the number of characters  <a href="#GetChars(System.Byte[],System.Int32,System.Int32,System.Char[],System.Int32)">Decoder.GetChars</a> would produce from decoding the specified range of bytes.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public abstract <a href="../../System/types/Int32.html">int</a> GetCharCount(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>index</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>count</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>bytes</i><br><dl>
+<dd>
+<param> The byte array to decode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>index</i><br><dl>
+<dd>
+<param> The index of the first byte in <i>bytes</i> to decode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>count</i><br><dl>
+<dd>
+<param> The number of bytes to decode.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The number of characters the next call to  <a href="#GetChars(System.Byte[],System.Int32,System.Int32,System.Char[],System.Int32)">Decoder.GetChars</a> would produce from decoding the specified range of elements in <i>bytes</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>bytes</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>index</i> or <i>count</i> is less than zero.<p> -or- </p>
+<p><i>index</i> plus <i>count</i> is greater than the length of <i>bytes</i>.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Use  <a href="#GetCharCount(System.Byte[],System.Int32,System.Int32)">Decoder.GetCharCount</a> to calculate the array size required by the  <a href="#GetChars(System.Byte[],System.Int32,System.Int32,System.Char[],System.Int32)">Decoder.GetChars</a> method to store the decoded bytes.<p> The state of the decoder is not affected by calling this method.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetCharsTopic1"></a><a name="GetChars(System.Byte[],System.Int32,System.Int32,System.Char[],System.Int32)">GetChars</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>byteIndex</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>byteCount</i>,</font><br>   <font color="#008080"><a href="../../System/types/Char.html">char[]</a> <i>chars</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>charIndex</i></font><br>)</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, decodes a specified range of elements from a byte array and stores them in a specified range of a Unicode character array.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public abstract <a href="../../System/types/Int32.html">int</a> GetChars(<br>   <font color="#008080"><a href="../../System/types/Byte.html">byte[]</a> <i>bytes</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>byteIndex</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>byteCount</i>,</font><br>   <font color="#008080"><a href="../../System/types/Char.html">char[]</a> <i>chars</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>charIndex</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>bytes</i><br><dl>
+<dd>
+<param> A byte array to decode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>byteIndex</i><br><dl>
+<dd>
+<param> The index of the first element in <i>bytes</i> to decode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>byteCount</i><br><dl>
+<dd>
+<param> The number of elements to decode.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>chars</i><br><dl>
+<dd>
+<param> The character array where the decoded results are stored.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>charIndex</i><br><dl>
+<dd>
+<param> The index of the first element in <i>chars</i> to store the decoded results.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The number of characters decoded into <i>chars</i>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td><i>bytes</i> or <i>chars</i> is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td><i>byteIndex</i>, <i>byteCount</i>, or <i>charIndex</i> is less than zero.<p> -or- </p>
+<p><i>byteIndex</i> plus <i>byteCount</i> is greater than the length of <i>bytes</i>.</p>
+<p> -or- </p>
+<p><i>charIndex</i> is greater than the length of <i>chars</i>.</p>
+</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Use  <a href="#GetCharCount(System.Byte[],System.Int32,System.Int32)">Decoder.GetCharCount</a> to calculate the array size required by the  <a href="#GetChars(System.Byte[],System.Int32,System.Int32,System.Char[],System.Int32)">Decoder.GetChars</a> method to store decoded bytes.<p> It is recommended that you always call  <a href="#GetCharCount(System.Byte[],System.Int32,System.Int32)">Decoder.GetCharCount</a> before calling  <a href="#GetChars(System.Byte[],System.Int32,System.Int32,System.Char[],System.Int32)">Decoder.GetChars</a> because the  <a href="#GetChars(System.Byte[],System.Int32,System.Int32,System.Char[],System.Int32)">Decoder.GetChars</a> method might change the internal state information between blocks of bytes.</p>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#GetCharCount(System.Byte[],System.Int32,System.Int32)">Decoder.GetCharCount</a> |  <a href="../../System.Text/types/Encoding.html#GetChars(System.Byte[])">Encoding.GetChars</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Security.Permissions.IsolatedStorageContainment</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Security.Permissions.IsolatedStorageContainment Enumeration</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Security.Permissions<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Specifies the permitted use of isolated storage.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public enum IsolatedStorageContainment</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Isolated storage uses evidence to determine a unique storage area for use by an application or component. The identity of an assembly uniquely determines the root of a virtual file system for use by that assembly. Thus, rather than many applications and components sharing a common resource such as the file system or registry, each has its own file area inherently assigned to it.<p> Three basic isolation scopes are used when assigning isolated storage: </p>
+<UL>
+<li><b>User</b> - Code is always scoped according to the current user. The same assembly will receive different stores when being run by different users.</li>
+<li><b>Assembly</b> - Code is identified cryptographically by strong name (for example, Microsoft.Office.* or Microsoft.Office.Word), by publisher (based on public key), by URL (for example, http://www.fourthcoffee.com/process/grind.htm), by site, or by zone.</li>
+<li><b>Domain</b> - Code is identified based on evidence associated with the application domain. Web application identity is derived from the site's URL, or by the Web page's URL, site, or zone. Local code identity is based on the application directory path.</li>
+</UL>
+<p> For definitions of URL, site, and zone, see  <a href="../../System.Security.Permissions/types/UrlIdentityPermission.html">UrlIdentityPermission</a>,  <a href="../../System.Security.Permissions/types/SiteIdentityPermission.html">SiteIdentityPermission</a>, and  <a href="../../System.Security.Permissions/types/ZoneIdentityPermission.html">ZoneIdentityPermission</a>.</p>
+<p> These identities are grouped together, in which case the identities are applied one after another until the desired isolated storage is created. The valid groupings are User+Assembly and User+Assembly+Domain. This grouping of identities is useful in many different applications.</p>
+<p> If data is stored by domain, user, and assembly, the data is private in that only code in that assembly can access the data. The data store is also isolated by the application in which it runs, so that the assembly does not represent a potential leak by exposing data to other applications.</p>
+<p> Isolation by assembly and user could be used for user data that applies across multiple applications; for example, license information, or a user's personal information (name, authentication credentials, and so on) that is independent of an application.</p>
+<p> <a href="../../System.Security.Permissions/types/IsolatedStorageContainment.html">IsolatedStorageContainment</a> exposes flags that determine whether an application is allowed to use isolated storage and, if so, which identity combinations are allowed to use it. It also determines whether an application is allowed to store information in a location that can roam with a user (Windows Roaming User Profiles or Folder Redirection must be configured).</p>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Security.Permissions/System.Security.Permissions.html">System.Security.Permissions Namespace</a><b>
+								See also:
+							</b><br><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconisolatedstorage.asp">MSDN: isolatedstorage</a> |  <a href="../../System.Security.Permissions/types/IsolatedStoragePermission.html">IsolatedStoragePermission</a> |  <a href="../../System.Security.Permissions/types/IsolatedStoragePermissionAttribute.html">IsolatedStoragePermissionAttribute</a> |  <a href="../../System.Security.Permissions/types/IsolatedStorageFilePermission.html">IsolatedStorageFilePermission</a> |  <a href="../../System.Security.Permissions/types/IsolatedStorageFilePermissionAttribute.html">IsolatedStorageFilePermissionAttribute</a></dd>
+</dl>
+<h3>System.Security.Permissions.IsolatedStorageContainment Member List: </h3>
+<dl>
+<dt><b>Public Fields</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><b>AdministerIsolatedStorageByUser</b></td>
+<td width="55%"> Unlimited administration ability for the user store. Allows browsing and deletion of the entire user store, but not read access other than the user's own domain/assembly identity.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>AssemblyIsolationByRoamingUser</b></td>
+<td width="55%"> Storage is isolated first by user and then by assembly evidence. Storage will roam if Windows user data roaming is enabled. This provides a data store for the assembly that is accessible in any domain context. The per-assembly data compartment requires additional trust because it potentially provides a "tunnel" between applications that could compromise the data isolation of applications in particular Web sites.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>AssemblyIsolationByUser</b></td>
+<td width="55%"> Storage is isolated first by user and then by code assembly. Storage is also isolated by computer. This provides a data store for the assembly that is accessible in any domain context. The per-assembly data compartment requires additional trust because it potentially provides a "tunnel" between applications that could compromise the data isolation of applications in particular Web sites.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>DomainIsolationByRoamingUser</b></td>
+<td width="55%"> Storage is isolated first by user and then by domain and assembly. Storage will roam if Windows user data roaming is enabled. Data can only be accessed within the context of the same application and only when run by the same user. This is helpful when a third-party assembly wants to keep a private data store.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>DomainIsolationByUser</b></td>
+<td width="55%"> Storage is isolated first by user and then by domain and assembly. Storage is also isolated by computer. Data can only be accessed within the context of the same application and only when run by the same user. This is helpful when a third-party assembly wants to keep a private data store.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>None</b></td>
+<td width="55%"> Use of isolated storage is not allowed.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>UnrestrictedIsolatedStorage</b></td>
+<td width="55%"> Use of isolated storage is allowed without restriction. Code has full access to any part of the user store, regardless of the identity of the domain or assembly. This use of isolated storage includes the ability to enumerate the contents of the isolated storage data store.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/ValueType.html">System.ValueType</a></li>
+<ul class="none">
+<li><a href="../../System/types/Enum.html">System.Enum</a></li>
+<ul class="none">
+<li><b>System.Security.Permissions.IsolatedStorageContainment</b></li>
+</ul>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

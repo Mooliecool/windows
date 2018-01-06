@@ -1,0 +1,981 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Xml.Serialization.XmlArrayAttribute</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Xml.Serialization.XmlArrayAttribute Class</h2><b>Assembly: </b>System.Xml.dll<br><b>Namespace: </b>System.Xml.Serialization<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Specifies that the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> should serialize a particular class member as an array of XML elements.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.ReturnValue)]<br><b>public class XmlArrayAttribute : Attribute</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html">XmlArrayAttribute</a> belongs to a family of attributes that controls how the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes, or deserializes, an object. For a complete list of similar attributes, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAttributesThatControlSerialization.asp">MSDN: attributesthatcontrolserialization</a>.<p> The  <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html">XmlArrayAttribute</a> can be applied to a public field or read/write property that returns an array of objects. It can also be applied to collections, and fields that return an  <a href="../../System.Collections/types/ArrayList.html">ArrayList</a> or any class that implements the  <a href="../../System.Collections/types/IEnumerable.html">IEnumerable</a> interface.</p>
+<p> When you apply the  <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html">XmlArrayAttribute</a> to a class member, the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> class's  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Serialize(System.IO.TextWriter,System.Object)">XmlSerializer.Serialize</a> method generates a nested sequence of XML elements from that member. (An XML schema document (or .xsd file), indicates such an array as a complexType.) For example, if the class to be serialized represents a purchase order, you can generate an array of purchased items by applying the  <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html">XmlArrayAttribute</a> to a public field that returns an array of objects that represent order items.</p>
+<p> If no attributes are applied to a public field or property that returns an array of complex or primitive type objects, the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> generates a nested sequence of XML elements by default. To more precisely control what XML elements are generated, apply an  <a href="../../System.Xml.Serialization/types/XmlArrayItemAttribute.html">XmlArrayItemAttribute</a> and an  <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html">XmlArrayAttribute</a> to the field or property. For example, by default, the name of the generated XML element is derived from the member identifier; you can change the name of the generated XML element by setting the  <a href="#ElementName">XmlArrayAttribute.ElementName</a> property.</p>
+<p> If you serialize an array that contains items of a specific type and all the classes derived from that type, you must use the  <a href="../../System.Xml.Serialization/types/XmlArrayItemAttribute.html">XmlArrayItemAttribute</a> to declare each of the types.</p><br><br><b>Note </b> In your code, you can use the word <b>XmlArray</b> instead of the longer  <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html">XmlArrayAttribute</a>. For more information about using attributes, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconExtendingMetadataUsingAttributes.asp">MSDN: extendingmetadatausingattributes</a>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes a class instance into an XML document containing several object arrays. The  <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html">XmlArrayAttribute</a> is applied to the members that become XML-element arrays.<pre>
+using System;
+using System.IO;
+using System.Xml.Serialization;
+using System.Xml;
+ 
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.SerializeDocument("books.xml");
+   }
+ 
+   public void SerializeDocument(string filename)
+   {
+      // Create a new XmlSerializer.
+      XmlSerializer s = 
+      new XmlSerializer(typeof(MyRootClass));
+
+      // Writing the file requires a StreamWriter.
+      TextWriter myWriter= new StreamWriter(filename);
+
+      // Create an instance of the class to serialize. 
+      MyRootClass myRootClass = new MyRootClass();
+
+      /* Use a basic method of creating an XML array: Create and 
+      populate a string array, and assign it to the 
+      MyStringArray property. */
+
+      string [] myString = {"Hello", "world", "!"};
+      myRootClass.MyStringArray = myString;
+       
+      /* Use more advanced method of creating an array.
+         Create instances of the Item and BookItem. BookItem 
+         is derived from Item. */
+      Item item1 = new Item();
+      BookItem item2 = new BookItem();
+  
+      // Set the objects' properties.
+      item1.ItemName = "Widget1";
+      item1.ItemCode = "w1";
+      item1.ItemPrice = 231;
+      item1.ItemQuantity = 3;
+ 
+      item2.ItemCode = "w2";
+      item2.ItemPrice = 123;
+      item2.ItemQuantity = 7;
+      item2.ISBN = "34982333";
+      item2.Title = "Book of Widgets";
+      item2.Author = "John Smith";
+       
+      // Fill array with the items.
+      Item [] myItems = {item1,item2};
+       
+      // Set class's Items property to the array.
+      myRootClass.Items = myItems;
+ 
+      /* Serialize the class, write it to disk, and close 
+         the TextWriter. */
+      s.Serialize(myWriter, myRootClass);
+      myWriter.Close();
+   }
+}
+
+// This is the class that will be serialized.
+public class MyRootClass
+{
+   private Item [] items;
+ 
+   /* Here is a simple way to serialize the array as XML. Using the
+      XmlArrayAttribute, assign an element name and namespace. The
+      IsNullable property determines whether the element will be 
+      generated if the field is set to a null value. If set to true,
+      the default, setting it to a null value will cause the XML
+      xsi:null attribute to be generated. */
+   [XmlArray(ElementName = "MyStrings",
+   Namespace = "http://www.cpandl.com", IsNullable = true)]
+   public string[] MyStringArray;
+  
+   /* Here is a more complex example of applying an 
+      XmlArrayAttribute. The Items property can contain both Item 
+      and BookItem objects. Use the XmlArrayItemAttribute to specify
+      that both types can be inserted into the array. */
+   [XmlArrayItem(ElementName= "Item", 
+   IsNullable=true,
+   Type = typeof(Item),
+   Namespace = "http://www.cpandl.com"),
+   XmlArrayItem(ElementName = "BookItem", 
+   IsNullable = true, 
+   Type = typeof(BookItem),
+   Namespace = "http://www.cohowinery.com")]
+   [XmlArray]
+   public Item []Items
+   {
+      get{return items;}
+      set{items = value;}
+   }
+}
+ 
+public class Item{
+   [XmlElement(ElementName = "OrderItem")]
+   public string ItemName;
+   public string ItemCode;
+   public decimal ItemPrice;
+   public int ItemQuantity;
+}
+ 
+public class BookItem:Item
+{
+   public string Title;
+   public string Author;
+   public string ISBN;
+}
+   
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Xml.Serialization/System.Xml.Serialization.html">System.Xml.Serialization Namespace</a> |  <a href="../../System.Xml.Serialization/types/XmlAttributes.html#XmlArray">XmlAttributes.XmlArray</a> |  <a href="../../System.Xml.Serialization/types/XmlArrayItemAttribute.html">XmlArrayItemAttribute</a> |  <a href="../../System.Xml.Serialization/types/XmlAttributeOverrides.html">XmlAttributeOverrides</a> |  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> |  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconIntroducingXMLSerialization.asp">MSDN: introducingxmlserialization</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconOverridingSerializationOfClassesWithXmlAttributeOverridesClass.asp">MSDN: overridingserializationofclasseswithxmlattributeoverridesclass</a> |  <a href="../../System.Xml.Serialization/types/XmlAttributes.html">XmlAttributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconControllingSerializationByXmlSerializerWithAttributes.asp">MSDN: controllingserializationbyxmlserializerwithattributes</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAnExampleOfXMLSerializationWithXmlSerializer.asp">MSDN: anexampleofxmlserializationwithxmlserializer</a></dd>
+</dl>
+<h3>System.Xml.Serialization.XmlArrayAttribute Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor()<br><br></code>Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html">XmlArrayAttribute</a> class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(string elementName)<br><br></code> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html">XmlArrayAttribute</a> class; specifies the XML element name generated in the XML-document instance.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ElementName">ElementName</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the XML element name given to the serialized array.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Form">Form</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets a value indicating whether the XML element name generated by the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> is qualified or unqualified.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsNullable">IsNullable</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets a value indicating whether the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> should serialize a member as an empty XML tag with the <b>xsi:nil</b> attribute set to <b>true</b>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Namespace">Namespace</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or set the namespace of the XML element.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#TypeId">TypeId</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#TypeId">System.Attribute.TypeId</a></font></b><br><br><br> When implemented in a derived class, gets a unique identifier for this <b>Attribute</b>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#GetHashCode">System.Attribute.GetHashCode</a></font></b><br><br><br> Returns the hash code for this instance.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsDefaultAttribute">IsDefaultAttribute</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#IsDefaultAttribute">System.Attribute.IsDefaultAttribute</a></font></b><br><br><br> When overridden in a derived class, returns an indication whether the value of this instance is the default value for the derived class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Match(System.Object)">Match</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#Match(System.Object)">System.Attribute.Match</a></font></b><br><br><br> When overridden in a derived class, returns a value indicating whether this instance equals a specified object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/Attribute.html">System.Attribute</a></li>
+<ul class="none">
+<li><b>System.Xml.Serialization.XmlArrayAttribute</b></li>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Xml.Serialization.XmlArrayAttribute Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html">XmlArrayAttribute</a> class.</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlArrayAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For more information about using attributes, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconExtendingMetadataUsingAttributes.asp">MSDN: extendingmetadatausingattributes</a>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example assigns the  <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html">XmlArrayAttribute</a> to two arrays.<pre>
+public class MyClass
+{
+    [XmlArrayAttribute()]
+    public string [] MyStringArray;
+    [XmlArrayAttribute()]
+    public int [] MyIntegerArray;
+}
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml.Serialization/types/XmlArrayItemAttribute.html">XmlArrayItemAttribute</a> |  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html">XmlArrayAttribute</a> class; specifies the XML element name generated in the XML-document instance.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public XmlArrayAttribute(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>elementName</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>elementName</i><br><dl>
+<dd>
+<param> The name of the XML element that the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> generates.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> For more information about using attributes, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconExtendingMetadataUsingAttributes.asp">MSDN: extendingmetadatausingattributes</a>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example assigns the  <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html">XmlArrayAttribute</a> to two arrays, and serializes a class instance that contains those arrays.<pre>
+using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
+ 
+public class MyClass{
+   [XmlArrayAttribute("MyStrings")]
+   public string [] MyStringArray;
+   [XmlArrayAttribute(ElementName = "MyIntegers")]
+   public int [] MyIntegerArray;
+}
+ 
+public class Run{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.SerializeObject("MyClass.xml");
+   }
+ 
+   public void SerializeObject(string filename)
+   {
+      // Create a new instance of the XmlSerializer class.
+      XmlSerializer s = new XmlSerializer(typeof(MyClass));
+      // A StreamWriter is needed to write the file.
+      TextWriter myWriter= new StreamWriter(filename);
+ 
+      MyClass myClass = new MyClass();
+      // Create and populate a string array, the assign
+      // it to the MyStringArray property.
+      string [] myStrings = {"Hello", "World", "!"};
+      myClass.MyStringArray = myStrings;
+      /* Create and populate an integer array, and assign
+      it to the MyIntegerArray property. */
+      int [] myIntegers = {1,2,3};
+      myClass.MyIntegerArray = myIntegers;     
+      // Serialize the class, and write it to disk.
+      s.Serialize(myWriter, myClass);
+      myWriter.Close();
+   }
+}
+
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml.Serialization/types/XmlArrayItemAttribute.html">XmlArrayItemAttribute</a> |  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ElementNameTopic1"></a><a name="ElementName">ElementName</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the XML element name given to the serialized array.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> ElementName {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Specify an  <a href="#ElementName">XmlArrayAttribute.ElementName</a> when you want the generated XML element name to differ from the member's identifier.<p> You can set the same  <a href="#ElementName">XmlArrayAttribute.ElementName</a> value to more than one member as long as the generated XML document uses XML namespaces to distinguish between the identically named members. For more details on using namespaces and creating prefixed names in the XML document, see  <a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes an instance of the Library class that contains a property named Books that returns an array of Book items. The example uses the  <a href="#ElementName">XmlArrayAttribute.ElementName</a> property to specify that the array of XML elements should be named My_Books rather than Books.<pre>
+using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
+ 
+public class Library
+{
+   private Book[] books;
+   [XmlArray(ElementName="My_Books")]
+   public Book[] Books
+   {
+      get{return books;}
+      set{books = value;}
+   }
+}
+ 
+public class Book
+{
+   public string Title;
+   public string Author;
+   public string ISBN;
+}
+ 
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.WriteBook("ArrayExample.xml");
+   }
+ 
+   public void WriteBook(string filename)
+   {
+      XmlSerializer mySerializer = new XmlSerializer(typeof(Library));
+      TextWriter t = new StreamWriter(filename);
+      XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+      ns.Add("bk", "http://wwww.contoso.com");
+ 
+      Book b1 = new Book();
+      b1.Title = "MyBook Title";
+      b1.Author = "An Author";
+      b1.ISBN = "00000000";
+ 
+      Book b2 = new Book();
+      b2.Title = "Another Title";
+      b2.Author = "Another Author";
+      b2.ISBN = "0000000";
+       
+      Library myLibrary = new Library();
+      Book[] myBooks = {b1,b2};
+      myLibrary.Books = myBooks;
+       
+      mySerializer.Serialize(t,myLibrary,ns);
+      t.Close();
+   }
+}
+   
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> |  <a href="#Namespace">XmlArrayAttribute.Namespace</a> |  <a href="#Form">XmlArrayAttribute.Form</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="FormTopic1"></a><a name="Form">Form</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets a value indicating whether the XML element name generated by the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> is qualified or unqualified.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Xml.Schema/types/XmlSchemaForm.html">XmlSchemaForm</a> Form {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#Form">XmlArrayAttribute.Form</a> property determines whether an XML element name is qualified or unqualified. The  <a href="#Form">XmlArrayAttribute.Form</a> property conforms to the 1999 World Wide Web Consortium (www.w3.org) document titled "Namespaces in XML." <p> If the  <a href="../../System.Xml.Serialization/types/XmlAttributeAttribute.html#Namespace">XmlAttributeAttribute.Namespace</a> property is set to any value, attempting to set the  <a href="../../System.Xml.Serialization/types/XmlElementAttribute.html#Form">XmlElementAttribute.Form</a> property to <b>XmlSchemaForm.Unqualified</b> throws an exception.</p> The default setting, <b>XmlSchemaForm.None</b>, instructs the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> to check the schema for the XML document to determine whether the namespace is qualified. If the schema does not specify a value for an individual element or attribute, the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> uses the <b>elementFormDefault</b> and <b>attributeFormDefault</b> values to determine whether an element or attribute is qualified. The XML code below shows a schema: <pre>
+              &lt;schema elementFormDefault="qualified" 
+              attributeFormDefault="unqualified" ... &gt;
+                 &lt;element name="Name"/&gt;
+                 &lt;attribute name="Number"/&gt;
+              &lt;/schema&gt;
+            </pre> When the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> reads the schema, the  <a href="../../System.Xml.Serialization/types/XmlAttributeAttribute.html#Form">XmlAttributeAttribute.Form</a> value for both the <b>Name</b> and <b>Number</b> will be <b>XmlSchemaForm.None</b>, but the <b>Name</b> element will be qualified, while the <b>Number</b> element will be unqualified.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes the Enterprises class. Two XML elements have the same local name ("Company") but different prefixes. The example sets the  <a href="#Form">XmlArrayAttribute.Form</a> property is set to <b>XmlForm.Qualified</b> to ensure that the qualified names occur in the XML instance.<pre>
+using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
+ 
+public class Enterprises
+{
+   private Winery[] wineries;
+   private VacationCompany[] companies;
+   // Set the Form property to qualified, and specify the Namespace. 
+   [XmlArray(Form = XmlSchemaForm.Qualified, ElementName="Company", 
+   Namespace="http://www.cohowinery.com")]
+   public Winery[] Wineries{
+      get{return wineries;}
+      set{wineries = value;}
+   }
+
+   [XmlArray(Form = XmlSchemaForm.Qualified, ElementName = "Company", 
+   Namespace = "http://www.treyresearch.com")]
+   public VacationCompany [] Companies{
+      get{return companies;}
+      set{companies = value;}
+   }
+}
+ 
+public class Winery
+{
+   public string Name;
+}
+ 
+public class VacationCompany{
+   public string Name;
+}
+ 
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.WriteEnterprises("MyEnterprises.xml");
+    }
+ 
+   public void WriteEnterprises(string filename)
+   {
+      // Create an instance of the XmlSerializer class.
+      XmlSerializer mySerializer = 
+      new XmlSerializer(typeof(Enterprises));
+      // Writing file requires a TextWriter.
+      TextWriter writer = new StreamWriter(filename);
+
+      // Create an instance of the XmlSerializerNamespaces class.
+      XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+
+      // Add namespaces and prefixes for the XML-instance document.
+      ns.Add("winery", "http://www.cohowinery.com");
+      ns.Add("vacationCompany", "http://www.treyresearch.com");
+
+      // Create an instance of the class that will be serialized.
+      Enterprises myEnterprises = new Enterprises();
+      
+      // Create objects and add to the array. 
+      Winery w1= new Winery();
+      w1.Name = "cohowinery";
+      Winery[]myWinery = {w1};
+      myEnterprises.Wineries = myWinery;
+ 
+      VacationCompany com1 = new VacationCompany();
+      com1.Name = "adventure-works";
+      VacationCompany[] myCompany = {com1};
+      myEnterprises.Companies = myCompany;
+
+      // Serialize the class, and close the TextWriter.
+      mySerializer.Serialize(writer, myEnterprises, ns);
+      writer.Close();
+   }
+
+   public void ReadEnterprises(string filename)
+   {
+      XmlSerializer mySerializer = 
+      new XmlSerializer(typeof(Enterprises));
+      FileStream fs = new FileStream(filename, FileMode.Open);
+      Enterprises myEnterprises = (Enterprises) 
+      mySerializer.Deserialize(fs);
+      
+      for(int i = 0; i &lt; myEnterprises.Wineries.Length;i++)
+      {
+         Console.WriteLine(myEnterprises.Wineries[i].Name);
+      }   
+      for(int i = 0; i &lt; myEnterprises.Companies.Length;i++)
+      {
+         Console.WriteLine(myEnterprises.Companies[i].Name);
+      }
+   }
+}
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> |  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Serialize(System.IO.TextWriter,System.Object)">XmlSerializer.Serialize</a> |  <a href="#ElementName">XmlArrayAttribute.ElementName</a> |  <a href="#Namespace">XmlArrayAttribute.Namespace</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="IsNullableTopic1"></a><a name="IsNullable">IsNullable</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets a value indicating whether the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> should serialize a member as an empty XML tag with the <b>xsi:nil</b> attribute set to <b>true</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> IsNullable {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The XML schema specification for structures allows an XML document to explicitly signal that an element's content is missing. Such an element contains the attribute <b>xsi:nil</b> set to <b>true</b>. For more information, see the World Wide Web Consortium (www.w3.org) specification titled "XML Schema Part 1: Structures".<p> If the  <a href="#IsNullable">XmlArrayAttribute.IsNullable</a> property is set to <b>true</b>, the <b>xsi:nil</b> attribute is generated for class members that have been set to <b>null</b>. For example, if you set a field named <b>MyStringArray</b> to <b>null</b>, the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> generates the following XML code.</p>
+<pre>
+              &lt;MyStringArray xsi:nil = "true" /&gt;
+            </pre>
+<p> If the  <a href="#IsNullable">XmlArrayAttribute.IsNullable</a> property is <b>false</b>, no XML element is generated.</p><br><br><b>Note </b> You cannot apply the  <a href="#IsNullable">XmlArrayAttribute.IsNullable</a> property to a member typed as a value type because a value type cannot contain <b>null</b>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example contains two arrays: one with the  <a href="#IsNullable">XmlArrayAttribute.IsNullable</a> property is set to <b>true</b>, and another with the  <a href="#IsNullable">XmlArrayAttribute.IsNullable</a> property set to <b>false</b>.<pre>
+public class MyClass
+{
+   [XmlArray (IsNullable = true)]
+   public string [] IsNullableIsTrueArray;
+   [XmlArray (IsNullable = false)]
+   public string [] IsNullableIsFalseArray;
+}
+   
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NamespaceTopic1"></a><a name="Namespace">Namespace</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or set the namespace of the XML element.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> Namespace {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="#Namespace">XmlArrayAttribute.Namespace</a> property allows you to create qualified XML element names. The  <a href="#Namespace">XmlArrayAttribute.Namespace</a> property conforms to the rules for creating an XML namespace as found in the 1999 World Wide Web Consortium (www.w3.org) document titled <i>Namespaces in XML</i>.<p> To create namespaces that are associated with a prefix, you must create an  <a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> object that contains the namespaces and prefixes used in the XML document. As you set the namespace for each  <a href="../../System.Xml.Serialization/types/XmlArrayAttribute.html">XmlArrayAttribute</a>, it must match one of the namespaces in the  <a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> object. When the XML is generated, each array will be correctly prefixed with the prefix associated with the specified namespace.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes an instance of the Library class that contains two members, one that contain book titles, and another that contain periodical titles. Although both XML elements are named Titles, each contains a different prefix. The example also includes an  <a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> object that contains the namespaces and prefixes used to qualify the two element names.<pre>
+using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
+ 
+public class Library
+   {
+   private Book[] books;
+   private Periodical [] periodicals;
+   /* This element will be qualified with the prefix 
+   that is associated with the namespace http://wwww.cpandl.com. */
+   [XmlArray(ElementName = "Titles", 
+   Namespace="http://wwww.cpandl.com")]
+   public Book[] Books
+   {
+      get{return books;}
+      set{books = value;}
+   }
+   /* This element will be qualified with the prefix that is
+   associated with the namespace http://www.proseware.com. */
+   [XmlArray(ElementName = "Titles", Namespace = 
+   "http://www.proseware.com")]
+   public Periodical[] Periodicals
+   {
+      get{return periodicals;}
+      set{periodicals = value;}
+   }
+}
+ 
+public class Book
+{
+   public string Title;
+   public string Author;
+   public string ISBN;
+   [XmlAttribute]
+   public string Publisher;
+}
+ 
+public class Periodical
+{
+   private string title;
+   public string Title
+   {
+      get{return title;}
+      set{title = value;}
+   }
+}
+ 
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.WriteBook("MyLibrary.xml");
+      test.ReadBook("MyLibrary.xml");   
+   }
+ 
+   public void WriteBook(string filename)
+   {
+      // Create a new XmlSerializer instance.
+      XmlSerializer mySerializer = new XmlSerializer(typeof(Library));
+      // Writing the file requires a StreamWriter.
+      TextWriter myStreamWriter = new StreamWriter(filename);
+      /* Create an XmlSerializerNamespaces and add prefixes and 
+      namespaces to be used. */
+      XmlSerializerNamespaces myNamespaces = 
+      new XmlSerializerNamespaces();
+      myNamespaces.Add("books", "http://wwww.cpandl.com");
+      myNamespaces.Add("magazines", "http://www.proseware.com");
+      // Create an instance of the class to be serialized.
+      Library myLibrary = new Library();
+ 
+      // Create two book objects.
+      Book b1 = new Book();
+      b1.Title = "My Book Title";
+      b1.Author = "An Author";
+      b1.ISBN = "000000000";
+      b1.Publisher = "Microsoft Press";
+ 
+      Book b2 = new Book();
+      b2.Title = "Another Book Title";
+      b2.Author = "Another Author";
+      b2.ISBN = "00000001";
+      b2.Publisher = "Another Press";
+       
+      /* Create an array using the objects, and set the Books property
+      to the array. */
+      Book[] myBooks = {b1,b2};
+      myLibrary.Books = myBooks;
+ 
+      // Create two Periodical objects.
+      Periodical per1 = new Periodical();
+      per1.Title = "My Magazine Title";
+      Periodical per2 = new Periodical();
+      per2.Title = "Another Magazine Title";
+ 
+      // Set the Periodicals property to the array. 
+      Periodical[] myPeridocials = {per1, per2};
+      myLibrary.Periodicals = myPeridocials;
+
+      // Serialize the myLibrary object.
+      mySerializer.Serialize(myStreamWriter, myLibrary, myNamespaces);
+
+       myStreamWriter.Close();
+    }
+ 
+   public void ReadBook(string filename)
+   {
+      /* Read the XML document. First create an instance of an XmlSerializer
+      using the class used to read the document. */
+      XmlSerializer mySerializer = new XmlSerializer(typeof(Library));
+      // A FileStream is needed to read the file.
+      FileStream myFileStream = new FileStream(filename, FileMode.Open);
+
+      Library myLibrary = (Library) mySerializer.Deserialize(myFileStream);
+
+      // Read each book in the array returned by the Books property.      
+      for(int i = 0; i&lt; myLibrary.Books.Length;i++)
+      {
+         Console.WriteLine(myLibrary.Books[i].Title);
+         Console.WriteLine(myLibrary.Books[i].Author);
+         Console.WriteLine(myLibrary.Books[i].ISBN);
+         Console.WriteLine(myLibrary.Books[i].Publisher);
+         Console.WriteLine();
+      }
+      // Read each Periodical returned by the Periodicals property.
+      for(int i = 0; i&lt; myLibrary.Periodicals.Length;i++)
+      {
+         Console.WriteLine(myLibrary.Periodicals[i].Title);
+      }
+   }
+}
+   
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> |  <a href="../../System.Xml.Serialization/types/XmlSerializer.html#Serialize(System.IO.TextWriter,System.Object)">XmlSerializer.Serialize</a> |  <a href="#ElementName">XmlArrayAttribute.ElementName</a> |  <a href="#Form">XmlArrayAttribute.Form</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="TypeIdTopic1"></a><a name="TypeId">TypeId</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#TypeId">System.Attribute.TypeId</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When implemented in a derived class, gets a unique identifier for this <b>Attribute</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> TypeId {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> As implemented, this identifier is merely the  <a href="../../System/types/Type.html">Type</a> of the attribute. However, it is intended that the unique identifier be used to identify two attributes of the same type.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~XmlArrayAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#GetHashCode">System.Attribute.GetHashCode</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the hash code for this instance.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A 32-bit signed integer hash code.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IsDefaultAttributeTopic1"></a><a name="IsDefaultAttribute">IsDefaultAttribute</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#IsDefaultAttribute">System.Attribute.IsDefaultAttribute</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, returns an indication whether the value of this instance is the default value for the derived class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsDefaultAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if this instance is the default attribute for the class; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The default implementation of this class returns <b>false</b>, and must be implemented in the derived class to be useful to that class.<p> The implementation of this method in a derived class compares the value of this instance to a standard, default value obtained by some means, then returns a Boolean value that indicates whether the value of this instance is equal to the standard. The standard value is typically coded as a constant in the implementation, or stored programmatically in a field used by the implementation.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MatchTopic1"></a><a name="Match(System.Object)">Match</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#Match(System.Object)">System.Attribute.Match</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, returns a value indicating whether this instance equals a specified object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Match(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> An  <a href="../../System/types/Object.html">Object</a> to compare with this instance of <b>Attribute</b>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if this instance equals <i>obj</i>; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method determines if one <b>Attribute</b> equals another. Its default implementation is the same as  <a href="#Equals(System.Object)">Attribute.Equals</a>, which performs a value and reference comparison. Override this method to implement support for attribute values, such as flags or bitfields, that consist of components that are meaningful in themselves. For example, consider an attribute whose value is a binary field divided into a bitfield of flags. Two instances of this attribute have one flag in set in common while all the other flags differ. The <b>Equal</b> method cannot determine that the two instances have the same flag set, but the <b>Match</b> method can.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

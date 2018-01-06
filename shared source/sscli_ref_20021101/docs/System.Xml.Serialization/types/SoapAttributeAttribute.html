@@ -1,0 +1,1365 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Xml.Serialization.SoapAttributeAttribute</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Xml.Serialization.SoapAttributeAttribute Class</h2><b>Assembly: </b>System.Xml.dll<br><b>Namespace: </b>System.Xml.Serialization<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Specifies that the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> should serialize the class member as an encoded SOAP attribute.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.ReturnValue)]<br><b>public class SoapAttributeAttribute : Attribute</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a> class belongs to a family of attributes that controls how the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes, or deserializes, an object as encoded SOAP XML. The resulting XML conforms to section 5 of the World Wide Web Consortium (www.w3.org) document, "Simple Object Access Protocol (SOAP) 1.1". For a complete list of similar attributes, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconAttributesThatControlSOAPEncodedSerialization.asp">MSDN: attributesthatcontrolsoapencodedserialization</a>.<p> To serialize an object as an encoded SOAP message, you must construct the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> using an  <a href="../../System.Xml.Serialization/types/XmlTypeMapping.html">XmlTypeMapping</a> created with the  <a href="../../System.Xml.Serialization/types/SoapReflectionImporter.html#ImportTypeMapping(System.Type)">SoapReflectionImporter.ImportTypeMapping</a> method of the  <a href="../../System.Xml.Serialization/types/SoapReflectionImporter.html">SoapReflectionImporter</a> class.</p>
+<p> Apply the  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a> to a public field to specify that the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> serializes the field as an XML attribute. You can specify an alternative name of the attribute by setting the  <a href="#AttributeName">SoapAttributeAttribute.AttributeName</a> property. Set the  <a href="#DataType">SoapAttributeAttribute.DataType</a> if the attribute must be given a specific XML Schema definition language (XSD) data type. If the attribute belongs to a specific XML namespace, set the  <a href="#Namespace">SoapAttributeAttribute.Namespace</a> property.</p>
+<p> For more information about using attributes, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconExtendingMetadataUsingAttributes.asp">MSDN: extendingmetadatausingattributes</a>.</p><br><br><b>Note </b> In your code, you can use the word <b>SoapAttribute</b> instead of the longer  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes a class that contains several fields to which a  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a> is applied.<pre>
+using System;
+using System.IO;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
+using System.Xml.Schema;
+
+[SoapInclude(typeof(Vehicle))]
+public class Group
+{
+   [SoapAttribute (Namespace = "http://www.cpandl.com")]
+   public string GroupName;
+   
+   [SoapAttribute(DataType = "base64Binary")]
+   public Byte [] GroupNumber;
+
+   [SoapAttribute(DataType = "date", AttributeName = "CreationDate")]
+   public DateTime Today;
+   [SoapElement(DataType = "nonNegativeInteger", ElementName = "PosInt")]
+   public string PostitiveInt;
+
+   public Vehicle GroupVehicle;
+}
+  
+public class Vehicle
+{
+   public string licenseNumber;
+}
+
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.SerializeObject("SoapAtts.xml");
+      test.DeserializeObject("SoapAtts.xml");
+   }
+   public void SerializeObject(string filename)
+   {
+      // Create an instance of the XmlSerializer class that
+      // can generate encoded SOAP messages.
+      XmlSerializer mySerializer =  ReturnSOAPSerializer();
+
+      Group myGroup=MakeGroup();
+      // Writing the file requires a TextWriter.
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      // Serialize the class, and close the TextWriter.
+      mySerializer.Serialize(writer, myGroup);
+      writer.WriteEndElement();
+      writer.Close();
+   }
+
+   private Group MakeGroup(){
+      // Create an instance of the class that will be serialized.
+      Group myGroup = new Group();
+
+      // Set the object properties.
+      myGroup.GroupName = ".NET";
+
+      Byte [] hexByte = new Byte[2]{Convert.ToByte(100),
+      Convert.ToByte(50)};
+      myGroup.GroupNumber = hexByte;
+
+      DateTime myDate = new DateTime(2002,5,2);
+      myGroup.Today = myDate;
+      myGroup.PostitiveInt= "10000";
+      myGroup.GroupVehicle = new Vehicle();
+      myGroup.GroupVehicle.licenseNumber="1234";
+      return myGroup;
+   }   	
+
+   public void DeserializeObject(string filename)
+   {
+      // Create an instance of the XmlSerializer class that
+      // can generate encoded SOAP messages.
+      XmlSerializer mySerializer =  ReturnSOAPSerializer();
+
+      // Reading the file requires an  XmlTextReader.
+      XmlTextReader reader= 
+      new XmlTextReader(filename);
+      reader.ReadStartElement("wrapper");
+
+      // Deserialize and cast the object.
+      Group myGroup; 
+      myGroup = (Group) mySerializer.Deserialize(reader);
+      reader.ReadEndElement();
+      reader.Close();
+
+   }
+   
+   private XmlSerializer ReturnSOAPSerializer(){
+      // Create an instance of the XmlSerializer class.
+      XmlTypeMapping myMapping = 
+      (new SoapReflectionImporter().ImportTypeMapping
+      (typeof(Group)));
+       return new XmlSerializer(myMapping);
+   }
+}
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Xml.Serialization/System.Xml.Serialization.html">System.Xml.Serialization Namespace</a> |  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> |  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> |  <a href="../../System.Xml.Serialization/types/SoapAttributes.html#SoapAttribute">SoapAttributes.SoapAttribute</a></dd>
+</dl>
+<h3>System.Xml.Serialization.SoapAttributeAttribute Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor()<br><br></code>Default constructor. This constructor is called by derived class constructors to initialize state in this type.<br> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a> class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(string attrName)<br><br></code> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a> class using the specified value as the name of the XML attribute.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#AttributeName">AttributeName</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the name of the XML attribute generated by the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#DataType">DataType</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the XML Schema definition language (XSD) data type of the SOAP attribute generated by the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Namespace">Namespace</a></td>
+<td width="55%"><b>Read-write</b><br><br> Gets or sets the XML namespace of the XML attribute.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#TypeId">TypeId</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b>Read-only</b><br><br><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#TypeId">System.Attribute.TypeId</a></font></b><br><br><br> When implemented in a derived class, gets a unique identifier for this <b>Attribute</b>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#GetHashCode">System.Attribute.GetHashCode</a></font></b><br><br><br> Returns the hash code for this instance.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#IsDefaultAttribute">IsDefaultAttribute</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#IsDefaultAttribute">System.Attribute.IsDefaultAttribute</a></font></b><br><br><br> When overridden in a derived class, returns an indication whether the value of this instance is the default value for the derived class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Match(System.Object)">Match</a><br>(inherited from <b>System.Attribute)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Attribute.html#Match(System.Object)">System.Attribute.Match</a></font></b><br><br><br> When overridden in a derived class, returns a value indicating whether this instance equals a specified object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/Attribute.html">System.Attribute</a></li>
+<ul class="none">
+<li><b>System.Xml.Serialization.SoapAttributeAttribute</b></li>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Xml.Serialization.SoapAttributeAttribute Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a> class.</dd>
+</dl><br><dl>
+<dd>Default constructor. This constructor is called by derived class constructors to initialize state in this type.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public SoapAttributeAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Use this constructor to create a  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a> when you are overriding the serialization of a class member. Create the  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a>, set its properties, and set the object to the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html#SoapAttribute">SoapAttributes.SoapAttribute</a> property of a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> object. For more details, see the  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> class overview.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a new  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a> that is used to override the serialization of a field. After creating a  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a> and setting its properties, the object is set to the  <a href="../../System.Xml.Serialization/types/SoapAttributes.html#SoapAttribute">SoapAttributes.SoapAttribute</a> property of a  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a>. The  <a href="../../System.Xml.Serialization/types/SoapAttributes.html">SoapAttributes</a> is then added to a  <a href="../../System.Xml.Serialization/types/SoapAttributeOverrides.html">SoapAttributeOverrides</a> that is used to create an  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>.<pre>
+using System;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
+
+
+public class Group
+{
+   // This attribute will be overridden.
+   [SoapAttribute (Namespace = "http://www.cpandl.com")]
+   public string GroupName;
+   
+}
+
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.SerializeOverride("SoapOveride.xml");
+     
+   }
+
+   public void SerializeOverride(string filename)
+   {
+      // Create an instance of the XmlSerializer class
+      // that overrides the serialization.
+      XmlSerializer overRideSerializer = CreateOverrideSerializer();
+
+      // Writing the file requires a TextWriter.
+      TextWriter writer = new StreamWriter(filename);
+
+      // Create an instance of the class that will be serialized.
+      Group myGroup = new Group();
+
+      // Set the object properties.
+      myGroup.GroupName = ".NET";
+
+      // Serialize the class, and close the TextWriter.
+      overRideSerializer.Serialize(writer, myGroup);
+       writer.Close();
+
+   }
+
+
+   private XmlSerializer CreateOverrideSerializer(){
+   	
+      SoapAttributeOverrides mySoapAttributeOverrides = 
+		new SoapAttributeOverrides();
+      SoapAttributes mySoapAttributes = new SoapAttributes();
+      // Create a new SoapAttributeAttribute to override the 
+      // one applied to the Group class. The resulting XML 
+      // stream will use the new namespace and attribute name.
+      SoapAttributeAttribute mySoapAttribute = 
+      new SoapAttributeAttribute();
+      mySoapAttribute.AttributeName = "TeamName";
+      // Change the Namespace.
+      mySoapAttribute.Namespace = "http://www.cohowinery.com";
+
+      mySoapAttributes.SoapAttribute = mySoapAttribute;
+      mySoapAttributeOverrides.
+      Add(typeof(Group), "GroupName" ,mySoapAttributes);
+	
+      XmlTypeMapping myMapping = (new SoapReflectionImporter
+        (mySoapAttributeOverrides)).ImportTypeMapping(typeof(Group));
+	
+      XmlSerializer ser = new XmlSerializer(myMapping);
+      return ser;
+   }
+
+}
+//&lt;?xml version="1.0" encoding="utf-8" ?&gt; 
+// &lt;Group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+//xmlns:xsd="http://www.w3.org/2001/XMLSchema" n1:TeamName=".NET" 
+//xmlns:n1="http://www.cohowinery" /&gt; 
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a> class using the specified value as the name of the XML attribute.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public SoapAttributeAttribute(<br>   <font color="#008080"><a href="../../System/types/String.html">string</a> <i>attrName</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>attrName</i><br><dl>
+<dd>
+<param> The name of the XML attribute.
+</dd>
+</dl>
+</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes a class that contains several fields to which a  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a> is applied.<pre>
+using System;
+using System.IO;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
+using System.Xml.Schema;
+
+[SoapInclude(typeof(Vehicle))]
+public class Group
+{
+   [SoapAttribute (Namespace = "http://www.cpandl.com")]
+   public string GroupName;
+   
+   [SoapAttribute(DataType = "base64Binary")]
+   public Byte [] GroupNumber;
+
+   [SoapAttribute(DataType = "date", AttributeName = "CreationDate")]
+   public DateTime Today;
+   [SoapElement(DataType = "nonNegativeInteger", ElementName = "PosInt")]
+   public string PostitiveInt;
+
+   public Vehicle GroupVehicle;
+}
+  
+public class Vehicle
+{
+   public string licenseNumber;
+}
+
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.SerializeObject("SoapAtts.xml");
+      test.DeserializeObject("SoapAtts.xml");
+   }
+   public void SerializeObject(string filename)
+   {
+      // Create an instance of the XmlSerializer class that
+      // can generate encoded SOAP messages.
+      XmlSerializer mySerializer =  ReturnSOAPSerializer();
+
+      Group myGroup=MakeGroup();
+      // Writing the file requires a TextWriter.
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      // Serialize the class, and close the TextWriter.
+      mySerializer.Serialize(writer, myGroup);
+      writer.WriteEndElement();
+      writer.Close();
+   }
+
+   private Group MakeGroup(){
+      // Create an instance of the class that will be serialized.
+      Group myGroup = new Group();
+
+      // Set the object properties.
+      myGroup.GroupName = ".NET";
+
+      Byte [] hexByte = new Byte[2]{Convert.ToByte(100),
+      Convert.ToByte(50)};
+      myGroup.GroupNumber = hexByte;
+
+      DateTime myDate = new DateTime(2002,5,2);
+      myGroup.Today = myDate;
+      myGroup.PostitiveInt= "10000";
+      myGroup.GroupVehicle = new Vehicle();
+      myGroup.GroupVehicle.licenseNumber="1234";
+      return myGroup;
+   }   	
+
+   public void DeserializeObject(string filename)
+   {
+      // Create an instance of the XmlSerializer class that
+      // can generate encoded SOAP messages.
+      XmlSerializer mySerializer =  ReturnSOAPSerializer();
+
+      // Reading the file requires an  XmlTextReader.
+      XmlTextReader reader= 
+      new XmlTextReader(filename);
+      reader.ReadStartElement("wrapper");
+
+      // Deserialize and cast the object.
+      Group myGroup; 
+      myGroup = (Group) mySerializer.Deserialize(reader);
+      reader.ReadEndElement();
+      reader.Close();
+
+   }
+   
+   private XmlSerializer ReturnSOAPSerializer(){
+      // Create an instance of the XmlSerializer class.
+      XmlTypeMapping myMapping = 
+      (new SoapReflectionImporter().ImportTypeMapping
+      (typeof(Group)));
+       return new XmlSerializer(myMapping);
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="AttributeNameTopic1"></a><a name="AttributeName">AttributeName</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the name of the XML attribute generated by the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> AttributeName {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Use the  <a href="#AttributeName">SoapAttributeAttribute.AttributeName</a> property to specify an XML attribute name when the default value cannot be used. For example, if the XML attribute name is invalid as a member identifier, you can use a valid name for the identifier while setting the  <a href="#AttributeName">SoapAttributeAttribute.AttributeName</a> to an invalid name.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes a class that contains several fields to which the  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a> is applied. The  <a href="#AttributeName">SoapAttributeAttribute.AttributeName</a> property is set for the <code>
+                Today
+              </code> field.<pre>
+using System;
+using System.IO;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
+using System.Xml.Schema;
+
+[SoapInclude(typeof(Vehicle))]
+public class Group
+{
+   [SoapAttribute (Namespace = "http://www.cpandl.com")]
+   public string GroupName;
+   
+   [SoapAttribute(DataType = "base64Binary")]
+   public Byte [] GroupNumber;
+
+   [SoapAttribute(DataType = "date", AttributeName = "CreationDate")]
+   public DateTime Today;
+   [SoapElement(DataType = "nonNegativeInteger", ElementName = "PosInt")]
+   public string PostitiveInt;
+
+   public Vehicle GroupVehicle;
+}
+  
+public class Vehicle
+{
+   public string licenseNumber;
+}
+
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.SerializeObject("SoapAtts.xml");
+      test.DeserializeObject("SoapAtts.xml");
+   }
+   public void SerializeObject(string filename)
+   {
+      // Create an instance of the XmlSerializer class that
+      // can generate encoded SOAP messages.
+      XmlSerializer mySerializer =  ReturnSOAPSerializer();
+
+      Group myGroup=MakeGroup();
+      // Writing the file requires a TextWriter.
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      // Serialize the class, and close the TextWriter.
+      mySerializer.Serialize(writer, myGroup);
+      writer.WriteEndElement();
+      writer.Close();
+   }
+
+   private Group MakeGroup(){
+      // Create an instance of the class that will be serialized.
+      Group myGroup = new Group();
+
+      // Set the object properties.
+      myGroup.GroupName = ".NET";
+
+      Byte [] hexByte = new Byte[2]{Convert.ToByte(100),
+      Convert.ToByte(50)};
+      myGroup.GroupNumber = hexByte;
+
+      DateTime myDate = new DateTime(2002,5,2);
+      myGroup.Today = myDate;
+      myGroup.PostitiveInt= "10000";
+      myGroup.GroupVehicle = new Vehicle();
+      myGroup.GroupVehicle.licenseNumber="1234";
+      return myGroup;
+   }   	
+
+   public void DeserializeObject(string filename)
+   {
+      // Create an instance of the XmlSerializer class that
+      // can generate encoded SOAP messages.
+      XmlSerializer mySerializer =  ReturnSOAPSerializer();
+
+      // Reading the file requires an  XmlTextReader.
+      XmlTextReader reader= 
+      new XmlTextReader(filename);
+      reader.ReadStartElement("wrapper");
+
+      // Deserialize and cast the object.
+      Group myGroup; 
+      myGroup = (Group) mySerializer.Deserialize(reader);
+      reader.ReadEndElement();
+      reader.Close();
+
+   }
+   
+   private XmlSerializer ReturnSOAPSerializer(){
+      // Create an instance of the XmlSerializer class.
+      XmlTypeMapping myMapping = 
+      (new SoapReflectionImporter().ImportTypeMapping
+      (typeof(Group)));
+       return new XmlSerializer(myMapping);
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="DataTypeTopic1"></a><a name="DataType">DataType</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the XML Schema definition language (XSD) data type of the SOAP attribute generated by the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> DataType {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/Exception.html">Exception</a></td>
+<td> The XML Schema data type you've specified cannot be mapped to the .NET data type.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The following table lists the XML Schema simple data types with their .NET equivalents.<p> For the XML Schema <b>base64Binary</b> and <b>hexBinary</b> data types, use an array of  <a href="../../System/types/Byte.html">Byte</a> structures, and apply a  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a> with the  <a href="#DataType">SoapAttributeAttribute.DataType</a> set to "base64Binary" or "hexBinary", as appropriate. For the XML Schema <b>time</b> and <b>date</b> data types, use the  <a href="../../System/types/DateTime.html">DateTime</a> type and apply the  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a> with the  <a href="#DataType">SoapAttributeAttribute.DataType</a> set to "date" or "time".</p>
+<p> For every XML Schema data type that is mapped to a string, apply the  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a> with its  <a href="#DataType">SoapAttributeAttribute.DataType</a> property set to the XML Schema data type. Note that this will not change the serialization format, only the schema for the member.</p><br><br><b>Note </b> The property is case-sensitive, so you must set it exactly to one of the XML Schema data types.<br><br><b>Note </b> Passing binary data as an XML element is more efficient then passing it as an XML attribute.<p> For more information about XML Schema data types, see the World Wide Consortium (www.w3.org ) document named "XML Schema Part 2: Datatypes".</p><br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+                  XML Schema data type
+                </TH>
+<TH>
+                  .NET data type
+                </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+                  anyURI
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  base64Binary
+                </TD>
+<TD> Array of  <a href="../../System/types/Byte.html">Byte</a> objects </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  boolean
+                </TD>
+<TD> <a href="../../System/types/Boolean.html">Boolean</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  byte
+                </TD>
+<TD> <a href="../../System/types/SByte.html">SByte</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  date
+                </TD>
+<TD> <a href="../../System/types/DateTime.html">DateTime</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  dateTime
+                </TD>
+<TD> <a href="../../System/types/DateTime.html">DateTime</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  decimal
+                </TD>
+<TD> <a href="../../System/types/Decimal.html">Decimal</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  double
+                </TD>
+<TD> <a href="../../System/types/Double.html">Double</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  ENTITY
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  ENTITIES
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  float
+                </TD>
+<TD> <a href="../../System/types/Single.html">Single</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  gDay
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  gMonth
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  gMonthDay
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  gYear
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  gYearMonth
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  hexBinary
+                </TD>
+<TD> Array of  <a href="../../System/types/Byte.html">Byte</a> objects </TD>
+</TR>
+<TR valign="top">
+<TD>
+                  ID
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  IDREF
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  IDREFS
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  int
+                </TD>
+<TD> <a href="../../System/types/Int32.html">Int32</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  integer
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  language
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  long
+                </TD>
+<TD> <a href="../../System/types/Int64.html">Int64</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  Name
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  NCName
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  negativeInteger
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  NMTOKEN
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  NMTOKENS
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  normalizedString
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  nonNegativeInteger
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  nonPositiveInteger
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  NOTATION
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  positiveInteger
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  QName
+                </TD>
+<TD> <a href="../../System.Xml/types/XmlQualifiedName.html">XmlQualifiedName</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  recurringDate
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  duration
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  string
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  short
+                </TD>
+<TD> <a href="../../System/types/Int16.html">Int16</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  time
+                </TD>
+<TD> <a href="../../System/types/DateTime.html">DateTime</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  token
+                </TD>
+<TD> <a href="../../System/types/String.html">String</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  unsignedByte
+                </TD>
+<TD> <a href="../../System/types/Byte.html">Byte</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  unsignedInt
+                </TD>
+<TD> <a href="../../System/types/UInt32.html">UInt32</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  unsignedLong
+                </TD>
+<TD> <a href="../../System/types/UInt64.html">UInt64</a></TD>
+</TR>
+<TR valign="top">
+<TD>
+                  unsignedShort
+                </TD>
+<TD> <a href="../../System/types/UInt16.html">UInt16</a></TD>
+</TR>
+</table>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes a class that contains several fields to which a  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a> is applied. The  <a href="#DataType">SoapAttributeAttribute.DataType</a> property is set for the <code>
+                GroupNumber
+              </code> and the <code>
+                Today
+              </code> fields.<pre>
+using System;
+using System.IO;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
+using System.Xml.Schema;
+
+[SoapInclude(typeof(Vehicle))]
+public class Group
+{
+   [SoapAttribute (Namespace = "http://www.cpandl.com")]
+   public string GroupName;
+   
+   [SoapAttribute(DataType = "base64Binary")]
+   public Byte [] GroupNumber;
+
+   [SoapAttribute(DataType = "date", AttributeName = "CreationDate")]
+   public DateTime Today;
+   [SoapElement(DataType = "nonNegativeInteger", ElementName = "PosInt")]
+   public string PostitiveInt;
+
+   public Vehicle GroupVehicle;
+}
+  
+public class Vehicle
+{
+   public string licenseNumber;
+}
+
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.SerializeObject("SoapAtts.xml");
+      test.DeserializeObject("SoapAtts.xml");
+   }
+   public void SerializeObject(string filename)
+   {
+      // Create an instance of the XmlSerializer class that
+      // can generate encoded SOAP messages.
+      XmlSerializer mySerializer =  ReturnSOAPSerializer();
+
+      Group myGroup=MakeGroup();
+      // Writing the file requires a TextWriter.
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      // Serialize the class, and close the TextWriter.
+      mySerializer.Serialize(writer, myGroup);
+      writer.WriteEndElement();
+      writer.Close();
+   }
+
+   private Group MakeGroup(){
+      // Create an instance of the class that will be serialized.
+      Group myGroup = new Group();
+
+      // Set the object properties.
+      myGroup.GroupName = ".NET";
+
+      Byte [] hexByte = new Byte[2]{Convert.ToByte(100),
+      Convert.ToByte(50)};
+      myGroup.GroupNumber = hexByte;
+
+      DateTime myDate = new DateTime(2002,5,2);
+      myGroup.Today = myDate;
+      myGroup.PostitiveInt= "10000";
+      myGroup.GroupVehicle = new Vehicle();
+      myGroup.GroupVehicle.licenseNumber="1234";
+      return myGroup;
+   }   	
+
+   public void DeserializeObject(string filename)
+   {
+      // Create an instance of the XmlSerializer class that
+      // can generate encoded SOAP messages.
+      XmlSerializer mySerializer =  ReturnSOAPSerializer();
+
+      // Reading the file requires an  XmlTextReader.
+      XmlTextReader reader= 
+      new XmlTextReader(filename);
+      reader.ReadStartElement("wrapper");
+
+      // Deserialize and cast the object.
+      Group myGroup; 
+      myGroup = (Group) mySerializer.Deserialize(reader);
+      reader.ReadEndElement();
+      reader.Close();
+
+   }
+   
+   private XmlSerializer ReturnSOAPSerializer(){
+      // Create an instance of the XmlSerializer class.
+      XmlTypeMapping myMapping = 
+      (new SoapReflectionImporter().ImportTypeMapping
+      (typeof(Group)));
+       return new XmlSerializer(myMapping);
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="NamespaceTopic1"></a><a name="Namespace">Namespace</a></i></b><b><i></i></b><b><font color="#008080"> (read-write)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets or sets the XML namespace of the XML attribute.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/String.html">string</a> Namespace {get; set;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Xml.Serialization/types/XmlAttributeAttribute.html#Namespace">XmlAttributeAttribute.Namespace</a> property conforms to the World Wide Web Consortium (www.w3.org ) specification "Namespaces in XML".<p> To create namespaces that are associated with prefixes, you must create an  <a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a> that contains the namespaces and prefixes used in the XML document. The namespace you set for each  <a href="../../System.Xml.Serialization/types/XmlAttributeAttribute.html">XmlAttributeAttribute</a> must match one of the namespaces in the  <a href="../../System.Xml.Serialization/types/XmlSerializerNamespaces.html">XmlSerializerNamespaces</a>. When the  <a href="../../System.Xml.Serialization/types/XmlSerializer.html">XmlSerializer</a> generates the XML code, it correctly prefixes each attribute name.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example serializes a class that contains several fields to which a  <a href="../../System.Xml.Serialization/types/SoapAttributeAttribute.html">SoapAttributeAttribute</a> is applied. The  <a href="#Namespace">SoapAttributeAttribute.Namespace</a> property is set for the <code>
+                GroupName
+              </code> the field.<pre>
+using System;
+using System.IO;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
+using System.Xml.Schema;
+
+[SoapInclude(typeof(Vehicle))]
+public class Group
+{
+   [SoapAttribute (Namespace = "http://www.cpandl.com")]
+   public string GroupName;
+   
+   [SoapAttribute(DataType = "base64Binary")]
+   public Byte [] GroupNumber;
+
+   [SoapAttribute(DataType = "date", AttributeName = "CreationDate")]
+   public DateTime Today;
+   [SoapElement(DataType = "nonNegativeInteger", ElementName = "PosInt")]
+   public string PostitiveInt;
+
+   public Vehicle GroupVehicle;
+}
+  
+public class Vehicle
+{
+   public string licenseNumber;
+}
+
+public class Run
+{
+   public static void Main()
+   {
+      Run test = new Run();
+      test.SerializeObject("SoapAtts.xml");
+      test.DeserializeObject("SoapAtts.xml");
+   }
+   public void SerializeObject(string filename)
+   {
+      // Create an instance of the XmlSerializer class that
+      // can generate encoded SOAP messages.
+      XmlSerializer mySerializer =  ReturnSOAPSerializer();
+
+      Group myGroup=MakeGroup();
+      // Writing the file requires a TextWriter.
+      XmlTextWriter writer = 
+      new XmlTextWriter(filename, Encoding.UTF8);
+      writer.Formatting = Formatting.Indented;
+      writer.WriteStartElement("wrapper");
+      // Serialize the class, and close the TextWriter.
+      mySerializer.Serialize(writer, myGroup);
+      writer.WriteEndElement();
+      writer.Close();
+   }
+
+   private Group MakeGroup(){
+      // Create an instance of the class that will be serialized.
+      Group myGroup = new Group();
+
+      // Set the object properties.
+      myGroup.GroupName = ".NET";
+
+      Byte [] hexByte = new Byte[2]{Convert.ToByte(100),
+      Convert.ToByte(50)};
+      myGroup.GroupNumber = hexByte;
+
+      DateTime myDate = new DateTime(2002,5,2);
+      myGroup.Today = myDate;
+      myGroup.PostitiveInt= "10000";
+      myGroup.GroupVehicle = new Vehicle();
+      myGroup.GroupVehicle.licenseNumber="1234";
+      return myGroup;
+   }   	
+
+   public void DeserializeObject(string filename)
+   {
+      // Create an instance of the XmlSerializer class that
+      // can generate encoded SOAP messages.
+      XmlSerializer mySerializer =  ReturnSOAPSerializer();
+
+      // Reading the file requires an  XmlTextReader.
+      XmlTextReader reader= 
+      new XmlTextReader(filename);
+      reader.ReadStartElement("wrapper");
+
+      // Deserialize and cast the object.
+      Group myGroup; 
+      myGroup = (Group) mySerializer.Deserialize(reader);
+      reader.ReadEndElement();
+      reader.Close();
+
+   }
+   
+   private XmlSerializer ReturnSOAPSerializer(){
+      // Create an instance of the XmlSerializer class.
+      XmlTypeMapping myMapping = 
+      (new SoapReflectionImporter().ImportTypeMapping
+      (typeof(Group)));
+       return new XmlSerializer(myMapping);
+   }
+}
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="TypeIdTopic1"></a><a name="TypeId">TypeId</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#TypeId">System.Attribute.TypeId</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When implemented in a derived class, gets a unique identifier for this <b>Attribute</b>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Object.html">object</a> TypeId {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> As implemented, this identifier is merely the  <a href="../../System/types/Type.html">Type</a> of the attribute. However, it is intended that the unique identifier be used to identify two attributes of the same type.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~SoapAttributeAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#GetHashCode">System.Attribute.GetHashCode</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the hash code for this instance.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A 32-bit signed integer hash code.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="IsDefaultAttributeTopic1"></a><a name="IsDefaultAttribute">IsDefaultAttribute</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#IsDefaultAttribute">System.Attribute.IsDefaultAttribute</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, returns an indication whether the value of this instance is the default value for the derived class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> IsDefaultAttribute();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if this instance is the default attribute for the class; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> The default implementation of this class returns <b>false</b>, and must be implemented in the derived class to be useful to that class.<p> The implementation of this method in a derived class compares the value of this instance to a standard, default value obtained by some means, then returns a Boolean value that indicates whether the value of this instance is equal to the standard. The standard value is typically coded as a constant in the implementation, or stored programmatically in a field used by the implementation.</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MatchTopic1"></a><a name="Match(System.Object)">Match</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Attribute.html#Match(System.Object)">System.Attribute.Match</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> When overridden in a derived class, returns a value indicating whether this instance equals a specified object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Match(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>obj</i><br><dl>
+<dd>
+<param> An  <a href="../../System/types/Object.html">Object</a> to compare with this instance of <b>Attribute</b>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if this instance equals <i>obj</i>; otherwise, <b>false</b>.</dd>
+</dl><b>Remarks</b><dl>
+<dd> This method determines if one <b>Attribute</b> equals another. Its default implementation is the same as  <a href="#Equals(System.Object)">Attribute.Equals</a>, which performs a value and reference comparison. Override this method to implement support for attribute values, such as flags or bitfields, that consist of components that are meaningful in themselves. For example, consider an attribute whose value is a binary field divided into a bitfield of flags. Two instances of this attribute have one flag in set in common while all the other flags differ. The <b>Equal</b> method cannot determine that the two instances have the same flag set, but the <b>Match</b> method can.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

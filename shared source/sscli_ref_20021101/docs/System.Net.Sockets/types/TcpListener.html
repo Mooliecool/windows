@@ -1,0 +1,869 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Net.Sockets.TcpListener</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Net.Sockets.TcpListener Class</h2><b>Assembly: </b>System.dll<br><b>Namespace: </b>System.Net.Sockets<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Listens for connections from TCP network clients.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public class TcpListener
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> class builds upon the  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> class to provide TCP services at a higher level of abstraction. You can use a  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> to listen for connections from TCP clients. Application level protocols such as FTP and HTTP are built on the  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> class.<p> You can create an instance of the  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> class by providing one of the following constructor argument lists: </p>
+<UL>
+<li> An  <a href="../../System.Net/types/IPEndPoint.html">IPEndPoint</a> containing your local IP address and port number.</li>
+<li> Your IP address and port number.</li>
+<li> Just your port number. In this case, the default network interface will be used.</li>
+</UL>
+<p> Use the  <a href="#Start">TcpListener.Start</a> property to begin listening for incoming connection requests. Employ the  <a href="#Pending">TcpListener.Pending</a> method to determine if connections are pending. Use  <a href="#AcceptSocket">TcpListener.AcceptSocket</a> to retrieve a  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>, or  <a href="#AcceptTcpClient">TcpListener.AcceptTcpClient</a> to retrieve a  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> used for facilitating communication with the remote machine. Finally, use  <a href="#Stop">TcpListener.Stop</a> to close the underlying listening  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>.</p><br><br><b>Note </b> Calling  <a href="#Stop">TcpListener.Stop</a> only closes the  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> used to listen for incoming connections. You must close any instances returned from  <a href="#AcceptSocket">TcpListener.AcceptSocket</a> or  <a href="#AcceptTcpClient">TcpListener.AcceptTcpClient</a> as well.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates a  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> on port 13 that responds to an incoming connection with the current date and time, and then exits.<pre>
+              const int portNumber = 13;
+		TcpListener tcpListener = new TcpListener(portNumber);
+
+		tcpListener.Start();
+
+              Console.WriteLine("Waiting for a connection....");
+                
+              try{
+              
+                   //Accept the pending client connection and return a TcpClient initialized for communication.
+                   TcpClient tcpClient = tcpListener.AcceptTcpClient();
+		     Console.WriteLine("Connection accepted.");
+
+		     NetworkStream networkStream = tcpClient.GetStream();
+
+                   string responseString = "You have successfully connected to me";
+
+                   Byte[] sendBytes = Encoding.ASCII.GetBytes(responseString);
+                   networkStream.Write(sendBytes, 0, sendBytes.Length);
+
+                   Console.WriteLine("Message Sent /&gt; : " + responseString);
+                   
+               //Any communication with the remote client using the TcpClient can go here.
+               //
+               ////////
+
+               //Close TcpListener and TcpClient.
+               tcpClient.Close();
+	        tcpListener.Stop();
+
+               }
+               catch (Exception e) {
+			        Console.WriteLine(e.ToString());
+	    	 }
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Net.Sockets/System.Net.Sockets.html">System.Net.Sockets Namespace</a> |  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a></dd>
+</dl>
+<h3>System.Net.Sockets.TcpListener Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(int port)<br><br></code> Initializes a new instance of the  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> class that listens on the specified port.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor2">ctor #2</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(IPEndPoint localEP)<br><br></code> Initializes a new instance of the  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> class with the specified local endpoint.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ctor3">ctor #3</a></td>
+<td width="55%"><b>Overloaded:</b><br><code>.ctor(IPAddress localaddr, int port)<br><br></code> Initializes a new instance of the  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> class that listens to the specified IP address and port.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#LocalEndpoint">LocalEndpoint</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the underlying  <a href="../../System.Net/types/EndPoint.html">EndPoint</a> of the current  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#AcceptSocket">AcceptSocket</a></td>
+<td width="55%"> Accepts a pending connection request.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#AcceptTcpClient">AcceptTcpClient</a></td>
+<td width="55%"> Accepts a pending connection request </td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Pending">Pending</a></td>
+<td width="55%"> Determines if there are pending connection requests.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Start">Start</a></td>
+<td width="55%"> Starts listening to network requests.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Stop">Stop</a></td>
+<td width="55%"> Closes the listener.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Properties</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Active">Active</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets a value that indicates whether  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> is actively listening for client connections.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Server">Server</a></td>
+<td width="55%"><b>Read-only</b><br><br> Gets the underlying network  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a></td>
+<td width="55%"><b>Overridden: </b><br> Frees resources used by the  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> class.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><b>System.Net.Sockets.TcpListener</b></li>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Net.Sockets.TcpListener Member Details</h3><b>Overloaded <i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> class that listens on the specified port.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public TcpListener(<br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>port</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>port</i><br><dl>
+<dd>
+<param> The port on which to listen. If this number is 0, the system will assign an open port.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The <i>port</i> parameter is not between  <a href="../../System.Net/types/IPEndPoint.html#MinPort">IPEndPoint.MinPort</a> and  <a href="../../System.Net/types/IPEndPoint.html#MaxPort">IPEndPoint.MaxPort</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The <i>port</i> parameter specifies the local port number on which you intend to listen. When you call  <a href="#Start">TcpListener.Start</a>,  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> uses the default network interface to listen for connections on the specified port.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates an instance of the TcpListener class using a local port number.<pre>
+        //Creates an instance of the TcpListener class by providing a local port number.  
+
+        try{
+            TcpListener tcpListener = new TcpListener(13);
+        }
+        catch ( Exception e ){
+            Console.WriteLine( e.ToString());
+        }
+
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic2"></a><a name="ctor2">ctor #2</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> class with the specified local endpoint.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public TcpListener(<br>   <font color="#008080"><a href="../../System.Net/types/IPEndPoint.html">IPEndPoint</a> <i>localEP</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>localEP</i><br><dl>
+<dd>
+<param> The local endpoint to which to bind the listener  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>localEP</i> parameter is <b>null</b>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The <i>localEP</i> parameter specifies the local  <a href="../../System.Net/types/IPEndPoint.html">IPEndPoint</a>. This constructor creates an underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>, and binds that  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> to <i>localEp</i>. If you call the  <a href="#Start">TcpListener.Start</a> method,  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> will listen for connections on <i>localEp</i>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates an instance of the  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> class. using the local endpoint.<pre>
+        //Creates an instance of the TcpListener class by providing a local endpoint.
+
+        IPAddress ipAddress = Dns.Resolve(Dns.GetHostName()).AddressList[0];
+        IPEndPoint ipLocalEndPoint = new IPEndPoint(ipAddress, 11000); 
+
+        try{
+            TcpListener tcpListener = new TcpListener(ipLocalEndPoint);
+        }
+        catch ( Exception e ){
+            Console.WriteLine( e.ToString());
+        }
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Net/types/IPEndPoint.html">IPEndPoint</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overloaded <i><a name=".ctorTopic3"></a><a name="ctor3">ctor #3</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes a new instance of the  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> class that listens to the specified IP address and port.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public TcpListener(<br>   <font color="#008080"><a href="../../System.Net/types/IPAddress.html">IPAddress</a> <i>localaddr</i>,</font><br>   <font color="#008080"><a href="../../System/types/Int32.html">int</a> <i>port</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>localaddr</i><br><dl>
+<dd>
+<param> The local IP address.
+</dd>
+</dl>
+</p>
+</dd>
+<dd>
+<p><i>port</i><br><dl>
+<dd>
+<param> The port on which to listen.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentNullException.html">ArgumentNullException</a></td>
+<td> The <i>localaddr</i> parameter is <b>null</b>.</td>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+<td> The <i>port</i> parameter is not between  <a href="../../System.Net/types/IPEndPoint.html#MinPort">IPEndPoint.MinPort</a> and  <a href="../../System.Net/types/IPEndPoint.html#MaxPort">IPEndPoint.MaxPort</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> initializes its underlying  <a href="../../System.Net/types/IPEndPoint.html">IPEndPoint</a> using the specified IP address and port number. If you call the  <a href="#Start">TcpListener.Start</a> method,  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> listens for connections using the underlying  <a href="../../System.Net/types/IPEndPoint.html">IPEndPoint</a>.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example creates an instance of the  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> class using a local IP address and port number.<pre>
+        //Creates an instance of the TcpListener class by providing a local IP address and port number.
+
+        IPAddress ipAddress = Dns.Resolve("localhost").AddressList[0];
+
+        try{
+            TcpListener tcpListener =  new TcpListener(ipAddress, 13);    
+        }
+        catch ( Exception e){
+            Console.WriteLine( e.ToString());
+        }
+    
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Net/types/IPAddress.html">IPAddress</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ActiveTopic1"></a><a name="Active">Active</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets a value that indicates whether  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> is actively listening for client connections.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Boolean.html">bool</a> Active {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> Classes deriving from  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> can use this property to keep track of the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> connection state.<br><br><b>Note </b> <a href="../../System.Net.Sockets/types/TcpClient.html#Active">TcpClient.Active</a> can be used to avoid redundant  <a href="#Start">TcpListener.Start</a> attempts.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="LocalEndpointTopic1"></a><a name="LocalEndpoint">LocalEndpoint</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the underlying  <a href="../../System.Net/types/EndPoint.html">EndPoint</a> of the current  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Net/types/EndPoint.html">EndPoint</a> LocalEndpoint {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> You can use  <a href="#LocalEndpoint">TcpListener.LocalEndpoint</a> if you want to identify the local network interface and port number being used to listen for incoming client connection requests.<br><br><b>Note </b> To obtain address and port information, you must explicitly cast  <a href="#LocalEndpoint">TcpListener.LocalEndpoint</a> to return an  <a href="../../System.Net/types/IPEndPoint.html">IPEndPoint</a>. You can then use the various methods within  <a href="../../System.Net/types/IPEndPoint.html">IPEndPoint</a> to retrieve the desired information.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Net.Sockets/types/Socket.html#Listen(System.Int32)">Socket.Listen</a> |  <a href="../../System.Net/types/EndPoint.html">EndPoint</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Property: <i><a name="ServerTopic1"></a><a name="Server">Server</a></i></b><b><i></i></b><b><font color="#008080"> (read-only)</font></b><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Gets the underlying network  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> Server {get;}
+          </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> creates a  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> to listen for incoming client connection requests. Classes deriving from  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> can use this property to get this  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>. Use the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> returned by the  <a href="#Server">TcpListener.Server</a> property if you require access beyond that which  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> provides.<br><br><b>Note </b> <a href="#Server">TcpListener.Server</a> only returns the  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> used to listen for incoming client connection requests. Use the  <a href="#AcceptSocket">TcpListener.AcceptSocket</a> method to accept a pending connection request and obtain a  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> for sending and receiving data. You can also use the  <a href="#AcceptTcpClient">TcpListener.AcceptTcpClient</a> method to accept a pending connection request and obtain a  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> for sending and receiving data.</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> |  <a href="#AcceptSocket">TcpListener.AcceptSocket</a> |  <a href="#AcceptTcpClient">TcpListener.AcceptTcpClient</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="AcceptSocketTopic1"></a><a name="AcceptSocket">AcceptSocket</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Accepts a pending connection request.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> AcceptSocket();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> used to send and receive data.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The listener has not been started with a call to  <a href="#Start">TcpListener.Start</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#AcceptSocket">TcpListener.AcceptSocket</a> returns a  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> that you can use to send and receive data. This  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> is initialized with the IP address and port number of the remote machine. You can use any of the  <a href="../../System.Net.Sockets/types/Socket.html#Send(System.Byte[],System.Int32,System.Net.Sockets.SocketFlags)">Socket.Send</a> and  <a href="../../System.Net.Sockets/types/Socket.html#Receive(System.Byte[],System.Int32,System.Net.Sockets.SocketFlags)">Socket.Receive</a> methods available in the  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> class to communicate with the remote machine.<br><br><b>Note </b> When you finish using the  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>, be sure to call its  <a href="../../System.Net.Sockets/types/Socket.html#Close">Socket.Close</a> method.<br><br><b>Note </b> If your application is relatively simple, consider using the  <a href="#AcceptTcpClient">TcpListener.AcceptTcpClient</a> method rather than  <a href="#AcceptSocket">TcpListener.AcceptSocket</a>. <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> provides you with simple methods for sending and receiving data over a network.</dd>
+</dl><b>Example</b><dl>
+<dd> In the following example,  <a href="#AcceptSocket">TcpListener.AcceptSocket</a> is used to return a  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>. This  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> is used to communicate with the newly connected client.<pre>
+	       
+              // Accepts the pending client connection and returns a socket for communciation.
+               Socket socket = tcpListener.AcceptSocket();
+		 Console.WriteLine("Connection accepted.");
+
+               string responseString = "You have successfully connected to me";
+
+               //Forms and sends a response string to the connected client.
+               Byte[] sendBytes = Encoding.ASCII.GetBytes(responseString);
+               int i = socket.Send(sendBytes);
+               Console.WriteLine("Message Sent /&gt; : " + responseString);
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="#AcceptTcpClient">TcpListener.AcceptTcpClient</a> |  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="AcceptTcpClientTopic1"></a><a name="AcceptTcpClient">AcceptTcpClient</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Accepts a pending connection request </dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> AcceptTcpClient();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> A  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> used to send and receive data.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The listener has not been started with a call to  <a href="#Start">TcpListener.Start</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#AcceptTcpClient">TcpListener.AcceptTcpClient</a> returns a  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> that you can use to send and receive data. Use  <a href="../../System.Net.Sockets/types/TcpClient.html#GetStream">TcpClient.GetStream</a> to obtain the underlying  <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a> of the  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a>. <a href="../../System.Net.Sockets/types/NetworkStream.html">NetworkStream</a> inherits from  <a href="../../System.IO/types/Stream.html">Stream</a>, which provides a rich collection of methods and properties for network communications.<br><br><b>Note </b> When you are through with the returned  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a>, be sure to call it's  <a href="../../System.Net.Sockets/types/TcpClient.html#Close">TcpClient.Close</a> method.<br><br><b>Note </b> If you want greater flexibility than a  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> offers, consider using  <a href="#AcceptSocket">TcpListener.AcceptSocket</a>.</dd>
+</dl><b>Example</b><dl>
+<dd> In the following example,  <a href="#AcceptTcpClient">TcpListener.AcceptTcpClient</a> is used to return a  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a>. This  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> is used to communicate with the newly connected client.<pre>
+	       
+              // Accepts the pending client connection and returns a socket for communciation.
+               Socket socket = tcpListener.AcceptSocket();
+		 Console.WriteLine("Connection accepted.");
+
+               string responseString = "You have successfully connected to me";
+
+               //Forms and sends a response string to the connected client.
+               Byte[] sendBytes = Encoding.ASCII.GetBytes(responseString);
+               int i = socket.Send(sendBytes);
+               Console.WriteLine("Message Sent /&gt; : " + responseString);
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> |  <a href="#AcceptSocket">TcpListener.AcceptSocket</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Frees resources used by the  <a href="../../System.Net.Sockets/types/TcpClient.html">TcpClient</a> class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~TcpListener();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The finalizer for the  <a href="../../System.Net.Sockets/types/TcpListener.html">TcpListener</a> class calls the  <a href="#Stop">TcpListener.Stop</a> method to free the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="PendingTopic1"></a><a name="Pending">Pending</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Determines if there are pending connection requests.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Boolean.html">bool</a> Pending();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd><b>true</b> if connections are pending; otherwise, <b>false</b>.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System/types/InvalidOperationException.html">InvalidOperationException</a></td>
+<td> The listener has not been started with a call to  <a href="#Start">TcpListener.Start</a>.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#Pending">TcpListener.Pending</a> polls for the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> to determine if there are pending connections.</dd>
+</dl><b>See also: 
+			</b><br> <a href="#Start">TcpListener.Start</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="StartTopic1"></a><a name="Start">Start</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Starts listening to network requests.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void Start();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Net.Sockets/types/SocketException.html">SocketException</a></td>
+<td> An error occurs while opening the network socket.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#Start">TcpListener.Start</a> initializes the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>. After this initialization,  <a href="#Start">TcpListener.Start</a> does the following: <UL>
+<li> Binds the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a> using the underlying  <a href="../../System.Net/types/IPEndPoint.html">IPEndPoint</a>.</li>
+<li> Begins listening for client connections by calling the  <a href="../../System.Net.Sockets/types/Socket.html#Listen(System.Int32)">Socket.Listen</a> method of the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>.</li>
+</UL>
+<p> This method only listens for connection requests. To detect these requests, you can use one of the following: </p>
+<UL>
+<li> The  <a href="#Pending">TcpListener.Pending</a> method to detect incoming connection requests </li>
+<li> The  <a href="#AcceptSocket">TcpListener.AcceptSocket</a> method or the  <a href="#AcceptTcpClient">TcpListener.AcceptTcpClient</a> method to block until a connection request arrives.</li>
+</UL>
+</dd>
+</dl><b>Example</b><dl>
+<dd> The following example demonstrates how  <a href="#Start">TcpListener.Start</a> is used to listen for incoming client connection attempts.<pre>
+              const int portNumber = 13;
+		TcpListener tcpListener = new TcpListener(portNumber);
+
+		tcpListener.Start();
+
+              Console.WriteLine("Waiting for a connection....");
+                
+              try{
+              
+                   //Accept the pending client connection and return a TcpClient initialized for communication.
+                   TcpClient tcpClient = tcpListener.AcceptTcpClient();
+		     Console.WriteLine("Connection accepted.");
+
+		     NetworkStream networkStream = tcpClient.GetStream();
+
+                   string responseString = "You have successfully connected to me";
+
+                   Byte[] sendBytes = Encoding.ASCII.GetBytes(responseString);
+                   networkStream.Write(sendBytes, 0, sendBytes.Length);
+
+                   Console.WriteLine("Message Sent /&gt; : " + responseString);
+                   
+               //Any communication with the remote client using the TcpClient can go here.
+               //
+               ////////
+
+               //Close TcpListener and TcpClient.
+               tcpClient.Close();
+	        tcpListener.Stop();
+
+               }
+               catch (Exception e) {
+			        Console.WriteLine(e.ToString());
+	    	 }
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Net.Sockets/types/Socket.html#Listen(System.Int32)">Socket.Listen</a> |  <a href="../../System.Net.Sockets/types/Socket.html#Bind(System.Net.EndPoint)">Socket.Bind</a> |  <a href="#AcceptTcpClient">TcpListener.AcceptTcpClient</a> |  <a href="#AcceptSocket">TcpListener.AcceptSocket</a> |  <a href="#Pending">TcpListener.Pending</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="StopTopic1"></a><a name="Stop">Stop</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Closes the listener.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public void Stop();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Net.Sockets/types/SocketException.html">SocketException</a></td>
+<td> An error occurs while closing the network socket.</td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="#Stop">TcpListener.Stop</a> closes <b></b> the listener.</dd>
+</dl><b>Example</b><dl>
+<dd> The following example demonstrates using  <a href="#Stop">TcpListener.Stop</a> to close the underlying  <a href="../../System.Net.Sockets/types/Socket.html">Socket</a>.<pre>
+              const int portNumber = 13;
+		TcpListener tcpListener = new TcpListener(portNumber);
+
+		tcpListener.Start();
+
+              Console.WriteLine("Waiting for a connection....");
+                
+              try{
+              
+                   //Accept the pending client connection and return a TcpClient initialized for communication.
+                   TcpClient tcpClient = tcpListener.AcceptTcpClient();
+		     Console.WriteLine("Connection accepted.");
+
+		     NetworkStream networkStream = tcpClient.GetStream();
+
+                   string responseString = "You have successfully connected to me";
+
+                   Byte[] sendBytes = Encoding.ASCII.GetBytes(responseString);
+                   networkStream.Write(sendBytes, 0, sendBytes.Length);
+
+                   Console.WriteLine("Message Sent /&gt; : " + responseString);
+                   
+               //Any communication with the remote client using the TcpClient can go here.
+               //
+               ////////
+
+               //Close TcpListener and TcpClient.
+               tcpClient.Close();
+	        tcpListener.Stop();
+
+               }
+               catch (Exception e) {
+			        Console.WriteLine(e.ToString());
+	    	 }
+
+    </pre>
+</dd>
+</dl><b>See also: 
+			</b><br> <a href="../../System.Net.Sockets/types/Socket.html#Close">Socket.Close</a><h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

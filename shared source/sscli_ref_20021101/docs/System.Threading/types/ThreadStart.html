@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Threading.ThreadStart</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Threading.ThreadStart Delegate</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Threading<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Represents the method that will handle the <b>Start</b> event of the  <a href="../../System.Threading/types/Thread.html">Thread</a> class.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Serializable]<br><b>public delegate void ThreadStart();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> When a thread is created, the new instance of the  <a href="../../System.Threading/types/Thread.html">Thread</a> class is created using a constructor that takes the <b>ThreadStart</b> delegate as its only parameter. However, the thread does not begin executing until the  <a href="../../System.Threading/types/Thread.html#Start">Thread.Start</a> method is invoked. When <b>Start</b> is called, execution begins at the first line of the method referenced by the <b>ThreadStart</b> delegate.<p> When you create a <b>ThreadStart</b> delegate, you identify the method that will handle the event. To associate the event handler with your event, add an instance of the delegate to the event. The event handler is called whenever the event occurs, unless you remove the delegate.</p>
+<p> For an example that demonstrates creating a <b>ThreadStart</b> delegate, see <b>Start</b>. For more information about event handler delegates, see  the conceptual topic at <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconEventsDelegates.asp">MSDN: eventsdelegates</a>.</p>
+</dd>
+</dl><b>Example</b><dl>
+<dd>
+<pre>
+	class WorkerThreadHandler {
+		public TcpListener myTcpListener;
+
+		public void HandleThread() {
+			Thread currentThread = Thread.CurrentThread;
+			Socket mySocket = myTcpListener.AcceptSocket();
+			string message =
+				"Thread Name: " + currentThread.Name +
+				"\r\nThread Apartment State: " + currentThread.ApartmentState.ToString() +
+				"\r\nThread State: " + currentThread.ThreadState.ToString();
+			Console.WriteLine(message);
+			byte[] buf = System.Text.Encoding.ASCII.GetBytes(message.ToCharArray());
+			mySocket.Send(buf);
+			Console.WriteLine("Closing connection with client.");
+			mySocket.Close();
+		}
+	}
+
+	public class MainThreadHandler {
+		private TcpListener myTcpListener;
+
+		public MainThreadHandler() {
+			myTcpListener = new TcpListener(10000);
+			myTcpListener.Start();
+			Console.WriteLine("Listener started. Press Ctrl+Break to stop.");
+
+			while (true) {
+				while (!myTcpListener.Pending()) {	
+					Thread.Sleep(1000);
+				}
+				WorkerThreadHandler myWorkerThreadHandler = new WorkerThreadHandler();
+				myWorkerThreadHandler.myTcpListener = this.myTcpListener;
+				ThreadStart myThreadStart = new ThreadStart(myWorkerThreadHandler.HandleThread);
+				Thread myWorkerThread = new Thread(myThreadStart);
+				myWorkerThread.Name = "Created at " + DateTime.Now.ToString();
+				myWorkerThread.Start();
+			}
+		}
+	}
+
+	// Server output upon telnet connection from client at port 10000:
+	// Listener started. Press Ctrl+Break to stop.
+	// Thread Name: Created at 8/15/2001 8:40:28 PM
+	// Thread Apartment State: MTA
+	// Thread State: Running
+	// Closing connection with client.
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Threading/System.Threading.html">System.Threading Namespace</a> |  <a href="../../System.Threading/types/Thread.html">Thread</a> |  <a href="../../System/types/AppDomain.html">AppDomain</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconEventsDelegates.asp">MSDN: eventsdelegates</a></dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/Delegate.html">System.Delegate</a></li>
+<ul class="none">
+<li><a href="../../System/types/MulticastDelegate.html">System.MulticastDelegate</a></li>
+<ul class="none">
+<li><b>System.Threading.ThreadStart</b></li>
+</ul>
+</ul>
+</ul>
+</ul>
+</p>
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

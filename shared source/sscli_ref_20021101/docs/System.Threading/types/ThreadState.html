@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Threading.ThreadState</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Threading.ThreadState Enumeration</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Threading<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Specifies the execution states of a  <a href="../../System.Threading/types/Thread.html">Thread</a>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code>[Flags]<br>[Serializable]<br><b>public enum ThreadState</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> <a href="../../System.Threading/types/ThreadState.html">ThreadState</a> defines a set of all possible execution states for threads. Once a thread is created, it is in at least one of the states until it terminates. Threads created within the common language runtime are initially in the <b>Unstarted</b> state, while external threads that come into the runtime are already in the <b>Running</b> state. An <b>Unstarted</b> thread is transitioned into the <b>Running</b> state by calling  <a href="../../System.Threading/types/Thread.html#Start">Thread.Start</a>. Not all combinations of <b>ThreadState</b> values are valid; for example, a thread cannot be in both the <b>Aborted</b> and <b>Unstarted</b> states.<p> The following table shows the actions that cause a change of state.</p><br><br><table border="1" width="90%" style="border-collapse: collapse">
+<THEAD>
+<TH>
+              Action
+            </TH>
+<TH>
+              ThreadState
+            </TH>
+</THEAD>
+<TR valign="top">
+<TD>
+              A thread is created within the common language runtime.
+            </TD>
+<TD>
+              Unstarted
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              A thread calls
+               <a href="../../System.Threading/types/Thread.html#Start">Thread.Start</a></TD>
+<TD>
+              Running
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              The thread starts running.
+            </TD>
+<TD>
+              Running
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              The thread calls
+               <a href="../../System.Threading/types/Thread.html#Sleep(System.Int32)">Thread.Sleep</a></TD>
+<TD>
+              WaitSleepJoin
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              The thread calls
+               <a href="../../System.Threading/types/Monitor.html#Wait(System.Object,System.Int32,System.Boolean)">Monitor.Wait</a>
+              on another object.
+            </TD>
+<TD>
+              WaitSleepJoin
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              The thread calls
+               <a href="../../System.Threading/types/Thread.html#Join">Thread.Join</a>
+              on another thread.
+            </TD>
+<TD>
+              WaitSleepJoin
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              Another thread calls
+               <a href="../../System.Threading/types/Thread.html#Interrupt">Thread.Interrupt</a></TD>
+<TD>
+              Running
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              Another thread calls
+               <a href="../../System.Threading/types/Thread.html#Suspend">Thread.Suspend</a></TD>
+<TD> SuspendRequested </TD>
+</TR>
+<TR valign="top">
+<TD>
+              The
+              thread responds to a
+               <a href="../../System.Threading/types/Thread.html#Suspend">Thread.Suspend</a>
+              request.
+            </TD>
+<TD>
+              Suspended
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              Another thread calls
+               <a href="../../System.Threading/types/Thread.html#Resume">Thread.Resume</a></TD>
+<TD>
+              Running
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              Another thread calls
+               <a href="../../System.Threading/types/Thread.html#Abort(System.Object)">Thread.Abort</a></TD>
+<TD>
+              AbortRequested
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              The
+              thread responds to a
+               <a href="../../System.Threading/types/Thread.html#Abort(System.Object)">Thread.Abort</a>
+              request.
+            </TD>
+<TD>
+              Stopped
+            </TD>
+</TR>
+<TR valign="top">
+<TD>
+              A thread is terminated.
+            </TD>
+<TD>
+              Stopped
+            </TD>
+</TR>
+</table>
+<p> In addition to the states noted above, there is also the <b>Background</b> state, which indicates whether the thread is running in the background or foreground.</p>
+<p> A thread can be in more than one state at a given time. For example, if a thread is blocked on a call to  <a href="../../System.Threading/types/Monitor.html#Wait(System.Object,System.Int32,System.Boolean)">Monitor.Wait</a>, and another thread calls  <a href="../../System.Threading/types/Thread.html#Abort(System.Object)">Thread.Abort</a> on the blocked thread, the blocked thread will be in both the <b>WaitSleepJoin</b> and the <b>AbortRequested</b> states at the same time. In this case, as soon as the thread returns from the call to  <a href="../../System.Threading/types/Monitor.html#Wait(System.Object,System.Int32,System.Boolean)">Monitor.Wait</a> or is interrupted, it will receive the  <a href="../../System.Threading/types/ThreadAbortException.html">ThreadAbortException</a> to begin aborting.</p>
+<p> The  <a href="../../System.Threading/types/Thread.html#ThreadState">Thread.ThreadState</a> property of a thread provides the current state of a thread. Applications must use a bitmask to determine whether a thread is running. Since the value for <b>Running</b> is zero (0), test if a thread is running by using code such as <code>
+            ((threadState
+            &amp; (Stopped | Unstarted)) == 0
+          </code>.</p>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Threading/System.Threading.html">System.Threading Namespace</a> |  <a href="../../System.Threading/types/Thread.html">Thread</a> | <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpguide/html/cpconManagedUnmanagedThreading.asp">MSDN: managedunmanagedthreading</a></dd>
+</dl>
+<h3>System.Threading.ThreadState Member List: </h3>
+<dl>
+<dt><b>Public Fields</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><b>Aborted</b></td>
+<td width="55%"> The thread is in the <b>Stopped</b> state.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>AbortRequested</b></td>
+<td width="55%"> The  <a href="../../System.Threading/types/Thread.html#Abort(System.Object)">Thread.Abort</a> method has been invoked on the thread, but the thread has not yet received the pending  <a href="../../System.Threading/types/ThreadAbortException.html">ThreadAbortException</a> that will attempt to terminate it.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>Background</b></td>
+<td width="55%"> The thread is being executed as a background thread, as opposed to a foreground thread. This state is controlled by setting the  <a href="../../System.Threading/types/Thread.html#IsBackground">Thread.IsBackground</a> property.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>Running</b></td>
+<td width="55%"> The thread has been started, it is not blocked, and there is no pending  <a href="../../System.Threading/types/ThreadAbortException.html">ThreadAbortException</a>.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>Stopped</b></td>
+<td width="55%"> The thread has stopped.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>StopRequested</b></td>
+<td width="55%"> The thread is being requested to stop. This is for internal use only.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>Suspended</b></td>
+<td width="55%"> The thread has been suspended.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>SuspendRequested</b></td>
+<td width="55%"> The thread is being requested to suspend.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>Unstarted</b></td>
+<td width="55%"> The  <a href="../../System.Threading/types/Thread.html#Start">Thread.Start</a> method has not been invoked on the thread.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><b>WaitSleepJoin</b></td>
+<td width="55%"> The thread is blocked as a result of a call to  <a href="../../System.Threading/types/Monitor.html#Wait(System.Object,System.Int32,System.Boolean)">Monitor.Wait</a>,  <a href="../../System.Threading/types/Thread.html#Sleep(System.Int32)">Thread.Sleep</a>, or  <a href="../../System.Threading/types/Thread.html#Join">Thread.Join</a>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/ValueType.html">System.ValueType</a></li>
+<ul class="none">
+<li><a href="../../System/types/Enum.html">System.Enum</a></li>
+<ul class="none">
+<li><b>System.Threading.ThreadState</b></li>
+</ul>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>

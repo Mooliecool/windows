@@ -1,0 +1,452 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../refdoc.css">
+<title>Type: System.Runtime.Remoting.ObjectHandle</title>
+</head>
+<body><a name="TopOfPage"></a><h2>System.Runtime.Remoting.ObjectHandle Class</h2><b>Assembly: </b>Mscorlib.dll<br><b>Namespace: </b>System.Runtime.Remoting<br><dl>
+<dt><b>Summary</b></dt>
+<dd> Wraps marshal by value object references, allowing them to be returned through an indirection.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+        public class ObjectHandle : MarshalByRefObject, IObjectHandle
+      </b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Remarks</b><dl>
+<dd> The  <a href="../../System.Runtime.Remoting/types/ObjectHandle.html">ObjectHandle</a> class is used to pass an object (in a wrapped state) between multiple application domains without loading the metadata for the wrapped object in each  <a href="../../System/types/AppDomain.html">AppDomain</a> through which the  <a href="../../System.Runtime.Remoting/types/ObjectHandle.html">ObjectHandle</a> travels. Thus, the  <a href="../../System.Runtime.Remoting/types/ObjectHandle.html">ObjectHandle</a> class gives the caller control of when the  <a href="../../System/types/Type.html">Type</a> of the remote object is loaded into a domain.</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example shows how to create an object in another  <a href="../../System/types/AppDomain.html">AppDomain</a>, and retrieve a proxy to the object from an  <a href="../../System.Runtime.Remoting/types/ObjectHandle.html">ObjectHandle</a>. In this example, you can assume that the code of the <b>MyType</b> class is compiled into an assembly called "ObjectHandleAssembly".<pre>
+using System;
+using System.Runtime.Remoting;
+
+
+public class MyType : MarshalByRefObject {
+
+   public MyType()  {
+      Console.Write("Created an instance of MyType in an AppDomain with the ");
+      Console.WriteLine("hash code {0}",AppDomain.CurrentDomain.GetHashCode());
+      Console.WriteLine("");
+   }
+
+   public int GetAppDomainHashCode() {
+      return AppDomain.CurrentDomain.GetHashCode();
+   }
+}
+
+
+class Test {
+
+   public static void Main() {
+
+      Console.WriteLine("The hash code of the default AppDomain is {0}.", 
+                        AppDomain.CurrentDomain.GetHashCode());
+      Console.WriteLine("");
+
+      // Creates another AppDomain.
+      AppDomain domain = AppDomain.CreateDomain("AnotherDomain", 
+                                                null, 
+                                                (AppDomainSetup)null);
+
+      // Creates an instance of MyType defined in the assembly called ObjectHandleAssembly.
+      ObjectHandle obj = domain.CreateInstance("ObjectHandleAssembly", "MyType");
+
+      // Unwrapps the proxy to the MyType object created in the other AppDomain.
+      MyType testObj = (MyType)obj.Unwrap();
+
+      if(RemotingServices.IsTransparentProxy(testObj))
+         Console.WriteLine("The unwrapped object is a proxy.");
+      else
+         Console.WriteLine("The unwrapped object is not a proxy!");    
+
+      Console.WriteLine("");
+      Console.Write("Calling a method on the object located in an AppDomain with the hash code ");
+      Console.WriteLine(testObj.GetAppDomainHashCode());
+   }
+}
+
+    </pre>
+</dd>
+</dl><b>See also: </b><dl>
+<dd> <a href="../../System.Runtime.Remoting/System.Runtime.Remoting.html">System.Runtime.Remoting Namespace</a></dd>
+</dl>
+<h3>System.Runtime.Remoting.ObjectHandle Member List: </h3>
+<dl>
+<dt><b>Public Constructors</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#ctor1">ctor #1</a></td>
+<td width="55%"> Initializes an instance of the  <a href="../../System.Runtime.Remoting/types/ObjectHandle.html">ObjectHandle</a> class, wrapping the given object <i>o</i>.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Public Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#CreateObjRef(System.Type)">CreateObjRef</a><br>(inherited from <b>System.MarshalByRefObject)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/MarshalByRefObject.html#CreateObjRef(System.Type)">System.MarshalByRefObject.CreateObjRef</a></font></b><br><br><br> Creates an object that contains all the relevant information required to generate a proxy used to communicate with a remote object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Equals(System.Object)">Equals</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetHashCode">GetHashCode</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetLifetimeService">GetLifetimeService</a><br>(inherited from <b>System.MarshalByRefObject)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/MarshalByRefObject.html#GetLifetimeService">System.MarshalByRefObject.GetLifetimeService</a></font></b><br><br><br> Retrieves the current lifetime service object that controls the lifetime policy for this instance.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#GetType">GetType</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#InitializeLifetimeService">InitializeLifetimeService</a></td>
+<td width="55%"><b>Overridden: </b><br> Initializes the lifetime lease of the wrapped object.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#ToString">ToString</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#Unwrap">Unwrap</a></td>
+<td width="55%"> Returns the wrapped object.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Protected Methods</b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<td width="35%"><a href="#Finalize">Finalize</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+<tr valign="top">
+<td width="35%"><a href="#MemberwiseClone">MemberwiseClone</a><br>(inherited from <b>System.Object)</b></td>
+<td width="55%"><b><font color="#800080">See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b><br><br>Derived from System.Object, the primary base class for all objects.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<p><b>Hierarchy:</b><ul class="none">
+<li><a href="../../System/types/Object.html">System.Object</a></li>
+<ul class="none">
+<li><a href="../../System/types/MarshalByRefObject.html">System.MarshalByRefObject</a></li>
+<ul class="none">
+<li><b>System.Runtime.Remoting.ObjectHandle</b></li>
+</ul>
+</ul>
+</ul>
+</p>
+<hr>
+<h3>System.Runtime.Remoting.ObjectHandle Member Details</h3><b><i><a name=".ctorTopic1"></a><a name="ctor1">ctor #1</a></i></b><b><i></i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes an instance of the  <a href="../../System.Runtime.Remoting/types/ObjectHandle.html">ObjectHandle</a> class, wrapping the given object <i>o</i>.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public ObjectHandle(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>o</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>o</i><br><dl>
+<dd>
+<param> The object that is wrapped by the new  <a href="../../System.Runtime.Remoting/types/ObjectHandle.html">ObjectHandle</a>.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="CreateObjRefTopic1"></a><a name="CreateObjRef(System.Type)">CreateObjRef</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>requestedType</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/MarshalByRefObject.html#CreateObjRef(System.Type)">System.MarshalByRefObject.CreateObjRef</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Creates an object that contains all the relevant information required to generate a proxy used to communicate with a remote object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System.Runtime.Remoting/types/ObjRef.html">ObjRef</a> CreateObjRef(<br>   <font color="#008080"><a href="../../System/types/Type.html">Type</a> <i>requestedType</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><b>Parameters:</b><br><dl>
+<dd>
+<p><i>requestedType</i><br><dl>
+<dd>
+<param> The  <a href="../../System/types/Type.html">Type</a> of the object that the new  <a href="../../System.Runtime.Remoting/types/ObjRef.html">ObjRef</a> will reference.
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> Information required to generate a proxy.</dd>
+</dl>
+<dl>
+<dt><b>Exceptions </b></dt>
+<dd>
+<table border="1" width="90%" style="border-collapse: collapse">
+<tr valign="top">
+<th width="30%">Exception Type</th>
+<th width="60%">Condition</th>
+</tr>
+<tr valign="top">
+<td> <a href="../../System.Runtime.Remoting/types/RemotingException.html">RemotingException</a></td>
+<td> This instance is not a valid remoting object.</td>
+</tr>
+</table>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="EqualsTopic1"></a><a name="Equals(System.Object)">Equals</a></i></b><b><i>(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>)</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Equals(System.Object)">System.Object.Equals</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Boolean.html">bool</a> Equals(<br>   <font color="#008080"><a href="../../System/types/Object.html">object</a> <i>obj</i></font><br>);</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="FinalizeTopic1"></a><a name="Finalize">Finalize</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#Finalize">System.Object.Finalize</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            ~ObjectHandle();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetHashCodeTopic1"></a><a name="GetHashCode">GetHashCode</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetHashCode">System.Object.GetHashCode</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual <a href="../../System/types/Int32.html">int</a> GetHashCode();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetLifetimeServiceTopic1"></a><a name="GetLifetimeService">GetLifetimeService</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/MarshalByRefObject.html#GetLifetimeService">System.MarshalByRefObject.GetLifetimeService</a></font></b></dd>
+</dl><br><dl>
+<dt><b>Summary</b></dt>
+<dd> Retrieves the current lifetime service object that controls the lifetime policy for this instance.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> GetLifetimeService();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An object of type  <a href="../../System.Runtime.Remoting.Lifetime/types/ILease.html">ILease</a> used to control the lifetime policy for this instance.</dd>
+</dl><b>Remarks</b><dl>
+<dd> For more information about lifetime services, see the  <a href="../../System.Runtime.Remoting.Lifetime/types/LifetimeServices.html">LifetimeServices</a> class.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="GetTypeTopic1"></a><a name="GetType">GetType</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#GetType">System.Object.GetType</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Type.html">Type</a> GetType();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Overridden Method: <i><a name="InitializeLifetimeServiceTopic1"></a><a name="InitializeLifetimeService">InitializeLifetimeService</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Initializes the lifetime lease of the wrapped object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public override <a href="../../System/types/Object.html">object</a> InitializeLifetimeService();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> An initialized  <a href="../../System.Runtime.Remoting.Lifetime/types/ILease.html">ILease</a> that allows you to control the lifetime of the wrapped object.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="MemberwiseCloneTopic1"></a><a name="MemberwiseClone">MemberwiseClone</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#MemberwiseClone">System.Object.MemberwiseClone</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            protected <a href="../../System/types/Object.html">object</a> MemberwiseClone();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="ToStringTopic1"></a><a name="ToString">ToString</a></i></b><b><i>()</i></b><dl>
+<dd><b><font color="#800080"> Inherited<br>See base class member description: <a href="../../System/types/Object.html#ToString">System.Object.ToString</a></font></b></dd>
+</dl>
+<dl>
+<dd>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public virtual string ToString();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl><br>For more information on members inherited from System.Object click on the link above.</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite"><b>Method: <i><a name="UnwrapTopic1"></a><a name="Unwrap">Unwrap</a></i></b><b><i>()</i></b><dl>
+<dt><b>Summary</b></dt>
+<dd> Returns the wrapped object.</dd>
+</dl>
+<dl>
+<dt><b>C# Syntax:</b></dt>
+<dd>
+<table border="1" class="syntax" width="90%" style="border-collapse: collapse">
+<tr>
+<td><code><b>
+            public <a href="../../System/types/Object.html">object</a> Unwrap();</b></code></td>
+</tr>
+</table>
+</dd>
+</dl>
+<dl>
+<dt><b>Return Value: </b></dt>
+<dd> The wrapped object.</dd>
+</dl>
+<dl>
+<dt><b>Implements: </b></dt>
+<dd> <a href="../../System.Runtime.Remoting/types/IObjectHandle.html#Unwrap">IObjectHandle.Unwrap</a></dd>
+</dl><b>Remarks</b><dl>
+<dd> An  <a href="../../System.Runtime.Remoting/types/ObjectHandle.html">ObjectHandle</a> is a remoted  <a href="../../System/types/MarshalByRefObject.html">MarshalByRefObject</a> that is tracked by the remoting lifetime service. A call to the current method can fail if the lifetime lease on the  <a href="../../System.Runtime.Remoting/types/ObjectHandle.html">ObjectHandle</a> expires.</dd>
+</dl><b>Example</b><dl>
+<dd> The following code example demonstrates how to activate an object in another  <a href="../../System/types/AppDomain.html">AppDomain</a>, retrieve a proxy to it with the  <a href="#Unwrap">ObjectHandle.Unwrap</a> method, and use the proxy to access the remote object.<pre>
+      // Creates an instance of MyType defined in the assembly called ObjectHandleAssembly.
+      ObjectHandle obj = domain.CreateInstance("ObjectHandleAssembly", "MyType");
+
+      // Unwrapps the proxy to the MyType object created in the other AppDomain.
+      MyType testObj = (MyType)obj.Unwrap();
+
+      if(RemotingServices.IsTransparentProxy(testObj))
+         Console.WriteLine("The unwrapped object is a proxy.");
+      else
+         Console.WriteLine("The unwrapped object is not a proxy!");    
+
+      Console.WriteLine("");
+      Console.Write("Calling a method on the object located in an AppDomain with the hash code ");
+      Console.WriteLine(testObj.GetAppDomainHashCode());
+
+    </pre>
+</dd>
+</dl>
+<h4 align="center"><a href="#TopOfPage" class="top">
+						Return to top
+					</a></h4>
+<hr class="lite">
+<h3 align="center"><a href="#TopOfPage">
+					Top of page
+				</a></h3><i><a href="../../documentation_license.txt">
+				  Copyright (c) 2002 Microsoft Corporation.  All rights reserved.
+				</a></i></body>
+</html>
